@@ -205,18 +205,6 @@ CHANNEL_LAYERS = {
     }
 }
 
-# Security Settings
-if not DEBUG:
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-
 # Render.com specific settings
 RENDER = os.getenv('RENDER', 'False').lower() == 'true'
 if RENDER:
@@ -226,3 +214,17 @@ if RENDER:
         ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
         # Allow CORS from any origin in production (you can restrict this later)
         CORS_ALLOW_ALL_ORIGINS = True
+
+# Security Settings
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    # Don't force SSL redirect on Render - Render's proxy handles HTTPS
+    if not RENDER:
+        SECURE_SSL_REDIRECT = True
+        SESSION_COOKIE_SECURE = True
+        CSRF_COOKIE_SECURE = True
+        SECURE_HSTS_SECONDS = 31536000
+        SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+        SECURE_HSTS_PRELOAD = True
