@@ -1,0 +1,211 @@
+/* Gradient Applied Modal Styles */
+
+.gradient-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.gradient-modal-content {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: modalSlideScale 0.3s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  margin: auto;
+}
+
+.gradient-modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gradient-modal-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-align: center;
+}
+
+.gradient-modal-body {
+  padding: 1.5rem;
+}
+
+.gradient-modal-preview {
+  width: 100%;
+  height: 80px;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.gradient-modal-message {
+  color: #e0e0e0;
+  font-size: 1rem;
+  text-align: center;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+.gradient-modal-instructions {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.gradient-modal-instructions h4 {
+  margin: 0 0 0.75rem 0;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.gradient-modal-instructions ul {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.gradient-modal-instructions li {
+  color: #d0d0d0;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.gradient-modal-instructions li:last-child {
+  margin-bottom: 0;
+}
+
+.gradient-modal-instructions strong {
+  color: #ffffff;
+}
+
+.gradient-modal-tip {
+  background: rgba(139, 92, 246, 0.15);
+  border-left: 3px solid #8b5cf6;
+  padding: 0.75rem;
+  border-radius: 6px;
+  color: #e0d0ff;
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.gradient-modal-tip strong {
+  color: #ffffff;
+}
+
+.gradient-modal-footer {
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.gradient-modal-button {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.gradient-modal-button:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+}
+
+.gradient-modal-button:active {
+  transform: translateY(0);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .gradient-modal-content {
+    max-width: 95%;
+    margin: 1rem;
+  }
+  
+  .gradient-modal-title {
+    font-size: 1.25rem;
+  }
+  
+  .gradient-modal-preview {
+    height: 60px;
+  }
+  
+  .gradient-modal-message {
+    font-size: 0.95rem;
+  }
+  
+  .gradient-modal-instructions {
+    padding: 0.875rem;
+  }
+  
+  .gradient-modal-instructions h4 {
+    font-size: 0.9rem;
+  }
+  
+  .gradient-modal-instructions li {
+    font-size: 0.85rem;
+  }
+  
+  .gradient-modal-tip {
+    font-size: 0.85rem;
+    padding: 0.625rem;
+  }
+  
+  .gradient-modal-button {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* Dark mode support (already dark, but for consistency) */
+@media (prefers-color-scheme: dark) {
+  .gradient-modal-content {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  }
+}

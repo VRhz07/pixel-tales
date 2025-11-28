@@ -1,0 +1,237 @@
+/* Add Relationship Modal - Purple Theme */
+
+.add-relationship-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 100;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.add-relationship-modal-container {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  width: 100%;
+  animation: slideUp 0.3s ease-out;
+  border: 1px solid #e5e7eb;
+}
+
+.dark .add-relationship-modal-container {
+  background: #2d2550;
+  border-color: transparent;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.add-relationship-modal-header {
+  padding: 24px 28px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dark .add-relationship-modal-header {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+.add-relationship-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.dark .add-relationship-modal-title {
+  color: #F9FAFB;
+}
+
+.add-relationship-modal-close-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F3F4F6;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #6B7280;
+}
+
+.dark .add-relationship-modal-close-btn {
+  background: #3d3a5a;
+  color: #d1d5db;
+}
+
+.add-relationship-modal-close-btn:hover {
+  background: #e5e7eb;
+  transform: rotate(90deg);
+}
+
+.dark .add-relationship-modal-close-btn:hover {
+  background: #4d4a6a;
+}
+
+.add-relationship-modal-body {
+  padding: 24px 28px;
+}
+
+.add-relationship-form-field {
+  margin-bottom: 20px;
+}
+
+.add-relationship-form-field:last-child {
+  margin-bottom: 0;
+}
+
+.add-relationship-form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.dark .add-relationship-form-label {
+  color: #D1D5DB;
+}
+
+.add-relationship-form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 14px;
+  background: white;
+  color: #111827;
+  transition: all 0.2s ease;
+}
+
+.dark .add-relationship-form-input {
+  background: #1e1b3d;
+  border-color: transparent;
+  color: #f9fafb;
+}
+
+.add-relationship-form-input:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.add-relationship-form-hint {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.dark .add-relationship-form-hint {
+  color: #9CA3AF;
+}
+
+.add-relationship-modal-footer {
+  padding: 20px 28px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.dark .add-relationship-modal-footer {
+  border-top-color: rgba(255, 255, 255, 0.05);
+}
+
+.add-relationship-cancel-btn {
+  padding: 10px 20px;
+  background: #f3f4f6;
+  color: #6b7280;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dark .add-relationship-cancel-btn {
+  background: #3d3a5a;
+  color: #d1d5db;
+}
+
+.add-relationship-cancel-btn:hover {
+  background: #e5e7eb;
+}
+
+.dark .add-relationship-cancel-btn:hover {
+  background: #4d4a6a;
+}
+
+.add-relationship-save-btn {
+  padding: 10px 20px;
+  background: #8b5cf6;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-relationship-save-btn:hover:not(:disabled) {
+  background: #7c3aed;
+  transform: translateY(-1px);
+}
+
+.add-relationship-save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .add-relationship-modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .add-relationship-modal-container {
+    border-radius: 24px 24px 0 0;
+    animation: slideUpMobile 0.3s ease-out;
+  }
+
+  @keyframes slideUpMobile {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .add-relationship-modal-header,
+  .add-relationship-modal-body,
+  .add-relationship-modal-footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}

@@ -1,0 +1,563 @@
+{
+    "designSystem": {
+      "name": "Imaginary Worlds Canvas Drawing Page",
+      "type": "creative_drawing_interface",
+      "framework": "react_typescript_tailwind",
+      "layout": "responsive_orientation_aware_canvas"
+    },
+    "colorPalette": {
+      "primary": {
+        "purple": "#8B5CF6",
+        "purpleDark": "#7C3AED",
+        "purpleLight": "#A78BFA"
+      },
+      "dark": {
+        "background": "#000000",
+        "surface": "#1F2937",
+        "surfaceLight": "#374151",
+        "surfaceDark": "#111827"
+      },
+      "neutral": {
+        "white": "#FFFFFF",
+        "gray800": "#1F2937",
+        "gray700": "#374151",
+        "gray600": "#4B5563",
+        "gray500": "#6B7280",
+        "gray400": "#9CA3AF"
+      },
+      "accent": {
+        "red": "#EF4444",
+        "redDark": "#DC2626"
+      },
+      "backgrounds": {
+        "page": "#000000",
+        "canvas": "#FFFFFF",
+        "toolbar": "#1F2937"
+      }
+    },
+    "elementStyling": {
+      "pageContainer": {
+        "background": "bg-black",
+        "padding": "p-0",
+        "minHeight": "min-h-screen",
+        "height": "h-screen",
+        "overflow": "overflow-hidden",
+        "context": "Full screen dark background - no scrolling"
+      },
+      "layoutOrientation": {
+        "portrait": {
+          "structure": "Canvas (top) + Toolbar (bottom)",
+          "canvasArea": "Main drawing area taking most of vertical space",
+          "toolbarPosition": "Fixed bottom horizontal toolbar",
+          "context": "Vertical layout for portrait screens"
+        },
+        "landscape": {
+          "structure": "Canvas (center) + Toolbar (right side)",
+          "canvasArea": "Main drawing area taking most of horizontal space",
+          "toolbarPosition": "Fixed right vertical toolbar",
+          "context": "Horizontal layout for landscape screens"
+        }
+      },
+      "canvasArea": {
+        "portrait": {
+          "container": {
+            "display": "flex items-center justify-center",
+            "padding": "p-4 pb-24",
+            "height": "h-full",
+            "context": "Canvas container - portrait mode with bottom padding for toolbar"
+          },
+          "canvas": {
+            "background": "bg-white",
+            "borderRadius": "rounded-2xl",
+            "shadow": "shadow-2xl",
+            "maxWidth": "max-w-full",
+            "aspectRatio": "aspect-square",
+            "context": "White square canvas with rounded corners"
+          }
+        },
+        "landscape": {
+          "container": {
+            "display": "flex items-center justify-center",
+            "padding": "p-4 pr-24",
+            "height": "h-full",
+            "context": "Canvas container - landscape mode with right padding for toolbar"
+          },
+          "canvas": {
+            "background": "bg-white",
+            "borderRadius": "rounded-2xl",
+            "shadow": "shadow-2xl",
+            "maxHeight": "max-h-full",
+            "aspectRatio": "aspect-square",
+            "context": "White square canvas with rounded corners"
+          }
+        }
+      },
+      "toolbar": {
+        "portrait": {
+          "container": {
+            "background": "bg-gray-800",
+            "borderRadius": "rounded-t-2xl",
+            "padding": "px-4 py-3",
+            "position": "fixed bottom-0 left-0 right-0",
+            "shadow": "shadow-lg",
+            "context": "Bottom toolbar - horizontal layout"
+          },
+          "toolGrid": {
+            "display": "flex items-center justify-center",
+            "spacing": "space-x-2",
+            "context": "Horizontal tool arrangement"
+          }
+        },
+        "landscape": {
+          "container": {
+            "background": "bg-gray-800",
+            "borderRadius": "rounded-l-2xl",
+            "padding": "px-3 py-4",
+            "position": "fixed top-0 right-0 bottom-0",
+            "shadow": "shadow-lg",
+            "width": "w-20",
+            "context": "Right sidebar toolbar - vertical layout"
+          },
+          "toolGrid": {
+            "display": "flex flex-col items-center",
+            "spacing": "space-y-2",
+            "context": "Vertical tool arrangement"
+          }
+        }
+      },
+      "toolButtons": {
+        "default": {
+          "background": "bg-gray-700",
+          "color": "text-gray-300",
+          "borderRadius": "rounded-xl",
+          "padding": "p-3",
+          "width": "w-12",
+          "height": "h-12",
+          "display": "flex items-center justify-center",
+          "hover": "hover:bg-gray-600",
+          "transition": "transition-colors",
+          "context": "Default tool button - dark gray"
+        },
+        "active": {
+          "background": "bg-purple-500",
+          "color": "text-white",
+          "borderRadius": "rounded-xl",
+          "padding": "p-3",
+          "width": "w-12",
+          "height": "h-12",
+          "display": "flex items-center justify-center",
+          "shadow": "shadow-lg shadow-purple-500/50",
+          "context": "Active tool button - purple with glow"
+        },
+        "destructive": {
+          "background": "bg-gray-700",
+          "color": "text-red-500",
+          "borderRadius": "rounded-xl",
+          "padding": "p-3",
+          "width": "w-12",
+          "height": "h-12",
+          "display": "flex items-center justify-center",
+          "hover": "hover:bg-red-900/30",
+          "transition": "transition-colors",
+          "context": "Delete/clear button - red icon"
+        },
+        "large": {
+          "background": "bg-purple-500",
+          "color": "text-white",
+          "borderRadius": "rounded-2xl",
+          "padding": "p-4",
+          "width": "w-16",
+          "height": "h-16",
+          "display": "flex items-center justify-center",
+          "shadow": "shadow-lg",
+          "hover": "hover:bg-purple-600",
+          "context": "Primary action button - larger size (color picker, done)"
+        },
+        "icon": {
+          "size": "h-5 w-5",
+          "context": "Icon size for all toolbar buttons"
+        }
+      },
+      "toolCategories": {
+        "brush": {
+          "tools": ["Soft", "Round", "Pencil", "Marker", "Airbrush"],
+          "icon": "paintbrush icon",
+          "context": "Brush type selection"
+        },
+        "shapes": {
+          "tools": ["Eraser", "Fill bucket", "Square", "Circle", "Line"],
+          "context": "Shape and utility tools"
+        },
+        "actions": {
+          "tools": ["Color picker", "Undo", "Redo", "Delete"],
+          "context": "Action and history tools"
+        },
+        "misc": {
+          "tools": ["Done/Save", "Import characters"],
+          "context": "Completion and content tools"
+        }
+      },
+      "brushMenu": {
+        "container": {
+          "background": "bg-gray-800",
+          "borderRadius": "rounded-xl",
+          "padding": "p-3",
+          "position": "absolute",
+          "shadow": "shadow-xl",
+          "border": "border border-gray-700",
+          "context": "Brush selection popup menu"
+        },
+        "portrait": {
+          "position": "bottom-20 left-1/2 transform -translate-x-1/2",
+          "context": "Above toolbar in portrait mode"
+        },
+        "landscape": {
+          "position": "right-24 top-1/2 transform -translate-y-1/2",
+          "context": "Left of toolbar in landscape mode"
+        },
+        "menuItem": {
+          "default": {
+            "background": "bg-gray-700",
+            "color": "text-gray-300",
+            "padding": "px-4 py-2",
+            "borderRadius": "rounded-lg",
+            "fontSize": "text-sm",
+            "fontWeight": "font-medium",
+            "display": "flex items-center",
+            "spacing": "space-x-2",
+            "hover": "hover:bg-gray-600",
+            "cursor": "cursor-pointer",
+            "context": "Brush menu items"
+          },
+          "active": {
+            "background": "bg-purple-500",
+            "color": "text-white",
+            "padding": "px-4 py-2",
+            "borderRadius": "rounded-lg",
+            "fontSize": "text-sm",
+            "fontWeight": "font-medium",
+            "display": "flex items-center",
+            "spacing": "space-x-2",
+            "context": "Selected brush type"
+          },
+          "checkIcon": {
+            "size": "h-4 w-4",
+            "color": "text-white",
+            "context": "Checkmark for selected item"
+          }
+        }
+      },
+      "characterImportModal": {
+        "overlay": {
+          "background": "bg-black/70",
+          "position": "fixed inset-0",
+          "display": "flex items-center justify-center",
+          "padding": "p-4",
+          "zIndex": "z-50",
+          "context": "Modal overlay with backdrop"
+        },
+        "modal": {
+          "background": "bg-gray-800",
+          "borderRadius": "rounded-2xl",
+          "padding": "p-6",
+          "maxWidth": "max-w-4xl",
+          "width": "w-full",
+          "maxHeight": "max-h-[90vh]",
+          "overflow": "overflow-y-auto",
+          "context": "Character import modal container"
+        },
+        "header": {
+          "display": "flex items-center justify-between",
+          "spacing": "mb-4",
+          "icon": {
+            "size": "h-6 w-6",
+            "color": "text-purple-500",
+            "context": "Character/people icon"
+          },
+          "title": {
+            "color": "text-white",
+            "fontSize": "text-xl",
+            "fontWeight": "font-bold",
+            "context": "Import Characters title"
+          },
+          "closeButton": {
+            "color": "text-gray-400",
+            "hover": "hover:text-white",
+            "context": "X close button"
+          }
+        },
+        "subtitle": {
+          "color": "text-gray-400",
+          "fontSize": "text-sm",
+          "spacing": "mb-4",
+          "context": "Select a character to import... description"
+        },
+        "uploadButton": {
+          "background": "bg-purple-500",
+          "color": "text-white",
+          "borderRadius": "rounded-lg",
+          "padding": "px-4 py-2.5",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "width": "w-full",
+          "display": "flex items-center justify-center",
+          "spacing": "space-x-2",
+          "hover": "hover:bg-purple-600",
+          "spacing_bottom": "mb-6",
+          "context": "Upload New Character button"
+        },
+        "characterGrid": {
+          "display": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+          "spacing": "gap-4",
+          "context": "Responsive character card grid"
+        },
+        "characterCard": {
+          "background": "bg-gray-700",
+          "borderRadius": "rounded-xl",
+          "overflow": "overflow-hidden",
+          "context": "Individual character card"
+        },
+        "characterImage": {
+          "aspectRatio": "aspect-square",
+          "objectFit": "object-cover",
+          "background": "bg-gray-600",
+          "context": "Character preview image"
+        },
+        "characterInfo": {
+          "padding": "p-4",
+          "title": {
+            "color": "text-white",
+            "fontSize": "text-base",
+            "fontWeight": "font-semibold",
+            "spacing": "mb-1",
+            "context": "Character name"
+          },
+          "date": {
+            "color": "text-gray-400",
+            "fontSize": "text-xs",
+            "spacing": "mb-3",
+            "context": "Added date"
+          },
+          "actions": {
+            "display": "flex items-center",
+            "spacing": "space-x-2",
+            "context": "Action buttons row"
+          },
+          "importButton": {
+            "background": "bg-purple-500",
+            "color": "text-white",
+            "borderRadius": "rounded-lg",
+            "padding": "px-3 py-1.5",
+            "fontSize": "text-sm",
+            "fontWeight": "font-medium",
+            "flex": "flex-1",
+            "display": "flex items-center justify-center",
+            "spacing": "space-x-1",
+            "hover": "hover:bg-purple-600",
+            "context": "Import character button"
+          },
+          "deleteButton": {
+            "background": "bg-red-500",
+            "color": "text-white",
+            "borderRadius": "rounded-lg",
+            "padding": "p-2",
+            "hover": "hover:bg-red-600",
+            "context": "Delete character button"
+          }
+        }
+      }
+    },
+    "responsiveBreakpoints": {
+      "orientationDetection": {
+        "portrait": "window.innerHeight > window.innerWidth",
+        "landscape": "window.innerWidth > window.innerHeight",
+        "context": "Detect orientation and adjust layout dynamically"
+      },
+      "mobile": {
+        "portrait": "Toolbar at bottom, tools horizontal",
+        "landscape": "Toolbar at right, tools vertical"
+      },
+      "tablet": {
+        "portrait": "Same as mobile portrait with larger canvas",
+        "landscape": "Same as mobile landscape with larger canvas"
+      },
+      "desktop": {
+        "default": "Toolbar at right, tools vertical (landscape layout)",
+        "context": "Desktop defaults to landscape-style layout"
+      }
+    },
+    "toolOrdering": {
+      "portrait": {
+        "order": [
+          "Brush selector (with popup)",
+          "Eraser",
+          "Fill bucket",
+          "Square",
+          "Circle",
+          "Line",
+          "Color picker (large)",
+          "Undo",
+          "Redo",
+          "Delete"
+        ],
+        "arrangement": "Single horizontal row with scrolling if needed",
+        "context": "Left to right tool arrangement"
+      },
+      "landscape": {
+        "order": [
+          "Brush selector (with popup)",
+          "Eraser",
+          "Fill bucket",
+          "Square",
+          "Circle",
+          "Line",
+          "Color picker (large)",
+          "Undo",
+          "Redo",
+          "Delete",
+          "Done/Save (large, bottom)",
+          "Import characters (bottom)"
+        ],
+        "arrangement": "Vertical column with large buttons at bottom",
+        "context": "Top to bottom tool arrangement"
+      }
+    },
+    "doNotRules": {
+      "layout": [
+        "DO NOT use light background - canvas page must have black background",
+        "DO NOT make toolbar transparent - use solid dark background",
+        "DO NOT place toolbar in same position for all orientations - adapt to portrait/landscape",
+        "DO NOT let canvas exceed screen bounds - maintain padding around edges"
+      ],
+      "colors": [
+        "DO NOT use light colors for toolbar buttons - keep dark theme",
+        "DO NOT style active button without purple - purple is the active state color",
+        "DO NOT use gradients on toolbar or buttons",
+        "DO NOT make delete button red background - only red icon on dark background"
+      ],
+      "canvas": [
+        "DO NOT make canvas anything other than white background",
+        "DO NOT remove rounded corners from canvas",
+        "DO NOT allow canvas to touch screen edges - maintain padding",
+        "DO NOT make canvas rectangular - keep square aspect ratio"
+      ],
+      "buttons": [
+        "DO NOT make all buttons same size - color picker and done are larger",
+        "DO NOT remove glow effect from active tool button",
+        "DO NOT use borders on toolbar buttons - background color changes only",
+        "DO NOT make icons too large or too small - h-5 w-5 is standard"
+      ],
+      "orientation": [
+        "DO NOT keep same layout when orientation changes - must adapt",
+        "DO NOT ignore viewport dimensions - check width vs height",
+        "DO NOT use media queries alone - use JavaScript for accurate orientation detection",
+        "DO NOT animate orientation changes - instant layout switch"
+      ]
+    },
+    "componentMapping": {
+      "CanvasPage": {
+        "baseClass": "h-screen overflow-hidden bg-black"
+      },
+      "CanvasArea": {
+        "portrait": "flex items-center justify-center p-4 pb-24 h-full",
+        "landscape": "flex items-center justify-center p-4 pr-24 h-full"
+      },
+      "Canvas": {
+        "baseClass": "bg-white rounded-2xl shadow-2xl",
+        "portrait": "max-w-full aspect-square",
+        "landscape": "max-h-full aspect-square"
+      },
+      "Toolbar": {
+        "portrait": "fixed bottom-0 left-0 right-0 bg-gray-800 rounded-t-2xl px-4 py-3 shadow-lg",
+        "landscape": "fixed top-0 right-0 bottom-0 w-20 bg-gray-800 rounded-l-2xl px-3 py-4 shadow-lg"
+      },
+      "ToolGrid": {
+        "portrait": "flex items-center justify-center space-x-2",
+        "landscape": "flex flex-col items-center space-y-2"
+      },
+      "ToolButton": {
+        "default": "bg-gray-700 text-gray-300 rounded-xl p-3 w-12 h-12 flex items-center justify-center hover:bg-gray-600 transition-colors",
+        "active": "bg-purple-500 text-white rounded-xl p-3 w-12 h-12 flex items-center justify-center shadow-lg shadow-purple-500/50",
+        "large": "bg-purple-500 text-white rounded-2xl p-4 w-16 h-16 flex items-center justify-center shadow-lg hover:bg-purple-600"
+      },
+      "BrushMenu": {
+        "container": "bg-gray-800 rounded-xl p-3 absolute shadow-xl border border-gray-700",
+        "item": "bg-gray-700 text-gray-300 px-4 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 hover:bg-gray-600 cursor-pointer",
+        "activeItem": "bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center space-x-2"
+      },
+      "CharacterModal": {
+        "overlay": "fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50",
+        "container": "bg-gray-800 rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto",
+        "characterGrid": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4",
+        "characterCard": "bg-gray-700 rounded-xl overflow-hidden"
+      }
+    },
+    "interactionPatterns": {
+      "orientationChange": {
+        "detection": "Listen to window resize and orientation change events",
+        "behavior": "Instantly switch between portrait and landscape layouts",
+        "canvasState": "Preserve canvas drawing during orientation changes",
+        "context": "Seamless layout adaptation"
+      },
+      "brushSelection": {
+        "trigger": "Click/tap brush tool button",
+        "behavior": "Open popup menu with brush types",
+        "selection": "Click brush type, menu closes, tool activates",
+        "position": "Menu appears above toolbar (portrait) or left of toolbar (landscape)",
+        "context": "Brush type selection flow"
+      },
+      "drawing": {
+        "tools": "Touch or mouse interaction on canvas",
+        "activeState": "Selected tool button shows purple background with glow",
+        "feedback": "Real-time drawing with selected brush/tool",
+        "context": "Canvas drawing interactions"
+      },
+      "characterImport": {
+        "trigger": "Click/tap character import button",
+        "behavior": "Open modal with character library",
+        "import": "Select character to place on canvas",
+        "context": "Add pre-made characters to drawing"
+      },
+      "historyActions": {
+        "undo": "Revert last drawing action",
+        "redo": "Restore undone action",
+        "clear": "Clear entire canvas with confirmation",
+        "context": "Drawing history management"
+      }
+    },
+    "stateManagement": {
+      "orientation": {
+        "current": "portrait | landscape",
+        "detection": "Window dimensions comparison",
+        "context": "Track current orientation"
+      },
+      "activeTool": {
+        "type": "brush | eraser | fill | square | circle | line",
+        "brushType": "soft | round | pencil | marker | airbrush (if brush selected)",
+        "context": "Currently selected drawing tool"
+      },
+      "canvasState": {
+        "drawingData": "Canvas drawing history/layers",
+        "color": "Currently selected color",
+        "history": "Undo/redo stack",
+        "context": "Canvas data management"
+      },
+      "uiStates": {
+        "brushMenuOpen": "Boolean for brush selection popup",
+        "characterModalOpen": "Boolean for character import modal",
+        "context": "UI overlay states"
+      }
+    },
+    "accessibility": {
+      "toolLabels": "ARIA labels for all tool buttons",
+      "keyboardShortcuts": "Keyboard shortcuts for common tools (B=brush, E=eraser, etc.)",
+      "touchOptimization": "Buttons sized for touch targets (min 48x48px)",
+      "orientationAnnouncement": "Screen reader announces orientation change"
+    },
+    "performanceConsiderations": {
+      "canvasRendering": "Use HTML5 Canvas or WebGL for drawing performance",
+      "orientationDebounce": "Debounce orientation change events to avoid excessive re-renders",
+      "toolSwitching": "Instant tool switching without animations",
+      "modalLazyLoad": "Load character images on modal open"
+    }
+  }

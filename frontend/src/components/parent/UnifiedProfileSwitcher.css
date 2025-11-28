@@ -1,0 +1,604 @@
+/* Unified Profile Switcher - Compact Mode (Dropdown) */
+.unified-switcher {
+  position: relative;
+  z-index: 100;
+}
+
+.unified-switcher-trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px 8px 8px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+/* Dark mode trigger (explicit) - parent dashboard context */
+.parent-dashboard.dark .unified-switcher-trigger,
+.dark .unified-switcher-trigger {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Light mode styles for trigger */
+.parent-dashboard:not(.dark) .unified-switcher-trigger,
+:not(.dark) .unified-switcher-trigger {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+/* Dark mode hover for trigger */
+.parent-dashboard.dark .unified-switcher-trigger:hover,
+.dark .unified-switcher-trigger:hover {
+  background: #2a2a2a !important;
+  border-color: #8B5CF6 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+/* Light mode hover for trigger */
+.parent-dashboard:not(.dark) .unified-switcher-trigger:hover,
+:not(.dark) .unified-switcher-trigger:hover {
+  background: #f9fafb;
+  border-color: #8B5CF6;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+.unified-switcher-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.unified-switcher-avatar svg {
+  width: 20px;
+  height: 20px;
+}
+
+.unified-switcher-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+/* Dark mode name color (explicit) - parent dashboard context */
+.parent-dashboard.dark .unified-switcher-name,
+.dark .unified-switcher-name {
+  color: #ffffff !important;
+}
+
+/* Light mode name color */
+.parent-dashboard:not(.dark) .unified-switcher-name,
+:not(.dark) .unified-switcher-name {
+  color: #1f2937;
+}
+
+.unified-switcher-icon {
+  width: 20px;
+  height: 20px;
+  color: #9CA3AF;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+/* Dark mode icon color (explicit) */
+.dark .unified-switcher-icon {
+  color: #9CA3AF;
+}
+
+/* Light mode icon color */
+:not(.dark) .unified-switcher-icon {
+  color: #6b7280;
+}
+
+.unified-switcher-icon.open {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.unified-switcher-dropdown {
+  position: fixed;
+  top: 70px; /* Below the top bar */
+  right: 20px;
+  bottom: 100px; /* Space for bottom nav bar */
+  width: 450px;
+  max-width: calc(100vw - 40px);
+  overflow: hidden; /* Prevent main container scroll */
+  background: #1a1a1a;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  padding: 16px;
+  animation: dropdownSlide 0.2s ease;
+  z-index: 1000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Light mode dropdown */
+:not(.dark) .unified-switcher-dropdown {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Dark mode dropdown (explicit) */
+.dark .unified-switcher-dropdown {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Custom scrollbar for dropdown */
+.unified-switcher-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.unified-switcher-dropdown::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+/* Light mode scrollbar track */
+:not(.dark) .unified-switcher-dropdown::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.unified-switcher-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.5);
+  border-radius: 10px;
+}
+
+.unified-switcher-dropdown::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.7);
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.unified-switcher-section {
+  padding: 12px 0;
+}
+
+.unified-switcher-section:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 12px;
+}
+
+/* Light mode section borders */
+:not(.dark) .unified-switcher-section:not(:last-child) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.unified-switcher-section.scrollable {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  padding-right: 4px; /* Space for scrollbar */
+}
+
+/* Scrollbar for the scrollable section */
+.unified-switcher-section.scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.unified-switcher-section.scrollable::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+}
+
+/* Light mode scrollbar track for scrollable section */
+:not(.dark) .unified-switcher-section.scrollable::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.unified-switcher-section.scrollable::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.4);
+  border-radius: 10px;
+}
+
+.unified-switcher-section.scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.6);
+}
+
+.unified-switcher-section.actions {
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
+.unified-switcher-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 4px 12px;
+  margin-bottom: 8px;
+}
+
+/* Dark mode section title (explicit) */
+.parent-dashboard.dark .unified-switcher-section-title,
+.dark .unified-switcher-section-title {
+  color: #9CA3AF !important;
+}
+
+/* Light mode section title */
+.parent-dashboard:not(.dark) .unified-switcher-section-title,
+:not(.dark) .unified-switcher-section-title {
+  color: #6b7280;
+}
+
+.unified-switcher-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+
+/* Grid layout for child profiles */
+.unified-switcher-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  padding: 4px;
+}
+
+.unified-switcher-grid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.03);
+  text-align: center;
+}
+
+/* Light mode grid item */
+:not(.dark) .unified-switcher-grid-item {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.unified-switcher-grid-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(139, 92, 246, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+}
+
+/* Light mode grid item hover */
+:not(.dark) .unified-switcher-grid-item:hover {
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.unified-switcher-grid-item .unified-switcher-item-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  font-size: 32px;
+  margin: 0;
+}
+
+.unified-switcher-grid-item .unified-switcher-item-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  text-align: center;
+}
+
+/* Dark mode grid item name (explicit) */
+.parent-dashboard.dark .unified-switcher-grid-item .unified-switcher-item-name,
+.dark .unified-switcher-grid-item .unified-switcher-item-name {
+  color: #ffffff !important;
+}
+
+/* Light mode grid item name */
+.parent-dashboard:not(.dark) .unified-switcher-grid-item .unified-switcher-item-name,
+:not(.dark) .unified-switcher-grid-item .unified-switcher-item-name {
+  color: #1f2937;
+}
+
+.unified-switcher-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Light mode item hover */
+:not(.dark) .unified-switcher-item:hover {
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.unified-switcher-item.current {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%);
+  cursor: default;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+/* Light mode current item */
+:not(.dark) .unified-switcher-item.current {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.unified-switcher-item.current:hover {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%);
+}
+
+/* Light mode current item hover */
+:not(.dark) .unified-switcher-item.current:hover {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%);
+}
+
+.unified-switcher-item.view-all {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  justify-content: space-between;
+}
+
+/* Light mode view-all */
+:not(.dark) .unified-switcher-item.view-all {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+}
+
+.unified-switcher-item.view-all:hover {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: #8B5CF6;
+}
+
+.unified-switcher-item-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.unified-switcher-item-avatar svg {
+  width: 20px;
+  height: 20px;
+}
+
+.unified-switcher-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.unified-switcher-item-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* Dark mode item name (explicit) */
+.parent-dashboard.dark .unified-switcher-item-name,
+.dark .unified-switcher-item-name {
+  color: #ffffff !important;
+}
+
+/* Light mode item name */
+.parent-dashboard:not(.dark) .unified-switcher-item-name,
+:not(.dark) .unified-switcher-item-name {
+  color: #1f2937;
+}
+
+.unified-switcher-item-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #8B5CF6;
+  background: #F3E8FF;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+}
+
+/* Dark mode badge */
+.dark .unified-switcher-item-badge {
+  color: #C4B5FD;
+  background: rgba(139, 92, 246, 0.2);
+}
+
+.unified-switcher-item-meta {
+  font-size: 12px;
+  color: #9CA3AF;
+}
+
+/* Light mode item meta */
+:not(.dark) .unified-switcher-item-meta {
+  color: #6b7280;
+}
+
+.unified-switcher-check {
+  font-size: 18px;
+  color: #8B5CF6;
+  font-weight: 700;
+}
+
+/* Ensure check is visible in both modes */
+.dark .unified-switcher-check {
+  color: #A78BFA;
+}
+
+:not(.dark) .unified-switcher-check {
+  color: #8B5CF6;
+}
+
+/* Action Buttons */
+.unified-switcher-action {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  font-family: inherit;
+}
+
+/* Light mode action button */
+:not(.dark) .unified-switcher-action {
+  color: #1f2937;
+}
+
+.unified-switcher-action svg {
+  width: 20px;
+  height: 20px;
+  color: #9CA3AF;
+}
+
+/* Light mode action icon */
+:not(.dark) .unified-switcher-action svg {
+  color: #6b7280;
+}
+
+.unified-switcher-action:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Light mode action hover */
+:not(.dark) .unified-switcher-action:hover {
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.unified-switcher-action.danger {
+  color: #EF4444;
+}
+
+.unified-switcher-action.danger svg {
+  color: #EF4444;
+}
+
+.unified-switcher-action.danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .unified-switcher-dropdown {
+    width: 400px;
+  }
+  
+  .unified-switcher-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  
+  .unified-switcher-grid-item .unified-switcher-item-avatar {
+    width: 70px;
+    height: 70px;
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .unified-switcher-dropdown {
+    width: 350px;
+    right: 10px;
+    top: 60px;
+    bottom: 90px; /* More space for mobile bottom nav */
+  }
+  
+  .unified-switcher-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .unified-switcher-name {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .unified-switcher-trigger {
+    padding: 8px 12px 8px 8px;
+  }
+
+  .unified-switcher-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .unified-switcher-name {
+    display: block; /* Keep name visible on mobile */
+    font-size: 14px;
+  }
+  
+  .unified-switcher-icon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .unified-switcher-dropdown {
+    width: calc(100vw - 20px);
+    right: 10px;
+    left: 10px;
+    top: 60px;
+    bottom: 80px; /* Space for bottom nav on mobile */
+  }
+  
+  .unified-switcher-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .unified-switcher-grid-item {
+    padding: 16px 8px;
+  }
+  
+  .unified-switcher-grid-item .unified-switcher-item-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+  
+  .unified-switcher-grid-item .unified-switcher-item-name {
+    font-size: 13px;
+  }
+}

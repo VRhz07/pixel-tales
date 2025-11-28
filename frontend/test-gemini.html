@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Gemini API</title>
+</head>
+<body>
+    <h1>Gemini API Model Tester</h1>
+    <button onclick="testModels()">Test Available Models</button>
+    <div id="results" style="margin-top: 20px; white-space: pre-wrap;"></div>
+
+    <script>
+        const API_KEY = 'AIzaSyDZ5fzoP5fy03Y4NibRGL_XG2SzpTXvZR8';
+        
+        async function testModels() {
+            const results = document.getElementById('results');
+            results.innerHTML = 'Testing models...\n\n';
+            
+            // Test 1: List available models
+            try {
+                results.innerHTML += '1. Fetching available models from v1beta...\n';
+                const listResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${API_KEY}`);
+                results.innerHTML += `Status: ${listResponse.status}\n`;
+                
+                if (listResponse.ok) {
+                    const listData = await listResponse.json();
+                    results.innerHTML += `✅ SUCCESS! Available models:\n`;
+                    
+                    if (listData.models && listData.models.length > 0) {
+                        listData.models.forEach(model => {
+                            results.innerHTML += `  - ${model.name}\n`;
+                            results.innerHTML += `    Supports: ${model.supportedGenerationMethods?.join(', ') || 'N/A'}\n`;
+                        });
+                    } else {
+                        results.innerHTML += `No models found in response\n`;
+                    }
+                    results.innerHTML += `\nFull Response: ${JSON.stringify(listData, null, 2)}\n\n`;
+                } else {
+                    const errorData = await listResponse.json();
+                    results.innerHTML += `❌ Failed to list models\n`;
+                    results.innerHTML += `Error: ${JSON.stringify(errorData, null, 2)}\n\n`;
+                }
+            } catch (error) {
+                results.innerHTML += `❌ Error listing models: ${error.message}\n\n`;
+            }
+            
+            // Test 2: Try gemini-pro
+            const modelsToTest = [
+                'gemini-pro',
+                'gemini-1.0-pro',
+                'gemini-1.5-pro',
+                'gemini-1.5-flash'
+            ];
+            
+            for (const model of modelsToTest) {
+                try {
+                    results.innerHTML += `2. Testing model: ${model}...\n`;
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`;
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{ text: 'Say hello' }]
+                            }]
+                        })
+                    });
+                    
+                    results.innerHTML += `   Status: ${response.status}\n`;
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        results.innerHTML += `   ✅ SUCCESS! This model works!\n`;
+                        results.innerHTML += `   Response: ${data.candidates[0].content.parts[0].text}\n\n`;
+                        break; // Found a working model
+                    } else {
+                        const errorData = await response.json();
+                        results.innerHTML += `   ❌ Failed: ${JSON.stringify(errorData)}\n\n`;
+                    }
+                } catch (error) {
+                    results.innerHTML += `   ❌ Error: ${error.message}\n\n`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

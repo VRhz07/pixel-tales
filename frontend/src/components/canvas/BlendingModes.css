@@ -1,0 +1,216 @@
+/* Blending Modes Styles */
+
+.blending-modes {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--cs-surface, #FFFFFF);
+  border-radius: 0.75rem;
+  width: 100%;
+}
+
+/* Current Mode Display */
+.bm-current-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bm-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--cs-text-secondary, #6B7280);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bm-current-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  background: var(--cs-bg-darker, #F3F4F6);
+  border-radius: 0.5rem;
+}
+
+.bm-current-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--cs-text-primary, #111827);
+}
+
+.bm-current-desc {
+  font-size: 0.75rem;
+  color: var(--cs-text-secondary, #6B7280);
+  line-height: 1.4;
+}
+
+/* Main Preview */
+.bm-preview {
+  position: relative;
+  width: 100%;
+  height: 100px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 2px solid var(--cs-border, #E5E7EB);
+}
+
+.bm-preview-base {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bm-preview-blend {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+}
+
+/* Categories */
+.bm-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bm-category {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bm-category-title {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--cs-text-secondary, #6B7280);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-left: 0.25rem;
+}
+
+.bm-modes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.5rem;
+}
+
+/* Mode Button */
+.bm-mode-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0.5rem;
+  background: var(--cs-bg-darker, #F3F4F6);
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bm-mode-btn:hover {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: var(--cs-purple, #8B5CF6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.bm-mode-btn.active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+  border-color: var(--cs-purple, #8B5CF6);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.bm-mode-preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  border: 1px solid var(--cs-border, #E5E7EB);
+}
+
+.bm-mode-preview-base {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bm-mode-preview-blend {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+}
+
+.bm-mode-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--cs-text-primary, #111827);
+  text-align: center;
+}
+
+/* Dark Mode */
+.dark .blending-modes {
+  background: var(--cs-surface, #1F2937);
+}
+
+.dark .bm-current-display {
+  background: var(--cs-bg-darker, #111827);
+}
+
+.dark .bm-current-name {
+  color: var(--cs-text-primary, #FFFFFF);
+}
+
+.dark .bm-preview {
+  border-color: var(--cs-border, #374151);
+}
+
+.dark .bm-mode-btn {
+  background: var(--cs-bg-darker, #111827);
+}
+
+.dark .bm-mode-btn:hover {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+.dark .bm-mode-preview {
+  border-color: var(--cs-border, #374151);
+}
+
+.dark .bm-mode-label {
+  color: var(--cs-text-primary, #FFFFFF);
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .blending-modes {
+    padding: 0.75rem;
+  }
+
+  .bm-modes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+
+  .bm-mode-btn {
+    padding: 0.5rem 0.375rem;
+  }
+
+  .bm-mode-label {
+    font-size: 0.625rem;
+  }
+}

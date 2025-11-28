@@ -1,0 +1,419 @@
+{
+  "designSystem": {
+    "name": "Imaginary Worlds Settings",
+    "type": "settings_interface",
+    "framework": "react_typescript_tailwind",
+    "layout": "mobile_first_responsive"
+  },
+  "colorPalette": {
+    "primary": {
+      "purple": "#8B5CF6",
+      "purpleDark": "#7C3AED",
+      "purpleLight": "#A78BFA"
+    },
+    "accent": {
+      "orange": "#FB923C",
+      "orangeLight": "#FED7AA"
+    },
+    "destructive": {
+      "red": "#EF4444",
+      "redDark": "#DC2626",
+      "redLight": "#FCA5A5"
+    },
+    "neutral": {
+      "white": "#FFFFFF",
+      "gray50": "#F9FAFB",
+      "gray100": "#F3F4F6",
+      "gray200": "#E5E7EB",
+      "gray300": "#D1D5DB",
+      "gray400": "#9CA3AF",
+      "gray500": "#6B7280",
+      "gray600": "#4B5563",
+      "gray700": "#374151",
+      "gray800": "#1F2937",
+      "gray900": "#111827"
+    },
+    "backgrounds": {
+      "page": "#F9FAFB",
+      "card": "#FFFFFF",
+      "section": "#FFFFFF"
+    }
+  },
+  "elementStyling": {
+    "pageContainer": {
+      "background": "bg-gray-50",
+      "minHeight": "min-h-screen",
+      "padding": "p-0",
+      "context": "Full page wrapper - light gray background"
+    },
+    "pageHeader": {
+      "container": {
+        "background": "bg-white",
+        "padding": "px-6 py-4",
+        "borderBottom": "border-b border-gray-200",
+        "context": "Page header - white background with bottom border"
+      },
+      "title": {
+        "color": "text-gray-900",
+        "fontSize": "text-2xl",
+        "fontWeight": "font-bold",
+        "context": "Main page title - dark text"
+      },
+      "subtitle": {
+        "color": "text-gray-500",
+        "fontSize": "text-sm",
+        "spacing": "mt-1",
+        "context": "Page subtitle - muted gray"
+      }
+    },
+    "sectionHeaders": {
+      "container": {
+        "background": "bg-white",
+        "padding": "px-6 py-4",
+        "borderBottom": "border-b border-gray-200",
+        "display": "flex items-center",
+        "spacing": "space-x-3",
+        "context": "Section headers with icons - white background"
+      },
+      "icon": {
+        "size": "h-5 w-5",
+        "color": "text-purple-500",
+        "context": "Section icons - purple color only"
+      },
+      "title": {
+        "color": "text-gray-900",
+        "fontSize": "text-lg",
+        "fontWeight": "font-semibold",
+        "context": "Section titles - dark text"
+      }
+    },
+    "settingsCards": {
+      "container": {
+        "background": "bg-white",
+        "border": "border-0",
+        "shadow": "shadow-none",
+        "context": "Settings cards - plain white background, no shadows or borders"
+      },
+      "item": {
+        "container": {
+          "padding": "px-6 py-4",
+          "borderBottom": "border-b border-gray-200 last:border-b-0",
+          "display": "flex items-center justify-between",
+          "context": "Individual setting items with bottom borders"
+        },
+        "leftContent": {
+          "title": {
+            "color": "text-gray-900",
+            "fontSize": "text-base",
+            "fontWeight": "font-medium",
+            "context": "Setting item titles - dark text"
+          },
+          "subtitle": {
+            "color": "text-gray-500",
+            "fontSize": "text-sm",
+            "spacing": "mt-1",
+            "context": "Setting descriptions - muted gray"
+          }
+        }
+      }
+    },
+    "actionButtons": {
+      "primary": {
+        "background": "bg-purple-500",
+        "color": "text-white",
+        "borderRadius": "rounded-lg",
+        "padding": "px-4 py-2",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "border": "border-0",
+        "hover": {
+          "background": "hover:bg-purple-600",
+          "context": "Hover state - darker purple"
+        },
+        "context": "Primary action buttons - solid purple background"
+      },
+      "secondary": {
+        "background": "bg-white",
+        "color": "text-purple-500",
+        "borderRadius": "rounded-lg",
+        "padding": "px-4 py-2",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "border": "border border-purple-200",
+        "hover": {
+          "background": "hover:bg-purple-50",
+          "context": "Hover state - light purple background"
+        },
+        "context": "Secondary buttons - white background with purple border and text"
+      },
+      "toggle": {
+        "background": "bg-white",
+        "color": "text-purple-500",
+        "borderRadius": "rounded-lg",
+        "padding": "px-4 py-2",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "border": "border border-purple-200",
+        "hover": {
+          "background": "hover:bg-purple-50"
+        },
+        "context": "Toggle buttons - same styling as secondary buttons"
+      },
+      "upgrade": {
+        "background": "bg-gradient-to-r from-purple-500 to-purple-600",
+        "color": "text-white",
+        "borderRadius": "rounded-lg",
+        "padding": "px-4 py-2",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "border": "border-0",
+        "hover": {
+          "background": "hover:from-purple-600 hover:to-purple-700",
+          "context": "Hover state - darker purple gradient"
+        },
+        "context": "Upgrade/premium buttons - purple gradient"
+      },
+      "destructive": {
+        "background": "bg-red-500",
+        "color": "text-white",
+        "borderRadius": "rounded-lg",
+        "padding": "px-6 py-3",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "border": "border-0",
+        "width": "w-full",
+        "display": "flex items-center justify-center",
+        "spacing": "space-x-2",
+        "hover": {
+          "background": "hover:bg-red-600",
+          "context": "Hover state - darker red"
+        },
+        "context": "Destructive actions - red background, full width"
+      },
+      "signOut": {
+        "background": "bg-white",
+        "color": "text-gray-700",
+        "borderRadius": "rounded-lg",
+        "padding": "px-6 py-3",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "border": "border border-gray-300",
+        "width": "w-full",
+        "display": "flex items-center justify-center",
+        "spacing": "space-x-2",
+        "hover": {
+          "background": "hover:bg-gray-50",
+          "context": "Hover state - light gray background"
+        },
+        "context": "Sign out button - white with gray border, full width"
+      }
+    },
+    "supportSection": {
+      "title": {
+        "color": "text-gray-900",
+        "fontSize": "text-lg",
+        "fontWeight": "font-semibold",
+        "padding": "px-6 py-4",
+        "background": "bg-gray-50",
+        "context": "Support section header - gray background"
+      },
+      "items": {
+        "container": {
+          "background": "bg-white",
+          "padding": "px-6 py-4",
+          "borderBottom": "border-b border-gray-200",
+          "display": "flex items-center justify-between",
+          "context": "Support item containers"
+        },
+        "leftContent": {
+          "display": "flex items-center",
+          "spacing": "space-x-3"
+        },
+        "icon": {
+          "container": {
+            "background": "bg-purple-100",
+            "borderRadius": "rounded-full",
+            "padding": "p-2",
+            "context": "Support icons - light purple circular background"
+          },
+          "helpCenter": {
+            "color": "text-purple-500",
+            "size": "h-4 w-4",
+            "context": "Help center icon - purple question mark"
+          },
+          "contact": {
+            "color": "text-orange-500",
+            "size": "h-4 w-4",
+            "context": "Contact icon - orange speaker/sound icon"
+          }
+        },
+        "title": {
+          "color": "text-gray-900",
+          "fontSize": "text-base",
+          "fontWeight": "font-medium",
+          "context": "Support item titles"
+        },
+        "subtitle": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm",
+          "spacing": "mt-1",
+          "context": "Support item descriptions"
+        },
+        "actionText": {
+          "color": "text-gray-700",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "context": "Action text (Open, Contact) - medium gray"
+        }
+      }
+    },
+    "appInfo": {
+      "container": {
+        "background": "bg-white",
+        "padding": "py-8",
+        "alignment": "text-center",
+        "context": "App info footer section"
+      },
+      "logo": {
+        "size": "h-8 w-8",
+        "color": "text-purple-400",
+        "spacing": "mx-auto mb-2",
+        "context": "App logo - light purple book icon"
+      },
+      "appName": {
+        "color": "text-gray-900",
+        "fontSize": "text-lg",
+        "fontWeight": "font-semibold",
+        "spacing": "mb-1",
+        "context": "App name - dark text"
+      },
+      "version": {
+        "color": "text-gray-500",
+        "fontSize": "text-sm",
+        "spacing": "mb-1",
+        "context": "Version number - muted gray"
+      },
+      "tagline": {
+        "color": "text-gray-500",
+        "fontSize": "text-sm",
+        "display": "flex items-center justify-center",
+        "spacing": "space-x-1",
+        "context": "App tagline with sparkle emoji"
+      }
+    },
+    "buttonIcons": {
+      "size": "h-4 w-4",
+      "color": "text-current",
+      "context": "Icons inside buttons inherit button text color"
+    },
+    "statusIndicators": {
+      "enabled": {
+        "color": "text-green-600",
+        "text": "On",
+        "context": "Enabled status - green text"
+      },
+      "disabled": {
+        "color": "text-gray-500",
+        "text": "Off",
+        "context": "Disabled status - gray text"
+      },
+      "basic": {
+        "color": "text-gray-500",
+        "text": "Basic",
+        "context": "Basic tier indicator - gray text"
+      }
+    }
+  },
+  "layoutPatterns": {
+    "settingsList": {
+      "structure": "Grouped sections with dividers",
+      "itemLayout": "flex justify-between items-center",
+      "spacing": "No gaps between items, borders as dividers",
+      "context": "List-based settings layout"
+    },
+    "actionButtons": {
+      "spacing": "mb-4 for individual buttons",
+      "fullWidth": "w-full for primary actions",
+      "grouping": "Related actions grouped together",
+      "context": "Button layout and spacing"
+    }
+  },
+  "doNotRules": {
+    "backgrounds": [
+      "DO NOT apply gradients to settings cards - use solid white",
+      "DO NOT add shadows to setting items",
+      "DO NOT use colored backgrounds for regular setting items",
+      "ONLY use colored backgrounds for section headers and support icons"
+    ],
+    "borders": [
+      "DO NOT add outer borders to setting cards",
+      "ONLY use bottom borders as item dividers",
+      "DO NOT use thick borders - stick to border-gray-200"
+    ],
+    "colors": [
+      "DO NOT use purple for regular text - only for actions and icons",
+      "DO NOT mix icon colors within same context",
+      "Support icons: purple for help, orange for contact",
+      "DO NOT use gradients except on upgrade buttons"
+    ],
+    "spacing": [
+      "DO NOT add gaps between setting items",
+      "DO NOT use card-like spacing - items should touch borders",
+      "DO NOT add extra padding to button groups"
+    ],
+    "buttons": [
+      "DO NOT use gradients on regular action buttons",
+      "ONLY destructive actions get red styling",
+      "DO NOT make secondary buttons look like primary buttons",
+      "Sign out buttons are neutral, not destructive"
+    ]
+  },
+  "componentMapping": {
+    "SettingsPage": {
+      "baseClass": "min-h-screen bg-gray-50",
+      "headerClass": "bg-white border-b border-gray-200 px-6 py-4"
+    },
+    "SectionHeader": {
+      "baseClass": "bg-white border-b border-gray-200 px-6 py-4 flex items-center space-x-3",
+      "iconClass": "h-5 w-5 text-purple-500",
+      "titleClass": "text-lg font-semibold text-gray-900"
+    },
+    "SettingItem": {
+      "baseClass": "px-6 py-4 border-b border-gray-200 last:border-b-0 flex items-center justify-between bg-white",
+      "titleClass": "text-base font-medium text-gray-900",
+      "subtitleClass": "text-sm text-gray-500 mt-1"
+    },
+    "ActionButton": {
+      "primary": "bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium",
+      "secondary": "bg-white hover:bg-purple-50 text-purple-500 border border-purple-200 px-4 py-2 rounded-lg text-sm font-medium",
+      "destructive": "bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg text-sm font-medium w-full flex items-center justify-center space-x-2"
+    },
+    "SupportItem": {
+      "baseClass": "bg-white px-6 py-4 border-b border-gray-200 flex items-center justify-between",
+      "iconContainer": "bg-purple-100 rounded-full p-2",
+      "contentClass": "flex items-center space-x-3"
+    }
+  },
+  "responsiveBreakpoints": {
+    "mobile": "Container padding reduces to px-4 on small screens",
+    "tablet": "Maintains current layout",
+    "desktop": "Could expand to max-width container"
+  },
+  "stateManagement": {
+    "toggleStates": {
+      "on": "text-green-600",
+      "off": "text-gray-500"
+    },
+    "buttonStates": {
+      "enabled": "Normal button styling",
+      "disabled": "opacity-50 cursor-not-allowed",
+      "loading": "Add spinner, maintain colors"
+    }
+  },
+  "accessibility": {
+    "focusStates": "focus:ring-2 focus:ring-purple-500 focus:ring-offset-2",
+    "semanticStructure": "Use proper headings and landmarks",
+    "colorContrast": "All text meets WCAG AA standards",
+    "interactiveElements": "All buttons and links have proper focus indicators"
+  }
+}

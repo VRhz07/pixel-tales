@@ -1,0 +1,458 @@
+{
+    "designSystem": {
+      "name": "Imaginary Worlds AI Writing Assistant Modal",
+      "type": "ai_assistance_interface",
+      "framework": "react_typescript_tailwind",
+      "layout": "modal_split_pane_editor"
+    },
+    "colorPalette": {
+      "primary": {
+        "purple": "#8B5CF6",
+        "purpleDark": "#7C3AED",
+        "purpleLight": "#A78BFA"
+      },
+      "neutral": {
+        "white": "#FFFFFF",
+        "gray50": "#F9FAFB",
+        "gray100": "#F3F4F6",
+        "gray200": "#E5E7EB",
+        "gray300": "#D1D5DB",
+        "gray400": "#9CA3AF",
+        "gray500": "#6B7280",
+        "gray600": "#4B5563",
+        "gray700": "#374151",
+        "gray800": "#1F2937",
+        "gray900": "#111827"
+      },
+      "backgrounds": {
+        "modal": "#FFFFFF",
+        "overlay": "rgba(0, 0, 0, 0.5)",
+        "textArea": "#F9FAFB"
+      }
+    },
+    "elementStyling": {
+      "modalOverlay": {
+        "background": "bg-black/50",
+        "position": "fixed inset-0",
+        "display": "flex items-center justify-center",
+        "padding": "p-4",
+        "zIndex": "z-50",
+        "context": "Modal backdrop overlay"
+      },
+      "modalContainer": {
+        "background": "bg-white",
+        "borderRadius": "rounded-2xl",
+        "shadow": "shadow-2xl",
+        "maxWidth": "max-w-6xl",
+        "width": "w-full",
+        "maxHeight": "max-h-[90vh]",
+        "display": "flex flex-col",
+        "overflow": "overflow-hidden",
+        "context": "Main modal container"
+      },
+      "modalHeader": {
+        "container": {
+          "padding": "p-6 pb-4",
+          "borderBottom": "border-b border-gray-200",
+          "context": "Modal header section"
+        },
+        "topRow": {
+          "display": "flex items-center justify-between",
+          "spacing": "mb-4",
+          "context": "Title and close button row"
+        },
+        "title": {
+          "display": "flex items-center",
+          "spacing": "space-x-2",
+          "icon": {
+            "size": "h-6 w-6",
+            "color": "text-purple-500",
+            "context": "AI sparkle icon"
+          },
+          "text": {
+            "color": "text-gray-900",
+            "fontSize": "text-xl",
+            "fontWeight": "font-bold",
+            "context": "AI Writing Assistant title"
+          }
+        },
+        "closeButton": {
+          "color": "text-gray-400",
+          "hover": "hover:text-gray-600",
+          "padding": "p-1",
+          "context": "X close button"
+        },
+        "tabBar": {
+          "display": "flex items-center",
+          "spacing": "space-x-2",
+          "context": "Feature selection tabs"
+        },
+        "tab": {
+          "default": {
+            "background": "bg-white",
+            "color": "text-purple-500",
+            "border": "border border-purple-200",
+            "borderRadius": "rounded-lg",
+            "padding": "px-4 py-2",
+            "fontSize": "text-sm",
+            "fontWeight": "font-medium",
+            "display": "flex items-center",
+            "spacing": "space-x-2",
+            "hover": "hover:bg-purple-50",
+            "transition": "transition-colors",
+            "context": "Inactive tab - outline style"
+          },
+          "active": {
+            "background": "bg-purple-500",
+            "color": "text-white",
+            "borderRadius": "rounded-lg",
+            "padding": "px-4 py-2",
+            "fontSize": "text-sm",
+            "fontWeight": "font-medium",
+            "display": "flex items-center",
+            "spacing": "space-x-2",
+            "context": "Active tab - solid purple"
+          },
+          "icon": {
+            "size": "h-4 w-4",
+            "context": "Tab icons"
+          }
+        }
+      },
+      "modalBody": {
+        "container": {
+          "display": "grid grid-cols-1 lg:grid-cols-2",
+          "gap": "gap-4",
+          "padding": "p-6",
+          "flex": "flex-1",
+          "overflow": "overflow-hidden",
+          "context": "Split pane content area"
+        },
+        "mobileLayout": {
+          "display": "flex flex-col",
+          "spacing": "space-y-4",
+          "context": "Stacked layout on mobile"
+        }
+      },
+      "textPanel": {
+        "container": {
+          "display": "flex flex-col",
+          "height": "h-full",
+          "minHeight": "min-h-[300px]",
+          "context": "Individual text panel wrapper"
+        },
+        "header": {
+          "display": "flex items-center",
+          "spacing": "space-x-2 mb-3",
+          "icon": {
+            "size": "h-5 w-5",
+            "color": "text-gray-700",
+            "context": "Panel icon (edit, sparkle, lightbulb)"
+          },
+          "title": {
+            "color": "text-gray-900",
+            "fontSize": "text-base",
+            "fontWeight": "font-semibold",
+            "context": "Panel title"
+          }
+        },
+        "textArea": {
+          "background": "bg-gray-50",
+          "border": "border border-gray-300",
+          "borderRadius": "rounded-lg",
+          "padding": "p-4",
+          "fontSize": "text-sm",
+          "color": "text-gray-900",
+          "placeholder": "placeholder-gray-400",
+          "lineHeight": "leading-relaxed",
+          "width": "w-full",
+          "height": "h-full",
+          "minHeight": "min-h-[250px]",
+          "resize": "resize-none",
+          "focus": {
+            "outline": "focus:outline-none",
+            "ring": "focus:ring-2 focus:ring-purple-500",
+            "borderColor": "focus:border-purple-500",
+            "background": "focus:bg-white",
+            "context": "Focus state styling"
+          },
+          "context": "Text input/output area"
+        },
+        "characterCount": {
+          "color": "text-gray-400",
+          "fontSize": "text-xs",
+          "spacing": "mt-2",
+          "context": "Character counter below textarea"
+        }
+      },
+      "rightPanel": {
+        "enhanced": {
+          "header": {
+            "display": "flex items-center justify-between",
+            "spacing": "mb-3",
+            "leftSide": {
+              "display": "flex items-center",
+              "spacing": "space-x-2"
+            },
+            "analyzeButton": {
+              "background": "bg-white",
+              "color": "text-purple-500",
+              "border": "border border-purple-200",
+              "borderRadius": "rounded-lg",
+              "padding": "px-3 py-1.5",
+              "fontSize": "text-sm",
+              "fontWeight": "font-medium",
+              "display": "flex items-center",
+              "spacing": "space-x-1",
+              "hover": "hover:bg-purple-50",
+              "context": "Analyze button in header"
+            }
+          },
+          "content": {
+            "readOnly": true,
+            "context": "Enhanced story output is read-only"
+          }
+        },
+        "suggestions": {
+          "emptyState": {
+            "display": "flex flex-col items-center justify-center",
+            "height": "h-full",
+            "minHeight": "min-h-[250px]",
+            "icon": {
+              "size": "h-12 w-12",
+              "color": "text-gray-300",
+              "spacing": "mb-3",
+              "context": "Lightbulb icon"
+            },
+            "text": {
+              "color": "text-gray-400",
+              "fontSize": "text-sm",
+              "alignment": "text-center",
+              "context": "Click 'Analyze' to get writing suggestions"
+            }
+          }
+        }
+      },
+      "modalFooter": {
+        "container": {
+          "borderTop": "border-t border-gray-200",
+          "padding": "p-6",
+          "display": "flex items-center justify-end",
+          "spacing": "space-x-3",
+          "context": "Modal action buttons footer"
+        },
+        "cancelButton": {
+          "background": "bg-white",
+          "color": "text-gray-700",
+          "border": "border border-gray-300",
+          "borderRadius": "rounded-lg",
+          "padding": "px-6 py-2.5",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "hover": "hover:bg-gray-50",
+          "context": "Cancel button - secondary style"
+        },
+        "doneButton": {
+          "background": "bg-purple-500",
+          "color": "text-white",
+          "borderRadius": "rounded-lg",
+          "padding": "px-6 py-2.5",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "hover": "hover:bg-purple-600",
+          "context": "Done/Apply button - primary action"
+        }
+      }
+    },
+    "featureTabs": {
+      "grammarCheck": {
+        "icon": "checkmark-circle icon",
+        "label": "Grammar Check",
+        "leftPanel": "Original Text",
+        "rightPanel": "Grammar Correction",
+        "behavior": "Check and correct grammar errors",
+        "context": "Grammar checking feature"
+      },
+      "writingTips": {
+        "icon": "lightbulb icon",
+        "label": "Writing Tips",
+        "leftPanel": "Original Text",
+        "rightPanel": "Writing Suggestions",
+        "behavior": "Provide writing improvement suggestions",
+        "emptyState": "Click 'Analyze' to get writing suggestions",
+        "context": "Writing tips feature"
+      },
+      "enhanceStory": {
+        "icon": "sparkle icon",
+        "label": "Enhance Story",
+        "leftPanel": "Original Text",
+        "rightPanel": "Enhanced Story",
+        "behavior": "AI-enhanced version of the story",
+        "context": "Story enhancement feature"
+      }
+    },
+    "responsiveBreakpoints": {
+      "mobile": {
+        "layout": "Single column, panels stacked vertically",
+        "modalWidth": "w-full with p-4 padding",
+        "textAreas": "min-h-[200px] shorter on mobile",
+        "context": "< 1024px width"
+      },
+      "tablet": {
+        "layout": "Single column or side-by-side depending on space",
+        "modalWidth": "max-w-4xl",
+        "context": "768px - 1024px"
+      },
+      "desktop": {
+        "layout": "Two column grid (lg:grid-cols-2)",
+        "modalWidth": "max-w-6xl",
+        "textAreas": "min-h-[250px]",
+        "context": "> 1024px width"
+      }
+    },
+    "layoutPatterns": {
+      "modalStructure": {
+        "order": [
+          "Modal Overlay (backdrop)",
+          "Modal Container:",
+          "  - Header (Title + Close + Tabs)",
+          "  - Body (Split pane or stacked)",
+          "    - Left: Original Text panel",
+          "    - Right: Output/Suggestions panel",
+          "  - Footer (Cancel + Done buttons)"
+        ],
+        "context": "Top-to-bottom modal structure"
+      },
+      "panelStructure": {
+        "pattern": "Icon + Title header, Textarea body, Character count footer",
+        "consistency": "Both panels use same structure",
+        "context": "Consistent panel design"
+      }
+    },
+    "doNotRules": {
+      "modal": [
+        "DO NOT make modal full screen - use max-w-6xl with padding",
+        "DO NOT allow modal to exceed 90vh - keep max-h-[90vh]",
+        "DO NOT remove backdrop overlay - users need clear modal context",
+        "DO NOT forget close button - always provide escape option"
+      ],
+      "layout": [
+        "DO NOT use same layout for all screen sizes - adapt mobile to stack",
+        "DO NOT make text areas too small - min-h-[250px] on desktop",
+        "DO NOT remove gap between panels - maintain visual separation",
+        "DO NOT center-align text in panels - left-align content"
+      ],
+      "tabs": [
+        "DO NOT style all tabs the same - active gets solid purple, inactive gets outline",
+        "DO NOT remove icons from tabs - they help identify features quickly",
+        "DO NOT use different tab styles than established pattern",
+        "DO NOT make tabs too large or too small"
+      ],
+      "colors": [
+        "DO NOT use colored backgrounds for text areas except focus state",
+        "DO NOT style analyze button with solid purple - outline style only",
+        "DO NOT use gradients anywhere in modal",
+        "DO NOT make right panel editable when showing enhanced/corrected output"
+      ],
+      "buttons": [
+        "DO NOT reverse button order - Cancel left, Done right",
+        "DO NOT use same styling for both footer buttons",
+        "DO NOT remove hover states from buttons"
+      ]
+    },
+    "componentMapping": {
+      "AIAssistantModal": {
+        "overlay": "fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50",
+        "container": "bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] flex flex-col overflow-hidden"
+      },
+      "ModalHeader": {
+        "container": "p-6 pb-4 border-b border-gray-200",
+        "title": "flex items-center space-x-2 text-xl font-bold text-gray-900",
+        "closeButton": "text-gray-400 hover:text-gray-600 p-1"
+      },
+      "TabBar": {
+        "container": "flex items-center space-x-2",
+        "activeTab": "bg-purple-500 text-white rounded-lg px-4 py-2 text-sm font-medium flex items-center space-x-2",
+        "inactiveTab": "bg-white text-purple-500 border border-purple-200 rounded-lg px-4 py-2 text-sm font-medium flex items-center space-x-2 hover:bg-purple-50 transition-colors"
+      },
+      "ModalBody": {
+        "desktop": "grid grid-cols-1 lg:grid-cols-2 gap-4 p-6 flex-1 overflow-hidden",
+        "mobile": "flex flex-col space-y-4 p-6 flex-1 overflow-auto"
+      },
+      "TextPanel": {
+        "container": "flex flex-col h-full min-h-[300px]",
+        "header": "flex items-center space-x-2 mb-3",
+        "textarea": "bg-gray-50 border border-gray-300 rounded-lg p-4 text-sm text-gray-900 placeholder-gray-400 leading-relaxed w-full h-full min-h-[250px] resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:bg-white",
+        "charCount": "text-xs text-gray-400 mt-2"
+      },
+      "EnhancedPanel": {
+        "header": "flex items-center justify-between mb-3",
+        "analyzeButton": "bg-white text-purple-500 border border-purple-200 rounded-lg px-3 py-1.5 text-sm font-medium flex items-center space-x-1 hover:bg-purple-50"
+      },
+      "EmptyState": {
+        "container": "flex flex-col items-center justify-center h-full min-h-[250px]",
+        "icon": "h-12 w-12 text-gray-300 mb-3",
+        "text": "text-sm text-gray-400 text-center"
+      },
+      "ModalFooter": {
+        "container": "border-t border-gray-200 p-6 flex items-center justify-end space-x-3",
+        "cancelButton": "bg-white text-gray-700 border border-gray-300 rounded-lg px-6 py-2.5 text-sm font-medium hover:bg-gray-50",
+        "doneButton": "bg-purple-500 text-white rounded-lg px-6 py-2.5 text-sm font-medium hover:bg-purple-600"
+      }
+    },
+    "interactionPatterns": {
+      "tabSwitching": {
+        "behavior": "Click tab to switch between Grammar Check, Writing Tips, and Enhance Story",
+        "state": "Active tab shows solid purple, content updates instantly",
+        "context": "Feature selection"
+      },
+      "textInput": {
+        "behavior": "Type or paste text in left panel (Original Text)",
+        "characterCount": "Updates in real-time as user types",
+        "context": "User input area"
+      },
+      "analysis": {
+        "grammarCheck": "Auto-analyzes when text is entered, shows corrections in right panel",
+        "writingTips": "Requires clicking 'Analyze' button to generate suggestions",
+        "enhanceStory": "Auto-generates enhanced version when text is entered",
+        "context": "AI processing triggers"
+      },
+      "completion": {
+        "done": "Applies changes and closes modal",
+        "cancel": "Discards changes and closes modal",
+        "context": "Modal exit actions"
+      }
+    },
+    "stateManagement": {
+      "activeTab": {
+        "options": ["grammarCheck", "writingTips", "enhanceStory"],
+        "default": "grammarCheck",
+        "context": "Current active feature"
+      },
+      "textContent": {
+        "originalText": "User input text",
+        "enhancedText": "AI-processed output",
+        "suggestions": "Writing improvement suggestions array",
+        "context": "Text data for both panels"
+      },
+      "uiStates": {
+        "isAnalyzing": "Loading state during AI processing",
+        "hasAnalyzed": "Whether analyze has been run (for Writing Tips)",
+        "characterCount": "Current character count",
+        "context": "UI feedback states"
+      }
+    },
+    "accessibility": {
+      "modalTrap": "Focus trapped within modal when open",
+      "escapeKey": "ESC key closes modal",
+      "tabNavigation": "Keyboard navigation between tabs and controls",
+      "ariaLabels": "Proper ARIA labels for all interactive elements",
+      "readableText": "Sufficient contrast ratios for all text"
+    },
+    "performanceConsiderations": {
+      "lazyAnalysis": "Don't auto-analyze on every keystroke, debounce or manual trigger",
+      "modalAnimation": "Smooth fade-in animation on modal open",
+      "textareaOptimization": "Optimize for large text inputs without lag",
+      "responsiveReflow": "Smooth transition between mobile and desktop layouts"
+    }
+  }

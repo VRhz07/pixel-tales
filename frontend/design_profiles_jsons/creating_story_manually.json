@@ -1,0 +1,559 @@
+{
+    "designSystem": {
+      "name": "Imaginary Worlds Create Story Page",
+      "type": "story_creation_interface",
+      "framework": "react_typescript_tailwind",
+      "layout": "multi_section_editor"
+    },
+    "colorPalette": {
+      "primary": {
+        "purple": "#8B5CF6",
+        "purpleDark": "#7C3AED",
+        "purpleLight": "#A78BFA"
+      },
+      "neutral": {
+        "white": "#FFFFFF",
+        "gray50": "#F9FAFB",
+        "gray100": "#F3F4F6",
+        "gray200": "#E5E7EB",
+        "gray300": "#D1D5DB",
+        "gray400": "#9CA3AF",
+        "gray500": "#6B7280",
+        "gray600": "#4B5563",
+        "gray700": "#374151",
+        "gray800": "#1F2937",
+        "gray900": "#111827"
+      },
+      "backgrounds": {
+        "page": "#F9FAFB",
+        "canvas": "#FFFFFF",
+        "editor": "#F9FAFB",
+        "section": "#FFFFFF"
+      }
+    },
+    "elementStyling": {
+      "pageContainer": {
+        "background": "bg-gray-50",
+        "padding": "p-0",
+        "minHeight": "min-h-screen",
+        "context": "Full page wrapper - light gray background"
+      },
+      "pageHeader": {
+        "container": {
+          "background": "bg-white",
+          "borderBottom": "border-b border-gray-200",
+          "padding": "px-6 py-4",
+          "display": "flex items-center justify-between",
+          "position": "sticky top-0 z-10",
+          "context": "Sticky header with back button, title, and save button"
+        },
+        "leftSection": {
+          "display": "flex items-center",
+          "spacing": "space-x-4",
+          "context": "Back button + title/subtitle group"
+        },
+        "backButton": {
+          "size": "h-6 w-6",
+          "color": "text-gray-700",
+          "hover": "hover:text-gray-900",
+          "context": "Back navigation chevron"
+        },
+        "titleGroup": {
+          "title": {
+            "color": "text-gray-900",
+            "fontSize": "text-xl",
+            "fontWeight": "font-bold",
+            "context": "Page title - Create Your Story"
+          },
+          "subtitle": {
+            "color": "text-gray-500",
+            "fontSize": "text-sm",
+            "spacing": "mt-1",
+            "context": "Page description - Bring your imagination to life"
+          }
+        },
+        "saveButton": {
+          "background": "bg-purple-500",
+          "color": "text-white",
+          "borderRadius": "rounded-lg",
+          "padding": "px-4 py-2",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "display": "flex items-center",
+          "spacing": "space-x-2",
+          "hover": "hover:bg-purple-600",
+          "context": "Save button - purple CTA"
+        },
+        "saveIcon": {
+          "size": "h-4 w-4",
+          "color": "text-white",
+          "context": "Save/floppy disk icon"
+        }
+      },
+      "contentArea": {
+        "container": {
+          "padding": "p-6",
+          "maxWidth": "max-w-4xl mx-auto",
+          "context": "Main content area with centered max-width container"
+        }
+      },
+      "storyTitleSection": {
+        "container": {
+          "background": "bg-white",
+          "borderRadius": "rounded-xl",
+          "padding": "p-6",
+          "shadow": "shadow-sm",
+          "border": "border border-gray-100",
+          "spacing": "mb-6",
+          "context": "Story title input section"
+        },
+        "label": {
+          "color": "text-gray-700",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "spacing": "mb-2 block",
+          "context": "Input label - Story Title"
+        },
+        "input": {
+          "background": "bg-white",
+          "border": "border border-gray-300",
+          "borderRadius": "rounded-lg",
+          "padding": "px-4 py-3",
+          "fontSize": "text-base",
+          "color": "text-gray-900",
+          "placeholder": "placeholder-gray-400",
+          "width": "w-full",
+          "focus": {
+            "outline": "focus:outline-none",
+            "ring": "focus:ring-2 focus:ring-purple-500",
+            "borderColor": "focus:border-purple-500",
+            "context": "Focus state - purple ring and border"
+          },
+          "context": "Story title input field"
+        }
+      },
+      "canvasSection": {
+        "container": {
+          "background": "bg-white",
+          "borderRadius": "rounded-xl",
+          "padding": "p-6",
+          "shadow": "shadow-sm",
+          "border": "border border-gray-100",
+          "spacing": "mb-6",
+          "context": "Canvas/illustration section"
+        },
+        "header": {
+          "display": "flex items-center justify-between",
+          "spacing": "mb-4",
+          "context": "Canvas header with title and edit button"
+        },
+        "title": {
+          "display": "flex items-center",
+          "spacing": "space-x-2",
+          "icon": {
+            "size": "h-5 w-5",
+            "color": "text-purple-500",
+            "context": "Canvas/image icon - purple"
+          },
+          "text": {
+            "color": "text-gray-900",
+            "fontSize": "text-base",
+            "fontWeight": "font-semibold",
+            "context": "Section title - Canvas"
+          }
+        },
+        "editButton": {
+          "background": "bg-white",
+          "color": "text-purple-500",
+          "border": "border border-purple-200",
+          "borderRadius": "rounded-lg",
+          "padding": "px-3 py-1.5",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "display": "flex items-center",
+          "spacing": "space-x-1",
+          "hover": "hover:bg-purple-50",
+          "context": "Edit canvas button - purple outline"
+        },
+        "canvasArea": {
+          "background": "bg-gray-50",
+          "border": "border-2 border-dashed border-gray-300",
+          "borderRadius": "rounded-lg",
+          "minHeight": "min-h-64",
+          "display": "flex items-center justify-center",
+          "context": "Canvas drawing/upload area with dashed border"
+        },
+        "emptyState": {
+          "color": "text-gray-400",
+          "fontSize": "text-sm",
+          "alignment": "text-center",
+          "context": "Placeholder text when canvas is empty"
+        }
+      },
+      "pageManagementSection": {
+        "container": {
+          "background": "bg-white",
+          "borderRadius": "rounded-xl",
+          "padding": "p-6",
+          "shadow": "shadow-sm",
+          "border": "border border-gray-100",
+          "spacing": "mb-6",
+          "context": "Page management section"
+        },
+        "header": {
+          "display": "flex items-center justify-between",
+          "spacing": "mb-4",
+          "context": "Section header with title and add page button"
+        },
+        "title": {
+          "display": "flex items-center",
+          "spacing": "space-x-2",
+          "icon": {
+            "size": "h-5 w-5",
+            "color": "text-pink-500",
+            "context": "Book/pages icon - PINK not purple"
+          },
+          "text": {
+            "color": "text-gray-900",
+            "fontSize": "text-base",
+            "fontWeight": "font-semibold",
+            "context": "Section title - Page Management"
+          }
+        },
+        "addPageButton": {
+          "background": "bg-white",
+          "color": "text-purple-500",
+          "border": "border border-purple-200",
+          "borderRadius": "rounded-lg",
+          "padding": "px-3 py-1.5",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "display": "flex items-center",
+          "spacing": "space-x-1",
+          "hover": "hover:bg-purple-50",
+          "context": "Add page button - purple outline"
+        },
+        "pagination": {
+          "container": {
+            "display": "flex items-center justify-center",
+            "spacing": "space-x-3 mb-4",
+            "context": "Page navigation controls"
+          },
+          "button": {
+            "background": "bg-gray-100",
+            "color": "text-gray-600",
+            "borderRadius": "rounded-lg",
+            "padding": "p-2",
+            "hover": "hover:bg-gray-200",
+            "disabled": "disabled:opacity-50 disabled:cursor-not-allowed",
+            "context": "Previous/next page buttons"
+          },
+          "pageInfo": {
+            "color": "text-gray-700",
+            "fontSize": "text-sm",
+            "fontWeight": "font-medium",
+            "context": "Page 1 of 1 text"
+          }
+        },
+        "pageThumbnail": {
+          "container": {
+            "background": "bg-white",
+            "border": "border-2 border-purple-500",
+            "borderRadius": "rounded-lg",
+            "padding": "p-4",
+            "width": "w-16",
+            "height": "h-20",
+            "display": "flex flex-col items-center justify-center",
+            "spacing": "mx-auto mb-3",
+            "cursor": "cursor-pointer",
+            "hover": "hover:bg-purple-50",
+            "context": "Page thumbnail preview - purple border when active"
+          },
+          "icon": {
+            "size": "h-6 w-6",
+            "color": "text-purple-500",
+            "spacing": "mb-1",
+            "context": "Document/page icon"
+          },
+          "pageNumber": {
+            "color": "text-gray-600",
+            "fontSize": "text-xs",
+            "fontWeight": "font-medium",
+            "context": "Page number label"
+          }
+        },
+        "helpText": {
+          "color": "text-gray-500",
+          "fontSize": "text-xs",
+          "alignment": "text-center",
+          "context": "Click on a page thumbnail to switch between pages"
+        }
+      },
+      "pageEditorSection": {
+        "container": {
+          "background": "bg-white",
+          "borderRadius": "rounded-xl",
+          "padding": "p-6",
+          "shadow": "shadow-sm",
+          "border": "border border-gray-100",
+          "spacing": "mb-6",
+          "context": "Individual page editor section"
+        },
+        "header": {
+          "display": "flex items-center justify-between",
+          "spacing": "mb-4",
+          "context": "Page header with title and AI button"
+        },
+        "title": {
+          "display": "flex items-center",
+          "spacing": "space-x-2",
+          "icon": {
+            "size": "h-5 w-5",
+            "color": "text-orange-500",
+            "context": "Book/page icon - ORANGE not purple"
+          },
+          "text": {
+            "color": "text-gray-900",
+            "fontSize": "text-base",
+            "fontWeight": "font-semibold",
+            "context": "Page number title - Page 1"
+          }
+        },
+        "aiButton": {
+          "background": "bg-white",
+          "color": "text-purple-500",
+          "border": "border border-purple-200",
+          "borderRadius": "rounded-lg",
+          "padding": "px-3 py-1.5",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "display": "flex items-center",
+          "spacing": "space-x-1",
+          "hover": "hover:bg-purple-50",
+          "context": "AI assistance button - purple outline"
+        },
+        "textArea": {
+          "background": "bg-gray-50",
+          "border": "border border-gray-300",
+          "borderRadius": "rounded-lg",
+          "padding": "p-4",
+          "fontSize": "text-base",
+          "color": "text-gray-900",
+          "placeholder": "placeholder-gray-400",
+          "minHeight": "min-h-48",
+          "width": "w-full",
+          "resize": "resize-none",
+          "focus": {
+            "outline": "focus:outline-none",
+            "ring": "focus:ring-2 focus:ring-purple-500",
+            "borderColor": "focus:border-purple-500",
+            "background": "focus:bg-white",
+            "context": "Focus state - purple ring, border, white background"
+          },
+          "context": "Story writing text area"
+        },
+        "characterCount": {
+          "color": "text-gray-400",
+          "fontSize": "text-xs",
+          "spacing": "mt-2",
+          "context": "Character count - 0 characters"
+        }
+      },
+      "bottomActions": {
+        "container": {
+          "background": "bg-white",
+          "borderTop": "border-t border-gray-200",
+          "padding": "p-4",
+          "display": "grid grid-cols-2 gap-3",
+          "position": "sticky bottom-0",
+          "context": "Sticky bottom action buttons"
+        },
+        "charactersButton": {
+          "background": "bg-white",
+          "color": "text-purple-500",
+          "border": "border border-purple-200",
+          "borderRadius": "rounded-lg",
+          "padding": "px-4 py-3",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "display": "flex items-center justify-center",
+          "spacing": "space-x-2",
+          "hover": "hover:bg-purple-50",
+          "context": "Characters button - purple outline"
+        },
+        "aiAssistantButton": {
+          "background": "bg-white",
+          "color": "text-purple-500",
+          "border": "border border-purple-200",
+          "borderRadius": "rounded-lg",
+          "padding": "px-4 py-3",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "display": "flex items-center justify-center",
+          "spacing": "space-x-2",
+          "hover": "hover:bg-purple-50",
+          "context": "AI Assistant button - purple outline"
+        },
+        "icon": {
+          "size": "h-5 w-5",
+          "color": "text-purple-500",
+          "context": "Button icons - purple color"
+        }
+      }
+    },
+    "layoutPatterns": {
+      "pageStructure": {
+        "order": [
+          "Sticky Header (Back + Title/Subtitle + Save)",
+          "Content Area:",
+          "  - Story Title Section",
+          "  - Canvas Section (with Edit button)",
+          "  - Page Management Section (with pagination and thumbnails)",
+          "  - Page Editor Section (per page)",
+          "Sticky Bottom Actions (Characters + AI Assistant)"
+        ],
+        "context": "Scrollable content between sticky header and footer"
+      },
+      "sectionPattern": {
+        "structure": "White card with rounded corners, shadow, and padding",
+        "header": "Icon + Title on left, Action button on right",
+        "content": "Section-specific content area",
+        "context": "Consistent section card pattern"
+      }
+    },
+    "iconColorSystem": {
+      "pageManagement": "text-pink-500",
+      "canvas": "text-purple-500",
+      "pageEditor": "text-orange-500",
+      "context": "Different sections use different icon colors for visual hierarchy"
+    },
+    "doNotRules": {
+      "colors": [
+        "DO NOT use same icon color for all sections - Page Management=pink, Canvas=purple, Page=orange",
+        "DO NOT use gradients on any buttons or sections",
+        "DO NOT style text area with white background initially - use gray-50",
+        "DO NOT use colored backgrounds on outline buttons - keep white with colored borders"
+      ],
+      "layout": [
+        "DO NOT make header or bottom actions scroll with content - keep sticky",
+        "DO NOT center-align text areas or inputs - left-align content",
+        "DO NOT remove max-width constraint from content area",
+        "DO NOT place save button in page flow - keep in sticky header"
+      ],
+      "canvas": [
+        "DO NOT use solid border for canvas area - use dashed border",
+        "DO NOT make canvas area too small - min-h-64 minimum",
+        "DO NOT use white background for empty canvas - use gray-50"
+      ],
+      "buttons": [
+        "DO NOT use solid purple backgrounds on secondary actions - outline style",
+        "DO NOT remove icons from action buttons",
+        "DO NOT make all buttons same width - bottom actions are grid, others auto-width"
+      ],
+      "pagination": [
+        "DO NOT hide page thumbnails - they're key navigation",
+        "DO NOT make thumbnails too small - w-16 h-20 minimum",
+        "DO NOT use non-purple border for active page thumbnail"
+      ]
+    },
+    "componentMapping": {
+      "CreateStoryPage": {
+        "baseClass": "min-h-screen bg-gray-50"
+      },
+      "PageHeader": {
+        "container": "bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10",
+        "backButton": "h-6 w-6 text-gray-700 hover:text-gray-900",
+        "title": "text-xl font-bold text-gray-900",
+        "subtitle": "text-sm text-gray-500 mt-1",
+        "saveButton": "bg-purple-500 hover:bg-purple-600 text-white rounded-lg px-4 py-2 text-sm font-medium flex items-center space-x-2"
+      },
+      "ContentArea": {
+        "baseClass": "p-6 max-w-4xl mx-auto"
+      },
+      "StoryTitleSection": {
+        "container": "bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6",
+        "label": "text-sm font-medium text-gray-700 mb-2 block",
+        "input": "bg-white border border-gray-300 rounded-lg px-4 py-3 text-base text-gray-900 placeholder-gray-400 w-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+      },
+      "CanvasSection": {
+        "container": "bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6",
+        "header": "flex items-center justify-between mb-4",
+        "icon": "h-5 w-5 text-purple-500",
+        "title": "text-base font-semibold text-gray-900",
+        "editButton": "bg-white hover:bg-purple-50 text-purple-500 border border-purple-200 rounded-lg px-3 py-1.5 text-sm font-medium flex items-center space-x-1",
+        "canvasArea": "bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg min-h-64 flex items-center justify-center"
+      },
+      "PageManagementSection": {
+        "container": "bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6",
+        "icon": "h-5 w-5 text-pink-500",
+        "addPageButton": "bg-white hover:bg-purple-50 text-purple-500 border border-purple-200 rounded-lg px-3 py-1.5 text-sm font-medium",
+        "pagination": "flex items-center justify-center space-x-3 mb-4",
+        "thumbnail": "bg-white border-2 border-purple-500 rounded-lg p-4 w-16 h-20 flex flex-col items-center justify-center mx-auto mb-3 cursor-pointer hover:bg-purple-50"
+      },
+      "PageEditorSection": {
+        "container": "bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6",
+        "icon": "h-5 w-5 text-orange-500",
+        "title": "text-base font-semibold text-gray-900",
+        "aiButton": "bg-white hover:bg-purple-50 text-purple-500 border border-purple-200 rounded-lg px-3 py-1.5 text-sm font-medium",
+        "textArea": "bg-gray-50 border border-gray-300 rounded-lg p-4 text-base text-gray-900 placeholder-gray-400 min-h-48 w-full resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:bg-white",
+        "characterCount": "text-xs text-gray-400 mt-2"
+      },
+      "BottomActions": {
+        "container": "bg-white border-t border-gray-200 p-4 grid grid-cols-2 gap-3 sticky bottom-0",
+        "button": "bg-white hover:bg-purple-50 text-purple-500 border border-purple-200 rounded-lg px-4 py-3 text-sm font-medium flex items-center justify-center space-x-2"
+      }
+    },
+    "interactionPatterns": {
+      "saving": {
+        "trigger": "Save button in sticky header",
+        "behavior": "Saves all story content and pages",
+        "feedback": "Success message or button state change",
+        "context": "Auto-save or manual save flow"
+      },
+      "pageNavigation": {
+        "methods": ["Pagination arrows", "Page thumbnails", "Add Page button"],
+        "behavior": "Switch between pages without losing content",
+        "context": "Multi-page story creation"
+      },
+      "canvasEditing": {
+        "trigger": "Edit button in Canvas section",
+        "behavior": "Opens drawing or image upload interface",
+        "context": "Visual content creation"
+      },
+      "aiAssistance": {
+        "locations": ["Page-specific AI button", "Bottom AI Assistant button"],
+        "behavior": "Provides writing suggestions or generates content",
+        "context": "AI-powered writing help"
+      },
+      "characterManagement": {
+        "trigger": "Characters button in bottom actions",
+        "behavior": "Opens character selection/creation interface",
+        "context": "Add characters to story"
+      }
+    },
+    "stateManagement": {
+      "storyData": {
+        "title": "Story title string",
+        "canvas": "Canvas/illustration data",
+        "pages": "Array of page objects with content",
+        "currentPage": "Active page index"
+      },
+      "uiStates": {
+        "unsavedChanges": "Track if save button should be enabled",
+        "characterCount": "Track character count per page",
+        "canvasMode": "Edit mode vs view mode"
+      }
+    },
+    "accessibility": {
+      "stickyElements": "Header and footer remain accessible via keyboard",
+      "textAreas": "Proper labels and focus management",
+      "pageNavigation": "Keyboard shortcuts for page switching",
+      "saveIndicator": "Clear feedback on save status"
+    },
+    "responsiveConsiderations": {
+      "mobile": "Current layout optimized for mobile",
+      "contentWidth": "Max-width container prevents too-wide content",
+      "bottomActions": "2-column grid on all screen sizes",
+      "stickyElements": "Header and footer remain sticky on scroll"
+    }
+  }

@@ -1,0 +1,103 @@
+/* Parent Bottom Navigation */
+.parent-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border-top: 1px solid #E8ECEF;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+  height: 70px;
+}
+
+.parent-bottom-nav-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 600px;
+  margin: 0 auto;
+  height: 100%;
+  padding: 0 16px;
+}
+
+.parent-bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #6B7280;
+  flex: 1;
+  max-width: 120px;
+}
+
+.parent-bottom-nav-item:hover {
+  color: #667eea;
+  transform: translateY(-2px);
+}
+
+.parent-bottom-nav-item.active {
+  color: #667eea;
+}
+
+.parent-bottom-nav-item.active .parent-bottom-nav-icon {
+  stroke-width: 2.5;
+}
+
+.parent-bottom-nav-icon {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+  transition: all 0.2s ease;
+}
+
+.parent-bottom-nav-label {
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+/* Dark Mode Support */
+.dark .parent-bottom-nav {
+  background: #1F2937;
+  border-top-color: #374151;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.dark .parent-bottom-nav-item {
+  color: #9CA3AF;
+}
+
+.dark .parent-bottom-nav-item:hover {
+  color: #818CF8;
+}
+
+.dark .parent-bottom-nav-item.active {
+  color: #818CF8;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .parent-bottom-nav {
+    height: 65px;
+  }
+
+  .parent-bottom-nav-item {
+    padding: 6px 12px;
+  }
+
+  .parent-bottom-nav-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .parent-bottom-nav-label {
+    font-size: 11px;
+  }
+}

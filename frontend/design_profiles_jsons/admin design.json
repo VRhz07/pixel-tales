@@ -1,0 +1,661 @@
+{
+  "designSystem": {
+    "name": "Pixel Tales Admin Dashboard",
+    "type": "admin_management_platform",
+    "framework": "react_typescript_tailwind",
+    "layout": "sidebar_dashboard_layout"
+  },
+  "colorPalette": {
+    "primary": {
+      "cyan": "#00BCD4",
+      "cyanDark": "#00ACC1",
+      "cyanLight": "#4DD0E1"
+    },
+    "status": {
+      "published": "#00BCD4",
+      "draft": "#9CA3AF",
+      "pending": "#6B7280",
+      "resolved": "#00BCD4",
+      "active": "#00BCD4"
+    },
+    "severity": {
+      "high": "#10B981",
+      "medium": "#F59E0B",
+      "low": "#EF4444"
+    },
+    "alerts": {
+      "error": "#FEE2E2",
+      "errorText": "#DC2626",
+      "warning": "#FEF3C7",
+      "warningText": "#D97706"
+    },
+    "dark": {
+      "background": "#1A1F2E",
+      "surface": "#212836",
+      "surfaceLight": "#2A3142",
+      "border": "#374151"
+    },
+    "neutral": {
+      "white": "#FFFFFF",
+      "gray50": "#F9FAFB",
+      "gray100": "#F3F4F6",
+      "gray200": "#E5E7EB",
+      "gray300": "#D1D5DB",
+      "gray400": "#9CA3AF",
+      "gray500": "#6B7280",
+      "gray600": "#4B5563",
+      "gray700": "#374151",
+      "gray800": "#1F2937",
+      "gray900": "#111827"
+    },
+    "text": {
+      "primary": "#111827",
+      "secondary": "#6B7280",
+      "tertiary": "#9CA3AF",
+      "onDark": "#FFFFFF"
+    }
+  },
+  "elementStyling": {
+    "appContainer": {
+      "desktop": {
+        "display": "grid grid-cols-[220px_1fr]",
+        "background": "bg-gray-50",
+        "minHeight": "min-h-screen",
+        "context": "Two-column layout: Sidebar | Content"
+      },
+      "mobile": {
+        "display": "flex flex-col",
+        "background": "bg-gray-50",
+        "minHeight": "min-h-screen",
+        "context": "Stacked mobile layout"
+      }
+    },
+    "sidebar": {
+      "desktop": {
+        "background": "bg-gray-900",
+        "width": "w-[220px]",
+        "height": "h-screen",
+        "position": "sticky top-0",
+        "overflow": "overflow-y-auto",
+        "context": "Fixed sidebar on desktop"
+      },
+      "mobile": {
+        "background": "bg-gray-900",
+        "position": "fixed bottom-0 left-0 right-0 z-50",
+        "padding": "p-4",
+        "borderTop": "border-t border-gray-700",
+        "context": "Bottom navigation on mobile"
+      },
+      "header": {
+        "padding": "px-4 py-5",
+        "borderBottom": "border-b border-gray-700",
+        "display": "flex items-center justify-between",
+        "context": "Sidebar header with logo"
+      },
+      "logo": {
+        "color": "text-white",
+        "fontSize": "text-lg",
+        "fontWeight": "font-bold",
+        "context": "Storybook Admin title"
+      },
+      "menuToggle": {
+        "color": "text-gray-400",
+        "hover": "hover:text-white",
+        "size": "h-5 w-5",
+        "context": "Collapse/expand icon"
+      }
+    },
+    "navigation": {
+      "sectionLabel": {
+        "color": "text-gray-500",
+        "fontSize": "text-xs",
+        "fontWeight": "font-semibold",
+        "textTransform": "uppercase",
+        "letterSpacing": "tracking-wider",
+        "padding": "px-4 py-3 mt-4",
+        "context": "Section labels (Main Menu, Content Creation)"
+      },
+      "menuItem": {
+        "default": {
+          "color": "text-gray-300",
+          "background": "bg-transparent",
+          "padding": "px-4 py-2.5",
+          "display": "flex items-center",
+          "spacing": "space-x-3",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "hover": "hover:bg-gray-800",
+          "transition": "transition-colors",
+          "context": "Inactive menu item"
+        },
+        "active": {
+          "color": "text-white",
+          "background": "bg-cyan-500",
+          "padding": "px-4 py-2.5",
+          "display": "flex items-center",
+          "spacing": "space-x-3",
+          "fontSize": "text-sm",
+          "fontWeight": "font-semibold",
+          "context": "Active menu item - cyan background"
+        },
+        "icon": {
+          "size": "h-5 w-5",
+          "context": "Menu item icons"
+        }
+      }
+    },
+    "mainContent": {
+      "container": {
+        "padding": "p-6 md:p-8",
+        "maxWidth": "max-w-7xl mx-auto",
+        "context": "Main content wrapper"
+      },
+      "pageHeader": {
+        "spacing": "mb-6",
+        "title": {
+          "color": "text-gray-900",
+          "fontSize": "text-2xl md:text-3xl",
+          "fontWeight": "font-bold",
+          "spacing": "mb-2",
+          "context": "Page title"
+        },
+        "subtitle": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm md:text-base",
+          "context": "Page description"
+        },
+        "actions": {
+          "display": "flex items-center",
+          "spacing": "space-x-3 mt-4",
+          "context": "Header action buttons (search, filter, add)"
+        }
+      }
+    },
+    "statsCard": {
+      "container": {
+        "background": "bg-white",
+        "border": "border border-gray-200",
+        "borderRadius": "rounded-xl",
+        "padding": "p-5",
+        "shadow": "shadow-sm",
+        "context": "Stat card container"
+      },
+      "header": {
+        "display": "flex items-center justify-between",
+        "spacing": "mb-3",
+        "label": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "context": "Stat label"
+        },
+        "icon": {
+          "size": "h-5 w-5",
+          "color": "text-gray-400",
+          "context": "Stat icon"
+        }
+      },
+      "value": {
+        "color": "text-gray-900",
+        "fontSize": "text-3xl",
+        "fontWeight": "font-bold",
+        "spacing": "mb-1",
+        "context": "Main stat value"
+      },
+      "change": {
+        "positive": {
+          "color": "text-green-600",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "context": "Positive change indicator"
+        },
+        "negative": {
+          "color": "text-red-600",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "context": "Negative change indicator"
+        },
+        "note": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm",
+          "context": "Additional context"
+        }
+      }
+    },
+    "dataTable": {
+      "container": {
+        "background": "bg-white",
+        "border": "border border-gray-200",
+        "borderRadius": "rounded-xl",
+        "overflow": "overflow-hidden",
+        "shadow": "shadow-sm",
+        "context": "Table container"
+      },
+      "header": {
+        "padding": "px-6 py-4",
+        "borderBottom": "border-b border-gray-200",
+        "context": "Table header section"
+      },
+      "title": {
+        "color": "text-gray-900",
+        "fontSize": "text-lg",
+        "fontWeight": "font-bold",
+        "spacing": "mb-1",
+        "context": "Table section title"
+      },
+      "subtitle": {
+        "color": "text-gray-500",
+        "fontSize": "text-sm",
+        "context": "Table section description"
+      },
+      "table": {
+        "width": "w-full",
+        "context": "Full-width table"
+      },
+      "thead": {
+        "background": "bg-gray-50",
+        "context": "Table header background"
+      },
+      "th": {
+        "color": "text-gray-500",
+        "fontSize": "text-xs",
+        "fontWeight": "font-medium",
+        "textTransform": "uppercase",
+        "letterSpacing": "tracking-wider",
+        "padding": "px-6 py-3",
+        "textAlign": "text-left",
+        "context": "Table header cells"
+      },
+      "tr": {
+        "borderBottom": "border-b border-gray-200",
+        "hover": "hover:bg-gray-50",
+        "transition": "transition-colors",
+        "context": "Table rows"
+      },
+      "td": {
+        "color": "text-gray-900",
+        "fontSize": "text-sm",
+        "padding": "px-6 py-4",
+        "context": "Table data cells"
+      },
+      "mobileCard": {
+        "background": "bg-white",
+        "border": "border border-gray-200",
+        "borderRadius": "rounded-lg",
+        "padding": "p-4",
+        "spacing": "mb-3",
+        "context": "Mobile card view alternative to table"
+      }
+    },
+    "statusBadge": {
+      "published": {
+        "background": "bg-cyan-500",
+        "color": "text-white",
+        "borderRadius": "rounded-full",
+        "padding": "px-3 py-1",
+        "fontSize": "text-xs",
+        "fontWeight": "font-semibold",
+        "context": "Published status"
+      },
+      "draft": {
+        "background": "bg-gray-200",
+        "color": "text-gray-700",
+        "borderRadius": "rounded-full",
+        "padding": "px-3 py-1",
+        "fontSize": "text-xs",
+        "fontWeight": "font-semibold",
+        "context": "Draft status"
+      },
+      "pending": {
+        "background": "bg-gray-200",
+        "color": "text-gray-700",
+        "borderRadius": "rounded-full",
+        "padding": "px-3 py-1",
+        "fontSize": "text-xs",
+        "fontWeight": "font-semibold",
+        "context": "Pending status"
+      },
+      "active": {
+        "background": "bg-cyan-500",
+        "color": "text-white",
+        "borderRadius": "rounded-full",
+        "padding": "px-3 py-1",
+        "fontSize": "text-xs",
+        "fontWeight": "font-semibold",
+        "context": "Active status"
+      }
+    },
+    "reportBadge": {
+      "inappropriateContent": {
+        "background": "bg-white",
+        "color": "text-red-600",
+        "border": "border border-red-300",
+        "borderRadius": "rounded-full",
+        "padding": "px-3 py-1",
+        "fontSize": "text-xs",
+        "fontWeight": "font-medium",
+        "context": "Inappropriate content tag"
+      },
+      "spam": {
+        "background": "bg-white",
+        "color": "text-orange-600",
+        "border": "border border-orange-300",
+        "borderRadius": "rounded-full",
+        "padding": "px-3 py-1",
+        "fontSize": "text-xs",
+        "fontWeight": "font-medium",
+        "context": "Spam tag"
+      },
+      "violentContent": {
+        "background": "bg-white",
+        "color": "text-red-700",
+        "border": "border border-red-400",
+        "borderRadius": "rounded-full",
+        "padding": "px-3 py-1",
+        "fontSize": "text-xs",
+        "fontWeight": "font-medium",
+        "context": "Violent content tag"
+      },
+      "harassment": {
+        "background": "bg-white",
+        "color": "text-purple-600",
+        "border": "border border-purple-300",
+        "borderRadius": "rounded-full",
+        "padding": "px-3 py-1",
+        "fontSize": "text-xs",
+        "fontWeight": "font-medium",
+        "context": "Harassment tag"
+      }
+    },
+    "actionButtons": {
+      "primary": {
+        "background": "bg-cyan-500",
+        "color": "text-white",
+        "borderRadius": "rounded-lg",
+        "padding": "px-4 py-2",
+        "fontSize": "text-sm",
+        "fontWeight": "font-semibold",
+        "hover": "hover:bg-cyan-600",
+        "transition": "transition-colors",
+        "context": "Primary action button"
+      },
+      "secondary": {
+        "background": "bg-white",
+        "color": "text-gray-700",
+        "border": "border border-gray-300",
+        "borderRadius": "rounded-lg",
+        "padding": "px-4 py-2",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "hover": "hover:bg-gray-50",
+        "transition": "transition-colors",
+        "context": "Secondary action button"
+      },
+      "success": {
+        "background": "bg-white",
+        "color": "text-green-600",
+        "border": "border border-green-300",
+        "borderRadius": "rounded-lg",
+        "padding": "px-3 py-1.5",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "hover": "hover:bg-green-50",
+        "transition": "transition-colors",
+        "context": "Approve button"
+      },
+      "danger": {
+        "background": "bg-white",
+        "color": "text-red-600",
+        "border": "border border-red-300",
+        "borderRadius": "rounded-lg",
+        "padding": "px-3 py-1.5",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "hover": "hover:bg-red-50",
+        "transition": "transition-colors",
+        "context": "Remove/Delete button"
+      }
+    },
+    "alertBanner": {
+      "error": {
+        "background": "bg-red-50",
+        "border": "border border-red-200",
+        "borderRadius": "rounded-lg",
+        "padding": "px-4 py-3",
+        "color": "text-red-700",
+        "fontSize": "text-sm",
+        "spacing": "mb-6",
+        "context": "Error alert banner"
+      },
+      "warning": {
+        "background": "bg-yellow-50",
+        "border": "border border-yellow-200",
+        "borderRadius": "rounded-lg",
+        "padding": "px-4 py-3",
+        "color": "text-yellow-800",
+        "fontSize": "text-sm",
+        "spacing": "mb-6",
+        "context": "Warning alert banner"
+      }
+    },
+    "searchBar": {
+      "container": {
+        "position": "relative",
+        "maxWidth": "max-w-md",
+        "context": "Search input wrapper"
+      },
+      "input": {
+        "background": "bg-white",
+        "border": "border border-gray-300",
+        "borderRadius": "rounded-lg",
+        "padding": "pl-10 pr-4 py-2",
+        "fontSize": "text-sm",
+        "width": "w-full",
+        "placeholder": "placeholder-gray-400",
+        "focus": {
+          "outline": "focus:outline-none",
+          "ring": "focus:ring-2 focus:ring-cyan-500",
+          "borderColor": "focus:border-cyan-500",
+          "context": "Focus state"
+        },
+        "context": "Search input field"
+      },
+      "icon": {
+        "position": "absolute left-3 top-1/2 transform -translate-y-1/2",
+        "size": "h-4 w-4",
+        "color": "text-gray-400",
+        "context": "Search icon"
+      }
+    },
+    "progressBar": {
+      "container": {
+        "background": "bg-gray-200",
+        "height": "h-2",
+        "borderRadius": "rounded-full",
+        "overflow": "overflow-hidden",
+        "width": "w-24",
+        "context": "Progress bar background"
+      },
+      "fill": {
+        "background": "bg-cyan-500",
+        "height": "h-full",
+        "borderRadius": "rounded-full",
+        "transition": "transition-all",
+        "context": "Progress bar fill"
+      },
+      "percentage": {
+        "color": "text-gray-600",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "spacing": "ml-2",
+        "context": "Percentage text"
+      }
+    }
+  },
+  "responsiveBreakpoints": {
+    "mobile": {
+      "maxWidth": "< 768px",
+      "layout": "Single column, stacked content",
+      "navigation": "Bottom navigation bar",
+      "tables": "Card view instead of table",
+      "statsGrid": "grid-cols-1",
+      "context": "Mobile phones"
+    },
+    "tablet": {
+      "range": "768px - 1024px",
+      "layout": "Two-column or collapsible sidebar",
+      "statsGrid": "grid-cols-2",
+      "context": "Tablets"
+    },
+    "desktop": {
+      "minWidth": "> 1024px",
+      "layout": "Fixed sidebar + main content",
+      "statsGrid": "grid-cols-2 md:grid-cols-4",
+      "context": "Desktop"
+    }
+  },
+  "doNotRules": {
+    "colors": [
+      "DO NOT use colors other than cyan for primary actions and active states",
+      "DO NOT change published status color from cyan",
+      "DO NOT use light backgrounds for sidebar - must stay dark (gray-900)",
+      "DO NOT mix badge border colors - each severity has specific color"
+    ],
+    "layout": [
+      "DO NOT show desktop sidebar on mobile - use bottom navigation",
+      "DO NOT hide essential actions on mobile - adapt to card view",
+      "DO NOT make content full-bleed - maintain padding",
+      "DO NOT stack all stats vertically on desktop - use grid"
+    ],
+    "tables": [
+      "DO NOT show tables on mobile without card alternative",
+      "DO NOT remove hover states from table rows",
+      "DO NOT make table text too small - maintain readability",
+      "DO NOT forget responsive overflow-x-auto for wide tables"
+    ],
+    "navigation": [
+      "DO NOT use same styling for active and inactive menu items",
+      "DO NOT remove section labels - they provide structure",
+      "DO NOT place navigation on right side - left sidebar or bottom only"
+    ],
+    "buttons": [
+      "DO NOT use solid backgrounds for all buttons - Review/View are secondary",
+      "DO NOT make Approve and Remove buttons same style - different colors required",
+      "DO NOT remove hover states from buttons"
+    ]
+  },
+  "componentMapping": {
+    "AdminDashboard": {
+      "desktop": "min-h-screen grid grid-cols-[220px_1fr] bg-gray-50",
+      "mobile": "min-h-screen flex flex-col bg-gray-50 pb-20"
+    },
+    "Sidebar": {
+      "desktop": "bg-gray-900 w-[220px] h-screen sticky top-0 overflow-y-auto",
+      "mobile": "fixed bottom-0 left-0 right-0 z-50 bg-gray-900 p-4 border-t border-gray-700"
+    },
+    "NavMenuItem": {
+      "default": "text-gray-300 bg-transparent px-4 py-2.5 flex items-center space-x-3 text-sm font-medium hover:bg-gray-800 transition-colors",
+      "active": "text-white bg-cyan-500 px-4 py-2.5 flex items-center space-x-3 text-sm font-semibold"
+    },
+    "StatsCard": {
+      "container": "bg-white border border-gray-200 rounded-xl p-5 shadow-sm",
+      "value": "text-3xl font-bold text-gray-900 mb-1",
+      "change": "text-sm font-medium text-green-600"
+    },
+    "DataTable": {
+      "container": "bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm",
+      "desktop": "block",
+      "mobile": "hidden"
+    },
+    "MobileCardView": {
+      "container": "bg-white border border-gray-200 rounded-lg p-4 mb-3",
+      "visible": "block md:hidden"
+    },
+    "StatusBadge": {
+      "published": "bg-cyan-500 text-white rounded-full px-3 py-1 text-xs font-semibold",
+      "draft": "bg-gray-200 text-gray-700 rounded-full px-3 py-1 text-xs font-semibold"
+    },
+    "ActionButton": {
+      "primary": "bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
+      "approve": "bg-white hover:bg-green-50 text-green-600 border border-green-300 rounded-lg px-3 py-1.5 text-sm font-medium",
+      "remove": "bg-white hover:bg-red-50 text-red-600 border border-red-300 rounded-lg px-3 py-1.5 text-sm font-medium"
+    },
+    "SearchBar": {
+      "container": "relative max-w-md",
+      "input": "bg-white border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm w-full focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+    },
+    "ProgressBar": {
+      "container": "bg-gray-200 h-2 rounded-full overflow-hidden w-24",
+      "fill": "bg-cyan-500 h-full rounded-full transition-all"
+    }
+  },
+  "pageLayouts": {
+    "dashboard": {
+      "structure": [
+        "Stats Grid (4 columns on desktop, 2 on tablet, 1 on mobile)",
+        "Recent Stories Table",
+        "Recent Activity Table"
+      ],
+      "context": "Overview dashboard layout"
+    },
+    "management": {
+      "structure": [
+        "Page Header (Title + Search + Actions)",
+        "Data Table or Card Grid",
+        "Pagination"
+      ],
+      "context": "Users, Stories, Drafts management"
+    },
+    "moderation": {
+      "structure": [
+        "Alert Banner (if items need attention)",
+        "Flagged Content Table with Actions"
+      ],
+      "context": "Content moderation interface"
+    },
+    "analytics": {
+      "structure": [
+        "Metric Cards (3 columns)",
+        "Monthly Growth Chart",
+        "Top Stories List",
+        "Top Authors List"
+      ],
+      "context": "Analytics dashboard"
+    }
+  },
+  "interactionPatterns": {
+    "navigation": {
+      "desktop": "Click menu item in sidebar to navigate",
+      "mobile": "Tap icon in bottom navigation bar",
+      "feedback": "Active menu item has cyan background",
+      "context": "Page navigation"
+    },
+    "dataManagement": {
+      "view": "Click View button or table row",
+      "edit": "Click Edit button",
+      "delete": "Click Delete/Remove button with confirmation",
+      "search": "Type in search bar for real-time filtering",
+      "filter": "Click filter icon for advanced filters",
+      "context": "CRUD operations"
+    },
+    "moderation": {
+      "review": "Click Review to see full content",
+      "approve": "Click Approve (green) to publish",
+      "remove": "Click Remove (red) to delete",
+      "context": "Content moderation flow"
+    },
+    "mobileAdaptation": {
+      "tables": "Convert to card view on mobile",
+      "forms": "Stack form fields vertically",
+      "navigation": "Move to bottom bar",
+      "context": "Mobile-specific UX"
+    }
+  },
+  "accessibility": {
+    "contrast": "WCAG AA compliant text contrast",
+    "focusStates": "Visible focus rings on all interactive elements",
+    "keyboardNav": "Full keyboard navigation support",
+    "screenReader": "Proper ARIA labels and semantic HTML",
+    "touchTargets": "Minimum 44x44px touch targets on mobile"
+  }
+}

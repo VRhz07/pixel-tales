@@ -1,0 +1,402 @@
+{
+  "designSystem": {
+    "name": "Imaginary Worlds Social & Leaderboard",
+    "type": "social_interface",
+    "framework": "react_typescript_tailwind",
+    "layout": "list_based_content"
+  },
+  "colorPalette": {
+    "primary": {
+      "purple": "#8B5CF6",
+      "purpleDark": "#7C3AED",
+      "purpleLight": "#A78BFA"
+    },
+    "rankings": {
+      "gold": "#F59E0B",
+      "silver": "#9CA3AF", 
+      "bronze": "#EA580C",
+      "fourth": "#D1D5DB",
+      "fifth": "#D1D5DB"
+    },
+    "status": {
+      "online": "#10B981",
+      "offline": "#9CA3AF"
+    },
+    "neutral": {
+      "white": "#FFFFFF",
+      "gray50": "#F9FAFB",
+      "gray100": "#F3F4F6",
+      "gray200": "#E5E7EB",
+      "gray300": "#D1D5DB",
+      "gray400": "#9CA3AF",
+      "gray500": "#6B7280",
+      "gray600": "#4B5563",
+      "gray700": "#374151",
+      "gray800": "#1F2937",
+      "gray900": "#111827"
+    },
+    "backgrounds": {
+      "page": "#F9FAFB",
+      "card": "#FFFFFF",
+      "avatar": "Various pastel colors per user"
+    }
+  },
+  "elementStyling": {
+    "pageContainer": {
+      "background": "bg-gray-50",
+      "padding": "p-6",
+      "minHeight": "min-h-screen",
+      "context": "Full page wrapper - light gray background"
+    },
+    "sectionHeaders": {
+      "container": {
+        "spacing": "mb-6",
+        "context": "Section header wrapper"
+      },
+      "titleRow": {
+        "display": "flex items-center",
+        "spacing": "space-x-2 mb-2",
+        "context": "Title with emoji icon"
+      },
+      "emoji": {
+        "fontSize": "text-xl",
+        "context": "Section emoji icons - trophy, people, etc."
+      },
+      "title": {
+        "color": "text-gray-900",
+        "fontSize": "text-xl",
+        "fontWeight": "font-bold",
+        "context": "Section titles - dark text"
+      },
+      "subtitle": {
+        "color": "text-gray-500",
+        "fontSize": "text-sm",
+        "context": "Section descriptions - muted gray"
+      }
+    },
+    "leaderboardList": {
+      "container": {
+        "spacing": "space-y-3",
+        "context": "List of leaderboard items with gaps"
+      },
+      "item": {
+        "container": {
+          "background": "bg-white",
+          "borderRadius": "rounded-xl",
+          "padding": "p-4",
+          "shadow": "shadow-sm",
+          "border": "border border-gray-100",
+          "display": "flex items-center justify-between",
+          "context": "Individual leaderboard items - white cards with subtle shadow"
+        },
+        "leftContent": {
+          "display": "flex items-center",
+          "spacing": "space-x-3",
+          "context": "Rank badge + avatar + info section"
+        },
+        "rightContent": {
+          "display": "flex items-center",
+          "context": "Achievement badges and medals"
+        }
+      }
+    },
+    "rankBadges": {
+      "first": {
+        "background": "bg-amber-500",
+        "color": "text-white",
+        "size": "w-8 h-8",
+        "borderRadius": "rounded-full",
+        "display": "flex items-center justify-center",
+        "fontSize": "text-sm",
+        "fontWeight": "font-bold",
+        "context": "1st place - gold/amber background"
+      },
+      "second": {
+        "background": "bg-gray-400",
+        "color": "text-white", 
+        "size": "w-8 h-8",
+        "borderRadius": "rounded-full",
+        "display": "flex items-center justify-center",
+        "fontSize": "text-sm",
+        "fontWeight": "font-bold",
+        "context": "2nd place - silver/gray background"
+      },
+      "third": {
+        "background": "bg-orange-600",
+        "color": "text-white",
+        "size": "w-8 h-8", 
+        "borderRadius": "rounded-full",
+        "display": "flex items-center justify-center",
+        "fontSize": "text-sm",
+        "fontWeight": "font-bold",
+        "context": "3rd place - bronze/orange background"
+      },
+      "other": {
+        "background": "bg-gray-300",
+        "color": "text-gray-600",
+        "size": "w-8 h-8",
+        "borderRadius": "rounded-full", 
+        "display": "flex items-center justify-center",
+        "fontSize": "text-sm",
+        "fontWeight": "font-bold",
+        "context": "4th+ place - light gray background with dark text"
+      }
+    },
+    "userAvatars": {
+      "container": {
+        "size": "w-10 h-10",
+        "borderRadius": "rounded-full",
+        "display": "flex items-center justify-center",
+        "fontSize": "text-lg",
+        "context": "User avatar circles with emoji or initial"
+      },
+      "backgrounds": {
+        "emma": "bg-yellow-100",
+        "you": "bg-orange-100", 
+        "alex": "bg-pink-100",
+        "sofia": "bg-purple-100",
+        "maya": "bg-blue-100",
+        "context": "Different pastel backgrounds per user"
+      },
+      "content": {
+        "emoji": "User's chosen emoji character",
+        "crown": "👑 for top performers",
+        "context": "Avatar content - emojis or symbols"
+      }
+    },
+    "userInfo": {
+      "name": {
+        "color": "text-gray-900",
+        "fontSize": "text-base",
+        "fontWeight": "font-semibold",
+        "spacing": "mb-1",
+        "context": "User names - dark text"
+      },
+      "stats": {
+        "color": "text-gray-500",
+        "fontSize": "text-sm",
+        "context": "Story count and activity info - muted gray"
+      },
+      "activity": {
+        "color": "text-gray-500",
+        "fontSize": "text-sm",
+        "prefix": "Latest:",
+        "context": "Latest story titles - muted gray with prefix"
+      }
+    },
+    "achievementBadges": {
+      "medal": {
+        "emoji": "🥇🥈🥉",
+        "size": "text-lg",
+        "context": "Medal emojis for top 3 positions"
+      },
+      "trophy": {
+        "emoji": "🏆",
+        "size": "text-lg", 
+        "context": "Trophy emoji for #1 position"
+      }
+    },
+    "socialList": {
+      "container": {
+        "spacing": "space-y-3",
+        "context": "Friends list with gaps between items"
+      },
+      "item": {
+        "container": {
+          "background": "bg-white",
+          "borderRadius": "rounded-xl",
+          "padding": "p-4",
+          "shadow": "shadow-sm",
+          "border": "border border-gray-100",
+          "display": "flex items-center justify-between",
+          "context": "Friend list items - same styling as leaderboard"
+        },
+        "leftContent": {
+          "display": "flex items-center",
+          "spacing": "space-x-3",
+          "context": "Avatar + user info section"
+        },
+        "rightContent": {
+          "display": "flex items-center",
+          "spacing": "space-x-2",
+          "context": "Status indicator + action button"
+        }
+      }
+    },
+    "onlineStatus": {
+      "indicator": {
+        "size": "w-2 h-2",
+        "borderRadius": "rounded-full",
+        "position": "absolute -top-0.5 -right-0.5",
+        "online": "bg-green-500",
+        "offline": "bg-gray-400",
+        "context": "Small dots on avatars indicating online status"
+      },
+      "container": {
+        "position": "relative",
+        "context": "Avatar wrapper to position status dot"
+      }
+    },
+    "actionButtons": {
+      "addFriends": {
+        "background": "bg-white",
+        "color": "text-purple-500",
+        "border": "border border-purple-200",
+        "borderRadius": "rounded-lg",
+        "padding": "px-4 py-2",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "display": "flex items-center",
+        "spacing": "space-x-2",
+        "hover": {
+          "background": "hover:bg-purple-50",
+          "context": "Hover state - light purple background"
+        },
+        "context": "Add Friends button - secondary button styling"
+      },
+      "messageButton": {
+        "background": "bg-gray-100",
+        "color": "text-gray-600", 
+        "borderRadius": "rounded-lg",
+        "padding": "p-2",
+        "hover": {
+          "background": "hover:bg-gray-200",
+          "context": "Hover state - darker gray"
+        },
+        "context": "Message/chat buttons - subtle gray styling"
+      }
+    },
+    "buttonIcons": {
+      "size": "h-4 w-4",
+      "color": "text-current",
+      "context": "Icons inside buttons inherit button text color"
+    }
+  },
+  "layoutPatterns": {
+    "listItems": {
+      "structure": "Card-based list with consistent spacing",
+      "itemLayout": "flex justify-between items-center",
+      "spacing": "space-y-3 between items",
+      "cardStyling": "Rounded corners, subtle shadows, white background",
+      "context": "Both leaderboard and social lists use same pattern"
+    },
+    "userRepresentation": {
+      "structure": "Rank/Status + Avatar + Info + Actions",
+      "avatarSizing": "Consistent w-10 h-10 across all contexts",
+      "infoHierarchy": "Name (bold) > Stats/Activity (muted)",
+      "context": "Standard user representation pattern"
+    }
+  },
+  "doNotRules": {
+    "backgrounds": [
+      "DO NOT use gradients on list items - keep white backgrounds",
+      "DO NOT apply page background to individual cards",
+      "DO NOT mix avatar background colors - each user has consistent color",
+      "ONLY use colored backgrounds on rank badges and status indicators"
+    ],
+    "spacing": [
+      "DO NOT remove gaps between list items - maintain space-y-3",
+      "DO NOT use tight padding on cards - maintain p-4",
+      "DO NOT stack elements without proper spacing"
+    ],
+    "colors": [
+      "DO NOT use purple for rank badges - use gold/silver/bronze system",
+      "DO NOT mix status indicator colors - green for online only",
+      "DO NOT use dark backgrounds for user avatars - keep pastel",
+      "Achievement emojis are decorative - no color styling needed"
+    ],
+    "badges": [
+      "DO NOT style emoji badges with CSS colors - they're already colored",
+      "DO NOT make rank badges too large - w-8 h-8 maximum",
+      "DO NOT use text rank badges for top 3 - use colored circular badges"
+    ],
+    "consistency": [
+      "DO NOT vary card styling between leaderboard and social sections",
+      "DO NOT change avatar sizing between contexts",
+      "DO NOT use different shadow styles for list items"
+    ]
+  },
+  "componentMapping": {
+    "LeaderboardItem": {
+      "baseClass": "bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center justify-between",
+      "rankBadgeClass": "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold",
+      "userInfoClass": "flex items-center space-x-3"
+    },
+    "RankBadge": {
+      "first": "bg-amber-500 text-white",
+      "second": "bg-gray-400 text-white", 
+      "third": "bg-orange-600 text-white",
+      "other": "bg-gray-300 text-gray-600"
+    },
+    "UserAvatar": {
+      "baseClass": "w-10 h-10 rounded-full flex items-center justify-center text-lg relative",
+      "backgrounds": {
+        "emma": "bg-yellow-100",
+        "alex": "bg-pink-100",
+        "sofia": "bg-purple-100",
+        "maya": "bg-blue-100",
+        "you": "bg-orange-100"
+      }
+    },
+    "OnlineStatus": {
+      "container": "relative",
+      "indicator": "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full",
+      "online": "bg-green-500",
+      "offline": "bg-gray-400"
+    },
+    "SocialItem": {
+      "baseClass": "bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center justify-between",
+      "leftContent": "flex items-center space-x-3",
+      "rightContent": "flex items-center space-x-2"
+    },
+    "SectionHeader": {
+      "container": "mb-6",
+      "titleRow": "flex items-center space-x-2 mb-2",
+      "title": "text-xl font-bold text-gray-900",
+      "subtitle": "text-sm text-gray-500"
+    }
+  },
+  "emojiSystem": {
+    "sectionIcons": {
+      "leaderboard": "🏆",
+      "social": "👥",
+      "context": "Emoji icons for section headers"
+    },
+    "achievements": {
+      "firstPlace": "🏆",
+      "medals": "🥇🥈🥉",
+      "context": "Achievement indicators - no CSS styling needed"
+    },
+    "userAvatars": {
+      "sun": "☀️",
+      "crown": "👑", 
+      "star": "⭐",
+      "unicorn": "🦄",
+      "rainbow": "🌈",
+      "context": "User avatar emojis - personality representations"
+    }
+  },
+  "stateManagement": {
+    "onlineStatus": {
+      "online": "Green dot visible on avatar",
+      "offline": "Gray dot or no dot",
+      "context": "Real-time status updates"
+    },
+    "rankings": {
+      "dynamic": "Rank badges update based on story count",
+      "achievements": "Medal emojis appear for top performers",
+      "context": "Leaderboard updates with user activity"
+    }
+  },
+  "accessibility": {
+    "rankBadges": "Proper contrast ratios for text on colored backgrounds",
+    "statusIndicators": "Color plus position to indicate status", 
+    "interactiveElements": "All buttons have focus states and proper semantics",
+    "listNavigation": "Keyboard navigation support for list items"
+  },
+  "responsiveConsiderations": {
+    "mobile": "Cards stack properly, maintain padding",
+    "tablet": "List items expand to use available width",
+    "desktop": "Consider max-width container for very wide screens"
+  }
+}

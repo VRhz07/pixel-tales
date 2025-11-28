@@ -1,0 +1,503 @@
+{
+    "designSystem": {
+      "name": "Imaginary Worlds Online Stories Page",
+      "type": "community_content_discovery",
+      "framework": "react_typescript_tailwind",
+      "layout": "search_filter_feed_layout"
+    },
+    "colorPalette": {
+      "primary": {
+        "purple": "#8B5CF6",
+        "purpleDark": "#7C3AED",
+        "purpleLight": "#A78BFA"
+      },
+      "genre": {
+        "fantasy": "#FB923C",
+        "adventure": "#F97316"
+      },
+      "neutral": {
+        "white": "#FFFFFF",
+        "gray50": "#F9FAFB",
+        "gray100": "#F3F4F6",
+        "gray200": "#E5E7EB",
+        "gray300": "#D1D5DB",
+        "gray400": "#9CA3AF",
+        "gray500": "#6B7280",
+        "gray600": "#4B5563",
+        "gray700": "#374151",
+        "gray800": "#1F2937",
+        "gray900": "#111827"
+      },
+      "accent": {
+        "yellow": "#F59E0B",
+        "pink": "#EC4899"
+      },
+      "backgrounds": {
+        "page": "#F9FAFB",
+        "card": "#FFFFFF"
+      }
+    },
+    "elementStyling": {
+      "pageContainer": {
+        "background": "bg-gray-50",
+        "padding": "p-6 pb-24",
+        "minHeight": "min-h-screen",
+        "context": "Full page wrapper - light gray background"
+      },
+      "pageHeader": {
+        "container": {
+          "spacing": "mb-6",
+          "context": "Header section with back button and title"
+        },
+        "backButton": {
+          "size": "h-6 w-6",
+          "color": "text-gray-700",
+          "spacing": "mb-4",
+          "hover": "hover:text-gray-900",
+          "context": "Back navigation arrow"
+        },
+        "title": {
+          "color": "text-gray-900",
+          "fontSize": "text-2xl",
+          "fontWeight": "font-bold",
+          "spacing": "mb-1",
+          "context": "Page title - Online Stories"
+        },
+        "subtitle": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm",
+          "spacing": "mb-4",
+          "context": "Page description - Discover magical tales from our community"
+        }
+      },
+      "searchBar": {
+        "container": {
+          "background": "bg-white",
+          "border": "border border-gray-200",
+          "borderRadius": "rounded-lg",
+          "padding": "px-4 py-3",
+          "display": "flex items-center",
+          "spacing": "space-x-2 mb-4",
+          "context": "Search input container"
+        },
+        "icon": {
+          "size": "h-5 w-5",
+          "color": "text-gray-400",
+          "context": "Search icon - gray color"
+        },
+        "input": {
+          "background": "bg-transparent",
+          "border": "border-0",
+          "color": "text-gray-900",
+          "fontSize": "text-sm",
+          "placeholder": "placeholder-gray-400",
+          "width": "w-full",
+          "focus": "focus:outline-none",
+          "context": "Search input field - Search stories or authors..."
+        }
+      },
+      "filterBar": {
+        "container": {
+          "display": "flex items-center",
+          "spacing": "space-x-3 mb-4",
+          "context": "Filter dropdowns row"
+        },
+        "filterIcon": {
+          "size": "h-5 w-5",
+          "color": "text-gray-700",
+          "context": "Filter funnel icon"
+        },
+        "dropdown": {
+          "button": {
+            "background": "bg-white",
+            "border": "border border-gray-200",
+            "borderRadius": "rounded-lg",
+            "padding": "px-4 py-2",
+            "fontSize": "text-sm",
+            "color": "text-gray-700",
+            "display": "flex items-center justify-between",
+            "spacing": "space-x-2",
+            "minWidth": "min-w-32",
+            "hover": "hover:bg-gray-50",
+            "context": "Filter dropdown buttons"
+          },
+          "icon": {
+            "size": "h-4 w-4",
+            "color": "text-gray-500",
+            "context": "Chevron down icon"
+          },
+          "menu": {
+            "background": "bg-white",
+            "border": "border border-gray-200",
+            "borderRadius": "rounded-lg",
+            "shadow": "shadow-lg",
+            "padding": "py-2",
+            "position": "absolute z-10",
+            "marginTop": "mt-2",
+            "context": "Dropdown menu panel"
+          },
+          "item": {
+            "default": {
+              "padding": "px-4 py-2",
+              "fontSize": "text-sm",
+              "color": "text-gray-700",
+              "hover": "hover:bg-gray-50",
+              "cursor": "cursor-pointer",
+              "context": "Dropdown menu items"
+            },
+            "selected": {
+              "padding": "px-4 py-2",
+              "fontSize": "text-sm",
+              "color": "text-gray-900",
+              "fontWeight": "font-medium",
+              "display": "flex items-center",
+              "spacing": "space-x-2",
+              "context": "Selected dropdown item with checkmark"
+            },
+            "checkmark": {
+              "size": "h-4 w-4",
+              "color": "text-purple-500",
+              "context": "Checkmark for selected items"
+            }
+          }
+        }
+      },
+      "resultsCount": {
+        "color": "text-gray-500",
+        "fontSize": "text-sm",
+        "spacing": "mb-4",
+        "context": "Results count text - 6 stories found"
+      },
+      "storyList": {
+        "container": {
+          "spacing": "space-y-4",
+          "context": "Story list with gaps between cards"
+        }
+      },
+      "storyCard": {
+        "container": {
+          "background": "bg-white",
+          "borderRadius": "rounded-xl",
+          "padding": "p-4",
+          "shadow": "shadow-sm",
+          "border": "border border-gray-100",
+          "context": "Individual story cards"
+        },
+        "header": {
+          "display": "flex items-start justify-between",
+          "spacing": "mb-2",
+          "context": "Story title and read button row"
+        },
+        "title": {
+          "color": "text-gray-900",
+          "fontSize": "text-lg",
+          "fontWeight": "font-bold",
+          "context": "Story title"
+        },
+        "author": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm",
+          "spacing": "mb-2",
+          "prefix": "by",
+          "context": "Author name with 'by' prefix"
+        },
+        "badges": {
+          "container": {
+            "display": "flex items-center",
+            "spacing": "space-x-2 mb-3",
+            "context": "Genre and age range badges row"
+          },
+          "genre": {
+            "borderRadius": "rounded-full",
+            "padding": "px-3 py-1",
+            "fontSize": "text-xs",
+            "fontWeight": "font-medium",
+            "context": "Genre badges - Fantasy (orange), Adventure (dark orange)"
+          },
+          "ageRange": {
+            "background": "bg-gray-100",
+            "color": "text-gray-700",
+            "borderRadius": "rounded-full",
+            "padding": "px-3 py-1",
+            "fontSize": "text-xs",
+            "fontWeight": "font-medium",
+            "context": "Age range badge - neutral gray"
+          }
+        },
+        "description": {
+          "color": "text-gray-600",
+          "fontSize": "text-sm",
+          "lineHeight": "leading-relaxed",
+          "spacing": "mb-3",
+          "context": "Story description/excerpt"
+        },
+        "metadata": {
+          "container": {
+            "display": "flex items-center justify-between",
+            "context": "Stats row at bottom of card"
+          },
+          "leftStats": {
+            "display": "flex items-center",
+            "spacing": "space-x-4",
+            "context": "Rating, downloads, likes group"
+          },
+          "rightStats": {
+            "display": "flex items-center",
+            "context": "Reading time"
+          },
+          "stat": {
+            "display": "flex items-center",
+            "spacing": "space-x-1",
+            "context": "Individual stat item"
+          }
+        },
+        "rating": {
+          "star": {
+            "size": "h-4 w-4",
+            "color": "text-yellow-500",
+            "context": "Star icon - yellow"
+          },
+          "value": {
+            "color": "text-gray-700",
+            "fontSize": "text-sm",
+            "fontWeight": "font-medium",
+            "context": "Rating number"
+          }
+        },
+        "downloads": {
+          "icon": {
+            "size": "h-4 w-4",
+            "color": "text-gray-400",
+            "context": "Download icon - gray"
+          },
+          "count": {
+            "color": "text-gray-500",
+            "fontSize": "text-sm",
+            "context": "Download count"
+          }
+        },
+        "likes": {
+          "icon": {
+            "size": "h-4 w-4",
+            "color": "text-pink-500",
+            "context": "Heart icon - pink"
+          },
+          "count": {
+            "color": "text-gray-500",
+            "fontSize": "text-sm",
+            "context": "Like count"
+          }
+        },
+        "readingTime": {
+          "icon": {
+            "size": "h-4 w-4",
+            "color": "text-gray-400",
+            "context": "Clock icon - gray"
+          },
+          "duration": {
+            "color": "text-gray-500",
+            "fontSize": "text-sm",
+            "context": "Reading duration - 10 min, 15 min"
+          }
+        },
+        "readButton": {
+          "background": "bg-white",
+          "color": "text-purple-500",
+          "border": "border border-purple-200",
+          "borderRadius": "rounded-lg",
+          "padding": "px-4 py-2",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "hover": "hover:bg-purple-50",
+          "context": "Read button - purple outline style"
+        }
+      }
+    },
+    "genreBadgeColors": {
+      "fantasy": {
+        "background": "bg-orange-500",
+        "color": "text-white",
+        "context": "Fantasy genre - orange background"
+      },
+      "adventure": {
+        "background": "bg-orange-600",
+        "color": "text-white",
+        "context": "Adventure genre - dark orange background"
+      }
+    },
+    "filterOptions": {
+      "category": {
+        "label": "Category Filter (First Dropdown)",
+        "options": ["All", "Fantasy", "Adventure", "Sci-Fi", "Comedy", "Mystery", "Calm"],
+        "default": "All",
+        "context": "Genre/category filter - same as offline stories"
+      },
+      "ageRange": {
+        "label": "Age Range Filter (Second Dropdown)",
+        "options": ["All", "3-6", "5-8", "8-12"],
+        "default": "All",
+        "context": "Age range filter"
+      },
+      "sortBy": {
+        "label": "Sort By Filter (Third Dropdown)",
+        "options": ["Most Popular", "Highest Rated", "Newest", "Most Downloaded"],
+        "default": "Most Popular",
+        "context": "Sort/ranking filter"
+      }
+    },
+    "layoutPatterns": {
+      "pageStructure": {
+        "order": [
+          "Back Button",
+          "Page Title & Subtitle",
+          "Search Bar",
+          "Filter Bar (Icon + 3 Dropdowns)",
+          "Results Count",
+          "Story Feed"
+        ],
+        "context": "Top-to-bottom page flow"
+      },
+      "storyCard": {
+        "structure": [
+          "Title + Read Button (flex justify-between)",
+          "Author (by Name)",
+          "Badges Row (genre, age)",
+          "Description/Excerpt",
+          "Stats Row (rating, downloads, likes | reading time)"
+        ],
+        "context": "Story card internal layout"
+      }
+    },
+    "doNotRules": {
+      "colors": [
+        "DO NOT use pink for read buttons - always use purple outline",
+        "DO NOT style heart/like icons with colors other than pink",
+        "DO NOT style star ratings with non-yellow colors",
+        "DO NOT use colored backgrounds for age range badges - keep gray"
+      ],
+      "layout": [
+        "DO NOT center-align story card content - keep left-aligned",
+        "DO NOT place read button below content - keep in header",
+        "DO NOT stack metadata stats vertically - use horizontal layout",
+        "DO NOT remove gaps between story cards"
+      ],
+      "stats": [
+        "DO NOT mix stat icon colors - stars=yellow, downloads=gray, likes=pink, time=gray",
+        "DO NOT remove any stats from cards - all are important social proof",
+        "DO NOT use large icons for stats - keep h-4 w-4",
+        "Stats should be split: left side (rating/downloads/likes) | right side (time)"
+      ],
+      "buttons": [
+        "DO NOT use solid purple backgrounds - read buttons are outline style",
+        "DO NOT use pink for online story actions - pink is for offline content",
+        "DO NOT remove hover states from buttons"
+      ],
+      "content": [
+        "DO NOT hide author names - always show with 'by' prefix",
+        "DO NOT truncate descriptions too early - show meaningful excerpts",
+        "DO NOT remove genre badges - they're important for discovery"
+      ]
+    },
+    "componentMapping": {
+      "OnlineStoriesPage": {
+        "baseClass": "min-h-screen bg-gray-50 p-6 pb-24"
+      },
+      "PageHeader": {
+        "backButton": "h-6 w-6 text-gray-700 hover:text-gray-900 mb-4",
+        "title": "text-2xl font-bold text-gray-900 mb-1",
+        "subtitle": "text-sm text-gray-500 mb-4"
+      },
+      "SearchBar": {
+        "container": "bg-white border border-gray-200 rounded-lg px-4 py-3 flex items-center space-x-2 mb-4",
+        "icon": "h-5 w-5 text-gray-400",
+        "input": "bg-transparent border-0 text-sm text-gray-900 placeholder-gray-400 w-full focus:outline-none"
+      },
+      "FilterBar": {
+        "container": "flex items-center space-x-3 mb-4",
+        "filterIcon": "h-5 w-5 text-gray-700"
+      },
+      "FilterDropdown": {
+        "button": "bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-700 flex items-center justify-between space-x-2 min-w-32 hover:bg-gray-50",
+        "menu": "absolute z-10 bg-white border border-gray-200 rounded-lg shadow-lg py-2 mt-2",
+        "item": "px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer",
+        "selectedItem": "px-4 py-2 text-sm text-gray-900 font-medium flex items-center space-x-2"
+      },
+      "StoryCard": {
+        "container": "bg-white rounded-xl p-4 shadow-sm border border-gray-100",
+        "header": "flex items-start justify-between mb-2",
+        "title": "text-lg font-bold text-gray-900",
+        "author": "text-sm text-gray-500 mb-2",
+        "badgesRow": "flex items-center space-x-2 mb-3",
+        "description": "text-sm text-gray-600 leading-relaxed mb-3",
+        "metadataRow": "flex items-center justify-between"
+      },
+      "GenreBadge": {
+        "fantasy": "bg-orange-500 text-white rounded-full px-3 py-1 text-xs font-medium",
+        "adventure": "bg-orange-600 text-white rounded-full px-3 py-1 text-xs font-medium"
+      },
+      "AgeBadge": {
+        "baseClass": "bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-medium"
+      },
+      "ReadButton": {
+        "baseClass": "bg-white hover:bg-purple-50 text-purple-500 border border-purple-200 rounded-lg px-4 py-2 text-sm font-medium"
+      },
+      "StatItem": {
+        "container": "flex items-center space-x-1",
+        "rating": "h-4 w-4 text-yellow-500 + text-sm font-medium text-gray-700",
+        "downloads": "h-4 w-4 text-gray-400 + text-sm text-gray-500",
+        "likes": "h-4 w-4 text-pink-500 + text-sm text-gray-500",
+        "readingTime": "h-4 w-4 text-gray-400 + text-sm text-gray-500"
+      }
+    },
+    "interactionPatterns": {
+      "filtering": {
+        "behavior": "Three independent filters: Genre, Age, Sort",
+        "feedback": "Results count updates dynamically",
+        "sorting": "Sort dropdown changes order of results",
+        "context": "Multi-criteria filtering and sorting"
+      },
+      "search": {
+        "behavior": "Real-time search as user types",
+        "scope": "Searches story titles and author names",
+        "placeholder": "Search stories or authors...",
+        "context": "Text-based story discovery"
+      },
+      "socialEngagement": {
+        "likes": "Heart icon showing engagement count",
+        "downloads": "Download count for popularity indication",
+        "ratings": "Star rating with numeric value",
+        "context": "Social proof and popularity metrics"
+      }
+    },
+    "contentDifferences": {
+      "vsOfflineStories": {
+        "buttonStyle": "Read (purple outline) vs View (pink solid)",
+        "authorDisplay": "Shows author name for community content",
+        "socialMetrics": "Shows likes, downloads, ratings (offline doesn't)",
+        "description": "Shorter excerpt vs longer collection description",
+        "context": "Online stories emphasize community and discovery"
+      }
+    },
+    "stateManagement": {
+      "filterStates": {
+        "category": "Selected genre/category",
+        "ageRange": "Selected age range",
+        "sortBy": "Selected sort option"
+      },
+      "searchState": {
+        "query": "Current search string",
+        "results": "Filtered and sorted story list"
+      }
+    },
+    "accessibility": {
+      "socialMetrics": "Screen reader announces rating scores and engagement counts",
+      "authorInfo": "Proper semantic markup for author attribution",
+      "readButtons": "Clear action labels and focus states",
+      "sortingFeedback": "Announce sort order changes to screen readers"
+    },
+    "responsiveConsiderations": {
+      "mobile": "Current layout optimized for mobile",
+      "statsRow": "May wrap on very small screens",
+      "filterBar": "Filters may wrap to multiple rows if needed"
+    }
+  }

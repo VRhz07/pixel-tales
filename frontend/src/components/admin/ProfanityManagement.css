@@ -1,0 +1,792 @@
+/* Profanity Management Styles */
+
+.profanity-management {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.profanity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.profanity-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: #1f2937;
+}
+
+.profanity-header p {
+  color: #6b7280;
+  margin: 0;
+}
+
+.profanity-header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Stats Cards */
+.profanity-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Tablet: 2 columns */
+@media (max-width: 1024px) {
+  .profanity-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* Mobile: 2 columns for stats (2x2 grid for 4 cards) */
+@media (max-width: 768px) {
+  .profanity-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+}
+
+/* Extra small mobile: Even tighter grid */
+@media (max-width: 480px) {
+  .profanity-stats {
+    gap: 0.4rem !important;
+    margin-bottom: 1rem !important;
+  }
+}
+
+.stat-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+}
+
+.stat-card h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #8b5cf6;
+  margin: 0 0 0.5rem 0;
+  line-height: 1;
+}
+
+.stat-card p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.3;
+}
+
+/* Tablet: Medium-sized cards */
+@media (max-width: 1024px) {
+  .stat-card {
+    padding: 1.25rem;
+  }
+  
+  .stat-card h3 {
+    font-size: 1.75rem;
+  }
+  
+  .stat-card p {
+    font-size: 0.8125rem;
+  }
+}
+
+/* Mobile: Much smaller cards for 2x2 grid */
+@media (max-width: 768px) {
+  .stat-card {
+    padding: 0.5rem 0.4rem !important;
+    border-radius: 6px !important;
+    min-height: 60px !important;
+  }
+  
+  .stat-card h3 {
+    font-size: 1.25rem !important;
+    margin: 0 0 0.15rem 0 !important;
+    font-weight: 700 !important;
+  }
+  
+  .stat-card p {
+    font-size: 0.6875rem !important;
+    line-height: 1.1 !important;
+  }
+}
+
+/* Extra small mobile: Ultra compact */
+@media (max-width: 480px) {
+  .stat-card {
+    padding: 0.45rem 0.35rem !important;
+    border-radius: 5px !important;
+    min-height: 55px !important;
+  }
+  
+  .stat-card h3 {
+    font-size: 1.125rem !important;
+    margin: 0 0 0.1rem 0 !important;
+    font-weight: 700 !important;
+  }
+  
+  .stat-card p {
+    font-size: 0.625rem !important;
+    line-height: 1.1 !important;
+  }
+}
+
+/* Filters */
+.profanity-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-box svg {
+  color: #9ca3af;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 0.875rem;
+  background: transparent;
+}
+
+.profanity-filters select {
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+/* Words List - Matching User Management Style */
+.profanity-list {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.profanity-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.profanity-list thead {
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.profanity-list th {
+  padding: 16px 24px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease;
+}
+
+.profanity-list tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.profanity-list tbody tr:last-child {
+  border-bottom: none;
+}
+
+.profanity-list tbody tr:hover {
+  background: #f9fafb;
+}
+
+.profanity-list td {
+  padding: 20px 24px;
+  font-size: 14px;
+  color: #1f2937;
+  transition: color 0.3s ease;
+  vertical-align: middle;
+}
+
+/* Severity Badge - Matching User Management Style */
+.severity-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: 1px solid;
+  transition: all 0.2s ease;
+}
+
+.severity-mild {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+  border-color: #93c5fd;
+}
+
+.severity-moderate {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #d97706;
+  border-color: #fcd34d;
+}
+
+.severity-severe {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+/* Status */
+.status-active {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: #059669;
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+
+.status-active::before {
+  content: '●';
+  font-size: 0.875rem;
+}
+
+.status-inactive {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: #9ca3af;
+  font-weight: 500;
+  font-size: 0.8125rem;
+}
+
+.status-inactive::before {
+  content: '●';
+  font-size: 0.875rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  color: #6b7280;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.btn-icon.btn-danger:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #8b5cf6;
+  color: #8b5cf6;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Buttons */
+.btn-primary, .btn-secondary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #8b5cf6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #7c3aed;
+}
+
+.btn-secondary {
+  background: white;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-content.modal-large {
+  max-width: 700px;
+}
+
+.modal-content h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.modal-content > p {
+  margin: 0 0 1.5rem 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+  background: white;
+  color: #1f2937;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.form-group.checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.form-group.checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.form-group.checkbox input[type="checkbox"] {
+  width: auto;
+  cursor: pointer;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* States */
+.loading-state,
+.error-state,
+.empty-state {
+  padding: 3rem;
+  text-align: center;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.error-state {
+  color: #dc2626;
+}
+
+.error-state svg {
+  margin: 0 auto 1rem;
+}
+
+/* Dark Mode */
+.profanity-management.dark .profanity-header h2 {
+  color: #f3f4f6;
+}
+
+.profanity-management.dark .profanity-header p {
+  color: #9ca3af;
+}
+
+.profanity-management.dark .stat-card {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.profanity-management.dark .stat-card h3 {
+  color: #a78bfa;
+}
+
+.profanity-management.dark .stat-card p {
+  color: #9ca3af;
+}
+
+.profanity-management.dark .search-box,
+.profanity-management.dark .profanity-filters select {
+  background: #1f2937;
+  border-color: #374151;
+  color: #f3f4f6;
+}
+
+.profanity-management.dark .search-box input {
+  color: #f3f4f6;
+}
+
+.profanity-management.dark .search-box input::placeholder {
+  color: #6b7280;
+}
+
+.profanity-management.dark .profanity-list {
+  background: #2d2550;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.profanity-management.dark .profanity-list thead {
+  background: #1e1b3d;
+  border-bottom-color: transparent;
+}
+
+.profanity-management.dark .profanity-list th {
+  color: #9ca3af;
+}
+
+.profanity-management.dark .profanity-list tbody tr {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+.profanity-management.dark .profanity-list tbody tr:hover {
+  background: #1e1b3d;
+}
+
+.profanity-management.dark .profanity-list td {
+  color: white;
+}
+
+.profanity-management.dark .severity-mild {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.25) 0%, rgba(30, 64, 175, 0.15) 100%);
+  color: #93c5fd;
+  border: 1px solid rgba(147, 197, 253, 0.3);
+}
+
+.profanity-management.dark .severity-moderate {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.25) 0%, rgba(217, 119, 6, 0.15) 100%);
+  color: #fcd34d;
+  border: 1px solid rgba(252, 211, 77, 0.3);
+}
+
+.profanity-management.dark .severity-severe {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(239, 68, 68, 0.15) 100%);
+  color: #fca5a5;
+  border: 1px solid rgba(252, 165, 165, 0.3);
+}
+
+.profanity-management.dark .btn-icon:hover {
+  background: #374151;
+  color: #f3f4f6;
+}
+
+.profanity-management.dark .btn-secondary {
+  background: #374151;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+
+.profanity-management.dark .btn-secondary:hover {
+  background: #4b5563;
+}
+
+.profanity-management.dark .pagination button {
+  background: #1f2937;
+  border-color: #374151;
+  color: #e5e7eb;
+}
+
+.profanity-management.dark .pagination button:hover:not(:disabled) {
+  background: #374151;
+  border-color: #8b5cf6;
+}
+
+.profanity-management.dark .pagination span {
+  color: #9ca3af;
+}
+
+/* Dark Mode - Modals */
+.profanity-management.dark .modal-overlay,
+.modal-overlay.dark {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.profanity-management.dark .modal-content,
+.modal-content.dark {
+  background: #1f2937;
+  color: #e5e7eb;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+}
+
+.profanity-management.dark .modal-content h3,
+.modal-content.dark h3 {
+  color: #f3f4f6;
+}
+
+.profanity-management.dark .modal-content > p,
+.modal-content.dark > p {
+  color: #9ca3af;
+}
+
+.profanity-management.dark .form-group label,
+.modal-content.dark .form-group label {
+  color: #e5e7eb;
+}
+
+.profanity-management.dark .form-group input[type="text"],
+.profanity-management.dark .form-group textarea,
+.profanity-management.dark .form-group select,
+.modal-content.dark .form-group input[type="text"],
+.modal-content.dark .form-group textarea,
+.modal-content.dark .form-group select {
+  background: #111827;
+  border-color: #374151;
+  color: #e5e7eb;
+}
+
+.profanity-management.dark .form-group input[type="text"]::placeholder,
+.profanity-management.dark .form-group textarea::placeholder,
+.modal-content.dark .form-group input[type="text"]::placeholder,
+.modal-content.dark .form-group textarea::placeholder {
+  color: #6b7280;
+}
+
+.profanity-management.dark .form-group input[type="text"]:focus,
+.profanity-management.dark .form-group textarea:focus,
+.profanity-management.dark .form-group select:focus,
+.modal-content.dark .form-group input[type="text"]:focus,
+.modal-content.dark .form-group textarea:focus,
+.modal-content.dark .form-group select:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.profanity-management.dark .modal-actions,
+.modal-content.dark .modal-actions {
+  border-top-color: #374151;
+}
+
+.profanity-management.dark .loading-state,
+.profanity-management.dark .error-state,
+.profanity-management.dark .empty-state {
+  background: #1f2937;
+  border-color: #374151;
+  color: #9ca3af;
+}
+
+.profanity-management.dark .pagination {
+  border-color: #374151;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .profanity-management {
+    padding: 1rem;
+  }
+
+  .profanity-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .profanity-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .profanity-header-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .profanity-header-actions button {
+    flex: 1;
+  }
+
+  .profanity-filters {
+    flex-direction: column;
+  }
+
+  .search-box {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .profanity-filters select {
+    width: 100%;
+  }
+
+  .profanity-list {
+    overflow-x: auto;
+  }
+
+  .profanity-list table {
+    min-width: 600px;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 1.5rem;
+    max-height: 85vh;
+  }
+
+  .modal-content h3 {
+    font-size: 1.25rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,468 @@
+{
+  "metadata": {
+    "name": "Pixel Tales",
+    "version": "1.0.0",
+    "framework": "React + TypeScript + Tailwind CSS",
+    "colorFormat": "HSL",
+    "description": "Child-friendly, playful design story reader page with purple theme, rounded corners, and bouncy animations"
+  },
+  
+  "colorPalette": {
+    "hslValues": {
+      "background": "270 50% 98%",
+      "foreground": "270 30% 20%",
+      "card": "0 0% 100%",
+      "cardForeground": "270 30% 20%",
+      "primary": "270 70% 60%",
+      "primaryForeground": "0 0% 100%",
+      "secondary": "45 100% 65%",
+      "secondaryForeground": "270 30% 20%",
+      "accent": "320 80% 70%",
+      "accentForeground": "0 0% 100%",
+      "muted": "270 30% 95%",
+      "mutedForeground": "270 20% 50%",
+      "border": "270 30% 90%",
+      "input": "270 30% 90%",
+      "ring": "270 70% 60%",
+      "purpleLight": "270 60% 85%",
+      "purpleMedium": "270 70% 60%",
+      "purpleDark": "270 80% 40%",
+      "yellowBright": "45 100% 65%",
+      "pinkBright": "320 80% 70%",
+      "tealBright": "180 70% 60%"
+    },
+    "hexApproximations": {
+      "background": "#F5F0FA",
+      "foreground": "#3D2E4D",
+      "card": "#FFFFFF",
+      "primary": "#9B72CF",
+      "secondary": "#FFD666",
+      "accent": "#E879CD",
+      "purpleLight": "#D4C5E8",
+      "purpleMedium": "#9B72CF",
+      "purpleDark": "#6B3DBF",
+      "yellowBright": "#FFD666",
+      "pinkBright": "#E879CD",
+      "tealBright": "#52C9C9"
+    },
+    "darkMode": {
+      "background": "270 40% 15%",
+      "foreground": "270 30% 95%",
+      "card": "270 40% 18%",
+      "primary": "270 70% 60%",
+      "muted": "270 30% 25%",
+      "border": "270 30% 25%"
+    }
+  },
+
+  "typography": {
+    "fonts": {
+      "heading": {
+        "family": "Fredoka",
+        "fallback": "sans-serif",
+        "googleFontsUrl": "https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap",
+        "weights": [300, 400, 500, 600, 700],
+        "tailwindClass": "font-fredoka",
+        "appliedTo": ["h1", "h2", "h3", "h4", "h5", "h6"]
+      },
+      "body": {
+        "family": "Comic Neue",
+        "fallback": "cursive",
+        "googleFontsUrl": "https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&display=swap",
+        "weights": [300, 400, 700],
+        "tailwindClass": "font-comic",
+        "appliedTo": ["body", "p", "span", "div (default)"]
+      }
+    },
+    "scale": {
+      "h1": "text-4xl md:text-6xl font-bold",
+      "h2": "text-3xl md:text-5xl font-bold",
+      "h3": "text-2xl md:text-4xl font-semibold",
+      "body": "text-base md:text-lg",
+      "bodyLarge": "text-lg md:text-xl"
+    }
+  },
+
+  "spacing": {
+    "containerPadding": "p-4 md:p-8",
+    "cardPadding": "p-6 md:p-12",
+    "buttonPadding": {
+      "default": "px-4 py-2",
+      "large": "px-8"
+    },
+    "gaps": {
+      "small": "gap-2",
+      "medium": "gap-4",
+      "large": "gap-6"
+    }
+  },
+
+  "borderRadius": {
+    "base": "1.5rem",
+    "mappings": {
+      "lg": "var(--radius) = 1.5rem",
+      "md": "calc(var(--radius) - 2px) = 1.3rem",
+      "sm": "calc(var(--radius) - 4px) = 1.1rem"
+    },
+    "componentUsage": {
+      "cards": "rounded-3xl (48px)",
+      "buttons": "rounded-md (6px) for default, rounded-full for navigation",
+      "pageIndicators": "rounded-full",
+      "inputs": "rounded-lg (24px)"
+    }
+  },
+
+  "shadows": {
+    "definitions": {
+      "card": "shadow-2xl",
+      "button": "shadow-2xl",
+      "pageIndicator": "shadow-lg",
+      "none": "shadow-none"
+    },
+    "tailwindEquivalents": {
+      "shadow-2xl": "0 25px 50px -12px rgb(0 0 0 / 0.25)",
+      "shadow-lg": "0 10px 15px -3px rgb(0 0 0 / 0.1)"
+    }
+  },
+
+  "gradients": {
+    "primary": {
+      "css": "linear-gradient(135deg, hsl(270 70% 60%), hsl(320 80% 70%))",
+      "description": "Purple to pink diagonal gradient",
+      "hexApproximation": "linear-gradient(135deg, #9B72CF 0%, #E879CD 100%)",
+      "tailwindClass": "gradient-primary",
+      "appliedTo": ["Hero sections", "Feature cards", "Special buttons"]
+    },
+    "page": {
+      "css": "linear-gradient(180deg, hsl(270 60% 95%), hsl(270 50% 98%))",
+      "description": "Subtle light purple vertical gradient",
+      "hexApproximation": "linear-gradient(180deg, #E8DFF5 0%, #F5F0FA 100%)",
+      "tailwindClass": "gradient-page",
+      "appliedTo": ["Page backgrounds", "Section backgrounds"]
+    }
+  },
+
+  "animations": {
+    "transitions": {
+      "smooth": {
+        "css": "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        "tailwindClass": "transition-smooth",
+        "appliedTo": ["General state changes", "Color transitions", "Opacity changes"]
+      },
+      "bounce": {
+        "css": "all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+        "tailwindClass": "transition-bounce",
+        "appliedTo": ["Navigation buttons", "Interactive elements", "Playful interactions"]
+      }
+    },
+    "keyframes": {
+      "bounceSoft": {
+        "name": "bounce-soft",
+        "definition": {
+          "0%, 100%": "translateY(0)",
+          "50%": "translateY(-10px)"
+        },
+        "duration": "2s",
+        "timing": "ease-in-out infinite",
+        "tailwindClass": "animate-bounce-soft"
+      },
+      "float": {
+        "name": "float",
+        "definition": {
+          "0%, 100%": "translateY(0px)",
+          "50%": "translateY(-15px)"
+        },
+        "duration": "3s",
+        "timing": "ease-in-out infinite",
+        "tailwindClass": "animate-float",
+        "appliedTo": ["Decorative illustrations", "Story page illustrations"]
+      },
+      "wiggle": {
+        "name": "wiggle",
+        "definition": {
+          "0%, 100%": "rotate(0deg)",
+          "25%": "rotate(-5deg)",
+          "75%": "rotate(5deg)"
+        },
+        "duration": "0.5s",
+        "timing": "ease-in-out",
+        "tailwindClass": "animate-wiggle",
+        "appliedTo": ["Attention-grabbing elements", "Error states", "Fun interactions"]
+      }
+    },
+    "hoverEffects": {
+      "scale": "hover:scale-110",
+      "scaleSubtle": "hover:scale-105",
+      "opacity": "hover:opacity-80"
+    }
+  },
+
+  "components": {
+    "storyCard": {
+      "structure": "Container with gradient background, card content, optional illustration overlay",
+      "background": {
+        "element": "Outer container div",
+        "color": "bg-card (white in light mode, dark card in dark mode)",
+        "gradient": "None on card itself, uses page background gradient"
+      },
+      "innerCard": {
+        "element": "Inner content card",
+        "background": "bg-card (hsl(0 0% 100%) = white)",
+        "border": "border-4 border-primary/20 (purple with 20% opacity)",
+        "borderColor": "hsl(270 70% 60% / 0.2) = rgba(155, 114, 207, 0.2)",
+        "borderRadius": "rounded-3xl (48px)",
+        "shadow": "shadow-2xl",
+        "padding": "p-6 md:p-12"
+      },
+      "illustration": {
+        "position": "absolute top-0 right-0",
+        "size": "w-32 h-32 md:w-48 md:h-48",
+        "opacity": "opacity-20",
+        "animation": "animate-float"
+      },
+      "content": {
+        "zIndex": "relative z-10",
+        "textColor": "text-foreground (dark purple)",
+        "headingColor": "text-primary (medium purple)"
+      }
+    },
+
+    "buttons": {
+      "navigationButton": {
+        "structure": "Circular floating button with icon",
+        "position": "fixed top-1/2 -translate-y-1/2, left-4 or right-4",
+        "size": "w-14 h-14 md:w-16 md:h-16",
+        "shape": "rounded-full",
+        "background": "bg-primary (hsl(270 70% 60%) = #9B72CF)",
+        "text": "text-primary-foreground (white)",
+        "shadow": "shadow-2xl",
+        "zIndex": "z-50",
+        "hover": {
+          "background": "hover:bg-primary/90",
+          "transform": "hover:scale-110",
+          "transition": "transition-bounce"
+        },
+        "disabled": {
+          "opacity": "disabled:opacity-30",
+          "pointerEvents": "disabled:pointer-events-none"
+        },
+        "icon": {
+          "size": "w-6 h-6 md:w-8 md:h-8",
+          "color": "Inherits text-primary-foreground (white)"
+        }
+      },
+      "primaryButton": {
+        "background": "bg-primary",
+        "text": "text-primary-foreground",
+        "hover": "hover:bg-primary/90",
+        "padding": "h-10 px-4 py-2 (default), h-11 px-8 (lg)",
+        "borderRadius": "rounded-md"
+      },
+      "secondaryButton": {
+        "background": "bg-secondary",
+        "text": "text-secondary-foreground",
+        "hover": "hover:bg-secondary/80",
+        "padding": "h-10 px-4 py-2"
+      }
+    },
+
+    "pageIndicator": {
+      "container": {
+        "position": "fixed bottom-8 left-1/2 -translate-x-1/2",
+        "background": "bg-card/80 (white with 80% opacity)",
+        "backdropBlur": "backdrop-blur-sm",
+        "padding": "px-6 py-3",
+        "borderRadius": "rounded-full",
+        "border": "border-2 border-primary/20",
+        "shadow": "shadow-lg",
+        "zIndex": "z-50",
+        "gap": "gap-3"
+      },
+      "dot": {
+        "default": {
+          "size": "w-3 h-3",
+          "shape": "rounded-full",
+          "background": "bg-primary/30",
+          "hover": "hover:bg-primary/50 hover:scale-110",
+          "transition": "transition-all duration-300"
+        },
+        "active": {
+          "size": "w-8 h-3 (elongated)",
+          "background": "bg-primary",
+          "transform": "scale-125"
+        }
+      }
+    },
+
+    "navigation": {
+      "link": {
+        "default": "text-primary",
+        "hover": "hover:text-primary/80",
+        "active": "font-bold",
+        "transition": "transition-smooth"
+      }
+    }
+  },
+
+  "layout": {
+    "page": {
+      "minHeight": "min-h-screen",
+      "display": "flex items-center justify-center",
+      "padding": "p-4 md:p-8",
+      "background": "bg-background or gradient-page"
+    },
+    "container": {
+      "maxWidth": "max-w-4xl",
+      "width": "w-full",
+      "margin": "mx-auto (implied by flex center)"
+    },
+    "grid": {
+      "default": "grid gap-4 md:gap-6",
+      "twoColumn": "grid-cols-1 md:grid-cols-2",
+      "threeColumn": "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+    }
+  },
+
+  "interactionStates": {
+    "hover": {
+      "buttons": "scale-110 + bg-primary/90",
+      "cards": "No default hover, add if needed",
+      "links": "text-primary/80",
+      "pageIndicators": "scale-110 + bg-primary/50"
+    },
+    "active": {
+      "buttons": "scale-105",
+      "pageIndicators": "scale-125 + w-8 (elongated) + bg-primary"
+    },
+    "disabled": {
+      "opacity": "opacity-30",
+      "pointerEvents": "pointer-events-none",
+      "cursor": "Not needed (pointer-events-none handles it)"
+    },
+    "focus": {
+      "ring": "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "outline": "focus-visible:outline-none"
+    }
+  },
+
+  "responsiveness": {
+    "breakpoints": {
+      "mobile": "< 768px (default)",
+      "tablet": "md: >= 768px",
+      "desktop": "lg: >= 1024px"
+    },
+    "typography": {
+      "h1": "text-4xl (mobile) -> text-6xl (md+)",
+      "h2": "text-3xl (mobile) -> text-5xl (md+)",
+      "body": "text-base (mobile) -> text-lg (md+)"
+    },
+    "spacing": {
+      "containerPadding": "p-4 (mobile) -> p-8 (md+)",
+      "cardPadding": "p-6 (mobile) -> p-12 (md+)"
+    },
+    "buttons": {
+      "navigationSize": "w-14 h-14 (mobile) -> w-16 h-16 (md+)",
+      "iconSize": "w-6 h-6 (mobile) -> w-8 h-8 (md+)"
+    }
+  },
+
+  "implementationGuide": {
+    "cssVariables": {
+      "location": "src/index.css in :root selector",
+      "format": "HSL values without hsl() wrapper",
+      "example": "--primary: 270 70% 60%;",
+      "usage": "Use hsl(var(--primary)) in CSS or bg-primary in Tailwind"
+    },
+    "tailwindConfig": {
+      "location": "tailwind.config.ts in theme.extend",
+      "colorMapping": "colors.primary.DEFAULT: 'hsl(var(--primary))'",
+      "customColors": "Add purple, yellow, pink, teal with sub-properties",
+      "animations": "Define in keyframes and animation objects"
+    },
+    "componentPatterns": {
+      "semanticTokens": "ALWAYS use semantic tokens (bg-primary, text-foreground) instead of direct colors",
+      "colorClasses": "Never use text-white, bg-white, text-black directly",
+      "gradients": "Use utility classes (gradient-primary) defined in index.css",
+      "transitions": "Use transition-smooth or transition-bounce classes"
+    }
+  },
+
+  "doNotRules": {
+    "colorMisuse": [
+      "DO NOT apply card gradients to icons",
+      "DO NOT use button background colors on text elements",
+      "DO NOT use gradient-primary on text (text doesn't support gradients well)",
+      "DO NOT use direct color values like #9B72CF, always use semantic tokens",
+      "DO NOT mix HSL and RGB formats in the same component"
+    ],
+    "structureMisuse": [
+      "DO NOT put shadows on text elements",
+      "DO NOT add borders to elements that should only have backgrounds",
+      "DO NOT apply animate-float to interactive elements (use on decorative only)",
+      "DO NOT use transition-bounce on all elements (reserve for playful interactions)",
+      "DO NOT override border-radius on buttons with rounded-full unless intentional"
+    ],
+    "layoutMisuse": [
+      "DO NOT use fixed positioning except for navigation buttons and page indicators",
+      "DO NOT apply backdrop-blur to solid background elements",
+      "DO NOT nest cards inside cards without purpose",
+      "DO NOT use absolute positioning for content (only for decorative overlays)"
+    ],
+    "accessibilityMisuse": [
+      "DO NOT remove focus-visible styles",
+      "DO NOT use opacity alone to disable (also set pointer-events-none)",
+      "DO NOT rely on color alone for states (use size/shape changes too)",
+      "DO NOT make clickable areas smaller than 44x44px on mobile"
+    ]
+  },
+
+  "codeExamples": {
+    "storyCard": {
+      "tsx": "const StoryCard = ({ children }) => (\n  <div className=\"min-h-screen flex items-center justify-center p-4 md:p-8 bg-background\">\n    <div className=\"max-w-4xl w-full\">\n      <div className=\"bg-card rounded-3xl shadow-2xl p-6 md:p-12 border-4 border-primary/20 relative overflow-hidden\">\n        <div className=\"relative z-10\">{children}</div>\n      </div>\n    </div>\n  </div>\n)"
+    },
+    "navigationButton": {
+      "tsx": "const NavButton = ({ direction, onClick }) => (\n  <Button\n    onClick={onClick}\n    className={`fixed top-1/2 -translate-y-1/2 ${\n      direction === 'prev' ? 'left-4' : 'right-4'\n    } z-50 rounded-full w-14 h-14 md:w-16 md:h-16 shadow-2xl hover:scale-110 transition-bounce bg-primary hover:bg-primary/90`}\n  >\n    <ChevronIcon className=\"w-6 h-6 md:w-8 md:h-8\" />\n  </Button>\n)"
+    },
+    "pageIndicator": {
+      "tsx": "const PageDot = ({ active, onClick }) => (\n  <button\n    onClick={onClick}\n    className={`rounded-full transition-all duration-300 ${\n      active\n        ? 'bg-primary scale-125 w-8 h-3'\n        : 'bg-primary/30 hover:bg-primary/50 hover:scale-110 w-3 h-3'\n    }`}\n  />\n)"
+    },
+    "typography": {
+      "tsx": "<h1 className=\"text-4xl md:text-6xl font-fredoka font-bold text-primary\">\n  Story Title\n</h1>\n<p className=\"text-base md:text-lg font-comic text-foreground\">\n  Story content goes here...\n</p>"
+    }
+  },
+
+  "designPrinciples": {
+    "childFriendly": "Large touch targets, high contrast, playful animations, rounded corners everywhere",
+    "playful": "Bouncy transitions, floating illustrations, wiggle animations, bright accent colors",
+    "accessible": "High contrast ratios, focus indicators, large interactive elements, keyboard navigation support",
+    "responsive": "Mobile-first approach, progressive enhancement for larger screens",
+    "consistent": "Semantic color tokens throughout, predictable spacing scale, unified animation timing"
+  },
+
+  "colorApplicationMatrix": {
+    "backgrounds": {
+      "page": "bg-background (light purple tint)",
+      "card": "bg-card (pure white light mode, dark in dark mode)",
+      "button": "bg-primary (medium purple)",
+      "buttonSecondary": "bg-secondary (bright yellow)",
+      "indicator": "bg-card/80 (semi-transparent white)"
+    },
+    "text": {
+      "heading": "text-primary (medium purple)",
+      "body": "text-foreground (dark purple)",
+      "buttonText": "text-primary-foreground (white)",
+      "muted": "text-muted-foreground (light gray purple)"
+    },
+    "borders": {
+      "card": "border-primary/20 (purple at 20% opacity)",
+      "input": "border-input (light purple gray)",
+      "indicator": "border-primary/20"
+    },
+    "effects": {
+      "cardShadow": "shadow-2xl (large, dramatic)",
+      "buttonShadow": "shadow-2xl",
+      "indicatorShadow": "shadow-lg (medium)",
+      "backdrop": "backdrop-blur-sm (on semi-transparent elements)"
+    }
+  }
+}

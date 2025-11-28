@@ -1,0 +1,35 @@
+services:
+  # Django Backend API
+  - type: web
+    name: pixeltales-backend
+    env: python
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: "./build.sh"
+    startCommand: "daphne -b 0.0.0.0 -p $PORT storybookapi.asgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DEBUG
+        value: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: GOOGLE_AI_API_KEY
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: FROM_EMAIL
+        sync: false
+      - key: JWT_ACCESS_TOKEN_LIFETIME_DAYS
+        value: 30
+      - key: JWT_REFRESH_TOKEN_LIFETIME_DAYS
+        value: 365
+      - key: DATABASE_URL
+        value: sqlite:///data/db.sqlite3
+    disk:
+      name: pixeltales-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1

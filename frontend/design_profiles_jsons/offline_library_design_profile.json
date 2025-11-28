@@ -1,0 +1,479 @@
+{
+    "designSystem": {
+      "name": "Imaginary Worlds Offline Stories Page",
+      "type": "filterable_content_library",
+      "framework": "react_typescript_tailwind",
+      "layout": "search_filter_list_layout"
+    },
+    "colorPalette": {
+      "primary": {
+        "purple": "#8B5CF6",
+        "purpleDark": "#7C3AED",
+        "purpleLight": "#A78BFA"
+      },
+      "secondary": {
+        "pink": "#EC4899",
+        "pinkLight": "#F9A8D4"
+      },
+      "genre": {
+        "fantasy": "#FB923C",
+        "adventure": "#F97316",
+        "sciFi": "#06B6D4",
+        "comedy": "#FBBF24",
+        "mystery": "#8B5CF6",
+        "calm": "#10B981"
+      },
+      "neutral": {
+        "white": "#FFFFFF",
+        "gray50": "#F9FAFB",
+        "gray100": "#F3F4F6",
+        "gray200": "#E5E7EB",
+        "gray300": "#D1D5DB",
+        "gray400": "#9CA3AF",
+        "gray500": "#6B7280",
+        "gray600": "#4B5563",
+        "gray700": "#374151",
+        "gray800": "#1F2937",
+        "gray900": "#111827"
+      },
+      "backgrounds": {
+        "page": "#F9FAFB",
+        "card": "#FFFFFF",
+        "dropdown": "#FFFFFF"
+      }
+    },
+    "elementStyling": {
+      "pageContainer": {
+        "background": "bg-gray-50",
+        "padding": "p-6 pb-24",
+        "minHeight": "min-h-screen",
+        "context": "Full page wrapper - light gray background"
+      },
+      "pageHeader": {
+        "container": {
+          "spacing": "mb-6",
+          "context": "Header section with back button and title"
+        },
+        "backButton": {
+          "size": "h-6 w-6",
+          "color": "text-gray-700",
+          "spacing": "mb-4",
+          "hover": "hover:text-gray-900",
+          "context": "Back navigation arrow"
+        },
+        "title": {
+          "color": "text-gray-900",
+          "fontSize": "text-2xl",
+          "fontWeight": "font-bold",
+          "spacing": "mb-1",
+          "context": "Page title - Offline Stories"
+        },
+        "subtitle": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm",
+          "spacing": "mb-4",
+          "context": "Page description - Download and read anytime"
+        }
+      },
+      "searchBar": {
+        "container": {
+          "background": "bg-white",
+          "border": "border border-gray-200",
+          "borderRadius": "rounded-lg",
+          "padding": "px-4 py-3",
+          "display": "flex items-center",
+          "spacing": "space-x-2 mb-4",
+          "context": "Search input container"
+        },
+        "icon": {
+          "size": "h-5 w-5",
+          "color": "text-gray-400",
+          "context": "Search icon - gray color"
+        },
+        "input": {
+          "background": "bg-transparent",
+          "border": "border-0",
+          "color": "text-gray-900",
+          "fontSize": "text-sm",
+          "placeholder": "placeholder-gray-400",
+          "width": "w-full",
+          "focus": "focus:outline-none",
+          "context": "Search input field - no border"
+        }
+      },
+      "filterBar": {
+        "container": {
+          "display": "flex items-center",
+          "spacing": "space-x-3 mb-4",
+          "context": "Filter dropdowns row"
+        },
+        "filterIcon": {
+          "size": "h-5 w-5",
+          "color": "text-gray-700",
+          "context": "Filter funnel icon"
+        },
+        "dropdown": {
+          "button": {
+            "background": "bg-white",
+            "border": "border border-gray-200",
+            "borderRadius": "rounded-lg",
+            "padding": "px-4 py-2",
+            "fontSize": "text-sm",
+            "color": "text-gray-700",
+            "display": "flex items-center justify-between",
+            "spacing": "space-x-2",
+            "minWidth": "min-w-24",
+            "hover": "hover:bg-gray-50",
+            "context": "Filter dropdown buttons"
+          },
+          "icon": {
+            "size": "h-4 w-4",
+            "color": "text-gray-500",
+            "context": "Chevron down icon in dropdowns"
+          },
+          "menu": {
+            "background": "bg-white",
+            "border": "border border-gray-200",
+            "borderRadius": "rounded-lg",
+            "shadow": "shadow-lg",
+            "padding": "py-2",
+            "position": "absolute z-10",
+            "marginTop": "mt-2",
+            "context": "Dropdown menu panel"
+          },
+          "item": {
+            "default": {
+              "padding": "px-4 py-2",
+              "fontSize": "text-sm",
+              "color": "text-gray-700",
+              "hover": "hover:bg-gray-50",
+              "cursor": "cursor-pointer",
+              "context": "Dropdown menu items"
+            },
+            "selected": {
+              "padding": "px-4 py-2",
+              "fontSize": "text-sm",
+              "color": "text-gray-900",
+              "fontWeight": "font-medium",
+              "display": "flex items-center",
+              "spacing": "space-x-2",
+              "context": "Selected dropdown item with checkmark"
+            },
+            "checkmark": {
+              "size": "h-4 w-4",
+              "color": "text-purple-500",
+              "context": "Checkmark for selected items"
+            }
+          }
+        }
+      },
+      "resultsCount": {
+        "color": "text-gray-500",
+        "fontSize": "text-sm",
+        "spacing": "mb-4",
+        "context": "Results count text - 6 collections found"
+      },
+      "collectionList": {
+        "container": {
+          "spacing": "space-y-4",
+          "context": "Story collection list with gaps"
+        },
+        "item": {
+          "background": "bg-white",
+          "borderRadius": "rounded-xl",
+          "padding": "p-4",
+          "shadow": "shadow-sm",
+          "border": "border border-gray-100",
+          "context": "Individual collection cards"
+        }
+      },
+      "collectionCard": {
+        "header": {
+          "display": "flex items-start justify-between",
+          "spacing": "mb-3",
+          "context": "Card header with title and download button"
+        },
+        "title": {
+          "color": "text-gray-900",
+          "fontSize": "text-lg",
+          "fontWeight": "font-bold",
+          "spacing": "mb-2",
+          "context": "Collection title"
+        },
+        "description": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm",
+          "lineHeight": "leading-relaxed",
+          "spacing": "mb-3",
+          "context": "Collection description text"
+        },
+        "badges": {
+          "container": {
+            "display": "flex items-center flex-wrap",
+            "spacing": "gap-2 mb-3",
+            "context": "Badge row for genre, age, difficulty"
+          },
+          "genre": {
+            "borderRadius": "rounded-full",
+            "padding": "px-3 py-1",
+            "fontSize": "text-xs",
+            "fontWeight": "font-medium",
+            "context": "Genre badges with specific colors"
+          },
+          "ageRange": {
+            "background": "bg-gray-100",
+            "color": "text-gray-700",
+            "borderRadius": "rounded-full",
+            "padding": "px-3 py-1",
+            "fontSize": "text-xs",
+            "fontWeight": "font-medium",
+            "context": "Age range badges - neutral gray"
+          },
+          "difficulty": {
+            "background": "bg-gray-100",
+            "color": "text-gray-700",
+            "borderRadius": "rounded-full",
+            "padding": "px-3 py-1",
+            "fontSize": "text-xs",
+            "fontWeight": "font-medium",
+            "context": "Difficulty level badges - neutral gray"
+          }
+        },
+        "metadata": {
+          "container": {
+            "display": "flex items-center",
+            "spacing": "space-x-4",
+            "context": "Story count and duration info"
+          },
+          "item": {
+            "display": "flex items-center",
+            "spacing": "space-x-1",
+            "context": "Individual metadata item"
+          },
+          "icon": {
+            "size": "h-4 w-4",
+            "color": "text-purple-500",
+            "context": "Metadata icons - purple color"
+          },
+          "text": {
+            "color": "text-gray-700",
+            "fontSize": "text-sm",
+            "fontWeight": "font-medium",
+            "context": "Metadata text values"
+          }
+        },
+        "downloadButton": {
+          "background": "bg-pink-500",
+          "color": "text-white",
+          "borderRadius": "rounded-lg",
+          "padding": "px-6 py-2",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "hover": "hover:bg-pink-600",
+          "context": "Download action button - pink styling"
+        }
+      }
+    },
+    "genreBadgeColors": {
+      "fantasy": {
+        "background": "bg-orange-500",
+        "color": "text-white",
+        "context": "Fantasy genre - orange background"
+      },
+      "adventure": {
+        "background": "bg-orange-600",
+        "color": "text-white",
+        "context": "Adventure genre - dark orange background"
+      },
+      "sciFi": {
+        "background": "bg-cyan-500",
+        "color": "text-white",
+        "context": "Sci-Fi genre - cyan background"
+      },
+      "comedy": {
+        "background": "bg-yellow-400",
+        "color": "text-gray-900",
+        "context": "Comedy genre - yellow background with dark text"
+      },
+      "mystery": {
+        "background": "bg-purple-500",
+        "color": "text-white",
+        "context": "Mystery genre - purple background"
+      },
+      "calm": {
+        "background": "bg-green-500",
+        "color": "text-white",
+        "context": "Calm genre - green background"
+      }
+    },
+    "filterOptions": {
+      "category": {
+        "label": "Category Filter (First Dropdown)",
+        "options": ["All", "Fantasy", "Adventure", "Sci-Fi", "Comedy", "Mystery", "Calm"],
+        "default": "All",
+        "context": "Genre/category filter"
+      },
+      "ageRange": {
+        "label": "Age Range Filter (Second Dropdown)",
+        "options": ["All", "3-6", "5-10", "8-12"],
+        "default": "All",
+        "context": "Age range filter"
+      },
+      "difficulty": {
+        "label": "Difficulty Filter (Third Dropdown)",
+        "options": ["All", "Easy", "Medium", "Hard"],
+        "default": "All",
+        "context": "Reading difficulty filter"
+      }
+    },
+    "layoutPatterns": {
+      "pageStructure": {
+        "order": [
+          "Back Button",
+          "Page Title & Subtitle",
+          "Search Bar",
+          "Filter Bar (Icon + 3 Dropdowns)",
+          "Results Count",
+          "Collection List"
+        ],
+        "context": "Top-to-bottom page flow"
+      },
+      "collectionCard": {
+        "structure": [
+          "Title + Download Button (flex justify-between)",
+          "Description",
+          "Badges Row (genre, age, difficulty)",
+          "Metadata Row (story count, duration)"
+        ],
+        "context": "Collection card internal structure"
+      }
+    },
+    "doNotRules": {
+      "colors": [
+        "DO NOT use purple for download buttons - always use pink",
+        "DO NOT use same color for all genre badges - each has specific color",
+        "DO NOT style age/difficulty badges with bright colors - keep neutral gray",
+        "DO NOT use gradients on any elements on this page"
+      ],
+      "layout": [
+        "DO NOT center-align collection card content - keep left-aligned",
+        "DO NOT remove gaps between collection cards",
+        "DO NOT stack badges vertically - use horizontal flex wrap",
+        "DO NOT place download button below content - keep in header position"
+      ],
+      "dropdowns": [
+        "DO NOT style dropdown buttons with colored backgrounds - keep white",
+        "DO NOT remove checkmarks from selected dropdown items",
+        "DO NOT use colored borders on dropdowns - keep gray-200",
+        "DO NOT make all dropdowns same width - let content determine width"
+      ],
+      "badges": [
+        "DO NOT use borders on badges - solid background only",
+        "DO NOT mix badge styles within same card",
+        "DO NOT use large badges - keep text-xs sizing",
+        "Genre badges get brand colors, metadata badges stay neutral"
+      ],
+      "search": [
+        "DO NOT add borders inside search input",
+        "DO NOT style search bar differently from other pages",
+        "DO NOT use colored search icons - keep gray-400"
+      ]
+    },
+    "componentMapping": {
+      "OfflineStoriesPage": {
+        "baseClass": "min-h-screen bg-gray-50 p-6 pb-24"
+      },
+      "PageHeader": {
+        "backButton": "h-6 w-6 text-gray-700 hover:text-gray-900 mb-4",
+        "title": "text-2xl font-bold text-gray-900 mb-1",
+        "subtitle": "text-sm text-gray-500 mb-4"
+      },
+      "SearchBar": {
+        "container": "bg-white border border-gray-200 rounded-lg px-4 py-3 flex items-center space-x-2 mb-4",
+        "icon": "h-5 w-5 text-gray-400",
+        "input": "bg-transparent border-0 text-sm text-gray-900 placeholder-gray-400 w-full focus:outline-none"
+      },
+      "FilterBar": {
+        "container": "flex items-center space-x-3 mb-4",
+        "filterIcon": "h-5 w-5 text-gray-700"
+      },
+      "FilterDropdown": {
+        "button": "bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-700 flex items-center justify-between space-x-2 min-w-24 hover:bg-gray-50",
+        "menu": "absolute z-10 bg-white border border-gray-200 rounded-lg shadow-lg py-2 mt-2",
+        "item": "px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer",
+        "selectedItem": "px-4 py-2 text-sm text-gray-900 font-medium flex items-center space-x-2"
+      },
+      "CollectionCard": {
+        "container": "bg-white rounded-xl p-4 shadow-sm border border-gray-100",
+        "header": "flex items-start justify-between mb-3",
+        "title": "text-lg font-bold text-gray-900 mb-2",
+        "description": "text-sm text-gray-500 leading-relaxed mb-3",
+        "badgesRow": "flex items-center flex-wrap gap-2 mb-3",
+        "metadataRow": "flex items-center space-x-4"
+      },
+      "GenreBadge": {
+        "fantasy": "bg-orange-500 text-white rounded-full px-3 py-1 text-xs font-medium",
+        "adventure": "bg-orange-600 text-white rounded-full px-3 py-1 text-xs font-medium",
+        "sciFi": "bg-cyan-500 text-white rounded-full px-3 py-1 text-xs font-medium",
+        "comedy": "bg-yellow-400 text-gray-900 rounded-full px-3 py-1 text-xs font-medium",
+        "mystery": "bg-purple-500 text-white rounded-full px-3 py-1 text-xs font-medium",
+        "calm": "bg-green-500 text-white rounded-full px-3 py-1 text-xs font-medium"
+      },
+      "MetadataBadge": {
+        "baseClass": "bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-medium"
+      },
+      "DownloadButton": {
+        "baseClass": "bg-pink-500 hover:bg-pink-600 text-white rounded-lg px-6 py-2 text-sm font-medium"
+      },
+      "MetadataItem": {
+        "container": "flex items-center space-x-1",
+        "icon": "h-4 w-4 text-purple-500",
+        "text": "text-sm font-medium text-gray-700"
+      }
+    },
+    "interactionPatterns": {
+      "filtering": {
+        "behavior": "Multiple independent filters can be applied simultaneously",
+        "feedback": "Results count updates dynamically",
+        "reset": "Each filter has 'All' option to clear",
+        "context": "Client-side filtering of collections"
+      },
+      "search": {
+        "behavior": "Real-time search as user types",
+        "scope": "Searches collection titles and descriptions",
+        "placeholder": "Search story collections...",
+        "context": "Filter collections by keyword"
+      },
+      "download": {
+        "behavior": "Click download button to save collection",
+        "feedback": "Button state changes or success message",
+        "context": "Download collection for offline access"
+      }
+    },
+    "stateManagement": {
+      "filterStates": {
+        "category": "Tracks selected genre/category",
+        "ageRange": "Tracks selected age range",
+        "difficulty": "Tracks selected difficulty level"
+      },
+      "searchState": {
+        "query": "Current search string",
+        "results": "Filtered collection list"
+      },
+      "dropdownStates": {
+        "open": "Which dropdown is currently open",
+        "selectedValue": "Currently selected option per dropdown"
+      }
+    },
+    "accessibility": {
+      "dropdowns": "Keyboard navigation support for dropdown menus",
+      "search": "Screen reader announces search results count",
+      "filters": "Clear labels and ARIA attributes for filters",
+      "buttons": "Proper focus states on all interactive elements"
+    },
+    "responsiveConsiderations": {
+      "mobile": "Current layout optimized for mobile",
+      "filterBar": "Filters may wrap to multiple rows on very small screens",
+      "cards": "Collections stack vertically with full width"
+    }
+  }

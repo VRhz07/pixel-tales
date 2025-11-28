@@ -1,0 +1,593 @@
+{
+    "designSystem": {
+      "name": "Imaginary Worlds Story Reader",
+      "type": "immersive_story_reading_interface",
+      "framework": "react_typescript_tailwind",
+      "layout": "full_screen_story_viewer",
+      "themes": ["light", "dark"]
+    },
+    "colorPalette": {
+      "light": {
+        "background": "#FFFFFF",
+        "surface": "#F9FAFB",
+        "text": {
+          "primary": "#111827",
+          "secondary": "#6B7280"
+        },
+        "accent": {
+          "purple": "#8B5CF6",
+          "purpleLight": "#A78BFA",
+          "pink": "#EC4899"
+        }
+      },
+      "dark": {
+        "background": "#000000",
+        "surface": "#1F2937",
+        "text": {
+          "primary": "#FFFFFF",
+          "secondary": "#9CA3AF"
+        },
+        "accent": {
+          "purple": "#A78BFA",
+          "purpleLight": "#C4B5FD",
+          "pink": "#F9A8D4"
+        }
+      },
+      "neutral": {
+        "white": "#FFFFFF",
+        "black": "#000000",
+        "gray900": "#111827",
+        "gray800": "#1F2937",
+        "gray700": "#374151",
+        "gray600": "#4B5563",
+        "gray500": "#6B7280",
+        "gray400": "#9CA3AF",
+        "gray300": "#D1D5DB",
+        "gray200": "#E5E7EB",
+        "gray100": "#F3F4F6",
+        "gray50": "#F9FAFB"
+      }
+    },
+    "elementStyling": {
+      "pageContainer": {
+        "light": {
+          "background": "bg-white",
+          "minHeight": "min-h-screen",
+          "padding": "pb-safe",
+          "context": "Light mode full page container"
+        },
+        "dark": {
+          "background": "bg-black",
+          "minHeight": "min-h-screen",
+          "padding": "pb-safe",
+          "context": "Dark mode full page container"
+        }
+      },
+      "topBar": {
+        "light": {
+          "background": "bg-white",
+          "borderBottom": "border-b border-gray-200",
+          "padding": "px-4 py-4",
+          "display": "flex items-center justify-between",
+          "position": "sticky top-0 z-10",
+          "context": "Light mode sticky header"
+        },
+        "dark": {
+          "background": "bg-gray-900",
+          "borderBottom": "border-b border-gray-800",
+          "padding": "px-4 py-4",
+          "display": "flex items-center justify-between",
+          "position": "sticky top-0 z-10",
+          "context": "Dark mode sticky header"
+        },
+        "backButton": {
+          "light": {
+            "color": "text-gray-700",
+            "hover": "hover:text-gray-900",
+            "size": "h-6 w-6",
+            "context": "Back arrow button - light mode"
+          },
+          "dark": {
+            "color": "text-gray-300",
+            "hover": "hover:text-white",
+            "size": "h-6 w-6",
+            "context": "Back arrow button - dark mode"
+          }
+        },
+        "title": {
+          "light": {
+            "color": "text-gray-900",
+            "fontSize": "text-lg",
+            "fontWeight": "font-bold",
+            "context": "Story title - light mode"
+          },
+          "dark": {
+            "color": "text-white",
+            "fontSize": "text-lg",
+            "fontWeight": "font-bold",
+            "context": "Story title - dark mode"
+          }
+        },
+        "moreButton": {
+          "light": {
+            "color": "text-gray-700",
+            "hover": "hover:text-gray-900",
+            "context": "Three dot menu - light mode"
+          },
+          "dark": {
+            "color": "text-gray-300",
+            "hover": "hover:text-white",
+            "context": "Three dot menu - dark mode"
+          }
+        }
+      },
+      "viewControls": {
+        "container": {
+          "position": "absolute top-16 right-4",
+          "zIndex": "z-20",
+          "display": "flex flex-col",
+          "spacing": "space-y-2",
+          "context": "Reading mode toggle controls"
+        },
+        "toggleButton": {
+          "light": {
+            "background": "bg-pink-500",
+            "color": "text-white",
+            "borderRadius": "rounded-lg",
+            "padding": "px-3 py-2",
+            "fontSize": "text-sm",
+            "fontWeight": "font-medium",
+            "display": "flex items-center",
+            "spacing": "space-x-2",
+            "shadow": "shadow-md",
+            "hover": "hover:bg-pink-600",
+            "context": "View mode toggle - light mode (pink)"
+          },
+          "dark": {
+            "background": "bg-pink-500",
+            "color": "text-white",
+            "borderRadius": "rounded-lg",
+            "padding": "px-3 py-2",
+            "fontSize": "text-sm",
+            "fontWeight": "font-medium",
+            "display": "flex items-center",
+            "spacing": "space-x-2",
+            "shadow": "shadow-md",
+            "hover": "hover:bg-pink-600",
+            "context": "View mode toggle - dark mode (pink)"
+          },
+          "icon": {
+            "size": "h-4 w-4",
+            "context": "Toggle icon (chevron or arrows)"
+          },
+          "checkmark": {
+            "size": "h-4 w-4",
+            "context": "Checkmark when mode is active"
+          }
+        }
+      },
+      "verticalScrollMode": {
+        "container": {
+          "padding": "px-4 pb-8",
+          "context": "Vertical scrolling story layout"
+        },
+        "pageCard": {
+          "light": {
+            "background": "bg-white",
+            "borderRadius": "rounded-2xl",
+            "shadow": "shadow-lg",
+            "overflow": "overflow-hidden",
+            "spacing": "mb-6",
+            "context": "Story page card - light mode"
+          },
+          "dark": {
+            "background": "bg-gray-900",
+            "borderRadius": "rounded-2xl",
+            "shadow": "shadow-2xl shadow-black/50",
+            "overflow": "overflow-hidden",
+            "spacing": "mb-6",
+            "context": "Story page card - dark mode"
+          }
+        },
+        "pageNumber": {
+          "container": {
+            "position": "absolute top-4 left-4",
+            "zIndex": "z-10",
+            "context": "Page number badge position"
+          },
+          "badge": {
+            "light": {
+              "background": "bg-purple-500",
+              "color": "text-white",
+              "borderRadius": "rounded-full",
+              "width": "w-8 h-8",
+              "display": "flex items-center justify-center",
+              "fontSize": "text-sm",
+              "fontWeight": "font-bold",
+              "shadow": "shadow-md",
+              "context": "Page number circle - light mode"
+            },
+            "dark": {
+              "background": "bg-purple-500",
+              "color": "text-white",
+              "borderRadius": "rounded-full",
+              "width": "w-8 h-8",
+              "display": "flex items-center justify-center",
+              "fontSize": "text-sm",
+              "fontWeight": "font-bold",
+              "shadow": "shadow-md",
+              "context": "Page number circle - dark mode"
+            }
+          }
+        },
+        "illustration": {
+          "container": {
+            "position": "relative",
+            "width": "w-full",
+            "aspectRatio": "aspect-square",
+            "context": "Square illustration container (1:1 ratio)"
+          },
+          "image": {
+            "width": "w-full",
+            "height": "h-full",
+            "objectFit": "object-cover",
+            "context": "Square story illustration image"
+          }
+        },
+        "storyText": {
+          "light": {
+            "padding": "p-6",
+            "color": "text-gray-900",
+            "fontSize": "text-base",
+            "lineHeight": "leading-relaxed",
+            "context": "Story text content - light mode"
+          },
+          "dark": {
+            "padding": "p-6",
+            "color": "text-gray-100",
+            "fontSize": "text-base",
+            "lineHeight": "leading-relaxed",
+            "context": "Story text content - dark mode"
+          }
+        }
+      },
+      "horizontalScrollMode": {
+        "container": {
+          "position": "relative",
+          "height": "h-[calc(100vh-64px)]",
+          "padding": "p-4",
+          "display": "flex items-center justify-center",
+          "context": "Horizontal swipe reading mode"
+        },
+        "pageCard": {
+          "light": {
+            "background": "bg-white",
+            "borderRadius": "rounded-2xl",
+            "shadow": "shadow-2xl",
+            "maxWidth": "max-w-md",
+            "width": "w-full",
+            "margin": "mx-auto",
+            "context": "Single page view - light mode"
+          },
+          "dark": {
+            "background": "bg-gray-900",
+            "borderRadius": "rounded-2xl",
+            "shadow": "shadow-2xl shadow-black/50",
+            "maxWidth": "max-w-md",
+            "width": "w-full",
+            "margin": "mx-auto",
+            "context": "Single page view - dark mode"
+          }
+        },
+        "illustration": {
+          "borderRadius": "rounded-2xl",
+          "width": "w-full",
+          "aspectRatio": "aspect-square",
+          "objectFit": "object-cover",
+          "spacing": "mb-4",
+          "context": "Square illustration in horizontal mode (1:1 ratio)"
+        },
+        "storyText": {
+          "light": {
+            "padding": "px-6 pb-6",
+            "color": "text-gray-900",
+            "fontSize": "text-base",
+            "lineHeight": "leading-relaxed",
+            "alignment": "text-center",
+            "context": "Centered story text - light mode"
+          },
+          "dark": {
+            "padding": "px-6 pb-6",
+            "color": "text-gray-100",
+            "fontSize": "text-base",
+            "lineHeight": "leading-relaxed",
+            "alignment": "text-center",
+            "context": "Centered story text - dark mode"
+          }
+        },
+        "navigationArrows": {
+          "container": {
+            "position": "absolute inset-y-0",
+            "display": "flex items-center",
+            "context": "Arrow navigation container"
+          },
+          "leftArrow": {
+            "position": "left-4",
+            "context": "Previous page arrow"
+          },
+          "rightArrow": {
+            "position": "right-4",
+            "context": "Next page arrow"
+          },
+          "button": {
+            "light": {
+              "background": "bg-white/90",
+              "color": "text-gray-900",
+              "borderRadius": "rounded-full",
+              "padding": "p-3",
+              "shadow": "shadow-lg",
+              "hover": "hover:bg-white",
+              "backdrop": "backdrop-blur-sm",
+              "context": "Arrow button - light mode"
+            },
+            "dark": {
+              "background": "bg-gray-800/90",
+              "color": "text-white",
+              "borderRadius": "rounded-full",
+              "padding": "p-3",
+              "shadow": "shadow-lg",
+              "hover": "hover:bg-gray-700",
+              "backdrop": "backdrop-blur-sm",
+              "context": "Arrow button - dark mode"
+            },
+            "icon": {
+              "size": "h-6 w-6",
+              "context": "Arrow icon size"
+            }
+          }
+        },
+        "pageIndicators": {
+          "container": {
+            "display": "flex items-center justify-center",
+            "spacing": "space-x-2",
+            "padding": "py-4",
+            "context": "Dot indicators at bottom"
+          },
+          "dot": {
+            "inactive": {
+              "light": {
+                "background": "bg-gray-300",
+                "width": "w-2 h-2",
+                "borderRadius": "rounded-full",
+                "context": "Inactive page dot - light mode"
+              },
+              "dark": {
+                "background": "bg-gray-600",
+                "width": "w-2 h-2",
+                "borderRadius": "rounded-full",
+                "context": "Inactive page dot - dark mode"
+              }
+            },
+            "active": {
+              "light": {
+                "background": "bg-purple-500",
+                "width": "w-8 h-2",
+                "borderRadius": "rounded-full",
+                "context": "Active page indicator - light mode"
+              },
+              "dark": {
+                "background": "bg-purple-500",
+                "width": "w-8 h-2",
+                "borderRadius": "rounded-full",
+                "context": "Active page indicator - dark mode"
+              }
+            }
+          }
+        }
+      },
+      "floatingActionButton": {
+        "light": {
+          "background": "bg-white",
+          "color": "text-gray-700",
+          "border": "border border-gray-300",
+          "borderRadius": "rounded-full",
+          "padding": "p-3",
+          "shadow": "shadow-lg",
+          "position": "fixed bottom-6 right-6",
+          "hover": "hover:bg-gray-50",
+          "context": "FAB in horizontal mode - light"
+        },
+        "dark": {
+          "background": "bg-gray-800",
+          "color": "text-gray-300",
+          "border": "border border-gray-700",
+          "borderRadius": "rounded-full",
+          "padding": "p-3",
+          "shadow": "shadow-lg",
+          "position": "fixed bottom-6 right-6",
+          "hover": "hover:bg-gray-700",
+          "context": "FAB in horizontal mode - dark"
+        },
+        "icon": {
+          "size": "h-6 w-6",
+          "context": "FAB icon (bookmark, share, etc.)"
+        }
+      }
+    },
+    "readingModes": {
+      "verticalScroll": {
+        "behavior": "Continuous scroll through all pages",
+        "navigation": "Scroll naturally, pages stack vertically",
+        "pageNumbers": "Visible on each page card",
+        "illustrations": "Square (1:1 aspect ratio) within cards",
+        "textPosition": "Below illustration in card",
+        "context": "Traditional reading mode with square images"
+      },
+      "leftToRight": {
+        "behavior": "Swipe horizontally between pages",
+        "navigation": "Arrow buttons or swipe gestures",
+        "pageIndicators": "Dot indicators at bottom",
+        "illustrations": "Square (1:1 aspect ratio) with text below",
+        "textPosition": "Centered below square illustration",
+        "context": "Comic/manga style reading with square images"
+      }
+    },
+    "responsiveBreakpoints": {
+      "mobile": {
+        "maxWidth": "max-w-full",
+        "padding": "px-4",
+        "cardWidth": "w-full",
+        "context": "< 768px"
+      },
+      "tablet": {
+        "maxWidth": "max-w-2xl mx-auto",
+        "padding": "px-6",
+        "context": "768px - 1024px"
+      },
+      "desktop": {
+        "maxWidth": "max-w-3xl mx-auto",
+        "padding": "px-8",
+        "context": "> 1024px"
+      }
+    },
+    "doNotRules": {
+      "aspectRatio": [
+        "DO NOT use aspect-[3/4] or any portrait ratio - illustrations must be aspect-square (1:1)",
+        "DO NOT crop square images to fit other ratios",
+        "DO NOT distort square canvas exports - maintain 1:1 ratio",
+        "DO NOT make illustrations rectangular in any mode"
+      ],
+      "themes": [
+        "DO NOT use same colors for light and dark mode - text must have proper contrast",
+        "DO NOT forget to style all elements for both themes",
+        "DO NOT use pure black text on white or pure white text on black - use gray-900 and gray-100",
+        "DO NOT ignore borders and shadows - they need theme-specific colors"
+      ],
+      "layout": [
+        "DO NOT mix vertical and horizontal mode elements - they're separate views",
+        "DO NOT hide page numbers in vertical mode - they help with navigation",
+        "DO NOT remove navigation arrows in horizontal mode - essential for non-swipe users",
+        "DO NOT make cards full-bleed - maintain padding and rounded corners"
+      ],
+      "readingModes": [
+        "DO NOT show page indicators in vertical scroll mode - unnecessary",
+        "DO NOT show page numbers in horizontal mode - use dots instead",
+        "DO NOT center-align text in vertical mode - left-align for readability",
+        "DO NOT left-align text in horizontal mode - center for single-page view"
+      ],
+      "controls": [
+        "DO NOT hide view mode toggles - users need to switch modes",
+        "DO NOT use different colors for toggle buttons between themes - pink stays pink",
+        "DO NOT make controls too small - ensure touch-friendly sizing",
+        "DO NOT remove checkmarks from active view mode"
+      ]
+    },
+    "componentMapping": {
+      "StoryReaderPage": {
+        "light": "min-h-screen bg-white pb-safe",
+        "dark": "min-h-screen bg-black pb-safe"
+      },
+      "TopBar": {
+        "light": "sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-4 flex items-center justify-between",
+        "dark": "sticky top-0 z-10 bg-gray-900 border-b border-gray-800 px-4 py-4 flex items-center justify-between"
+      },
+      "ViewControls": {
+        "container": "absolute top-16 right-4 z-20 flex flex-col space-y-2",
+        "button": "bg-pink-500 text-white rounded-lg px-3 py-2 text-sm font-medium flex items-center space-x-2 shadow-md hover:bg-pink-600"
+      },
+      "VerticalScrollMode": {
+        "container": "px-4 pb-8",
+        "pageCard": {
+          "light": "bg-white rounded-2xl shadow-lg overflow-hidden mb-6 relative",
+          "dark": "bg-gray-900 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden mb-6 relative"
+        },
+        "pageNumber": "absolute top-4 left-4 z-10 bg-purple-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold shadow-md",
+        "illustration": "w-full aspect-square object-cover",
+        "text": {
+          "light": "p-6 text-base leading-relaxed text-gray-900",
+          "dark": "p-6 text-base leading-relaxed text-gray-100"
+        }
+      },
+      "HorizontalScrollMode": {
+        "container": "relative h-[calc(100vh-64px)] p-4 flex items-center justify-center",
+        "pageCard": {
+          "light": "bg-white rounded-2xl shadow-2xl max-w-md w-full mx-auto",
+          "dark": "bg-gray-900 rounded-2xl shadow-2xl shadow-black/50 max-w-md w-full mx-auto"
+        },
+        "illustration": "rounded-2xl w-full aspect-square object-cover mb-4",
+        "text": {
+          "light": "px-6 pb-6 text-base leading-relaxed text-center text-gray-900",
+          "dark": "px-6 pb-6 text-base leading-relaxed text-center text-gray-100"
+        },
+        "navigationArrow": {
+          "light": "bg-white/90 backdrop-blur-sm text-gray-900 rounded-full p-3 shadow-lg hover:bg-white",
+          "dark": "bg-gray-800/90 backdrop-blur-sm text-white rounded-full p-3 shadow-lg hover:bg-gray-700"
+        },
+        "pageIndicators": "flex items-center justify-center space-x-2 py-4",
+        "dotInactive": {
+          "light": "w-2 h-2 rounded-full bg-gray-300",
+          "dark": "w-2 h-2 rounded-full bg-gray-600"
+        },
+        "dotActive": {
+          "light": "w-8 h-2 rounded-full bg-purple-500",
+          "dark": "w-8 h-2 rounded-full bg-purple-500"
+        }
+      }
+    },
+    "interactionPatterns": {
+      "modeToggling": {
+        "trigger": "Click view mode toggle buttons",
+        "behavior": "Switch between vertical scroll and horizontal swipe",
+        "persistence": "Remember user's preferred mode",
+        "context": "Reading mode selection"
+      },
+      "verticalScrollNavigation": {
+        "method": "Native scroll or swipe vertically",
+        "behavior": "Pages scroll continuously",
+        "feedback": "Page numbers visible on each card",
+        "context": "Vertical reading flow"
+      },
+      "horizontalNavigation": {
+        "methods": ["Swipe left/right", "Click arrow buttons", "Keyboard arrows"],
+        "behavior": "One page at a time transition",
+        "feedback": "Dot indicators update, arrows enable/disable at boundaries",
+        "context": "Horizontal reading flow"
+      },
+      "themeDetection": {
+        "method": "System preference or user toggle",
+        "behavior": "Apply light or dark theme styles",
+        "persistence": "Save theme preference",
+        "context": "Dark mode support"
+      }
+    },
+    "stateManagement": {
+      "readingMode": {
+        "options": ["verticalScroll", "leftToRight"],
+        "default": "verticalScroll",
+        "context": "Current reading mode"
+      },
+      "currentPage": {
+        "horizontal": "Track active page index for navigation",
+        "vertical": "Optional scroll position tracking",
+        "context": "Page position state"
+      },
+      "theme": {
+        "options": ["light", "dark"],
+        "detection": "System preference or manual toggle",
+        "context": "Active theme mode"
+      }
+    },
+    "accessibility": {
+      "contrast": "WCAG AA compliant text contrast in both themes",
+      "textSize": "Readable font sizes (16px base minimum)",
+      "touchTargets": "Minimum 44x44px for all interactive elements",
+      "keyboardNav": "Arrow keys work in horizontal mode",
+      "screenReader": "Proper ARIA labels for navigation controls"
+    },
+    "performanceConsiderations": {
+      "imageLoading": "Lazy load square illustrations outside viewport",
+      "smoothScrolling": "CSS smooth scroll for vertical mode",
+      "swipeGestures": "Optimized touch event handling for horizontal mode",
+      "themeTransition": "Instant theme switching without flicker"
+    }
+  }

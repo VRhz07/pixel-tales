@@ -1,0 +1,147 @@
+/* Empty State Component - Purple Theme */
+
+.empty-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+}
+
+.empty-state-icon-wrapper {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.empty-state-icon-wrapper.no-data {
+  background: #ede9fe;
+}
+
+.empty-state-icon-wrapper.no-users {
+  background: #ede9fe;
+}
+
+.empty-state-icon-wrapper.error {
+  background: #fee2e2;
+}
+
+.dark .empty-state-icon-wrapper.no-data {
+  background: #8b5cf6;
+}
+
+.dark .empty-state-icon-wrapper.no-users {
+  background: #8b5cf6;
+}
+
+.dark .empty-state-icon-wrapper.error {
+  background: #7f1d1d;
+}
+
+.empty-state-icon-wrapper svg {
+  width: 56px;
+  height: 56px;
+}
+
+.empty-state-icon-wrapper.no-data svg {
+  color: #8b5cf6;
+}
+
+.empty-state-icon-wrapper.no-users svg {
+  color: #8b5cf6;
+}
+
+.empty-state-icon-wrapper.error svg {
+  color: #dc2626;
+}
+
+.dark .empty-state-icon-wrapper.no-data svg {
+  color: #c4b5fd;
+}
+
+.dark .empty-state-icon-wrapper.no-users svg {
+  color: #c4b5fd;
+}
+
+.dark .empty-state-icon-wrapper.error svg {
+  color: #f87171;
+}
+
+.empty-state-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 12px 0;
+}
+
+.dark .empty-state-title {
+  color: #F9FAFB;
+}
+
+.empty-state-description {
+  font-size: 16px;
+  color: #6B7280;
+  max-width: 500px;
+  margin: 0 0 32px 0;
+  line-height: 1.6;
+}
+
+.dark .empty-state-description {
+  color: #9CA3AF;
+}
+
+.empty-state-retry-btn {
+  padding: 12px 24px;
+  background: #8b5cf6;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.empty-state-retry-btn:hover {
+  background: #7c3aed;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .empty-state-container {
+    padding: 60px 20px;
+  }
+
+  .empty-state-icon-wrapper {
+    width: 100px;
+    height: 100px;
+  }
+
+  .empty-state-icon-wrapper svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .empty-state-title {
+    font-size: 20px;
+  }
+
+  .empty-state-description {
+    font-size: 14px;
+  }
+}

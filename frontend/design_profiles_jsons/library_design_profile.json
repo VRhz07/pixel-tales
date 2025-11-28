@@ -1,0 +1,520 @@
+{
+    "designSystem": {
+      "name": "Imaginary Worlds Library Page",
+      "type": "content_library_interface",
+      "framework": "react_typescript_tailwind",
+      "layout": "mixed_content_sections"
+    },
+    "colorPalette": {
+      "primary": {
+        "purple": "#8B5CF6",
+        "purpleDark": "#7C3AED",
+        "purpleLight": "#A78BFA"
+      },
+      "secondary": {
+        "pink": "#EC4899",
+        "pinkLight": "#F9A8D4"
+      },
+      "accent": {
+        "yellow": "#F59E0B",
+        "orange": "#F97316"
+      },
+      "neutral": {
+        "white": "#FFFFFF",
+        "gray50": "#F9FAFB",
+        "gray100": "#F3F4F6",
+        "gray200": "#E5E7EB",
+        "gray300": "#D1D5DB",
+        "gray400": "#9CA3AF",
+        "gray500": "#6B7280",
+        "gray600": "#4B5563",
+        "gray700": "#374151",
+        "gray800": "#1F2937",
+        "gray900": "#111827"
+      },
+      "backgrounds": {
+        "page": "#F9FAFB",
+        "card": "#FFFFFF",
+        "section": "#FFFFFF"
+      }
+    },
+    "elementStyling": {
+      "pageContainer": {
+        "background": "bg-gray-50",
+        "padding": "p-6 pb-24",
+        "minHeight": "min-h-screen",
+        "context": "Full page wrapper with bottom navigation spacing"
+      },
+      "pageHeader": {
+        "title": {
+          "color": "text-gray-900",
+          "fontSize": "text-2xl",
+          "fontWeight": "font-bold",
+          "spacing": "mb-2",
+          "context": "Main page title - Library"
+        },
+        "subtitle": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm",
+          "spacing": "mb-6",
+          "context": "Page subtitle - Your magical collection"
+        }
+      },
+      "sectionHeaders": {
+        "container": {
+          "display": "flex items-center",
+          "spacing": "space-x-2 mb-4",
+          "context": "Section headers with icons"
+        },
+        "icon": {
+          "size": "h-5 w-5",
+          "color": "text-purple-500",
+          "context": "Section icons - purple color"
+        },
+        "title": {
+          "color": "text-gray-900",
+          "fontSize": "text-lg",
+          "fontWeight": "font-bold",
+          "context": "Section titles - Your Works, Online Stories, etc."
+        }
+      },
+      "browseButtons": {
+        "primary": {
+          "background": "bg-white",
+          "color": "text-purple-500",
+          "border": "border border-purple-200",
+          "borderRadius": "rounded-lg",
+          "padding": "px-6 py-3",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "width": "w-full",
+          "alignment": "text-center",
+          "spacing": "mb-6",
+          "hover": {
+            "background": "hover:bg-purple-50",
+            "context": "Hover state - light purple background"
+          },
+          "context": "Browse buttons - white background with purple border and text"
+        }
+      },
+      "storyList": {
+        "container": {
+          "spacing": "space-y-3 mb-6",
+          "context": "Story list with gaps between items"
+        },
+        "item": {
+          "container": {
+            "background": "bg-white",
+            "borderRadius": "rounded-xl",
+            "padding": "p-4",
+            "shadow": "shadow-sm",
+            "border": "border border-gray-100",
+            "display": "flex items-center justify-between",
+            "context": "Individual story items - white cards"
+          },
+          "leftContent": {
+            "display": "flex-1",
+            "context": "Story info section"
+          },
+          "rightContent": {
+            "display": "flex items-center",
+            "spacing": "space-x-2",
+            "context": "Action buttons and icons"
+          }
+        },
+        "title": {
+          "color": "text-gray-900",
+          "fontSize": "text-base",
+          "fontWeight": "font-semibold",
+          "spacing": "mb-1",
+          "context": "Story titles - dark text"
+        },
+        "metadata": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm",
+          "spacing": "mb-2",
+          "context": "Author, page count, status info - muted text"
+        },
+        "stats": {
+          "display": "flex items-center",
+          "spacing": "space-x-4",
+          "context": "Rating and download stats"
+        },
+        "rating": {
+          "display": "flex items-center",
+          "spacing": "space-x-1",
+          "star": {
+            "color": "text-yellow-500",
+            "size": "h-4 w-4",
+            "context": "Star rating - yellow color"
+          },
+          "value": {
+            "color": "text-gray-700",
+            "fontSize": "text-sm",
+            "fontWeight": "font-medium",
+            "context": "Rating number - medium gray"
+          }
+        },
+        "downloads": {
+          "display": "flex items-center",
+          "spacing": "space-x-1",
+          "icon": {
+            "color": "text-gray-400",
+            "size": "h-4 w-4",
+            "context": "Download icon - light gray"
+          },
+          "count": {
+            "color": "text-gray-500",
+            "fontSize": "text-sm",
+            "context": "Download count - muted gray"
+          }
+        }
+      },
+      "actionButtons": {
+        "read": {
+          "background": "bg-white",
+          "color": "text-purple-500",
+          "border": "border border-purple-200",
+          "borderRadius": "rounded-lg",
+          "padding": "px-4 py-2",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "hover": {
+            "background": "hover:bg-purple-50",
+            "context": "Hover state - light purple background"
+          },
+          "context": "Read buttons - secondary purple styling"
+        },
+        "view": {
+          "background": "bg-pink-500",
+          "color": "text-white",
+          "borderRadius": "rounded-lg",
+          "padding": "px-4 py-2",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "hover": {
+            "background": "hover:bg-pink-600",
+            "context": "Hover state - darker pink"
+          },
+          "context": "View buttons for offline content - pink background"
+        },
+        "edit": {
+          "background": "bg-gray-100",
+          "color": "text-gray-600",
+          "borderRadius": "rounded-lg",
+          "padding": "p-2",
+          "hover": {
+            "background": "hover:bg-gray-200",
+            "context": "Hover state - darker gray"
+          },
+          "context": "Edit icon buttons - subtle gray styling"
+        },
+        "share": {
+          "background": "bg-gray-100",
+          "color": "text-gray-600",
+          "borderRadius": "rounded-lg",
+          "padding": "p-2",
+          "hover": {
+            "background": "hover:bg-gray-200",
+            "context": "Hover state - darker gray"
+          },
+          "context": "Share icon buttons - subtle gray styling"
+        }
+      },
+      "characterSection": {
+        "container": {
+          "background": "bg-white",
+          "borderRadius": "rounded-2xl",
+          "padding": "p-6",
+          "shadow": "shadow-sm",
+          "border": "border border-gray-100",
+          "alignment": "text-center",
+          "spacing": "mb-6",
+          "context": "Character library card - centered content"
+        },
+        "illustration": {
+          "size": "h-16 w-16",
+          "spacing": "mx-auto mb-4",
+          "context": "Character illustration - theater masks emoji"
+        },
+        "title": {
+          "color": "text-gray-900",
+          "fontSize": "text-lg",
+          "fontWeight": "font-bold",
+          "spacing": "mb-2",
+          "context": "Character Library title"
+        },
+        "description": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm",
+          "spacing": "mb-4",
+          "context": "Character section description"
+        },
+        "viewButton": {
+          "background": "bg-purple-500",
+          "color": "text-white",
+          "borderRadius": "rounded-lg",
+          "padding": "px-6 py-3",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "display": "flex items-center justify-center",
+          "spacing": "space-x-2",
+          "hover": {
+            "background": "hover:bg-purple-600",
+            "context": "Hover state - darker purple"
+          },
+          "context": "View Characters button - primary purple styling"
+        }
+      },
+      "offlineStoryItems": {
+        "container": {
+          "background": "bg-white",
+          "borderRadius": "rounded-xl",
+          "padding": "p-4",
+          "shadow": "shadow-sm",
+          "border": "border border-gray-100",
+          "display": "flex items-center justify-between",
+          "context": "Offline story items - same base styling as online stories"
+        },
+        "leftContent": {
+          "title": {
+            "color": "text-gray-900",
+            "fontSize": "text-base",
+            "fontWeight": "font-semibold",
+            "spacing": "mb-1",
+            "context": "Offline story titles"
+          },
+          "metadata": {
+            "color": "text-gray-500",
+            "fontSize": "text-sm",
+            "context": "Story count and genre info"
+          }
+        },
+        "viewButton": {
+          "background": "bg-pink-500",
+          "color": "text-white",
+          "borderRadius": "rounded-lg",
+          "padding": "px-4 py-2",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "display": "flex items-center",
+          "spacing": "space-x-1",
+          "hover": {
+            "background": "hover:bg-pink-600",
+            "context": "Hover state - darker pink"
+          },
+          "context": "Offline view buttons - distinct pink styling"
+        }
+      },
+      "buttonIcons": {
+        "size": "h-4 w-4",
+        "color": "text-current",
+        "context": "Icons inside buttons inherit button text color"
+      },
+      "bottomNavigation": {
+        "container": {
+          "background": "bg-white",
+          "borderTop": "border-t border-gray-200",
+          "padding": "px-6 py-3",
+          "position": "fixed bottom-0 left-0 right-0",
+          "context": "Bottom navigation bar"
+        },
+        "navGrid": {
+          "display": "grid grid-cols-5 gap-4",
+          "context": "5-column navigation layout"
+        },
+        "navItem": {
+          "active": {
+            "background": "bg-purple-50",
+            "borderRadius": "rounded-lg",
+            "alignment": "text-center",
+            "padding": "py-2",
+            "context": "Active Library tab - light purple background"
+          },
+          "inactive": {
+            "alignment": "text-center",
+            "padding": "py-2",
+            "context": "Inactive navigation items"
+          }
+        },
+        "navIcon": {
+          "active": {
+            "size": "h-6 w-6",
+            "color": "text-purple-500",
+            "spacing": "mx-auto mb-1",
+            "context": "Active navigation icon - purple"
+          },
+          "inactive": {
+            "size": "h-6 w-6",
+            "color": "text-gray-400",
+            "spacing": "mx-auto mb-1",
+            "context": "Inactive navigation icons - gray"
+          }
+        },
+        "navLabel": {
+          "active": {
+            "color": "text-purple-600",
+            "fontSize": "text-xs",
+            "fontWeight": "font-medium",
+            "context": "Active navigation label - purple and bold"
+          },
+          "inactive": {
+            "color": "text-gray-500",
+            "fontSize": "text-xs",
+            "context": "Inactive navigation labels - gray"
+          }
+        }
+      }
+    },
+    "contentCategories": {
+      "yourWorks": {
+        "identifier": "User-created content",
+        "actions": ["edit", "share"],
+        "statusTypes": ["draft", "published"],
+        "metrics": ["pages", "likes"],
+        "context": "Personal story collection with editing capabilities"
+      },
+      "onlineStories": {
+        "identifier": "Community/published content",
+        "actions": ["read"],
+        "metrics": ["rating", "downloads"],
+        "context": "Discoverable stories from other users"
+      },
+      "offlineStories": {
+        "identifier": "Downloaded/cached content",
+        "actions": ["view"],
+        "organization": "By genre/category",
+        "context": "Offline-accessible story collections"
+      },
+      "characters": {
+        "identifier": "Character management",
+        "actions": ["view", "manage"],
+        "context": "Centralized character library"
+      }
+    },
+    "doNotRules": {
+      "buttons": [
+        "DO NOT use same color for all action buttons - View=pink, Read=purple outline",
+        "DO NOT use gradients on library action buttons",
+        "DO NOT make browse buttons look like primary actions - use outline style",
+        "Edit and share icons should remain subtle gray, not purple"
+      ],
+      "content": [
+        "DO NOT mix story item layouts between sections",
+        "DO NOT remove rating/download stats from online stories",
+        "DO NOT use same button styling for offline vs online content actions",
+        "Browse buttons should span full width, action buttons should be compact"
+      ],
+      "sections": [
+        "DO NOT use different card styling between story sections",
+        "DO NOT center-align story metadata - left-align within cards",
+        "Character section is uniquely centered - don't apply to story sections",
+        "DO NOT remove section icons from headers"
+      ],
+      "colors": [
+        "DO NOT use purple for offline content actions - use pink",
+        "DO NOT use pink for online content actions - use purple",
+        "DO NOT style star ratings with non-yellow colors",
+        "DO NOT mix action button colors within same content type"
+      ],
+      "spacing": [
+        "DO NOT remove gaps between story items",
+        "DO NOT use tight padding on story cards",
+        "DO NOT stack action buttons without proper spacing"
+      ]
+    },
+    "componentMapping": {
+      "LibraryPage": {
+        "baseClass": "min-h-screen bg-gray-50 p-6 pb-24",
+        "headerClass": "text-2xl font-bold text-gray-900 mb-2"
+      },
+      "BrowseButton": {
+        "baseClass": "w-full bg-white text-purple-500 border border-purple-200 rounded-lg px-6 py-3 text-sm font-medium text-center hover:bg-purple-50 mb-6"
+      },
+      "StoryItem": {
+        "baseClass": "bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center justify-between",
+        "titleClass": "text-base font-semibold text-gray-900 mb-1",
+        "metadataClass": "text-sm text-gray-500 mb-2"
+      },
+      "ActionButton": {
+        "read": "bg-white hover:bg-purple-50 text-purple-500 border border-purple-200 rounded-lg px-4 py-2 text-sm font-medium",
+        "view": "bg-pink-500 hover:bg-pink-600 text-white rounded-lg px-4 py-2 text-sm font-medium",
+        "edit": "bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg p-2",
+        "share": "bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg p-2"
+      },
+      "CharacterSection": {
+        "baseClass": "bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center mb-6",
+        "buttonClass": "bg-purple-500 hover:bg-purple-600 text-white rounded-lg px-6 py-3 text-sm font-medium flex items-center justify-center space-x-2"
+      },
+      "SectionHeader": {
+        "baseClass": "flex items-center space-x-2 mb-4",
+        "iconClass": "h-5 w-5 text-purple-500",
+        "titleClass": "text-lg font-bold text-gray-900"
+      },
+      "RatingDisplay": {
+        "container": "flex items-center space-x-1",
+        "star": "h-4 w-4 text-yellow-500",
+        "value": "text-sm font-medium text-gray-700"
+      },
+      "StatsDisplay": {
+        "container": "flex items-center space-x-4",
+        "item": "flex items-center space-x-1",
+        "icon": "h-4 w-4 text-gray-400",
+        "text": "text-sm text-gray-500"
+      }
+    },
+    "iconMapping": {
+      "sections": {
+        "yourWorks": "book/document icon",
+        "characters": "people/user icon"
+      },
+      "actions": {
+        "edit": "pencil/edit icon",
+        "share": "share/export icon",
+        "view": "eye icon",
+        "download": "download icon"
+      },
+      "stats": {
+        "rating": "star icon (yellow)",
+        "downloads": "download icon (gray)"
+      },
+      "navigation": {
+        "library": "book icon (active=purple, inactive=gray)"
+      }
+    },
+    "stateManagement": {
+      "contentStates": {
+        "published": "Shows likes count and share option",
+        "draft": "Shows edit option, no likes",
+        "offline": "Pink view buttons, cached indicator"
+      },
+      "navigationState": {
+        "activeLibrary": "Purple background on Library tab",
+        "inactiveOthers": "Gray icons and text for other tabs"
+      }
+    },
+    "layoutPatterns": {
+      "contentSections": {
+        "structure": "Header + Browse Button + Item List pattern",
+        "browsing": "Full-width buttons for section exploration",
+        "itemActions": "Contextual actions based on content type",
+        "context": "Consistent section structure with content-specific actions"
+      },
+      "specialSections": {
+        "characterLibrary": "Centered card with illustration and primary CTA",
+        "offlineContent": "Distinct pink styling for cached content",
+        "context": "Special treatment for non-story content"
+      }
+    },
+    "accessibility": {
+      "buttonLabeling": "Clear action labels (Read, View, Edit)",
+      "contentHierarchy": "Proper heading structure for sections",
+      "interactiveElements": "Focus states on all buttons and links",
+      "statusIndication": "Clear visual distinction between content states"
+    },
+    "responsiveConsiderations": {
+      "mobile": "Current layout optimized for mobile",
+      "tablet": "Story items could show more metadata",
+      "desktop": "Consider multi-column layout for story lists"
+    }
+  }

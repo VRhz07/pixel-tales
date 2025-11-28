@@ -1,0 +1,498 @@
+{
+    "designSystem": {
+      "name": "Imaginary Worlds Profile Page",
+      "type": "user_profile_interface",
+      "framework": "react_typescript_tailwind",
+      "layout": "mobile_first_gamified_profile"
+    },
+    "colorPalette": {
+      "primary": {
+        "purple": "#8B5CF6",
+        "purpleDark": "#7C3AED",
+        "purpleLight": "#A78BFA"
+      },
+      "gamification": {
+        "progressGreen": "#10B981",
+        "xpProgress": "#10B981",
+        "levelBadge": "#F59E0B"
+      },
+      "achievement": {
+        "completed": "#10B981",
+        "completedLight": "#D1FAE5",
+        "inProgress": "#8B5CF6",
+        "inProgressLight": "#EDE9FE",
+        "locked": "#9CA3AF",
+        "lockedLight": "#F3F4F6"
+      },
+      "neutral": {
+        "white": "#FFFFFF",
+        "gray50": "#F9FAFB",
+        "gray100": "#F3F4F6",
+        "gray200": "#E5E7EB",
+        "gray300": "#D1D5DB",
+        "gray400": "#9CA3AF",
+        "gray500": "#6B7280",
+        "gray600": "#4B5563",
+        "gray700": "#374151",
+        "gray800": "#1F2937",
+        "gray900": "#111827"
+      },
+      "backgrounds": {
+        "page": "#F9FAFB",
+        "card": "#FFFFFF",
+        "avatarBackground": "#DDD6FE"
+      }
+    },
+    "elementStyling": {
+      "pageContainer": {
+        "background": "bg-gray-50",
+        "padding": "p-6 pb-24",
+        "minHeight": "min-h-screen",
+        "context": "Full page wrapper with bottom navigation spacing"
+      },
+      "pageHeader": {
+        "title": {
+          "color": "text-gray-900",
+          "fontSize": "text-2xl",
+          "fontWeight": "font-bold",
+          "spacing": "mb-8",
+          "context": "Main page title - Profile"
+        }
+      },
+      "userProfileCard": {
+        "container": {
+          "background": "bg-white",
+          "borderRadius": "rounded-2xl",
+          "padding": "p-6",
+          "shadow": "shadow-sm",
+          "border": "border border-gray-100",
+          "spacing": "mb-6",
+          "alignment": "text-center",
+          "context": "Main profile card - centered content"
+        },
+        "avatar": {
+          "container": {
+            "size": "w-20 h-20",
+            "background": "bg-purple-200",
+            "borderRadius": "rounded-full",
+            "display": "flex items-center justify-center",
+            "spacing": "mx-auto mb-4",
+            "context": "Large circular avatar with purple background"
+          },
+          "emoji": {
+            "fontSize": "text-3xl",
+            "context": "Crown emoji or user's chosen avatar"
+          }
+        },
+        "title": {
+          "color": "text-gray-900",
+          "fontSize": "text-xl",
+          "fontWeight": "font-bold",
+          "spacing": "mb-2",
+          "context": "User title/role - Story Creator"
+        },
+        "levelInfo": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm",
+          "spacing": "mb-4",
+          "context": "Level and XP information - muted text"
+        },
+        "progressBar": {
+          "container": {
+            "background": "bg-gray-200",
+            "height": "h-2",
+            "borderRadius": "rounded-full",
+            "spacing": "mb-2",
+            "context": "Progress bar background - light gray"
+          },
+          "fill": {
+            "background": "bg-green-500",
+            "height": "h-full",
+            "borderRadius": "rounded-full",
+            "context": "Progress bar fill - green color"
+          }
+        },
+        "progressText": {
+          "color": "text-gray-500",
+          "fontSize": "text-xs",
+          "alignment": "text-center",
+          "context": "XP until next level text"
+        }
+      },
+      "statsGrid": {
+        "container": {
+          "display": "grid grid-cols-2 gap-4",
+          "spacing": "mb-6",
+          "context": "2-column stats layout"
+        },
+        "statCard": {
+          "background": "bg-white",
+          "borderRadius": "rounded-xl",
+          "padding": "p-4",
+          "shadow": "shadow-sm",
+          "border": "border border-gray-100",
+          "alignment": "text-center",
+          "context": "Individual stat cards"
+        },
+        "icon": {
+          "size": "h-6 w-6",
+          "color": "text-purple-500",
+          "spacing": "mx-auto mb-2",
+          "context": "Stat icons - purple color"
+        },
+        "value": {
+          "color": "text-gray-900",
+          "fontSize": "text-2xl",
+          "fontWeight": "font-bold",
+          "spacing": "mb-1",
+          "context": "Stat numbers - large bold text"
+        },
+        "label": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm",
+          "context": "Stat labels - muted text"
+        }
+      },
+      "achievementsSection": {
+        "header": {
+          "display": "flex items-center",
+          "spacing": "space-x-2 mb-4",
+          "context": "Section header with trophy emoji"
+        },
+        "emoji": {
+          "fontSize": "text-xl",
+          "context": "Trophy emoji - no CSS styling"
+        },
+        "title": {
+          "color": "text-gray-900",
+          "fontSize": "text-lg",
+          "fontWeight": "font-bold",
+          "context": "Achievements section title"
+        },
+        "list": {
+          "spacing": "space-y-3 mb-6",
+          "context": "Achievement items with gaps"
+        }
+      },
+      "achievementItems": {
+        "completed": {
+          "container": {
+            "background": "bg-white",
+            "borderRadius": "rounded-xl",
+            "padding": "p-4",
+            "shadow": "shadow-sm",
+            "border": "border-l-4 border-l-green-500 border-r border-t border-b border-gray-100",
+            "display": "flex items-center",
+            "spacing": "space-x-3",
+            "context": "Completed achievements - green left border"
+          },
+          "iconContainer": {
+            "background": "bg-green-100",
+            "borderRadius": "rounded-lg",
+            "padding": "p-3",
+            "context": "Icon background for completed achievements"
+          },
+          "icon": {
+            "size": "h-5 w-5",
+            "color": "text-green-600",
+            "context": "Achievement icons - green for completed"
+          }
+        },
+        "inProgress": {
+          "container": {
+            "background": "bg-white",
+            "borderRadius": "rounded-xl",
+            "padding": "p-4",
+            "shadow": "shadow-sm",
+            "border": "border-l-4 border-l-purple-500 border-r border-t border-b border-gray-100",
+            "display": "flex items-center justify-between",
+            "context": "In-progress achievements - purple left border"
+          },
+          "leftContent": {
+            "display": "flex items-center",
+            "spacing": "space-x-3"
+          },
+          "iconContainer": {
+            "background": "bg-purple-100",
+            "borderRadius": "rounded-lg",
+            "padding": "p-3",
+            "context": "Icon background for in-progress achievements"
+          },
+          "icon": {
+            "size": "h-5 w-5",
+            "color": "text-purple-600",
+            "context": "Achievement icons - purple for in-progress"
+          },
+          "progressContainer": {
+            "minWidth": "min-w-0 flex-1",
+            "spacing": "ml-4",
+            "context": "Progress bar container"
+          },
+          "progressBar": {
+            "container": {
+              "background": "bg-gray-200",
+              "height": "h-2",
+              "borderRadius": "rounded-full",
+              "spacing": "mb-1",
+              "context": "Achievement progress bar background"
+            },
+            "fill": {
+              "background": "bg-purple-500",
+              "height": "h-full",
+              "borderRadius": "rounded-full",
+              "context": "Achievement progress fill - purple"
+            }
+          },
+          "progressText": {
+            "color": "text-gray-500",
+            "fontSize": "text-xs",
+            "context": "Progress fraction text"
+          }
+        },
+        "locked": {
+          "container": {
+            "background": "bg-white",
+            "borderRadius": "rounded-xl",
+            "padding": "p-4",
+            "shadow": "shadow-sm",
+            "border": "border border-gray-100",
+            "display": "flex items-center",
+            "spacing": "space-x-3",
+            "opacity": "opacity-60",
+            "context": "Locked achievements - reduced opacity"
+          },
+          "iconContainer": {
+            "background": "bg-gray-100",
+            "borderRadius": "rounded-lg",
+            "padding": "p-3",
+            "context": "Icon background for locked achievements"
+          },
+          "icon": {
+            "size": "h-5 w-5",
+            "color": "text-gray-400",
+            "context": "Achievement icons - gray for locked"
+          }
+        },
+        "content": {
+          "title": {
+            "color": "text-gray-900",
+            "fontSize": "text-base",
+            "fontWeight": "font-semibold",
+            "spacing": "mb-1",
+            "context": "Achievement titles"
+          },
+          "description": {
+            "color": "text-gray-500",
+            "fontSize": "text-sm",
+            "context": "Achievement descriptions"
+          },
+          "badge": {
+            "background": "bg-yellow-100",
+            "color": "text-yellow-800",
+            "borderRadius": "rounded-full",
+            "padding": "px-2 py-1",
+            "fontSize": "text-xs",
+            "fontWeight": "font-medium",
+            "context": "Achievement badges - yellow background"
+          }
+        }
+      },
+      "trophyShelf": {
+        "header": {
+          "color": "text-gray-900",
+          "fontSize": "text-lg",
+          "fontWeight": "font-bold",
+          "spacing": "mb-4",
+          "context": "Trophy Shelf section title"
+        },
+        "container": {
+          "background": "bg-white",
+          "borderRadius": "rounded-xl",
+          "padding": "p-6",
+          "shadow": "shadow-sm",
+          "border": "border border-gray-100",
+          "alignment": "text-center",
+          "spacing": "mb-6",
+          "context": "Trophy display container"
+        },
+        "trophyGrid": {
+          "display": "flex items-center justify-center",
+          "spacing": "space-x-4 mb-4",
+          "context": "Trophy emoji grid"
+        },
+        "trophyEmojis": {
+          "size": "text-3xl",
+          "context": "Trophy and badge emojis - no CSS styling needed"
+        },
+        "description": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm",
+          "context": "Trophy shelf description text"
+        }
+      },
+      "bottomNavigation": {
+        "container": {
+          "background": "bg-white",
+          "borderTop": "border-t border-gray-200",
+          "padding": "px-6 py-3",
+          "position": "fixed bottom-0 left-0 right-0",
+          "context": "Bottom navigation bar"
+        },
+        "navGrid": {
+          "display": "grid grid-cols-5 gap-4",
+          "context": "5-column navigation layout"
+        },
+        "navItem": {
+          "default": {
+            "alignment": "text-center",
+            "padding": "py-2",
+            "context": "Individual nav items"
+          },
+          "active": {
+            "background": "bg-purple-50",
+            "borderRadius": "rounded-lg",
+            "context": "Active nav item - light purple background"
+          }
+        },
+        "navIcon": {
+          "default": {
+            "size": "h-6 w-6",
+            "color": "text-gray-400",
+            "spacing": "mx-auto mb-1",
+            "context": "Navigation icons - gray when inactive"
+          },
+          "active": {
+            "color": "text-purple-500",
+            "context": "Active navigation icon - purple"
+          }
+        },
+        "navLabel": {
+          "default": {
+            "color": "text-gray-500",
+            "fontSize": "text-xs",
+            "context": "Navigation labels - gray when inactive"
+          },
+          "active": {
+            "color": "text-purple-600",
+            "fontWeight": "font-medium",
+            "context": "Active navigation label - purple and bold"
+          }
+        }
+      }
+    },
+    "gamificationElements": {
+      "levelSystem": {
+        "display": "Level X • Y,XXX XP",
+        "progressBar": "Green fill showing progress to next level",
+        "context": "XP-based level progression"
+      },
+      "achievements": {
+        "states": ["completed", "inProgress", "locked"],
+        "visualCues": "Left border colors and icon backgrounds",
+        "progress": "Purple progress bars for in-progress achievements",
+        "context": "Achievement system with clear visual states"
+      },
+      "trophyCollection": {
+        "display": "Emoji-based trophy and badge collection",
+        "layout": "Horizontal centered grid of earned trophies",
+        "context": "Visual representation of major accomplishments"
+      }
+    },
+    "doNotRules": {
+      "backgrounds": [
+        "DO NOT use gradients on stat cards or achievement items",
+        "DO NOT apply page background to individual cards",
+        "ONLY use colored backgrounds for progress bars and icon containers",
+        "Avatar backgrounds should remain consistent purple tone"
+      ],
+      "borders": [
+        "DO NOT add borders to trophy shelf or stat cards except standard gray-100",
+        "ONLY use colored left borders on achievement items to show state",
+        "DO NOT use thick borders - maintain subtle border styling"
+      ],
+      "colors": [
+        "DO NOT mix achievement state colors - green=completed, purple=progress, gray=locked",
+        "DO NOT use purple for completed achievements - use green",
+        "DO NOT style trophy emojis with CSS - they're already colored",
+        "Progress bars should always be green for XP, purple for achievement progress"
+      ],
+      "layout": [
+        "DO NOT stack stat cards vertically on mobile - maintain 2-column grid",
+        "DO NOT center-align achievement text - left-align content within items",
+        "DO NOT remove bottom navigation spacing from page content"
+      ],
+      "gamification": [
+        "DO NOT use different colors for XP progress bars",
+        "DO NOT style achievement badges inconsistently",
+        "DO NOT mix trophy emoji sizes - keep consistent text-3xl"
+      ]
+    },
+    "componentMapping": {
+      "ProfileCard": {
+        "baseClass": "bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center mb-6",
+        "avatarClass": "w-20 h-20 bg-purple-200 rounded-full flex items-center justify-center mx-auto mb-4",
+        "titleClass": "text-xl font-bold text-gray-900 mb-2"
+      },
+      "StatCard": {
+        "baseClass": "bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center",
+        "iconClass": "h-6 w-6 text-purple-500 mx-auto mb-2",
+        "valueClass": "text-2xl font-bold text-gray-900 mb-1",
+        "labelClass": "text-sm text-gray-500"
+      },
+      "AchievementItem": {
+        "completed": "bg-white rounded-xl p-4 shadow-sm border-l-4 border-l-green-500 border-r border-t border-b border-gray-100 flex items-center space-x-3",
+        "inProgress": "bg-white rounded-xl p-4 shadow-sm border-l-4 border-l-purple-500 border-r border-t border-b border-gray-100 flex items-center justify-between",
+        "locked": "bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center space-x-3 opacity-60"
+      },
+      "AchievementIcon": {
+        "completed": "bg-green-100 rounded-lg p-3 h-5 w-5 text-green-600",
+        "inProgress": "bg-purple-100 rounded-lg p-3 h-5 w-5 text-purple-600", 
+        "locked": "bg-gray-100 rounded-lg p-3 h-5 w-5 text-gray-400"
+      },
+      "ProgressBar": {
+        "xp": "bg-gray-200 h-2 rounded-full mb-2 > bg-green-500 h-full rounded-full",
+        "achievement": "bg-gray-200 h-2 rounded-full mb-1 > bg-purple-500 h-full rounded-full"
+      },
+      "BottomNav": {
+        "container": "bg-white border-t border-gray-200 px-6 py-3 fixed bottom-0 left-0 right-0",
+        "grid": "grid grid-cols-5 gap-4",
+        "item": "text-center py-2",
+        "activeItem": "bg-purple-50 rounded-lg",
+        "icon": "h-6 w-6 mx-auto mb-1",
+        "activeIcon": "text-purple-500",
+        "inactiveIcon": "text-gray-400"
+      }
+    },
+    "iconMapping": {
+      "stats": {
+        "stories": "book icon",
+        "characters": "user/people icon", 
+        "likes": "heart/star icon",
+        "days": "calendar icon"
+      },
+      "achievements": {
+        "illustrator": "image/palette icon",
+        "storyteller": "book icon",
+        "author": "star icon",
+        "streak": "flame icon"
+      },
+      "navigation": {
+        "home": "house icon",
+        "library": "book icon", 
+        "profile": "user icon",
+        "social": "people icon",
+        "settings": "gear icon"
+      }
+    },
+    "responsiveConsiderations": {
+      "mobile": "Current layout optimized for mobile-first",
+      "tablet": "Stats grid could expand to 4 columns",
+      "desktop": "Consider max-width container and larger avatar"
+    },
+    "accessibility": {
+      "progressBars": "Include aria-label with current progress",
+      "achievements": "Proper contrast for all state colors",
+      "navigation": "Clear focus states and semantic HTML",
+      "gamification": "Screen reader friendly XP and level announcements"
+    }
+  }

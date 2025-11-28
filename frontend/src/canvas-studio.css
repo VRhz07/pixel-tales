@@ -1,0 +1,2543 @@
+/* ============================================
+   CANVAS STUDIO - PROFESSIONAL DRAWING APP
+   Design System Implementation
+   ============================================ */
+
+/* Color Palette from Design Profile */
+:root {
+  --cs-bg-dark: #2C3137;
+  --cs-bg-darker: #1F2329;
+  --cs-surface: #343A40;
+  --cs-surface-light: #404650;
+  --cs-text-primary: #FFFFFF;
+  --cs-text-secondary: #B8BCC2;
+  --cs-text-tertiary: #8B9197;
+  --cs-purple: #8B5CF6;
+  --cs-purple-dark: #7C3AED;
+  --cs-purple-light: #A78BFA;
+  --cs-border: #404650;
+  --cs-hover: #404650;
+  --cs-canvas-bg: #FFFFFF;
+  --cs-canvas-border: #E5E7EB;
+}
+
+/* ============================================
+   MAIN LAYOUT - THREE COLUMN GRID
+   ============================================ */
+
+.canvas-studio {
+  width: 100vw;
+  height: 100vh;
+  background: var(--cs-bg-dark);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Capacitor safe area for canvas studio */
+body.capacitor .canvas-studio {
+  padding-top: var(--sat);
+  height: calc(100vh - var(--sab));
+}
+
+.canvas-studio-desktop {
+  display: grid;
+  grid-template-columns: 60px 1fr 280px; /* Increased right panel from 200px to 280px */
+  grid-template-rows: auto 1fr;
+}
+
+/* Force canvas to 500px in desktop layout */
+.canvas-studio-desktop .canvas-studio-canvas {
+  width: 500px !important;
+  height: 500px !important;
+}
+
+.canvas-studio-mobile {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================
+   TOP BAR
+   ============================================ */
+
+.canvas-studio-topbar {
+  grid-column: 1 / -1;
+  background: var(--cs-bg-darker);
+  border-bottom: 1px solid var(--cs-border);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem; /* Added gap for better spacing between groups */
+  z-index: 100;
+}
+
+/* Capacitor safe area for topbar */
+body.capacitor .canvas-studio-topbar {
+  padding-top: calc(0.75rem + var(--sat));
+}
+
+.canvas-studio-topbar-left,
+.canvas-studio-topbar-center,
+.canvas-studio-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.canvas-studio-title {
+  color: var(--cs-text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.canvas-studio-topbar-btn {
+  background: transparent;
+  color: var(--cs-text-secondary);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvas-studio-topbar-btn:hover {
+  background: var(--cs-hover);
+  color: var(--cs-text-primary);
+}
+
+.canvas-studio-topbar-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.canvas-studio-zoom-display {
+  color: var(--cs-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.canvas-studio-zoom-input {
+  width: 3.5rem;
+  background: var(--cs-bg-light);
+  border: 1px solid var(--cs-border);
+  border-radius: 0.375rem;
+  color: var(--cs-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 0.25rem 0.5rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.canvas-studio-zoom-input:focus {
+  border-color: var(--cs-purple);
+  background: var(--cs-bg-darker);
+}
+
+.canvas-studio-zoom-percent {
+  color: var(--cs-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-left: 0.25rem;
+}
+
+/* ============================================
+   LEFT TOOLBAR - 60px WIDTH
+   ============================================ */
+
+.canvas-studio-left-toolbar {
+  background: var(--cs-bg-darker);
+  border-right: 1px solid var(--cs-border);
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+}
+
+.canvas-studio-tool-btn {
+  background: transparent;
+  color: var(--cs-text-secondary);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin: 0 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.canvas-studio-tool-btn:hover {
+  background: var(--cs-hover);
+}
+
+.canvas-studio-tool-btn-active {
+  background: var(--cs-purple) !important;
+  color: var(--cs-text-primary) !important;
+}
+
+.canvas-studio-tool-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.canvas-studio-tool-icon-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.canvas-studio-tool-label {
+  font-size: 0.625rem;
+  color: var(--cs-text-tertiary);
+  margin-top: 0.25rem;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.canvas-studio-tool-indicator {
+  position: absolute;
+  bottom: 0.25rem;
+  right: 0.25rem;
+  width: 4px;
+  height: 4px;
+  background: var(--cs-purple);
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+/* ============================================
+   TOOL SUBMENU
+   ============================================ */
+
+.canvas-studio-submenu {
+  position: fixed;
+  /* Position is set dynamically via inline styles based on clicked button */
+  background: var(--cs-surface);
+  border: 1px solid var(--cs-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  padding: 0.5rem;
+  min-width: 12rem;
+  z-index: 1000;
+  transform: none;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Mobile Submenu */
+.canvas-studio-submenu-mobile {
+  position: fixed;
+  left: 50%;
+  bottom: 80px;
+  top: auto;
+  transform: translateX(-50%);
+  animation: slideUp 0.2s ease-out;
+  max-width: 90vw;
+  z-index: 1001;
+}
+
+.canvas-studio-submenu-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.canvas-studio-submenu-item {
+  background: transparent;
+  color: var(--cs-text-secondary);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.canvas-studio-submenu-item:hover {
+  background: var(--cs-hover);
+}
+
+.canvas-studio-submenu-item-active {
+  background: var(--cs-hover) !important;
+  color: var(--cs-text-primary) !important;
+}
+
+.canvas-studio-submenu-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--cs-text-secondary);
+}
+
+.canvas-studio-submenu-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+.canvas-studio-submenu-check {
+  width: 1rem;
+  height: 1rem;
+  color: var(--cs-purple);
+  margin-left: auto;
+}
+
+/* ============================================
+   CANVAS AREA - CENTER
+   ============================================ */
+
+.canvas-studio-canvas-area {
+  background: var(--cs-bg-dark);
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.canvas-studio-canvas-area-mobile {
+  position: fixed;
+  top: 48px; /* Below top bar */
+  bottom: 140px; /* Above brush settings panel + toolbar - increased for better clearance */
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow: hidden;
+  transition: bottom 0.3s ease;
+}
+
+/* Capacitor safe area for mobile canvas */
+body.capacitor .canvas-studio-canvas-area-mobile {
+  top: calc(48px + var(--sat));
+  bottom: calc(140px + var(--sab));
+}
+
+/* Expand space when additional settings are visible */
+.canvas-studio-canvas-area-mobile.has-settings {
+  bottom: 200px; /* Above all settings + toolbar - increased for better clearance */
+}
+
+.canvas-studio-canvas-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvas-studio-canvas {
+  background: var(--cs-canvas-bg);
+  border-radius: 0;
+  box-shadow: none;
+  width: 500px;
+  height: 500px;
+  aspect-ratio: 1 / 1;
+}
+
+/* ============================================
+   RIGHT PANEL - 280px WIDTH (Wider for layer controls)
+   ============================================ */
+
+.canvas-studio-right-panel {
+  background: var(--cs-bg-darker);
+  border-left: 1px solid var(--cs-border);
+  width: 280px; /* Increased from 200px to fit layer controls */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Panel Tabs */
+.canvas-studio-panel-tabs {
+  background: var(--cs-bg-darker);
+  border-bottom: 1px solid var(--cs-border);
+  padding: 0.5rem 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.canvas-studio-panel-tab {
+  background: transparent;
+  color: var(--cs-text-secondary);
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.canvas-studio-panel-tab:hover {
+  color: var(--cs-text-primary);
+}
+
+.canvas-studio-panel-tab-active {
+  color: var(--cs-text-primary) !important;
+  border-bottom-color: var(--cs-purple) !important;
+  font-weight: 600;
+}
+
+.canvas-studio-panel-tab-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.canvas-studio-color-circle-icon {
+  width: 1rem;
+  height: 1rem;
+  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 50%, #7c3aed 100%);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+}
+
+/* Panel Content */
+.canvas-studio-panel-content {
+  padding: 0.5rem;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100vh - 120px);
+}
+
+/* Custom Scrollbar for Panel Content */
+.canvas-studio-panel-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.canvas-studio-panel-content::-webkit-scrollbar-track {
+  background: var(--cs-bg-darker);
+  border-radius: 4px;
+}
+
+.canvas-studio-panel-content::-webkit-scrollbar-thumb {
+  background: var(--cs-border);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.canvas-studio-panel-content::-webkit-scrollbar-thumb:hover {
+  background: var(--cs-purple);
+}
+
+/* Settings Group */
+.canvas-studio-setting-group {
+  margin-bottom: 1.5rem;
+}
+
+.canvas-studio-setting-label {
+  color: var(--cs-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.canvas-studio-slider {
+  width: 100%;
+  height: 0.5rem;
+  background: var(--cs-border);
+  border-radius: 9999px;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.canvas-studio-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  background: var(--cs-text-primary);
+  border: 2px solid var(--cs-purple);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.canvas-studio-slider::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  background: var(--cs-text-primary);
+  border: 2px solid var(--cs-purple);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.canvas-studio-setting-value {
+  color: var(--cs-text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  text-align: right;
+}
+
+/* Layers List */
+.canvas-studio-layers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.canvas-studio-layer-item {
+  background: var(--cs-surface);
+  border: 1px solid var(--cs-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.canvas-studio-layer-item:hover {
+  background: var(--cs-hover);
+}
+
+.canvas-studio-layer-item-active {
+  border-color: var(--cs-purple);
+  background: var(--cs-hover);
+}
+
+.canvas-studio-layer-thumbnail {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--cs-canvas-bg);
+  border: 1px solid var(--cs-border);
+  border-radius: 0.25rem;
+}
+
+.canvas-studio-layer-name {
+  color: var(--cs-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+/* Color Section */
+.canvas-studio-color-section {
+  margin-bottom: 1.5rem;
+}
+
+.canvas-studio-color-section-title {
+  color: var(--cs-text-secondary);
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+/* Color Picker */
+.canvas-studio-color-picker-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--cs-surface);
+  border-radius: 0.5rem;
+}
+
+.canvas-studio-color-picker {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  background: none;
+}
+
+.canvas-studio-color-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.canvas-studio-color-picker::-webkit-color-swatch {
+  border: 2px solid var(--cs-border);
+  border-radius: 0.375rem;
+}
+
+.canvas-studio-color-preview {
+  width: 32px;
+  height: 32px;
+  border-radius: 0.375rem;
+  border: 2px solid var(--cs-border);
+}
+
+.canvas-studio-color-hex {
+  color: var(--cs-text-secondary);
+  font-size: 0.75rem;
+  font-family: monospace;
+  font-weight: 500;
+}
+
+/* Recent Colors Row */
+.canvas-studio-colors-row {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.canvas-studio-colors-row .canvas-studio-color-swatch {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+/* Colors Grid */
+.canvas-studio-colors-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.375rem;
+}
+
+.canvas-studio-color-swatch {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 2px solid transparent;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.canvas-studio-color-swatch:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.canvas-studio-color-swatch-active {
+  border-color: var(--cs-text-primary) !important;
+  box-shadow: 0 0 0 2px var(--cs-purple);
+}
+
+/* ============================================
+   MOBILE BOTTOM TOOLBAR
+   ============================================ */
+
+.canvas-studio-mobile-toolbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--cs-bg-darker);
+  border-top: 1px solid var(--cs-border);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem; /* Increased from 0.5rem for better button spacing */
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+}
+
+/* Capacitor safe area for mobile toolbar */
+body.capacitor .canvas-studio-mobile-toolbar {
+  padding-bottom: calc(0.75rem + var(--sab));
+}
+
+.canvas-studio-mobile-tool {
+  background: var(--cs-surface);
+  color: var(--cs-text-secondary);
+  border: none;
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvas-studio-mobile-tool:hover {
+  background: var(--cs-hover);
+}
+
+.canvas-studio-mobile-tool-active {
+  background: var(--cs-purple) !important;
+  color: var(--cs-text-primary) !important;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.5);
+}
+
+.canvas-studio-mobile-tool-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.canvas-studio-color-indicator {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  border: 2px solid var(--cs-text-primary);
+}
+
+/* ============================================
+   MOBILE SLIDERS (Above Toolbar)
+   ============================================ */
+
+.canvas-studio-mobile-sliders {
+  position: fixed;
+  bottom: 80px; /* Above the toolbar - increased for better clearance */
+  left: 0;
+  right: 0;
+  background: var(--cs-bg-main);
+  border-top: 1px solid var(--cs-border);
+  padding: 0.5rem 1rem; /* Reduced vertical padding from 1rem */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* Reduced gap from 0.75rem */
+  z-index: 90;
+}
+
+/* Capacitor safe area for mobile sliders */
+body.capacitor .canvas-studio-mobile-sliders {
+  bottom: calc(80px + var(--sab));
+}
+
+.canvas-studio-sliders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.25rem; /* Reduced from 0.5rem */
+}
+
+.canvas-studio-sliders-title {
+  color: var(--cs-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.canvas-studio-reset-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.375rem;
+  padding: 0.375rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.canvas-studio-reset-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--cs-purple);
+}
+
+.canvas-studio-reset-btn:active {
+  transform: scale(0.95);
+}
+
+.canvas-studio-reset-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--cs-text-primary);
+}
+
+.canvas-studio-slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem; /* Reduced from 0.5rem for more compact layout */
+}
+
+.canvas-studio-slider-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--cs-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  width: 100%;
+}
+
+.canvas-studio-slider-label > span:first-child {
+  flex-shrink: 0;
+}
+
+.canvas-studio-slider-value {
+  color: var(--cs-text-primary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.canvas-studio-slider-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.canvas-studio-brush-preview {
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.canvas-studio-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.canvas-studio-slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.canvas-studio-slider::-moz-range-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.canvas-studio-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--cs-purple);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.5);
+  transition: all 0.2s ease;
+  margin-top: -7px; /* Center the thumb: (20px - 6px) / 2 */
+}
+
+.canvas-studio-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.7);
+}
+
+.canvas-studio-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--cs-purple);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.5);
+  transition: all 0.2s ease;
+}
+
+.canvas-studio-slider::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.7);
+}
+
+/* ============================================
+   MOBILE MODAL
+   ============================================ */
+
+.canvas-studio-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 200;
+}
+
+.canvas-studio-modal {
+  background: var(--cs-bg-darker);
+  border-radius: 1rem 1rem 0 0;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+.canvas-studio-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.canvas-studio-modal-title {
+  color: var(--cs-text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.canvas-studio-modal-close-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--cs-text-secondary);
+  cursor: pointer;
+}
+
+.canvas-studio-modal-large {
+  max-height: 90vh;
+}
+
+.canvas-studio-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Color Picker Sections */
+.canvas-studio-color-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.canvas-studio-color-section-title {
+  color: var(--cs-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.canvas-studio-color-picker-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.canvas-studio-color-wheel {
+  width: 120px;
+  height: 120px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: none;
+}
+
+.canvas-studio-color-wheel::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 50%;
+}
+
+.canvas-studio-color-wheel::-webkit-color-swatch {
+  border: 3px solid var(--cs-border);
+  border-radius: 50%;
+}
+
+.canvas-studio-color-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.canvas-studio-color-preview-swatch {
+  width: 60px;
+  height: 60px;
+  border-radius: 0.5rem;
+  border: 2px solid var(--cs-border);
+}
+
+.canvas-studio-color-hex {
+  color: var(--cs-text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+/* Compact Color Picker for Mobile */
+.canvas-studio-color-section-compact {
+  margin-bottom: 1rem;
+}
+
+.canvas-studio-color-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--cs-surface);
+  border-radius: 0.5rem;
+}
+
+.canvas-studio-color-wheel-compact {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: none;
+  flex-shrink: 0;
+}
+
+.canvas-studio-color-wheel-compact::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 50%;
+}
+
+.canvas-studio-color-wheel-compact::-webkit-color-swatch {
+  border: 2px solid var(--cs-border);
+  border-radius: 50%;
+}
+
+.canvas-studio-color-hex-compact {
+  color: var(--cs-text-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: monospace;
+  flex: 1;
+}
+
+.canvas-studio-color-apply-btn-compact {
+  background: var(--cs-purple);
+  color: var(--cs-text-primary);
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.canvas-studio-color-apply-btn-compact:hover {
+  background: var(--cs-purple-hover);
+  transform: scale(1.05);
+}
+
+.canvas-studio-color-apply-btn {
+  background: var(--cs-purple);
+  color: var(--cs-text-primary);
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.canvas-studio-color-apply-btn:hover {
+  background: var(--cs-purple-dark);
+  transform: translateY(-1px);
+}
+
+.canvas-studio-colors-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.canvas-studio-colors-row .canvas-studio-color-swatch {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Tablet Portrait & Mobile - Use mobile layout */
+@media (max-width: 1024px) and (orientation: portrait) {
+  .canvas-studio-desktop {
+    display: none;
+  }
+
+  .canvas-studio-mobile {
+    display: flex;
+  }
+  
+  /* Add padding to show canvas rounded corners */
+  .canvas-studio-canvas-wrapper {
+    padding: 1rem;
+  }
+  
+  /* Ensure canvas stays square in portrait mode */
+  .canvas-studio-canvas {
+    /* Fixed size for consistency across orientations */
+    width: 500px !important;
+    height: 500px !important;
+    aspect-ratio: 1 / 1 !important;
+  }
+}
+
+/* Phone Landscape - Use mobile landscape layout */
+@media (max-width: 1024px) and (orientation: landscape) and (max-height: 600px) {
+  .canvas-studio-desktop {
+    display: none;
+  }
+
+  .canvas-studio-mobile {
+    display: flex;
+  }
+  
+  /* Add padding to show canvas rounded corners */
+  .canvas-studio-canvas-wrapper {
+    padding: 1rem;
+  }
+}
+
+/* Tablet Landscape - Use desktop layout (only if height > 600px) */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) and (min-height: 601px) {
+  .canvas-studio-desktop {
+    display: grid !important;
+  }
+  
+  .canvas-studio-mobile {
+    display: none !important;
+  }
+  
+  .canvas-studio-left-toolbar {
+    display: flex !important;
+  }
+  
+  .canvas-studio-canvas-area {
+    display: flex !important;
+  }
+  
+  /* Same fixed size as portrait for consistency */
+  .canvas-studio-canvas {
+    width: 500px !important;
+    height: 500px !important;
+    aspect-ratio: 1 / 1 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .canvas-studio-topbar {
+    padding: 0.625rem 0.75rem; /* Increased padding for better mobile spacing */
+    gap: 0.5rem; /* Reduced gap for mobile to fit more content */
+  }
+  
+  .canvas-studio-title {
+    font-size: 0.875rem;
+  }
+  
+  .canvas-studio-topbar-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+  
+  .canvas-studio-canvas-area {
+    padding: 1rem;
+  }
+  
+  .canvas-studio-mobile-toolbar {
+    padding: 0.75rem 0.5rem; /* Increased vertical padding for better spacing */
+    gap: 0.5rem; /* Explicit gap for smaller screens */
+  }
+  
+  .canvas-studio-mobile-tool {
+    width: 2.75rem; /* Increased from 2.5rem for better touch targets */
+    height: 2.75rem; /* Increased from 2.5rem for better touch targets */
+  }
+}
+
+/* ============================================
+   LANDSCAPE MODE (Mobile) - Rearrange Layout
+   ============================================ */
+
+@media (max-width: 1024px) and (orientation: landscape) and (max-height: 600px) {
+  /* Change to horizontal layout: left bar | canvas | right bar */
+  .canvas-studio-mobile {
+    display: grid;
+    grid-template-columns: 48px 1fr 80px;
+    grid-template-rows: 1fr;
+    height: 100vh;
+  }
+
+  /* Top bar becomes left vertical bar */
+  .canvas-studio-topbar {
+    grid-column: 1;
+    grid-row: 1;
+    flex-direction: column;
+    width: 48px;
+    height: 100%;
+    padding: 0.5rem 0;
+    border-right: 1px solid var(--cs-border);
+    border-bottom: none;
+  }
+
+  .canvas-studio-topbar-left,
+  .canvas-studio-topbar-center,
+  .canvas-studio-topbar-right {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .canvas-studio-topbar-center {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .canvas-studio-topbar-btn {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .canvas-studio-topbar-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .canvas-studio-zoom-input {
+    width: 2.5rem;
+    font-size: 0.625rem;
+    padding: 0.125rem;
+  }
+
+  .canvas-studio-zoom-percent {
+    font-size: 0.625rem;
+  }
+
+  /* Canvas in middle */
+  .canvas-studio-canvas-area {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  /* Override mobile canvas positioning in landscape */
+  .canvas-studio-canvas-area-mobile {
+    position: static;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+  }
+
+  /* Bottom toolbar becomes right vertical bar */
+  .canvas-studio-mobile-toolbar {
+    grid-column: 3;
+    grid-row: 1;
+    position: static;
+    flex-direction: column;
+    width: 80px;
+    height: 100%;
+    padding: 0.5rem 0;
+    border-left: 1px solid var(--cs-border);
+    border-top: none;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .canvas-studio-mobile-tool {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .canvas-studio-mobile-tool-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  /* Sliders positioned to the right side (vertical/standing orientation) */
+  .canvas-studio-mobile-sliders {
+    position: fixed;
+    right: 88px; /* 80px toolbar + 8px gap */
+    top: 50%;
+    transform: translateY(-50%);
+    left: auto;
+    bottom: auto;
+    width: 120px;
+    height: auto;
+    max-height: 80vh;
+    background: var(--cs-bg-main);
+    border: 1px solid var(--cs-border);
+    border-radius: 0.5rem;
+    padding: 1rem 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .canvas-studio-sliders-header {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .canvas-studio-sliders-title {
+    font-size: 0.625rem;
+    writing-mode: horizontal-tb;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .canvas-studio-reset-btn {
+    padding: 0.375rem;
+  }
+
+  .canvas-studio-reset-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .canvas-studio-slider-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .canvas-studio-slider-label {
+    font-size: 0.625rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .canvas-studio-slider-label > span:first-child {
+    font-weight: 600;
+  }
+
+  .canvas-studio-slider-preview {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .canvas-studio-brush-preview {
+    /* Size is set inline via style attribute, just ensure it displays */
+    max-width: 40px !important;
+    max-height: 40px !important;
+    min-width: 4px !important;
+    min-height: 4px !important;
+    flex-shrink: 0;
+  }
+
+  .canvas-studio-slider-value {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .canvas-studio-slider {
+    width: 100%;
+  }
+
+  /* Submenu positioning in landscape - next to left toolbar where brush tool is */
+  .canvas-studio-submenu-mobile {
+    left: 88px; /* 80px toolbar + 8px gap - brush tool is on the left in landscape */
+    right: auto;
+    bottom: auto;
+    top: 50%;
+    transform: translateY(-50%) !important;
+    animation: fadeIn 0.2s ease-out !important; /* Use fade instead of slide */
+  }
+
+  .canvas-studio-submenu-backdrop {
+    z-index: 1000;
+  }
+
+  /* Modal positioning in landscape - next to right toolbar */
+  .canvas-studio-modal-overlay {
+    align-items: center !important;
+    justify-content: flex-end !important;
+    padding-right: 88px; /* 80px toolbar + 8px gap */
+  }
+
+  .canvas-studio-modal {
+    width: auto;
+    max-width: 400px;
+    min-width: 320px;
+    max-height: 90vh;
+    border-radius: 1rem;
+    margin: 0;
+    animation: fadeIn 0.2s ease-out !important; /* Use fade instead of slide */
+    transform: none !important; /* Remove any transform */
+  }
+
+  .canvas-studio-modal-large {
+    max-width: 450px;
+  }
+
+  /* Fix canvas size in landscape */
+  .canvas-studio-canvas-area {
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+  }
+
+  .canvas-studio-canvas-wrapper {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .canvas-studio-canvas {
+    /* Same fixed size for consistency across orientations */
+    width: 500px;
+    height: 500px;
+    aspect-ratio: 1 / 1; /* Keep square aspect ratio */
+  }
+}
+
+/* ============================================
+   MODAL VARIANTS & BUTTONS
+   ============================================ */
+
+.canvas-studio-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.canvas-studio-modal-small {
+  max-width: 400px;
+  width: 100%;
+  border-radius: 1rem;
+}
+
+.canvas-studio-modal-medium {
+  max-width: 500px;
+  width: 100%;
+  border-radius: 1rem;
+}
+
+.canvas-studio-modal-close {
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  color: var(--cs-text-secondary);
+  transition: color 0.2s;
+}
+
+.canvas-studio-modal-close:hover {
+  color: var(--cs-text-primary);
+}
+
+.canvas-studio-btn-secondary {
+  padding: 0.625rem 1.25rem;
+  background: var(--cs-surface);
+  color: var(--cs-text-primary);
+  border: 1px solid var(--cs-border);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.canvas-studio-btn-secondary:hover {
+  background: var(--cs-hover);
+  border-color: var(--cs-text-tertiary);
+}
+
+.canvas-studio-btn-danger {
+  padding: 0.625rem 1.25rem;
+  background: #EF4444;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.canvas-studio-btn-danger:hover {
+  background: #DC2626;
+}
+
+.canvas-studio-btn-danger:active {
+  transform: scale(0.98);
+}
+
+.canvas-studio-btn-primary {
+  padding: 0.625rem 1.25rem;
+  background: var(--cs-purple);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.canvas-studio-btn-primary:hover {
+  background: var(--cs-purple-dark);
+}
+
+.canvas-studio-btn-primary:active {
+  transform: scale(0.98);
+}
+
+/* ============================================
+   TRASH ZONE
+   ============================================ */
+
+.canvas-studio-trash-zone {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  background: rgba(107, 114, 128, 0.2);
+  border: 2px dashed #9CA3AF;
+  border-radius: 50%;
+  z-index: 100;
+  transition: all 0.2s ease;
+  pointer-events: all;
+}
+
+/* Mobile: Position trash zone higher and make it larger */
+@media (max-width: 768px) {
+  .canvas-studio-trash-zone {
+    bottom: 120px; /* Move up to be more visible */
+    width: 60px;
+    height: 60px;
+  }
+}
+
+.canvas-studio-trash-zone-active {
+  background: rgba(239, 68, 68, 0.9);
+  border-color: #EF4444;
+  border-style: solid;
+  transform: translateX(-50%) scale(1.15);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.canvas-studio-trash-zone-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #6B7280;
+  transition: color 0.2s;
+}
+
+/* Mobile: Larger icon */
+@media (max-width: 768px) {
+  .canvas-studio-trash-zone-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+.canvas-studio-trash-zone-active .canvas-studio-trash-zone-icon {
+  color: white;
+}
+
+.canvas-studio-trash-zone-text {
+  display: none;
+}
+
+/* ============================================
+   PROFESSIONAL LAYER SYSTEM
+   ============================================ */
+
+/* Layer Modal */
+.canvas-studio-layers-modal {
+  max-width: 450px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.canvas-studio-layers-modal .canvas-studio-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--cs-border);
+}
+
+.canvas-studio-layer-add-btn {
+  background: var(--cs-purple);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  margin-left: auto;
+  margin-right: 0.5rem;
+}
+
+.canvas-studio-layer-add-btn:hover {
+  background: var(--cs-purple-dark);
+  transform: scale(1.05);
+}
+
+.canvas-studio-layer-add-btn:active {
+  transform: scale(0.95);
+}
+
+/* Layers List */
+.canvas-studio-layers-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Layer Item */
+.canvas-studio-layer-item {
+  background: var(--cs-surface);
+  border: 2px solid transparent;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  display: flex;
+  align-items: flex-start; /* Changed from center to flex-start */
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.canvas-studio-layer-item:hover {
+  background: var(--cs-surface-light);
+  border-color: var(--cs-border);
+}
+
+.canvas-studio-layer-item-active {
+  background: var(--cs-surface-light);
+  border-color: var(--cs-purple);
+  box-shadow: 0 0 0 1px var(--cs-purple);
+}
+
+.canvas-studio-layer-item-locked {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.canvas-studio-layer-item-locked:hover {
+  background: var(--cs-surface);
+  border-color: transparent;
+}
+
+/* Layer Thumbnail */
+.canvas-studio-layer-thumbnail {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  background: white;
+  border: 1px solid var(--cs-border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.canvas-studio-layer-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.canvas-studio-layer-thumbnail-empty {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%),
+              linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
+}
+
+/* Layer Info */
+.canvas-studio-layer-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  width: 100%; /* Ensure it takes full available width */
+}
+
+.canvas-studio-layer-name {
+  color: var(--cs-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.canvas-studio-layer-name-input {
+  background: var(--cs-bg-darker);
+  color: var(--cs-text-primary);
+  border: 1px solid var(--cs-purple);
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  width: 100%;
+  outline: none;
+}
+
+/* Layer Opacity */
+.canvas-studio-layer-opacity {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%; /* Full width of parent */
+  margin-bottom: 0.5rem; /* Add space below for controls */
+}
+
+.canvas-studio-layer-opacity-label {
+  color: var(--cs-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  min-width: 40px; /* Fixed width for label */
+  text-align: left;
+  flex-shrink: 0; /* Prevent label from shrinking */
+}
+
+.canvas-studio-layer-opacity-slider {
+  flex: 1; /* Take remaining space */
+  height: 4px;
+  background: var(--cs-bg-darker);
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 80px; /* Minimum slider width */
+}
+
+.canvas-studio-layer-opacity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--cs-purple);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.canvas-studio-layer-opacity-slider::-webkit-slider-thumb:hover {
+  background: var(--cs-purple-light);
+  transform: scale(1.2);
+}
+
+.canvas-studio-layer-opacity-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--cs-purple);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.canvas-studio-layer-opacity-slider::-moz-range-thumb:hover {
+  background: var(--cs-purple-light);
+  transform: scale(1.2);
+}
+
+/* Layer Controls */
+.canvas-studio-layer-controls {
+  display: flex;
+  flex-direction: row; /* Horizontal layout */
+  align-items: center;
+  gap: 0.5rem; /* Space between buttons */
+  flex-shrink: 0; /* Prevent controls from shrinking */
+  width: 100%; /* Full width to align with opacity slider */
+  justify-content: center; /* Center the buttons */
+  padding-left: 40px; /* Offset for the opacity label width */
+}
+
+.canvas-studio-layer-control-btn {
+  background: transparent;
+  color: var(--cs-text-secondary);
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem; /* Increased from 0.375rem for better touch targets */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  width: 32px; /* Slightly larger for better visibility */
+  height: 32px; /* Slightly larger for better visibility */
+  flex-shrink: 0; /* Prevent button from shrinking */
+  flex: 1; /* Buttons share equal width */
+  max-width: 48px; /* Prevent buttons from getting too large */
+  position: relative; /* For tooltip positioning */
+}
+
+.canvas-studio-layer-control-btn:hover {
+  background: var(--cs-bg-darker);
+  color: var(--cs-text-primary);
+}
+
+/* Enhanced tooltip for layer control buttons */
+.canvas-studio-layer-control-btn::after {
+  content: attr(aria-label);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--cs-bg-darker);
+  color: var(--cs-text-primary);
+  padding: 0.375rem 0.625rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--cs-border);
+  z-index: 1000;
+}
+
+.canvas-studio-layer-control-btn:hover::after {
+  opacity: 1;
+}
+
+.canvas-studio-layer-control-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.canvas-studio-layer-control-btn:disabled:hover {
+  background: transparent;
+  color: var(--cs-text-secondary);
+  transform: none;
+}
+
+.canvas-studio-layer-control-btn:disabled:hover::after {
+  opacity: 0;
+}
+
+/* Layer More Options */
+.canvas-studio-layer-more {
+  position: relative;
+}
+
+.canvas-studio-layer-more:hover .canvas-studio-layer-actions {
+  display: flex;
+}
+
+.canvas-studio-layer-actions {
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--cs-bg-darker);
+  border: 1px solid var(--cs-border);
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  display: none;
+  gap: 0.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  margin-right: 0.5rem;
+}
+
+.canvas-studio-layer-actions button {
+  background: transparent;
+  color: var(--cs-text-secondary);
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+}
+
+.canvas-studio-layer-actions button:hover {
+  background: var(--cs-surface);
+  color: var(--cs-text-primary);
+}
+
+/* Enhanced tooltip for layer action buttons */
+.canvas-studio-layer-actions button::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--cs-bg-darker);
+  color: var(--cs-text-primary);
+  padding: 0.375rem 0.625rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--cs-border);
+  z-index: 1000;
+}
+
+.canvas-studio-layer-actions button:hover::after {
+  opacity: 1;
+}
+
+/* Layer Reorder */
+.canvas-studio-layer-reorder {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.canvas-studio-layer-reorder button {
+  padding: 0.25rem;
+}
+
+/* Desktop Layer Panel (Right Sidebar) */
+@media (min-width: 1024px) {
+  .canvas-studio-desktop .canvas-studio-right-panel {
+    display: flex;
+    flex-direction: column;
+    background: var(--cs-bg-darker);
+    border-left: 1px solid var(--cs-border);
+    overflow: hidden;
+    width: 280px; /* Ensure consistent width */
+  }
+  
+  .canvas-studio-layers-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .canvas-studio-layers-panel-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--cs-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .canvas-studio-layers-panel-title {
+    color: var(--cs-text-primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .canvas-studio-layers-panel .canvas-studio-layers-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem; /* Reduced from 0.75rem */
+  }
+  
+  .canvas-studio-layers-panel .canvas-studio-layer-item {
+    padding: 0.5rem;
+  }
+  
+  .canvas-studio-layers-panel .canvas-studio-layer-thumbnail {
+    width: 48px; /* Slightly smaller */
+    height: 48px;
+    min-width: 48px;
+  }
+  
+  /* Compact layer controls for desktop panel */
+  .canvas-studio-right-panel .canvas-studio-layer-control-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0.25rem;
+  }
+  
+  /* Adjust layer info width */
+  .canvas-studio-right-panel .canvas-studio-layer-info {
+    gap: 0.375rem; /* Tighter spacing */
+  }
+  
+  /* Smaller opacity label */
+  .canvas-studio-right-panel .canvas-studio-layer-opacity-label {
+    min-width: 35px; /* Reduced from 40px */
+    font-size: 0.7rem;
+  }
+  
+  /* Adjust controls padding */
+  .canvas-studio-right-panel .canvas-studio-layer-controls {
+    padding-left: 35px; /* Match smaller label width */
+    gap: 0.375rem;
+  }
+}
+
+/* Scrollbar Styling for Layers List */
+.canvas-studio-layers-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.canvas-studio-layers-list::-webkit-scrollbar-track {
+  background: var(--cs-bg-darker);
+  border-radius: 4px;
+}
+
+.canvas-studio-layers-list::-webkit-scrollbar-thumb {
+  background: var(--cs-surface);
+  border-radius: 4px;
+}
+
+.canvas-studio-layers-list::-webkit-scrollbar-thumb:hover {
+  background: var(--cs-surface-light);
+}
+
+/* Layer Drag Handle */
+.canvas-studio-layer-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  cursor: grab;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.canvas-studio-layer-drag-handle:hover {
+  opacity: 1;
+}
+
+.canvas-studio-layer-drag-handle:active {
+  cursor: grabbing;
+}
+
+.canvas-studio-layer-drag-dots {
+  display: grid;
+  grid-template-columns: repeat(2, 4px);
+  gap: 3px;
+}
+
+.canvas-studio-layer-drag-dots div {
+  width: 4px;
+  height: 4px;
+  background: var(--cs-text-secondary);
+  border-radius: 50%;
+}
+
+/* Layer Drag States */
+.canvas-studio-layer-item-dragging {
+  opacity: 0.5;
+  transform: scale(0.95);
+  cursor: grabbing;
+}
+
+.canvas-studio-layer-item-drag-over {
+  border-color: var(--cs-purple) !important;
+  background: var(--cs-surface-light) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+}
+
+/* Layer Animations */
+@keyframes layerSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.canvas-studio-layer-item {
+  animation: layerSlideIn 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+/* Smooth opacity slider */
+.canvas-studio-layer-opacity-slider {
+  transition: none; /* Remove transition for instant feedback */
+}
+
+.canvas-studio-layer-opacity-slider::-webkit-slider-thumb {
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.canvas-studio-layer-opacity-slider::-moz-range-thumb {
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .canvas-studio-layers-modal {
+    max-width: 95vw;
+    max-height: 85vh;
+  }
+  
+  .canvas-studio-layer-item {
+    padding: 1rem; /* Increased from 0.625rem for better spacing */
+    gap: 1rem; /* Increased from 0.75rem for more space between elements */
+  }
+  
+  .canvas-studio-layer-thumbnail {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+  }
+  
+  .canvas-studio-layer-name {
+    font-size: 0.8125rem;
+  }
+  
+  .canvas-studio-layer-control-btn {
+    padding: 0.5rem; /* Touch-friendly padding for mobile */
+    width: 36px; /* Larger touch targets for mobile */
+    height: 36px; /* Larger touch targets for mobile */
+  }
+  
+  .canvas-studio-layer-controls {
+    gap: 0.75rem; /* More space between buttons on mobile */
+    margin-top: 0.25rem; /* Small top margin on mobile */
+    padding-left: 40px; /* Match desktop offset for opacity label */
+  }
+  
+  .canvas-studio-layer-info {
+    gap: 0.75rem; /* Increased from 0.5rem for better vertical spacing */
+  }
+  
+  .canvas-studio-layer-opacity {
+    gap: 0.75rem; /* Increased from 0.5rem for better spacing */
+  }
+}
+
+/* ============================================
+   DARK MODE (Already Dark by Default)
+   ============================================ */
+
+/* Canvas Studio is dark by default, no additional dark mode needed */
+
+/* ============================================
+   INSTAGRAM STORIES STYLE TEXT
+   ============================================ */
+
+/* Overlay container */
+.canvas-text-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* Dimmed background */
+.canvas-text-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  pointer-events: all;
+}
+
+/* Top Toolbar */
+.canvas-text-top-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(50, 50, 50, 0.95);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  gap: 0.5rem;
+  pointer-events: all;
+  z-index: 1003;
+}
+
+.canvas-text-toolbar-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #FFFFFF;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.canvas-text-toolbar-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.canvas-text-toolbar-btn.active {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.canvas-text-color-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid #FFFFFF;
+}
+
+.canvas-text-font-btn {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.canvas-text-size-slider-wrapper {
+  flex: 1;
+  max-width: 150px;
+  display: flex;
+  align-items: center;
+  padding: 0 0.5rem;
+}
+
+.canvas-text-size-slider {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.canvas-text-size-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #FFFFFF;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.canvas-text-size-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.canvas-text-size-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #FFFFFF;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.canvas-text-size-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+.canvas-text-done-btn {
+  padding: 0.625rem 1.5rem;
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+
+.canvas-text-done-btn:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.canvas-text-done-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Color Picker Popup */
+.canvas-text-color-picker {
+  position: fixed;
+  top: 70px;
+  left: 1rem;
+  background: rgba(50, 50, 50, 0.98);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 1rem;
+  pointer-events: all;
+  z-index: 1004;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.canvas-text-color-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+}
+
+.canvas-text-color-option {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.canvas-text-color-option:hover {
+  transform: scale(1.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.canvas-text-color-option.active {
+  border-color: #FFFFFF;
+  box-shadow: 0 0 0 2px rgba(50, 50, 50, 0.98), 0 0 0 5px #FFFFFF;
+}
+
+/* Text input on canvas */
+.canvas-text-on-canvas {
+  position: fixed;
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, -50%);
+  pointer-events: all;
+  z-index: 1001;
+  width: 90%;
+  max-width: 600px;
+}
+
+.canvas-text-input-field {
+  width: 100%;
+  min-height: 100px;
+  padding: 1rem;
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+  resize: none;
+  outline: none;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  /* Font properties will be set via inline styles */
+}
+
+.canvas-text-input-field::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Font Style Buttons - Float above keyboard */
+.canvas-text-font-styles {
+  position: fixed;
+  bottom: max(20px, env(keyboard-inset-bottom, 20px));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  pointer-events: all;
+  z-index: 1002;
+  transition: bottom 0.3s ease-out;
+}
+
+.canvas-text-font-style {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(80, 80, 80, 0.9);
+  border: 2px solid transparent;
+  color: #FFFFFF;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.canvas-text-font-style:hover {
+  background: rgba(100, 100, 100, 0.9);
+}
+
+.canvas-text-font-style.active {
+  background: #FFFFFF;
+  color: #000000;
+  border-color: #FFFFFF;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .canvas-text-top-toolbar {
+    height: 56px;
+    padding: 0 0.75rem;
+    gap: 0.375rem;
+  }
+
+  .canvas-text-toolbar-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.125rem;
+  }
+
+  .canvas-text-color-circle {
+    width: 24px;
+    height: 24px;
+  }
+
+  .canvas-text-size-slider-wrapper {
+    max-width: 100px;
+  }
+
+  .canvas-text-done-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .canvas-text-color-picker {
+    left: 0.5rem;
+    right: 0.5rem;
+    top: 60px;
+  }
+
+  .canvas-text-color-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.375rem;
+  }
+
+  .canvas-text-color-option {
+    width: 36px;
+    height: 36px;
+  }
+
+  .canvas-text-on-canvas {
+    width: 95%;
+  }
+
+  .canvas-text-input-field {
+    font-size: 1.5rem;
+    min-height: 80px;
+    padding: 0.75rem;
+  }
+
+  .canvas-text-font-styles {
+    bottom: max(15px, env(keyboard-inset-bottom, 15px));
+    gap: 0.5rem;
+    padding: 0.375rem;
+  }
+  
+  .canvas-text-on-canvas {
+    top: 25%;
+  }
+
+  .canvas-text-font-style {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .canvas-text-toolbar-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .canvas-text-font-style {
+    width: 44px;
+    height: 44px;
+    font-size: 1.125rem;
+  }
+
+  .canvas-text-input-field {
+    font-size: 1.25rem;
+  }
+}

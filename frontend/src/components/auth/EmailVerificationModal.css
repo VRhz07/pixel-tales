@@ -1,0 +1,331 @@
+/* Email Verification Modal */
+.email-verification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.email-verification-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.dark .email-verification-modal {
+  background: #1F2937;
+}
+
+.email-verification-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.email-verification-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.email-verification-icon svg {
+  width: 40px;
+  height: 40px;
+  color: white;
+}
+
+.email-verification-title {
+  margin: 0 0 10px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.dark .email-verification-title {
+  color: #F9FAFB;
+}
+
+.email-verification-subtitle {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0;
+}
+
+.dark .email-verification-subtitle {
+  color: #9CA3AF;
+}
+
+.email-verification-subtitle strong {
+  color: #1A1A1A;
+}
+
+.dark .email-verification-subtitle strong {
+  color: #F9FAFB;
+}
+
+.email-verification-success {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background-color: #d1fae5;
+  border: 1px solid #10b981;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dark .email-verification-success {
+  background-color: #064e3b;
+  border-color: #10b981;
+}
+
+.email-verification-success svg {
+  width: 20px;
+  height: 20px;
+  color: #10b981;
+}
+
+.email-verification-success span {
+  color: #065f46;
+  font-size: 14px;
+}
+
+.dark .email-verification-success span {
+  color: #6ee7b7;
+}
+
+.email-verification-error {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background-color: #fee2e2;
+  border: 1px solid #ef4444;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dark .email-verification-error {
+  background-color: #7f1d1d;
+  border-color: #ef4444;
+}
+
+.email-verification-error svg {
+  width: 20px;
+  height: 20px;
+  color: #ef4444;
+}
+
+.email-verification-error span {
+  color: #991b1b;
+  font-size: 14px;
+}
+
+.dark .email-verification-error span {
+  color: #fca5a5;
+}
+
+.email-verification-code-inputs {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.email-verification-code-input {
+  width: 50px;
+  height: 60px;
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.2s;
+  background: white;
+  color: #1A1A1A;
+}
+
+.dark .email-verification-code-input {
+  background: #374151;
+  border-color: #4B5563;
+  color: #F9FAFB;
+}
+
+.email-verification-code-input.filled {
+  border-color: #667eea;
+}
+
+.dark .email-verification-code-input.filled {
+  border-color: #818CF8;
+}
+
+.email-verification-code-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.dark .email-verification-code-input:focus {
+  border-color: #818CF8;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+}
+
+.email-verification-code-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.email-verification-verify-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: all 0.2s;
+}
+
+.email-verification-verify-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.email-verification-verify-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.dark .email-verification-verify-btn:disabled {
+  background: #4B5563;
+}
+
+.email-verification-resend {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.email-verification-resend-text {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+
+.dark .email-verification-resend-text {
+  color: #9CA3AF;
+}
+
+.email-verification-resend-btn {
+  background: none;
+  border: none;
+  color: #667eea;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.dark .email-verification-resend-btn {
+  color: #818CF8;
+}
+
+.email-verification-resend-btn:disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.dark .email-verification-resend-btn:disabled {
+  color: #6B7280;
+}
+
+.email-verification-help {
+  padding: 12px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.dark .email-verification-help {
+  background-color: #374151;
+}
+
+.email-verification-help p {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.dark .email-verification-help p {
+  color: #D1D5DB;
+}
+
+.email-verification-cancel-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid #e5e7eb;
+  background: white;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dark .email-verification-cancel-btn {
+  background: #374151;
+  border-color: #4B5563;
+  color: #D1D5DB;
+}
+
+.email-verification-cancel-btn:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  color: #1A1A1A;
+}
+
+.dark .email-verification-cancel-btn:hover:not(:disabled) {
+  background: #4B5563;
+  border-color: #6B7280;
+  color: #F9FAFB;
+}
+
+.email-verification-cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .email-verification-modal {
+    padding: 30px 20px;
+  }
+
+  .email-verification-code-input {
+    width: 45px;
+    height: 55px;
+    font-size: 20px;
+  }
+
+  .email-verification-code-inputs {
+    gap: 8px;
+  }
+}

@@ -1,0 +1,369 @@
+{
+  "designSystem": {
+    "name": "Imaginary Worlds",
+    "type": "storytelling_platform",
+    "framework": "react_typescript_tailwind"
+  },
+  "colorPalette": {
+    "primary": {
+      "purple": "#8B5CF6",
+      "purpleDark": "#7C3AED",
+      "purpleLight": "#A78BFA"
+    },
+    "secondary": {
+      "orange": "#FB923C",
+      "orangeDark": "#F97316",
+      "orangeLight": "#FDBA74"
+    },
+    "neutral": {
+      "white": "#FFFFFF",
+      "gray50": "#F9FAFB",
+      "gray100": "#F3F4F6",
+      "gray200": "#E5E7EB",
+      "gray300": "#D1D5DB",
+      "gray400": "#9CA3AF",
+      "gray500": "#6B7280",
+      "gray600": "#4B5563",
+      "gray700": "#374151",
+      "gray800": "#1F2937",
+      "gray900": "#111827"
+    },
+    "backgrounds": {
+      "pageGradient": "linear-gradient(135deg, #E0E7FF 0%, #F3E8FF 100%)",
+      "cardBackground": "#FFFFFF",
+      "inputBackground": "#FFFFFF"
+    }
+  },
+  "elementStyling": {
+    "pageContainer": {
+      "background": "bg-gradient-to-br from-indigo-100 to-purple-100",
+      "minHeight": "min-h-screen",
+      "padding": "p-6",
+      "display": "flex items-center justify-center",
+      "context": "Full page wrapper - applies gradient background"
+    },
+    "logoSection": {
+      "container": {
+        "alignment": "text-center",
+        "spacing": "mb-8"
+      },
+      "icon": {
+        "color": "text-purple-500",
+        "size": "text-4xl",
+        "spacing": "mb-2",
+        "context": "Book and sparkle icon - solid purple fill"
+      },
+      "title": {
+        "color": "text-purple-600",
+        "fontSize": "text-3xl",
+        "fontWeight": "font-bold",
+        "spacing": "mb-2",
+        "context": "Main brand title - purple text only"
+      },
+      "subtitle": {
+        "color": "text-gray-500",
+        "fontSize": "text-base",
+        "context": "Tagline text - muted gray"
+      }
+    },
+    "authCard": {
+      "container": {
+        "background": "bg-white",
+        "borderRadius": "rounded-2xl",
+        "shadow": "shadow-xl",
+        "padding": "p-8",
+        "width": "w-full max-w-md",
+        "border": "border-0",
+        "context": "Main card container - white background with shadow, NO gradients"
+      },
+      "header": {
+        "title": {
+          "color": "text-gray-900",
+          "fontSize": "text-2xl",
+          "fontWeight": "font-bold",
+          "alignment": "text-center",
+          "spacing": "mb-2",
+          "context": "Card title - dark gray text"
+        },
+        "subtitle": {
+          "color": "text-gray-500",
+          "fontSize": "text-sm",
+          "alignment": "text-center",
+          "spacing": "mb-6",
+          "context": "Card subtitle - muted gray"
+        }
+      }
+    },
+    "tabNavigation": {
+      "container": {
+        "display": "flex",
+        "background": "bg-gray-100",
+        "borderRadius": "rounded-lg",
+        "padding": "p-1",
+        "spacing": "mb-6",
+        "context": "Tab container - light gray background"
+      },
+      "tab": {
+        "default": {
+          "background": "bg-transparent",
+          "color": "text-gray-500",
+          "padding": "px-4 py-2",
+          "borderRadius": "rounded-md",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "transition": "transition-colors",
+          "context": "Inactive tab - transparent with gray text"
+        },
+        "active": {
+          "background": "bg-purple-500",
+          "color": "text-white",
+          "padding": "px-4 py-2",
+          "borderRadius": "rounded-md",
+          "fontSize": "text-sm",
+          "fontWeight": "font-medium",
+          "context": "Active tab - purple background with white text"
+        }
+      }
+    },
+    "formElements": {
+      "inputGroup": {
+        "spacing": "mb-4",
+        "context": "Form field wrapper spacing"
+      },
+      "label": {
+        "color": "text-gray-700",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "spacing": "mb-2 block",
+        "context": "Input labels - medium gray text"
+      },
+      "inputContainer": {
+        "position": "relative",
+        "context": "Wrapper for input with icon"
+      },
+      "input": {
+        "background": "bg-white",
+        "border": "border border-gray-300",
+        "borderRadius": "rounded-lg",
+        "padding": "pl-10 pr-4 py-3",
+        "fontSize": "text-sm",
+        "width": "w-full",
+        "placeholder": "placeholder-gray-400",
+        "focus": {
+          "outline": "focus:outline-none",
+          "ring": "focus:ring-2 focus:ring-purple-500",
+          "borderColor": "focus:border-purple-500",
+          "context": "Focus state - purple ring and border"
+        },
+        "context": "Input fields - white background with gray border"
+      },
+      "inputIcon": {
+        "position": "absolute left-3 top-1/2 transform -translate-y-1/2",
+        "color": "text-gray-400",
+        "size": "h-4 w-4",
+        "context": "Icons inside input fields - gray color only"
+      },
+      "passwordToggle": {
+        "position": "absolute right-3 top-1/2 transform -translate-y-1/2",
+        "color": "text-gray-400",
+        "size": "h-4 w-4",
+        "cursor": "cursor-pointer",
+        "hover": {
+          "color": "hover:text-gray-600",
+          "context": "Password visibility toggle - darker on hover"
+        },
+        "context": "Password toggle button - gray icon"
+      }
+    },
+    "buttons": {
+      "primary": {
+        "background": "bg-gradient-to-r from-orange-400 to-orange-500",
+        "color": "text-white",
+        "borderRadius": "rounded-lg",
+        "padding": "px-4 py-3",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "width": "w-full",
+        "display": "flex items-center justify-center",
+        "spacing": "space-x-2",
+        "hover": {
+          "background": "hover:from-orange-500 hover:to-orange-600",
+          "context": "Hover state - darker orange gradient"
+        },
+        "focus": {
+          "outline": "focus:outline-none",
+          "ring": "focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+        },
+        "context": "Primary action buttons - orange gradient background"
+      },
+      "secondary": {
+        "background": "bg-purple-500",
+        "color": "text-white",
+        "borderRadius": "rounded-lg",
+        "padding": "px-4 py-3",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "width": "w-full",
+        "display": "flex items-center justify-center",
+        "spacing": "space-x-2",
+        "hover": {
+          "background": "hover:bg-purple-600",
+          "context": "Hover state - darker purple"
+        },
+        "focus": {
+          "outline": "focus:outline-none",
+          "ring": "focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+        },
+        "context": "Secondary action buttons - solid purple background"
+      },
+      "buttonIcon": {
+        "size": "h-4 w-4",
+        "color": "text-current",
+        "context": "Icons inside buttons - inherit text color (white)"
+      }
+    },
+    "socialButtons": {
+      "container": {
+        "display": "grid grid-cols-2 gap-3",
+        "spacing": "mt-4",
+        "context": "Social login buttons container"
+      },
+      "button": {
+        "background": "bg-white",
+        "border": "border border-gray-300",
+        "borderRadius": "rounded-lg",
+        "padding": "px-4 py-3",
+        "display": "flex items-center justify-center",
+        "spacing": "space-x-2",
+        "hover": {
+          "background": "hover:bg-gray-50",
+          "context": "Hover state - light gray background"
+        },
+        "context": "Social login buttons - white background with gray border"
+      },
+      "icon": {
+        "size": "h-4 w-4",
+        "color": "text-gray-600",
+        "context": "Social media icons - dark gray color"
+      },
+      "text": {
+        "color": "text-gray-700",
+        "fontSize": "text-sm",
+        "fontWeight": "font-medium",
+        "context": "Social button text - dark gray"
+      }
+    },
+    "links": {
+      "primary": {
+        "color": "text-purple-500",
+        "fontSize": "text-sm",
+        "hover": {
+          "color": "hover:text-purple-600",
+          "textDecoration": "hover:underline",
+          "context": "Hover state - darker purple with underline"
+        },
+        "context": "Primary links - purple color"
+      },
+      "secondary": {
+        "color": "text-gray-500",
+        "fontSize": "text-sm",
+        "hover": {
+          "color": "hover:text-gray-600",
+          "context": "Hover state - darker gray"
+        },
+        "context": "Secondary links - gray color"
+      }
+    },
+    "dividers": {
+      "textDivider": {
+        "container": {
+          "position": "relative",
+          "display": "flex items-center justify-center",
+          "spacing": "my-6"
+        },
+        "line": {
+          "position": "absolute inset-0 flex items-center",
+          "border": "border-t border-gray-300",
+          "context": "Divider line - light gray border"
+        },
+        "text": {
+          "background": "bg-white",
+          "color": "text-gray-500",
+          "fontSize": "text-xs",
+          "padding": "px-3",
+          "textTransform": "uppercase",
+          "letterSpacing": "tracking-wide",
+          "context": "Divider text - white background with gray text"
+        }
+      }
+    },
+    "legalText": {
+      "color": "text-gray-400",
+      "fontSize": "text-xs",
+      "alignment": "text-center",
+      "lineHeight": "leading-relaxed",
+      "context": "Terms and privacy text - light gray"
+    }
+  },
+  "doNotRules": {
+    "gradients": [
+      "DO NOT apply page gradients to cards or form elements",
+      "DO NOT apply button gradients to input fields",
+      "DO NOT use gradients on icons or text elements",
+      "ONLY use orange gradient on primary action buttons",
+      "ONLY use page gradient on body/container background"
+    ],
+    "colors": [
+      "DO NOT use purple gradient backgrounds - only solid purple",
+      "DO NOT apply card background colors to inputs",
+      "DO NOT use button colors on regular text",
+      "DO NOT mix icon colors - inputs use gray-400, buttons use current color"
+    ],
+    "shadows": [
+      "DO NOT apply card shadows to form elements",
+      "ONLY apply shadows to main card containers",
+      "DO NOT add shadows to buttons or inputs"
+    ],
+    "borders": [
+      "DO NOT add borders to cards (use shadows only)",
+      "ONLY add borders to inputs and social buttons",
+      "DO NOT use purple borders except on input focus states"
+    ]
+  },
+  "responsiveBreakpoints": {
+    "mobile": "max-w-sm",
+    "tablet": "max-w-md",
+    "desktop": "max-w-lg"
+  },
+  "animations": {
+    "transitions": "transition-colors duration-200 ease-in-out",
+    "hover": "transform-none (no scaling or transforms)",
+    "focus": "ring animations with 2px offset"
+  },
+  "accessibility": {
+    "focusRing": "focus:ring-2 focus:ring-offset-2",
+    "colorContrast": "All text meets WCAG AA standards",
+    "semanticHTML": "Use proper form labels and button elements"
+  },
+  "componentMapping": {
+    "AuthCard": {
+      "baseClass": "bg-white rounded-2xl shadow-xl p-8 w-full max-w-md",
+      "variants": {
+        "signin": "Sign In form state",
+        "signup": "Sign Up form state"
+      }
+    },
+    "FormInput": {
+      "baseClass": "w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-white text-sm placeholder-gray-400",
+      "focusClass": "focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+    },
+    "PrimaryButton": {
+      "baseClass": "w-full px-4 py-3 bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-lg font-medium text-sm flex items-center justify-center space-x-2",
+      "hoverClass": "hover:from-orange-500 hover:to-orange-600"
+    },
+    "SecondaryButton": {
+      "baseClass": "w-full px-4 py-3 bg-purple-500 text-white rounded-lg font-medium text-sm flex items-center justify-center space-x-2",
+      "hoverClass": "hover:bg-purple-600"
+    }
+  }
+}
