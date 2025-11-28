@@ -214,6 +214,13 @@ if RENDER:
         ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
         # Allow CORS from any origin in production (you can restrict this later)
         CORS_ALLOW_ALL_ORIGINS = True
+    
+    # CSRF settings for Render
+    CSRF_TRUSTED_ORIGINS = [
+        f'https://{RENDER_EXTERNAL_HOSTNAME}' if RENDER_EXTERNAL_HOSTNAME else '',
+    ]
+    # Filter out empty strings
+    CSRF_TRUSTED_ORIGINS = [origin for origin in CSRF_TRUSTED_ORIGINS if origin]
 
 # Security Settings
 if not DEBUG:
