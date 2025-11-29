@@ -49,7 +49,7 @@ Go to your service → **Environment** tab → Add these:
 DEBUG=False
 SECRET_KEY=<will be auto-generated>
 ALLOWED_HOSTS=<your-app-name>.onrender.com
-GOOGLE_AI_API_KEY=AIzaSyDZ5fzoP5fy03Y4NibRGL_XG2SzpTXvZR8
+GOOGLE_AI_API_KEY=your-gemini-api-key-here  # Backend only - see SECURITY_SETUP.md
 DATABASE_URL=sqlite:///data/db.sqlite3
 RENDER=True
 FROM_EMAIL=noreply@pixeltales.com

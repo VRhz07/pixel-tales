@@ -36,8 +36,8 @@
 
 /* Capacitor safe area for canvas studio */
 body.capacitor .canvas-studio {
-  padding-top: var(--sat);
-  height: calc(100vh - var(--sab));
+  padding-top: env(safe-area-inset-top);
+  height: calc(100vh - env(safe-area-inset-bottom));
 }
 
 .canvas-studio-desktop {
@@ -75,7 +75,7 @@ body.capacitor .canvas-studio {
 
 /* Capacitor safe area for topbar */
 body.capacitor .canvas-studio-topbar {
-  padding-top: calc(0.75rem + var(--sat));
+  padding-top: 0;
 }
 
 .canvas-studio-topbar-left,
@@ -362,8 +362,8 @@ body.capacitor .canvas-studio-topbar {
 
 /* Capacitor safe area for mobile canvas */
 body.capacitor .canvas-studio-canvas-area-mobile {
-  top: calc(48px + var(--sat));
-  bottom: calc(140px + var(--sab));
+  top: calc(48px + env(safe-area-inset-top));
+  bottom: calc(140px + env(safe-area-inset-bottom));
 }
 
 /* Expand space when additional settings are visible */
@@ -692,7 +692,7 @@ body.capacitor .canvas-studio-canvas-area-mobile {
 
 /* Capacitor safe area for mobile toolbar */
 body.capacitor .canvas-studio-mobile-toolbar {
-  padding-bottom: calc(0.75rem + var(--sab));
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
 }
 
 .canvas-studio-mobile-tool {
@@ -751,7 +751,7 @@ body.capacitor .canvas-studio-mobile-toolbar {
 
 /* Capacitor safe area for mobile sliders */
 body.capacitor .canvas-studio-mobile-sliders {
-  bottom: calc(80px + var(--sab));
+  bottom: calc(80px + env(safe-area-inset-bottom));
 }
 
 .canvas-studio-sliders-header {

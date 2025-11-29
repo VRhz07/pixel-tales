@@ -61,7 +61,7 @@ pixeltales-backend.onrender.com,localhost,127.0.0.1
 #### 4. GOOGLE_AI_API_KEY
 ```
 Key:   GOOGLE_AI_API_KEY
-Value: AIzaSyDZ5fzoP5fy03Y4NibRGL_XG2SzpTXvZR8
+Value: your-gemini-api-key-here (⚠️ Backend only - see SECURITY_SETUP.md)
 ```
 **What it does:** Your Gemini API key for AI story generation
 
@@ -132,7 +132,7 @@ Copy these exactly:
 | `DEBUG` | `False` | ✅ Yes |
 | `SECRET_KEY` | (auto-generated) | ✅ Yes |
 | `ALLOWED_HOSTS` | `your-app-name.onrender.com` | ✅ Yes |
-| `GOOGLE_AI_API_KEY` | `AIzaSyDZ5fzoP5fy03Y4NibRGL_XG2SzpTXvZR8` | ✅ Yes |
+| `GOOGLE_AI_API_KEY` | `your-gemini-api-key-here` | ✅ Yes (Backend only!) |
 | `DATABASE_URL` | `sqlite:///data/db.sqlite3` | ✅ Yes |
 | `RENDER` | `True` | ✅ Yes |
 | `FROM_EMAIL` | `noreply@pixeltales.com` | ✅ Yes |

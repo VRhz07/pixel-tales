@@ -9,7 +9,7 @@ We're deploying your Django backend to Render.com (free hosting) so your mobile 
 
 ### 1. Get Your API Keys Ready
 You'll need these during deployment:
-- ✅ **Google AI API Key** (Gemini): `AIzaSyDZ5fzoP5fy03Y4NibRGL_XG2SzpTXvZR8`
+- ✅ **Google AI API Key** (Gemini): `your-gemini-api-key-here` (⚠️ Old key exposed - regenerate!)
 - ✅ **SendGrid API Key**: Get from https://sendgrid.com (optional for now)
 
 ### 2. Push Your Code to GitHub
@@ -73,7 +73,7 @@ After creating the service:
 | `DEBUG` | `False` | Production mode |
 | `SECRET_KEY` | (auto-generated) | Render creates this |
 | `ALLOWED_HOSTS` | `your-app-name.onrender.com` | Replace with your actual URL |
-| `GOOGLE_AI_API_KEY` | `AIzaSyDZ5fzoP5fy03Y4NibRGL_XG2SzpTXvZR8` | Your Gemini key |
+| `GOOGLE_AI_API_KEY` | `your-gemini-api-key-here` | Your Gemini key (backend only!) |
 | `DATABASE_URL` | `sqlite:///data/db.sqlite3` | SQLite in persistent disk |
 | `RENDER` | `True` | Tells Django it's on Render |
 | `FROM_EMAIL` | `noreply@pixeltales.com` | Any email you want |

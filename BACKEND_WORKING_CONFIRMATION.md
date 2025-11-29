@@ -165,8 +165,12 @@ Edit `frontend/.env`:
 VITE_API_BASE_URL=https://pixeltales-backend.onrender.com/api
 
 # Keep these:
-VITE_GEMINI_API_KEY=AIzaSyDZ5fzoP5fy03Y4NibRGL_XG2SzpTXvZR8
-VITE_OCR_SPACE_API_KEY=K83029623188957
+VITE_GEMINI_API_KEY=your-gemini-api-key-here
+VITE_OCR_SPACE_API_KEY=your-ocr-api-key-here
+
+# ⚠️ WARNING: These frontend keys are NO LONGER USED!
+# API keys are now securely stored on the backend.
+# See SECURITY_SETUP.md for details.
 ```
 
 **Important:** Use `/api` at the end!

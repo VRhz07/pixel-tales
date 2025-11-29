@@ -307,6 +307,16 @@ class SoundService {
       this.backgroundMusic.volume = this.backgroundMusicVolume;
       this.backgroundMusic.preload = 'auto';
       
+      // Ensure proper looping by handling ended event as fallback
+      this.backgroundMusic.addEventListener('ended', () => {
+        if (this.backgroundMusicEnabled && this.isMusicPlaying) {
+          this.backgroundMusic!.currentTime = 0;
+          this.backgroundMusic!.play().catch(err => {
+            console.debug('Could not restart background music', err);
+          });
+        }
+      });
+      
       // Handle page visibility changes
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {

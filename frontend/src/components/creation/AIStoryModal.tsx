@@ -137,17 +137,28 @@ const AIStoryModal = ({ isOpen, onClose }: AIStoryModalProps) => {
       setGenerationStage('✨ Creating your magical story...');
       setGenerationProgress(20);
       
-      // Import the Gemini service
-      const { generateStory } = await import('../../services/geminiService');
+      // Import the Gemini proxy service (secure - API key stays on backend)
+      const { generateStoryWithGemini } = await import('../../services/geminiProxyService');
       
-      // Call Gemini API with story language (independent of interface language)
-      const generatedText = await generateStory({
-        prompt: formData.storyIdea,
-        genres: formData.selectedGenres.map(id => genres.find(g => g.id === id)?.name || id),
-        ageGroup: '6-8', // Default age group, can be made selectable later
-        artStyle: formData.selectedArtStyle || 'cartoon',
-        pageCount: formData.pageCount,
-        language: formData.storyLanguage // Use selected story language, not interface language
+      // Build comprehensive prompt
+      const genreNames = formData.selectedGenres.map(id => genres.find(g => g.id === id)?.name || id).join(', ');
+      const fullPrompt = `
+Generate a ${genreNames} story for children aged 6-8 with ${formData.pageCount} pages.
+Art Style: ${formData.selectedArtStyle || 'cartoon'}
+Language: ${formData.storyLanguage === 'tl' ? 'Tagalog' : 'English'}
+
+Story Idea: ${formData.storyIdea}
+
+Please create a complete story with title, description, and pages in JSON format.
+Each page should have text and an imagePrompt for illustration generation.
+      `.trim();
+      
+      // Call Gemini API via secure backend proxy
+      const generatedText = await generateStoryWithGemini(fullPrompt, {
+        temperature: 0.9,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 16384,
       });
       
       setGenerationProgress(40);

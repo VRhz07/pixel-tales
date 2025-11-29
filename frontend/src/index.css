@@ -5,6 +5,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Safe Area Insets for Mobile Devices (Status Bar) */
+body.capacitor {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Ensure main content respects safe areas */
+.capacitor #root {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Canvas pages should be full screen without status bar padding */
+.capacitor .canvas-drawing-page,
+.capacitor .cover-canvas-page {
+  margin-top: calc(-1 * env(safe-area-inset-top));
+  padding-top: 0 !important;
+}
+
 /* Child-Friendly Animations */
 @keyframes float {
   0%, 100% {

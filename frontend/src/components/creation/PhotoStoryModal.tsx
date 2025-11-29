@@ -14,10 +14,10 @@ import { useThemeStore } from '../../stores/themeStore';
 import { useStoryStore } from '../../stores/storyStore';
 import { useI18nStore } from '../../stores/i18nStore';
 import { ART_STYLE_OPTIONS, AI_GENRE_OPTIONS } from '../../constants/genres';
-import { analyzeImageAndGenerateStory } from '../../services/geminiService';
+import { analyzeImageWithGemini } from '../../services/geminiProxyService';
 import { generateStoryIllustrationsFromPrompts } from '../../services/imageGenerationService';
 import { VoiceFilteredTextarea } from '../common/VoiceFilteredTextarea';
-import { extractTextFromImage, extractTextWithOCRSpace, OCRResult } from '../../services/ocrService';
+import { processImageWithOCR } from '../../services/ocrProxyService';
 
 interface PhotoStoryModalProps {
   isOpen: boolean;
@@ -58,7 +58,7 @@ const PhotoStoryModal = ({ isOpen, onClose }: PhotoStoryModalProps) => {
   // OCR-specific state
   const [creationMode, setCreationMode] = useState<CreationMode>('photo');
   const [isExtractingText, setIsExtractingText] = useState(false);
-  const [ocrResult, setOcrResult] = useState<OCRResult | null>(null);
+  const [ocrResult, setOcrResult] = useState<{ text: string; success: boolean } | null>(null);
   const [extractedText, setExtractedText] = useState<string>('');
   const [ocrProgress, setOcrProgress] = useState<number>(0);
   const [ocrStatus, setOcrStatus] = useState<string>('');
@@ -177,7 +177,7 @@ const PhotoStoryModal = ({ isOpen, onClose }: PhotoStoryModalProps) => {
     setShowCamera(false);
   };
 
-  // Extract text from image using free OCR services
+  // Extract text from image using secure backend OCR proxy
   const handleExtractText = async () => {
     if (!formData.capturedImage) {
       alert('Please capture or upload a photo first');
@@ -188,49 +188,16 @@ const PhotoStoryModal = ({ isOpen, onClose }: PhotoStoryModalProps) => {
     setOcrProgress(0);
     setOcrStatus('Initializing OCR...');
 
-    const OCR_SPACE_KEY = import.meta.env.VITE_OCR_SPACE_API_KEY;
-
     try {
-      let result: OCRResult;
+      console.log(`🔒 Using secure backend OCR proxy (${isHandwritten ? 'handwriting' : 'print'} mode)...`);
+      setOcrStatus('Processing image...');
+      setOcrProgress(30);
 
-      if (OCR_SPACE_KEY) {
-        // Use OCR.space API (better for handwriting)
-        console.log(`🌐 Using OCR.space API (${isHandwritten ? 'handwriting' : 'print'} mode)...`);
-        setOcrStatus('Connecting to OCR.space...');
-        setOcrProgress(10);
-
-        result = await extractTextWithOCRSpace(
-          formData.capturedImage,
-          OCR_SPACE_KEY,
-          'eng',
-          isHandwritten
-        );
-        
-        console.log('✅ OCR.space extraction complete!');
-      } else {
-        // Fallback to Tesseract.js (offline, free)
-        console.log(`📖 Using Tesseract.js (${isHandwritten ? 'handwriting' : 'print'} mode)...`);
-        setOcrStatus('Loading Tesseract OCR engine...');
-        setOcrProgress(10);
-
-        result = await extractTextFromImage(
-          formData.capturedImage,
-          (progress) => {
-            setOcrProgress(progress * 100);
-            if (progress < 0.3) {
-              setOcrStatus('Loading OCR engine...');
-            } else if (progress < 0.6) {
-              setOcrStatus('Recognizing text...');
-            } else {
-              setOcrStatus('Processing results...');
-            }
-          },
-          isHandwritten
-        );
-        
-        console.log('✅ Tesseract extraction complete!');
-      }
-
+      const result = await processImageWithOCR(
+        formData.capturedImage,
+        isHandwritten
+      );
+      
       setOcrProgress(100);
       setOcrStatus('Text extraction complete!');
       setOcrResult(result);
@@ -238,7 +205,6 @@ const PhotoStoryModal = ({ isOpen, onClose }: PhotoStoryModalProps) => {
       
       console.log(`📝 Extracted ${result.text.length} characters`);
       console.log(`📄 Text content:`, result.text);
-      console.log(`🎯 Confidence: ${Math.round(result.confidence)}%`);
 
       // If text was found, automatically add it to additional context
       if (result.text && result.text.length > 0) {
@@ -260,28 +226,12 @@ const PhotoStoryModal = ({ isOpen, onClose }: PhotoStoryModalProps) => {
 
     } catch (error) {
       console.error('❌ OCR extraction failed:', error);
-      
-      const OCR_SPACE_KEY = import.meta.env.VITE_OCR_SPACE_API_KEY;
-      
-      if (OCR_SPACE_KEY) {
-        alert(
-          '❌ OCR.space API Error\n\n' +
-          'The OCR service encountered an error. This could be due to:\n' +
-          '• Rate limiting (10 requests/minute)\n' +
-          '• Invalid API key\n' +
-          '• Service temporarily down\n\n' +
-          'Please try again in a moment or use Photo Story mode.'
-        );
-      } else {
-        alert(
-          '❌ OCR Extraction Failed\n\n' +
-          'For better results, especially with handwriting, get a free OCR.space API key:\n\n' +
-          '1. Visit: https://ocr.space/ocrapi\n' +
-          '2. Register for free (no credit card)\n' +
-          '3. Add to .env: VITE_OCR_SPACE_API_KEY=your_key\n\n' +
-          'Or try using Photo Story mode instead.'
-        );
-      }
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(
+        '❌ OCR Extraction Failed\n\n' +
+        `Error: ${errorMessage}\n\n` +
+        'Please try again or use Photo Story mode instead.'
+      );
     } finally {
       setIsExtractingText(false);
       setOcrProgress(0);
@@ -303,16 +253,34 @@ const PhotoStoryModal = ({ isOpen, onClose }: PhotoStoryModalProps) => {
     try {
       // Step 1: Analyze image and generate story (20%)
       setGenerationProgress(20);
-      const storyData = await analyzeImageAndGenerateStory(
-        formData.capturedImage,
-        {
-          additionalContext: formData.additionalContext,
-          artStyle: formData.selectedArtStyle,
-          genres: formData.selectedGenres, // Pass array of genres
-          pageCount: formData.pageCount,
-          language: formData.storyLanguage
-        }
-      );
+      
+      // Build prompt for image analysis
+      const analysisPrompt = `
+Analyze this photo and create an engaging ${formData.pageCount}-page story based on what you see.
+
+${formData.additionalContext ? `Additional Context: ${formData.additionalContext}` : ''}
+Art Style: ${formData.selectedArtStyle}
+Language: ${formData.storyLanguage === 'tl' ? 'Tagalog' : 'English'}
+
+Create a story with the following JSON format:
+{
+  "title": "Story Title",
+  "description": "Brief description",
+  "characterDescription": "Detailed character description based on photo",
+  "colorScheme": "Color palette",
+  "pages": [...]
+}
+      `.trim();
+      
+      const storyJSON = await analyzeImageWithGemini(formData.capturedImage, analysisPrompt);
+      
+      // Parse the JSON response
+      const jsonMatch = storyJSON.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('Invalid response format from AI');
+      }
+      
+      const storyData = JSON.parse(jsonMatch[0]);
 
       // Step 2: Create story in store (25%)
       setGenerationStage('Creating your story...');
@@ -890,7 +858,7 @@ const PhotoStoryModal = ({ isOpen, onClose }: PhotoStoryModalProps) => {
                 <div className="form-section">
                   <label className="form-label">
                     <DocumentTextIcon className="w-5 h-5" />
-                    Extracted Text ({ocrResult.text.length} characters, {Math.round(ocrResult.confidence)}% confidence)
+                    Extracted Text ({ocrResult.text.length} characters)
                   </label>
                   <div className="ocr-result-container">
                     <textarea

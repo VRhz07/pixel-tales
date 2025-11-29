@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .jwt_auth import CustomTokenObtainPairView, jwt_register, jwt_logout, jwt_user_profile, jwt_create_session, verify_email, resend_verification_code, verify_password, send_password_reset_code, verify_password_reset_code, reset_password, change_password, delete_account
-from . import views, admin_views, admin_auth, admin_features, admin_profanity
+from . import views, admin_views, admin_auth, admin_features, admin_profanity, ai_proxy_views
 
 # Create a router for ViewSets (we'll add these later)
 router = DefaultRouter()
@@ -177,6 +177,13 @@ urlpatterns = [
     
     # Public endpoint for frontend profanity filter
     path('profanity/active/', admin_profanity.get_active_profanity_words, name='get_active_profanity_words'),
+    
+    # AI Service Proxy Endpoints (Secure - API keys stay on backend)
+    path('ai/gemini/generate-story/', ai_proxy_views.generate_story_with_gemini, name='generate_story_with_gemini'),
+    path('ai/gemini/generate-character/', ai_proxy_views.generate_character_with_gemini, name='generate_character_with_gemini'),
+    path('ai/gemini/analyze-image/', ai_proxy_views.analyze_image_with_gemini, name='analyze_image_with_gemini'),
+    path('ai/ocr/process/', ai_proxy_views.ocr_image, name='ocr_image'),
+    path('ai/status/', ai_proxy_views.check_ai_service_status, name='check_ai_service_status'),
     
     # Parent/Teacher Dashboard endpoints
     path('parent/children/', views.get_parent_children, name='get_parent_children'),

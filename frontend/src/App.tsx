@@ -411,7 +411,7 @@ function AppContent() {
   };
   
   // Show bottom nav only for authenticated users or anonymous users (but not on auth page or canvas drawing)
-  // Don't show if user is null (not loaded yet) or on auth/canvas/admin/story-creation pages
+  // Don't show if user is null (not loaded yet) or on auth/canvas/admin/story-creation/parent pages
   const showBottomNav = user && 
     (isAuthenticated || user.id === 'anonymous') && 
     location.pathname !== '/auth' && 
@@ -419,6 +419,8 @@ function AppContent() {
     location.pathname !== '/cover-canvas' &&
     location.pathname !== '/create-story-manual' &&
     location.pathname !== '/admin' &&
+    location.pathname !== '/parent-dashboard' &&
+    location.pathname !== '/parent-settings' &&
     location.pathname !== '/';
   
   // Check if current page is home page for wrapper class
