@@ -32,7 +32,7 @@ export async function generateStoryWithGemini(
   generationConfig?: GenerationConfig
 ): Promise<string> {
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     
     if (!token) {
       throw new Error('Authentication required. Please log in.');
@@ -81,7 +81,7 @@ export async function generateStoryWithGemini(
  */
 export async function generateCharacterWithGemini(prompt: string): Promise<string> {
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     
     if (!token) {
       throw new Error('Authentication required. Please log in.');
@@ -125,7 +125,7 @@ export async function analyzeImageWithGemini(
   prompt: string = 'Extract all text from this image'
 ): Promise<string> {
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     
     if (!token) {
       throw new Error('Authentication required. Please log in.');
@@ -172,7 +172,7 @@ export async function checkAIServiceStatus(): Promise<{
   ocr_available: boolean;
 }> {
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     
     if (!token) {
       throw new Error('Authentication required. Please log in.');
