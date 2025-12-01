@@ -15,7 +15,7 @@ from io import BytesIO
 
 
 # Gemini API Configuration
-GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
+GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent'
 GEMINI_API_KEY = settings.GOOGLE_AI_API_KEY
 
 
@@ -152,7 +152,7 @@ def analyze_image_with_gemini(request):
             image_data = image_data.split(',')[1]
         
         # Make request to Gemini Vision API
-        vision_url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
+        vision_url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent'
         response = requests.post(
             f'{vision_url}?key={GEMINI_API_KEY}',
             headers={'Content-Type': 'application/json'},
@@ -228,7 +228,7 @@ def ocr_image(request):
             )
         
         # Make request to Gemini Vision API
-        vision_url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
+        vision_url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent'
         response = requests.post(
             f'{vision_url}?key={GEMINI_API_KEY}',
             headers={'Content-Type': 'application/json'},
