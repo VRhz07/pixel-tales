@@ -368,14 +368,13 @@ export default function AdminDashboardPage() {
                   <div className="admin-dropdown-divider"></div>
                   
                   <button
-                    onClick={() => {
-                      setConfirmAction(() => async () => {
-                        await adminAuthService.logout();
-                        setIsAdminAuthenticated(false);
-                        setShowProfileDropdown(false);
-                      });
-                      setShowConfirmModal(true);
+                    onClick={async () => {
                       setShowProfileDropdown(false);
+                      await adminAuthService.logout();
+                      setIsAdminAuthenticated(false);
+                      setAdminUser(null);
+                      // Force page reload to clear all state
+                      window.location.reload();
                     }}
                     className="admin-dropdown-logout-btn"
                   >
