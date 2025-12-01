@@ -8,7 +8,7 @@
     "dev:admin": "vite --config vite.config.admin.ts",
     "build": "vite build",
     "build:check": "tsc -b && vite build",
-    "build:admin": "vite build --config vite.config.admin.ts",
+    "build:admin": "vite build --config vite.config.admin.ts && node rename-admin-build.js",
     "lint": "eslint .",
     "preview": "vite preview",
     "preview:admin": "vite preview --config vite.config.admin.ts --outDir dist-admin",
