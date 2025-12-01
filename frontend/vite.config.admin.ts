@@ -19,9 +19,9 @@ export default defineConfig({
   build: {
     outDir: 'dist-admin',
     emptyOutDir: true,
-    // Specify the admin HTML entry point (using index.html)
+    // Specify the admin HTML entry point (using index.admin.html)
     rollupOptions: {
-      input: path.resolve(__dirname, 'index.html'),
+      input: path.resolve(__dirname, 'index.admin.html'),
     },
   },
   // Environment variables
