@@ -181,7 +181,10 @@ CORS_ALLOWED_ORIGINS = [
     'http://192.168.56.1:8000',  # Network access - backend
     'http://192.168.1.8:3001',  # Network access
     'http://26.163.247.72:3000',  # Alternative network interface
-    'http://26.163.247.72:3001',  # Alternative network interface
+    'http://26.163.247.72:3001',
+    'https://pixeltales-admin.onrender.com',
+    'https://pixeltales-backend.onrender.com',
+          
 ]
 
 # Allow all origins in development (for mobile testing)
@@ -218,6 +221,8 @@ if RENDER:
     # CSRF settings for Render
     CSRF_TRUSTED_ORIGINS = [
         f'https://{RENDER_EXTERNAL_HOSTNAME}' if RENDER_EXTERNAL_HOSTNAME else '',
+        'https://pixeltales-admin.onrender.com','https://pixeltales-backend.onrender.com',
+
     ]
     # Filter out empty strings
     CSRF_TRUSTED_ORIGINS = [origin for origin in CSRF_TRUSTED_ORIGINS if origin]
