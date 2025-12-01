@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import FormInput from './FormInput';
-import ContinueWithoutAccount from './SocialButtons';
 import ForgotPasswordModal from './ForgotPasswordModal';
 import { useAuthStore } from '../../stores/authStore';
 
@@ -11,7 +10,8 @@ const SignInForm: React.FC = () => {
   const { signIn, isLoading } = useAuthStore();
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
+    rememberMe: true // Default to true for better UX
   });
   const [error, setError] = useState('');
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
@@ -27,7 +27,7 @@ const SignInForm: React.FC = () => {
     }
     
     try {
-      await signIn(formData.email, formData.password);
+      await signIn(formData.email, formData.password, formData.rememberMe);
       
       // Get the user from auth store to check user type
       const { user } = useAuthStore.getState();
@@ -45,18 +45,6 @@ const SignInForm: React.FC = () => {
     }
   };
 
-  const handleContinueWithoutAccount = () => {
-    setError('');
-    
-    try {
-      // Use the new continueWithoutAccount method from auth store
-      const { continueWithoutAccount } = useAuthStore.getState();
-      continueWithoutAccount();
-      navigate('/home');
-    } catch (err) {
-      setError('Failed to continue without account. Please try again.');
-    }
-  };
 
   return (
     <>
@@ -95,8 +83,18 @@ const SignInForm: React.FC = () => {
         required
       />
 
-      {/* Forgot Password Link */}
-      <div className="auth-forgot-password">
+      {/* Remember Me & Forgot Password */}
+      <div className="auth-options-row">
+        <label className="auth-checkbox-label">
+          <input
+            type="checkbox"
+            checked={formData.rememberMe}
+            onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })}
+            className="auth-checkbox"
+          />
+          <span>Keep me signed in</span>
+        </label>
+        
         <button
           type="button"
           onClick={() => setShowForgotPasswordModal(true)}
@@ -122,16 +120,6 @@ const SignInForm: React.FC = () => {
           <span>Sign In</span>
         )}
       </button>
-
-      {/* Divider */}
-      <div className="auth-divider">
-        <span>Or</span>
-      </div>
-
-      {/* Continue Without Account */}
-      <ContinueWithoutAccount
-        onContinueWithoutAccount={handleContinueWithoutAccount}
-      />
 
       {/* Legal Text */}
       <p className="auth-legal">

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech API Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #8B5CF6;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #7C3AED;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #1e293b;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error {
+            color: #ef4444;
+        }
+        .success {
+            color: #10b981;
+        }
+        .info {
+            color: #3b82f6;
+        }
+        .warning {
+            color: #f59e0b;
+        }
+        h1 {
+            color: #1e293b;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.idle {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+        .status.listening {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        .status.success {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Speech API Diagnostic Tool</h1>
+        <p>This tool tests if Google's Speech API is accessible from your browser.</p>
+        
+        <div id="status" class="status idle">Status: Ready</div>
+        
+        <div>
+            <button id="testBtn" onclick="testSpeechAPI()">Test Speech Recognition</button>
+            <button onclick="clearLog()">Clear Log</button>
+            <button onclick="checkBrowser()">Check Browser Support</button>
+        </div>
+        
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+        const logDiv = document.getElementById('log');
+        const statusDiv = document.getElementById('status');
+        const testBtn = document.getElementById('testBtn');
+        let recognition = null;
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type;
+            logDiv.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function setStatus(message, type = 'idle') {
+            statusDiv.textContent = `Status: ${message}`;
+            statusDiv.className = `status ${type}`;
+        }
+
+        function clearLog() {
+            logDiv.innerHTML = '';
+            log('Log cleared', 'info');
+        }
+
+        function checkBrowser() {
+            log('=== Browser Support Check ===', 'info');
+            
+            // Check Speech Recognition
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                log('✅ Speech Recognition API is available', 'success');
+            } else {
+                log('❌ Speech Recognition API is NOT available', 'error');
+                return;
+            }
+
+            // Check browser
+            const userAgent = navigator.userAgent;
+            if (userAgent.includes('Chrome')) {
+                log('✅ Browser: Chrome (Good for Speech API)', 'success');
+            } else if (userAgent.includes('Edge')) {
+                log('✅ Browser: Edge (Good for Speech API)', 'success');
+            } else if (userAgent.includes('Safari')) {
+                log('✅ Browser: Safari (Good for Speech API)', 'success');
+            } else {
+                log('⚠️ Browser: ' + userAgent, 'warning');
+            }
+
+            // Check connection
+            if (navigator.onLine) {
+                log('✅ Internet connection: Online', 'success');
+            } else {
+                log('❌ Internet connection: Offline', 'error');
+            }
+
+            // Check protocol
+            if (window.location.protocol === 'https:') {
+                log('✅ Protocol: HTTPS (Secure)', 'success');
+            } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                log('✅ Protocol: HTTP on localhost (Allowed)', 'success');
+            } else {
+                log('⚠️ Protocol: HTTP (May have issues)', 'warning');
+            }
+
+            log('=== Check Complete ===', 'info');
+        }
+
+        function testSpeechAPI() {
+            log('=== Starting Speech API Test ===', 'info');
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                log('❌ Speech Recognition not supported', 'error');
+                setStatus('Not Supported', 'idle');
+                return;
+            }
+
+            try {
+                recognition = new SpeechRecognition();
+                log('✅ Created Speech Recognition instance', 'success');
+
+                recognition.continuous = false;
+                recognition.interimResults = true;
+                recognition.maxAlternatives = 1;
+                recognition.lang = 'en-US';
+                
+                log('✅ Configured recognition settings', 'success');
+                log('   - Language: en-US', 'info');
+                log('   - Continuous: false', 'info');
+                log('   - Interim Results: true', 'info');
+
+                recognition.onstart = () => {
+                    log('✅ Speech recognition STARTED successfully!', 'success');
+                    setStatus('Listening... Speak now!', 'listening');
+                    testBtn.disabled = true;
+                    testBtn.textContent = 'Listening...';
+                };
+
+                recognition.onresult = (event) => {
+                    log('✅ Got speech result!', 'success');
+                    for (let i = 0; i < event.results.length; i++) {
+                        const result = event.results[i];
+                        const transcript = result[0].transcript;
+                        const confidence = result[0].confidence;
+                        
+                        if (result.isFinal) {
+                            log(`📝 Final: "${transcript}" (confidence: ${(confidence * 100).toFixed(1)}%)`, 'success');
+                        } else {
+                            log(`📝 Interim: "${transcript}"`, 'info');
+                        }
+                    }
+                };
+
+                recognition.onerror = (event) => {
+                    log(`❌ ERROR: ${event.error}`, 'error');
+                    
+                    switch(event.error) {
+                        case 'network':
+                            log('⚠️ NETWORK ERROR DETAILS:', 'warning');
+                            log('   This means Google Speech API is not accessible', 'warning');
+                            log('   Possible causes:', 'warning');
+                            log('   1. Google API is temporarily down', 'warning');
+                            log('   2. Too many requests (rate limited)', 'warning');
+                            log('   3. Regional restrictions', 'warning');
+                            log('   4. Firewall blocking Google APIs', 'warning');
+                            log('   5. VPN interfering with API access', 'warning');
+                            log('', 'info');
+                            log('💡 SOLUTIONS:', 'info');
+                            log('   1. Wait 5-10 minutes and try again', 'info');
+                            log('   2. Disable VPN if using one', 'info');
+                            log('   3. Try in incognito mode', 'info');
+                            log('   4. Try different browser', 'info');
+                            log('   5. Check if Google services are accessible', 'info');
+                            break;
+                        case 'aborted':
+                            log('   Recognition was aborted (normal if you stopped it)', 'info');
+                            break;
+                        case 'no-speech':
+                            log('   No speech was detected', 'warning');
+                            break;
+                        case 'audio-capture':
+                            log('   Microphone could not be accessed', 'error');
+                            break;
+                        case 'not-allowed':
+                            log('   Microphone permission was denied', 'error');
+                            break;
+                        default:
+                            log(`   Unknown error type: ${event.error}`, 'error');
+                    }
+                    
+                    setStatus('Error: ' + event.error, 'idle');
+                    testBtn.disabled = false;
+                    testBtn.textContent = 'Test Speech Recognition';
+                };
+
+                recognition.onend = () => {
+                    log('✅ Speech recognition ended', 'info');
+                    setStatus('Ready', 'idle');
+                    testBtn.disabled = false;
+                    testBtn.textContent = 'Test Speech Recognition';
+                };
+
+                log('🎤 Starting recognition... Click ALLOW when browser asks for microphone permission', 'info');
+                recognition.start();
+
+            } catch (error) {
+                log(`❌ Exception: ${error.message}`, 'error');
+                setStatus('Error', 'idle');
+                testBtn.disabled = false;
+            }
+        }
+
+        // Auto-check on load
+        window.onload = () => {
+            log('Speech API Diagnostic Tool loaded', 'info');
+            log('Click "Check Browser Support" to verify your setup', 'info');
+            log('Click "Test Speech Recognition" to test the API', 'info');
+            log('', 'info');
+            checkBrowser();
+        };
+    </script>
+</body>
+</html>

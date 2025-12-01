@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
@@ -11,7 +11,7 @@ import { App } from '@capacitor/app';
 export const useCapacitorBackButton = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [lastBackPress, setLastBackPress] = useState(0);
+  const lastBackPressRef = useRef(0);
 
   useEffect(() => {
     // Check if running in Capacitor
@@ -20,14 +20,14 @@ export const useCapacitorBackButton = () => {
         // If we're on the home page or auth page, show exit confirmation
         if (location.pathname === '/' || location.pathname === '/home' || location.pathname === '/auth') {
           const currentTime = Date.now();
-          const timeSinceLastPress = currentTime - lastBackPress;
+          const timeSinceLastPress = currentTime - lastBackPressRef.current;
           
           // If back pressed twice within 2 seconds, exit
           if (timeSinceLastPress < 2000) {
             App.exitApp();
           } else {
             // First press - show toast message
-            setLastBackPress(currentTime);
+            lastBackPressRef.current = currentTime;
             
             // Show native toast or alert
             const toastMessage = 'Press back again to exit';
@@ -56,7 +56,9 @@ export const useCapacitorBackButton = () => {
               
               // Remove toast after 2 seconds
               setTimeout(() => {
-                document.body.removeChild(toast);
+                if (toast.parentNode) {
+                  document.body.removeChild(toast);
+                }
               }, 2000);
             }
           }
@@ -70,5 +72,5 @@ export const useCapacitorBackButton = () => {
         backButtonListener.remove();
       };
     }
-  }, [navigate, location, lastBackPress]);
+  }, [navigate, location]);
 };

@@ -717,15 +717,26 @@ const ManualStoryCreationPage: React.FC = () => {
         };
 
         const handlePageChangeEvent = (message: any) => {
-          // Update who is on what page
-          setParticipants(prev => prev.map(p => p.username === message.username ? { ...p, current_page: message.page_number } : p));
+          // SECURITY FIX: Only handle actual page_change messages
           if (message.type !== 'page_change') return;
+          
           console.log(`📄 ${message.username} moved to page ${message.page_number}`);
+          
+          // Update who is on what page (only for page_change messages)
+          setParticipants(prev => prev.map(p => 
+            p.username === message.username 
+              ? { ...p, current_page: message.page_number } 
+              : p
+          ));
           
           // Request fresh page viewers data when someone changes pages (for the modal)
           if (showPageDeletionModal && currentSessionId) {
             collaborationService.requestPageViewers();
           }
+          
+          // CRITICAL: Do NOT change currentPageIndex here!
+          // Users should stay on their own page and only see remote updates
+          // Page navigation only happens through explicit user action
         };
 
         const handlePageAdded = (message: any) => {
@@ -900,13 +911,11 @@ const ManualStoryCreationPage: React.FC = () => {
                 text: message.text,
               });
               
-              // Force re-render of the text component by triggering a state update
-              setTimeout(() => {
-                const updatedStory = useStoryStore.getState().getStory(currentStory.id);
-                if (updatedStory) {
-                  setCurrentStory({ ...updatedStory });
-                }
-              }, 50);
+              // BUG FIX: DO NOT call setCurrentStory here!
+              // The updatePage function already updates the Zustand store, which will trigger
+              // React re-renders automatically. Calling setCurrentStory causes extra renders
+              // that interfere with currentPageIndex and cause users to be pulled to the wrong page.
+              // The setTimeout+setCurrentStory was unnecessary and causing the page pull bug.
             } else {
               console.warn('⚠️ Could not map incoming text_edit to a local page', message);
             }
@@ -1166,11 +1175,11 @@ const ManualStoryCreationPage: React.FC = () => {
                   latestStory = storyStore.getStory(currentStory.id);
                 }
                 
-                // Refresh currentStory state
-                const refreshedStory = storyStore.getStory(currentStory.id);
-                if (refreshedStory) {
-                  setCurrentStory({ ...refreshedStory });
-                }
+                // BUG FIX: DO NOT call setCurrentStory here!
+                // The store already updated via addPage/insertPageAt, which will trigger
+                // React re-renders automatically. Calling setCurrentStory causes extra renders
+                // that interfere with currentPageIndex and cause page pull bugs.
+                // This was part of the drawing page pull bug.
               }
               
               // Now map to local page ID
@@ -1271,11 +1280,11 @@ const ManualStoryCreationPage: React.FC = () => {
               console.log('⚠️ Unknown page ID for drawing:', localPageId, '(messagePageId:', messagePageId, ')');
             }
             
-            // Force a re-render of the story to update hasCanvasData
-            const refreshedStory = useStoryStore.getState().getStory(currentStory.id);
-            if (refreshedStory) {
-              setCurrentStory({ ...refreshedStory });
-            }
+            // BUG FIX: DO NOT call setCurrentStory here!
+            // The saveCanvasData function already updates the Zustand store, which will trigger
+            // React re-renders automatically. Calling setCurrentStory causes extra renders
+            // that interfere with currentPageIndex and cause users to be pulled to the wrong page.
+            // This was the root cause of the drawing page pull bug.
             
             console.log('🖌️ Remote drawing activity detected - LIVE PREVIEW updated!');
           } else {
@@ -1339,9 +1348,20 @@ const ManualStoryCreationPage: React.FC = () => {
           }
         };
 
-        // Debug: Listen to ALL messages
+        // Debug: Listen to ALL messages and track setCurrentPageIndex calls
         const handleAllMessages = (message: any) => {
           console.log('🔔 WebSocket message received (all):', message.type, message);
+          
+          // CRITICAL DEBUG: Track if any message tries to change page
+          if (message.page_number !== undefined || message.page_index !== undefined) {
+            console.warn('⚠️ Message contains page info:', {
+              type: message.type,
+              page_number: message.page_number,
+              page_index: message.page_index,
+              username: message.username,
+              currentPageIndex: currentPageIndex
+            });
+          }
         };
         collaborationService.on('all', handleAllMessages);
         
@@ -1621,6 +1641,11 @@ const ManualStoryCreationPage: React.FC = () => {
 
   // Handle page navigation - sync to other users
   const handlePageNavigationSync = (newPageIndex: number) => {
+    console.log('🔄 handlePageNavigationSync called:', {
+      from: currentPageIndex,
+      to: newPageIndex,
+      stack: new Error().stack?.split('\n')[2] // Show where it was called from
+    });
     setCurrentPageIndex(newPageIndex);
     
     if (isCollaborating && currentSessionId) {
@@ -2364,6 +2389,7 @@ const ManualStoryCreationPage: React.FC = () => {
   const goToPreviousPage = () => {
     if (currentPageIndex > 0) {
       const newPageIndex = currentPageIndex - 1;
+      // FIX: Use sync function to properly notify collaborators without pulling them
       handlePageNavigationSync(newPageIndex);
     }
   };
@@ -2371,6 +2397,7 @@ const ManualStoryCreationPage: React.FC = () => {
   const goToNextPage = () => {
     if (currentStory && currentPageIndex < currentStory.pages.length - 1) {
       const newPageIndex = currentPageIndex + 1;
+      // FIX: Use sync function to properly notify collaborators without pulling them
       handlePageNavigationSync(newPageIndex);
     }
   };

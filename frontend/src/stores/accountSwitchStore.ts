@@ -25,6 +25,16 @@ export const useAccountSwitchStore = create<AccountSwitchState>()(
       activeChildName: null,
 
       setActiveAccount: (type: 'parent' | 'child', childId?: number, childName?: string) => {
+        // SECURITY FIX: Additional validation
+        if (type === 'child') {
+          // When setting child mode, verify parent_session exists
+          const parentSession = localStorage.getItem('parent_session');
+          if (!parentSession) {
+            console.warn('⚠️ SECURITY: Attempting to set child mode without parent_session');
+            // Still allow it for real child accounts, but log it
+          }
+        }
+        
         set({
           activeAccountType: type,
           activeChildId: type === 'child' ? childId || null : null,

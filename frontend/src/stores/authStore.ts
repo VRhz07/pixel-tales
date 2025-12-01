@@ -13,7 +13,7 @@ interface AuthState {
   userLimits: UserLimits | null;
   
   // Actions
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   signUp: (name: string, email: string, password: string, userType: 'child' | 'parent' | 'teacher') => Promise<void>;
   signOut: () => Promise<void>;
   continueWithoutAccount: () => void;
@@ -34,11 +34,37 @@ export const useAuthStore = create<AuthState>()(
       featureAccess: null,
       userLimits: null,
 
-      signIn: async (email: string, password: string) => {
+      signIn: async (email: string, password: string, rememberMe: boolean = true) => {
         set({ isLoading: true, error: null });
         
         try {
           const response = await authService.login(email, password);
+          
+          // Store remember me preference
+          if (rememberMe) {
+            localStorage.setItem('rememberMe', 'true');
+          } else {
+            localStorage.setItem('rememberMe', 'false');
+            // Set session expiry for non-remembered sessions (24 hours)
+            const expiryTime = Date.now() + (24 * 60 * 60 * 1000);
+            localStorage.setItem('sessionExpiry', expiryTime.toString());
+          }
+          
+          // SECURITY FIX: Clear any leftover parent_session from previous sessions
+          localStorage.removeItem('parent_session');
+          
+          // SECURITY FIX: Clear account switch state to prevent confusion
+          import('../stores/accountSwitchStore').then(({ useAccountSwitchStore }) => {
+            const accountSwitchStore = useAccountSwitchStore.getState();
+            accountSwitchStore.clearActiveAccount();
+            
+            // Set correct account type based on actual user type
+            const userType = response.user.user_type;
+            if (userType === 'parent' || userType === 'teacher') {
+              accountSwitchStore.setActiveAccount('parent');
+            }
+            // Don't set 'child' for actual child logins - they shouldn't have account switching
+          });
           
           set({ 
             user: response.user, 
@@ -139,6 +165,10 @@ export const useAuthStore = create<AuthState>()(
           // Clear parent session if exists
           localStorage.removeItem('parent_session');
           
+          // Clear remember me and session expiry
+          localStorage.removeItem('rememberMe');
+          localStorage.removeItem('sessionExpiry');
+          
           set({ 
             user: null, 
             isAuthenticated: false, 
@@ -229,8 +259,106 @@ export const useAuthStore = create<AuthState>()(
         // Check if we have stored auth data
         const storedUser = authService.getUserData();
         const isAuthenticated = authService.isAuthenticated();
+        
+        // Check if session has expired (for non-remembered sessions)
+        const rememberMe = localStorage.getItem('rememberMe') === 'true';
+        const sessionExpiry = localStorage.getItem('sessionExpiry');
+        
+        if (!rememberMe && sessionExpiry) {
+          const expiryTime = parseInt(sessionExpiry);
+          if (Date.now() > expiryTime) {
+            // Session expired, sign out
+            await get().signOut();
+            return false;
+          }
+        }
 
         if (storedUser && isAuthenticated) {
+          // CRITICAL FIX: Check if there's a parent_session
+          const parentSession = localStorage.getItem('parent_session');
+          
+          if (parentSession) {
+            // We have a parent session - this means we were viewing as child
+            try {
+              const sessionData = JSON.parse(parentSession);
+              
+              // SECURITY: Validate the parent session
+              if (!sessionData.parentId || !sessionData.parentUserType) {
+                // Invalid session structure - clear it and restore parent
+                console.warn('🔒 Invalid parent_session structure - restoring parent account');
+                localStorage.removeItem('parent_session');
+                
+                // Restore parent user data if available
+                if (sessionData.userData) {
+                  const parentUserData = typeof sessionData.userData === 'string' 
+                    ? JSON.parse(sessionData.userData) 
+                    : sessionData.userData;
+                  localStorage.setItem('user_data', JSON.stringify(parentUserData));
+                }
+                
+                // Restore parent tokens if available
+                if (sessionData.tokens) {
+                  if (sessionData.tokens.access) {
+                    localStorage.setItem('access_token', sessionData.tokens.access);
+                  }
+                  if (sessionData.tokens.refresh) {
+                    localStorage.setItem('refresh_token', sessionData.tokens.refresh);
+                  }
+                }
+                
+                // Clear account switch state
+                import('../stores/accountSwitchStore').then(({ useAccountSwitchStore }) => {
+                  useAccountSwitchStore.getState().clearActiveAccount();
+                });
+                
+                // Reload user data from restored parent data
+                const restoredUser = authService.getUserData();
+                if (restoredUser) {
+                  set({
+                    user: restoredUser,
+                    isAuthenticated: true,
+                  });
+                  
+                  import('../stores/storyStore').then(({ useStoryStore }) => {
+                    useStoryStore.getState().setCurrentUser(restoredUser.id);
+                  });
+                  
+                  return true;
+                }
+              } else {
+                // Valid parent session exists - parent was viewing as child
+                console.log('🔒 Parent session detected - restoring child view state');
+                
+                // Set the account switch state to reflect child view
+                import('../stores/accountSwitchStore').then(({ useAccountSwitchStore }) => {
+                  const childId = storedUser.id ? parseInt(storedUser.id) : undefined;
+                  useAccountSwitchStore.getState().setActiveAccount('child', childId, storedUser.name);
+                });
+              }
+            } catch (e) {
+              // Corrupted parent session - clear it
+              console.error('🔒 Corrupted parent_session - clearing:', e);
+              localStorage.removeItem('parent_session');
+              
+              // Clear account switch state
+              import('../stores/accountSwitchStore').then(({ useAccountSwitchStore }) => {
+                useAccountSwitchStore.getState().clearActiveAccount();
+              });
+            }
+          } else {
+            // No parent session - this is a normal user login
+            // Set account type based on actual user type
+            const userType = storedUser.user_type;
+            import('../stores/accountSwitchStore').then(({ useAccountSwitchStore }) => {
+              if (userType === 'parent' || userType === 'teacher') {
+                useAccountSwitchStore.getState().setActiveAccount('parent');
+              } else if (userType === 'child') {
+                const childId = storedUser.id ? parseInt(storedUser.id) : undefined;
+                useAccountSwitchStore.getState().setActiveAccount('child', childId, storedUser.name);
+              }
+            });
+          }
+          
           set({
             user: storedUser,
             isAuthenticated: true,

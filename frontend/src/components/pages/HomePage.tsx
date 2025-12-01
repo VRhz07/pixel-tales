@@ -26,22 +26,39 @@ const HomePage = () => {
 
   // Set active account state when on home page
   useEffect(() => {
-    const parentSession = localStorage.getItem('parent_session');
+    // SECURITY FIX: Only set account type based on actual authentication, not persisted state
+    if (!user) return;
     
-    if (parentSession && user) {
-      // User is viewing as child from parent dashboard
-      const userType = user?.profile?.user_type || user?.user_type;
-      if (userType === 'child') {
-        setActiveAccount('child', user.id ? parseInt(user.id) : undefined, user.name);
+    const parentSession = localStorage.getItem('parent_session');
+    const userType = user?.profile?.user_type || user?.user_type;
+    
+    // If there's a parent session, this means a parent is viewing as a child
+    if (parentSession) {
+      try {
+        const sessionData = JSON.parse(parentSession);
+        // Verify this is actually a parent viewing as child, not a real child login
+        if (sessionData.parentId && sessionData.parentUserType && 
+            (sessionData.parentUserType === 'parent' || sessionData.parentUserType === 'teacher')) {
+          // Parent is viewing as child - this is legitimate
+          setActiveAccount('child', user.id ? parseInt(user.id) : undefined, user.name);
+          return;
+        } else {
+          // Invalid parent session - clear it
+          console.warn('Invalid parent_session detected - clearing');
+          localStorage.removeItem('parent_session');
+        }
+      } catch (e) {
+        // Corrupted parent session - clear it
+        localStorage.removeItem('parent_session');
       }
-    } else if (user) {
-      // Direct login - set account type based on user type
-      const userType = user?.profile?.user_type || user?.user_type;
-      if (userType === 'child') {
-        setActiveAccount('child', user.id ? parseInt(user.id) : undefined, user.name);
-      } else if (userType === 'parent' || userType === 'teacher') {
-        setActiveAccount('parent');
-      }
+    }
+    
+    // No parent session, or invalid session - set based on actual user type
+    if (userType === 'parent' || userType === 'teacher') {
+      setActiveAccount('parent');
+    } else if (userType === 'child') {
+      // Real child account logged in directly
+      setActiveAccount('child', user.id ? parseInt(user.id) : undefined, user.name);
     }
   }, [user, setActiveAccount]);
   

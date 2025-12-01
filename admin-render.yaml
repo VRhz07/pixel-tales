@@ -1,0 +1,44 @@
+# Render Blueprint for Admin Dashboard
+# Deploy this as a separate static site on Render
+# This file can be used with Render's Blueprint feature
+
+services:
+  - type: web
+    name: pixeltales-admin
+    env: static
+    buildCommand: cd frontend && npm install && npm run build:admin
+    staticPublishPath: ./frontend/dist-admin
+    pullRequestPreviewsEnabled: false
+    
+    # Security headers
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: no-referrer
+      - path: /*
+        name: X-XSS-Protection
+        value: 1; mode=block
+      - path: /*
+        name: Permissions-Policy
+        value: geolocation=(), microphone=(), camera=()
+    
+    # SPA routing - redirect all routes to index.html
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    
+    # Environment variables
+    envVars:
+      - key: VITE_API_URL
+        sync: false  # Set manually in Render dashboard
+      - key: VITE_ADMIN_ONLY
+        value: true
+      - key: NODE_ENV
+        value: production

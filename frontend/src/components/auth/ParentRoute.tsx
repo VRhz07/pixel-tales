@@ -17,21 +17,50 @@ const ParentRoute: React.FC<ParentRouteProps> = ({ children }) => {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // Check if user has parent or teacher privileges
-  const userType = user?.profile?.user_type || user?.user_type;
+  // SECURITY FIX: Check the ACTUAL logged-in user type, not the viewed profile
+  const actualUserType = user?.user_type || user?.profile?.user_type;
+  
+  // CRITICAL: If the actual logged-in user is a child, NEVER allow parent route access
+  if (actualUserType === 'child') {
+    console.error('❌ SECURITY: Child user attempted to access parent route!', {
+      userId: user?.id,
+      userName: user?.name,
+      userType: actualUserType
+    });
+    return <Navigate to="/home" replace />;
+  }
   
   // If user is not a parent or teacher, redirect to home
-  if (userType !== 'parent' && userType !== 'teacher') {
-    console.warn('Unauthorized access attempt to parent route by:', userType);
+  if (actualUserType !== 'parent' && actualUserType !== 'teacher') {
+    console.warn('Unauthorized access attempt to parent route by:', actualUserType);
     return <Navigate to="/home" replace />;
   }
 
-  // Extra security: Check if currently viewing as child
-  // This prevents children from accessing parent dashboard even if parent_session exists
-  const parentSession = localStorage.getItem('parent_session');
-  if (parentSession && activeAccountType === 'child') {
-    console.warn('Child account attempted to access parent route');
+  // Extra security: If currently viewing as child, don't allow parent dashboard access
+  // This is for when parent switches to child view - they must switch back to access parent dashboard
+  if (activeAccountType === 'child') {
+    console.warn('Currently viewing as child - redirecting from parent route');
     return <Navigate to="/home" replace />;
+  }
+  
+  // Validate parent_session if it exists
+  const parentSession = localStorage.getItem('parent_session');
+  if (parentSession) {
+    try {
+      const sessionData = JSON.parse(parentSession);
+      // If there's a parent session, verify it matches the current user
+      if (sessionData.parentId && sessionData.parentId !== user?.id) {
+        console.error('❌ SECURITY: parent_session mismatch detected!', {
+          sessionParentId: sessionData.parentId,
+          currentUserId: user?.id
+        });
+        localStorage.removeItem('parent_session');
+        // Continue anyway since actual user is parent/teacher
+      }
+    } catch (e) {
+      // Corrupted session
+      localStorage.removeItem('parent_session');
+    }
   }
 
   return <>{children}</>;

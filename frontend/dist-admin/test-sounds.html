@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sound Effects Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .sound-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .sound-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sound-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .sound-button:active {
+            transform: translateY(0);
+        }
+        
+        .sound-button.playing {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+        
+        .sound-button.error {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        }
+        
+        .controls {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .volume-control input {
+            flex: 1;
+        }
+        
+        .info {
+            background: #e6fffa;
+            border-left: 4px solid #38b2ac;
+            padding: 1rem;
+            margin-top: 2rem;
+            border-radius: 0.25rem;
+        }
+        
+        .warning {
+            background: #fffaf0;
+            border-left: 4px solid #ed8936;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.25rem;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat {
+            flex: 1;
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔊 Sound Effects Test</h1>
+        <p class="subtitle">Test all your sound effects</p>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="totalSounds">0</div>
+                <div class="stat-label">Total Sounds</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="workingSounds">0</div>
+                <div class="stat-label">Working</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="failedSounds">0</div>
+                <div class="stat-label">Failed</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="volume-control">
+                <span>🔈</span>
+                <input type="range" id="volumeSlider" min="0" max="100" value="50">
+                <span>🔊</span>
+                <span id="volumeLabel">50%</span>
+            </div>
+            <button onclick="testAllSounds()" style="width: 100%; padding: 0.75rem; background: #48bb78; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;">
+                🎵 Test All Sounds
+            </button>
+        </div>
+        
+        <!-- Button Sounds -->
+        <div class="section">
+            <div class="section-title">🖱️ Button Sounds</div>
+            <div class="sound-grid">
+                <button class="sound-button" onclick="playSound('button-click')">Button Click</button>
+                <button class="sound-button" onclick="playSound('button-toggle')">Button Toggle</button>
+                <button class="sound-button" onclick="playSound('button-success')">Button Success</button>
+                <button class="sound-button" onclick="playSound('button-cancel')">Button Cancel</button>
+            </div>
+        </div>
+        
+        <!-- Navigation Sounds -->
+        <div class="section">
+            <div class="section-title">📱 Navigation Sounds</div>
+            <div class="sound-grid">
+                <button class="sound-button" onclick="playSound('page-turn')">Page Turn</button>
+                <button class="sound-button" onclick="playSound('tab-switch')">Tab Switch</button>
+                <button class="sound-button" onclick="playSound('swipe')">Swipe</button>
+            </div>
+        </div>
+        
+        <!-- Notification Sounds -->
+        <div class="section">
+            <div class="section-title">🔔 Notification Sounds</div>
+            <div class="sound-grid">
+                <button class="sound-button" onclick="playSound('notification')">Notification</button>
+                <button class="sound-button" onclick="playSound('message-received')">Message Received</button>
+                <button class="sound-button" onclick="playSound('achievement')">Achievement</button>
+                <button class="sound-button" onclick="playSound('error')">Error</button>
+                <button class="sound-button" onclick="playSound('warning')">Warning</button>
+            </div>
+        </div>
+        
+        <!-- Drawing Sounds -->
+        <div class="section">
+            <div class="section-title">🎨 Drawing Sounds</div>
+            <div class="sound-grid">
+                <button class="sound-button" onclick="playSound('brush-stroke')">Brush Stroke</button>
+                <button class="sound-button" onclick="playSound('eraser')">Eraser</button>
+                <button class="sound-button" onclick="playSound('color-pick')">Color Pick</button>
+                <button class="sound-button" onclick="playSound('tool-select')">Tool Select</button>
+            </div>
+        </div>
+        
+        <!-- AI Sounds -->
+        <div class="section">
+            <div class="section-title">🤖 AI & Loading Sounds</div>
+            <div class="sound-grid">
+                <button class="sound-button" onclick="playSound('ai-thinking')">AI Thinking</button>
+                <button class="sound-button" onclick="playSound('loading-complete')">Loading Complete</button>
+                <button class="sound-button" onclick="playSound('magic-sparkle')">Magic Sparkle</button>
+            </div>
+        </div>
+        
+        <!-- Social Sounds -->
+        <div class="section">
+            <div class="section-title">❤️ Social Sounds</div>
+            <div class="sound-grid">
+                <button class="sound-button" onclick="playSound('like')">Like</button>
+                <button class="sound-button" onclick="playSound('friend-request')">Friend Request</button>
+                <button class="sound-button" onclick="playSound('collaboration-invite')">Collaboration Invite</button>
+            </div>
+        </div>
+        
+        <div class="info">
+            <strong>✅ Tips:</strong>
+            <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">
+                <li>Click any button to test the sound</li>
+                <li>Adjust volume with the slider above</li>
+                <li>Buttons will turn green when playing, red if failed</li>
+                <li>Check browser console for detailed logs</li>
+            </ul>
+        </div>
+        
+        <div class="warning" id="warningBox" style="display: none;">
+            <strong>⚠️ Large Files Detected:</strong>
+            <div id="warningContent"></div>
+        </div>
+    </div>
+    
+    <script>
+        const sounds = {};
+        const soundFiles = [
+            'button-click', 'button-toggle', 'button-success', 'button-cancel',
+            'page-turn', 'tab-switch', 'swipe',
+            'notification', 'message-received', 'achievement', 'error', 'warning',
+            'brush-stroke', 'eraser', 'color-pick', 'tool-select',
+            'ai-thinking', 'loading-complete', 'magic-sparkle',
+            'like', 'friend-request', 'collaboration-invite'
+        ];
+        
+        let workingCount = 0;
+        let failedCount = 0;
+        
+        // Volume control
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeLabel = document.getElementById('volumeLabel');
+        
+        volumeSlider.addEventListener('input', (e) => {
+            const volume = e.target.value;
+            volumeLabel.textContent = volume + '%';
+            Object.values(sounds).forEach(audio => {
+                audio.volume = volume / 100;
+            });
+        });
+        
+        // Preload all sounds
+        soundFiles.forEach(soundName => {
+            const audio = new Audio(`/sounds/${soundName}.mp3`);
+            audio.volume = 0.5;
+            audio.preload = 'auto';
+            
+            audio.addEventListener('canplaythrough', () => {
+                console.log(`✅ Loaded: ${soundName}.mp3`);
+                workingCount++;
+                updateStats();
+            });
+            
+            audio.addEventListener('error', (e) => {
+                console.error(`❌ Failed to load: ${soundName}.mp3`, e);
+                failedCount++;
+                updateStats();
+            });
+            
+            sounds[soundName] = audio;
+        });
+        
+        function updateStats() {
+            document.getElementById('totalSounds').textContent = soundFiles.length;
+            document.getElementById('workingSounds').textContent = workingCount;
+            document.getElementById('failedSounds').textContent = failedCount;
+            
+            // Check for large files
+            checkLargeFiles();
+        }
+        
+        function checkLargeFiles() {
+            const warnings = [];
+            
+            // These are the files we know are large from the analysis
+            if (sounds['ai-thinking']) {
+                warnings.push('• <strong>ai-thinking.mp3</strong> (3.9 MB) - Consider compressing to < 100 KB');
+            }
+            if (sounds['eraser']) {
+                warnings.push('• <strong>eraser.mp3</strong> (236 KB) - Consider compressing to < 100 KB');
+            }
+            if (sounds['brush-stroke']) {
+                warnings.push('• <strong>brush-stroke.mp3</strong> (120 KB) - Consider compressing to < 50 KB');
+            }
+            
+            if (warnings.length > 0) {
+                const warningBox = document.getElementById('warningBox');
+                const warningContent = document.getElementById('warningContent');
+                warningContent.innerHTML = '<ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">' 
+                    + warnings.map(w => '<li>' + w + '</li>').join('') 
+                    + '</ul>';
+                warningBox.style.display = 'block';
+            }
+        }
+        
+        function playSound(soundName) {
+            const audio = sounds[soundName];
+            const button = event.target;
+            
+            if (!audio) {
+                console.error(`Sound not found: ${soundName}`);
+                button.classList.add('error');
+                setTimeout(() => button.classList.remove('error'), 500);
+                return;
+            }
+            
+            try {
+                // Clone audio to allow overlapping plays
+                const audioClone = audio.cloneNode();
+                audioClone.volume = audio.volume;
+                
+                button.classList.add('playing');
+                
+                audioClone.play().then(() => {
+                    console.log(`🔊 Playing: ${soundName}`);
+                }).catch(e => {
+                    console.error(`Failed to play: ${soundName}`, e);
+                    button.classList.add('error');
+                });
+                
+                audioClone.onended = () => {
+                    button.classList.remove('playing');
+                };
+                
+                setTimeout(() => {
+                    button.classList.remove('playing', 'error');
+                }, 500);
+                
+            } catch (error) {
+                console.error(`Error playing sound: ${soundName}`, error);
+                button.classList.add('error');
+                setTimeout(() => button.classList.remove('error'), 500);
+            }
+        }
+        
+        async function testAllSounds() {
+            console.log('🎵 Testing all sounds...');
+            
+            for (let i = 0; i < soundFiles.length; i++) {
+                const soundName = soundFiles[i];
+                const audio = sounds[soundName];
+                
+                if (audio) {
+                    try {
+                        const audioClone = audio.cloneNode();
+                        audioClone.volume = audio.volume;
+                        await audioClone.play();
+                        console.log(`✅ ${i + 1}/${soundFiles.length}: ${soundName}`);
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    } catch (error) {
+                        console.error(`❌ ${i + 1}/${soundFiles.length}: ${soundName} failed`, error);
+                    }
+                }
+            }
+            
+            console.log('✅ All sounds tested!');
+        }
+        
+        // Initialize stats
+        updateStats();
+    </script>
+</body>
+</html>

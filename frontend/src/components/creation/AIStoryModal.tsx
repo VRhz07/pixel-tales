@@ -141,9 +141,9 @@ const AIStoryModal = ({ isOpen, onClose }: AIStoryModalProps) => {
       const { generateStoryWithGemini } = await import('../../services/geminiProxyService');
       
       // Build comprehensive prompt
-      const genreNames = formData.selectedGenres.map(id => genres.find(g => g.id === id)?.name || id).join(', ');
+      const selectedGenreNames = formData.selectedGenres.map(id => genres.find(g => g.id === id)?.name || id).join(', ');
       const fullPrompt = `
-Generate a ${genreNames} story for children aged 6-8 with ${formData.pageCount} pages.
+Generate a ${selectedGenreNames} story for children aged 6-8 with ${formData.pageCount} pages.
 Art Style: ${formData.selectedArtStyle || 'cartoon'}
 Language: ${formData.storyLanguage === 'tl' ? 'Tagalog' : 'English'}
 

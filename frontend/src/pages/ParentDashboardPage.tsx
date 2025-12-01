@@ -333,9 +333,13 @@ const ParentDashboardPage: React.FC = () => {
       if (response.success && response.tokens) {
         // Store parent info in localStorage before switching (including full user data)
         const currentUserData = localStorage.getItem('user_data');
+        const parentUserType = user?.user_type || user?.profile?.user_type;
         const parentInfo = {
           id: user?.id,
           name: user?.name,
+          parentId: user?.id, // SECURITY: Explicit parent ID
+          parentUserType: parentUserType, // SECURITY: Store actual user type for validation
+          timestamp: Date.now(), // SECURITY: Add timestamp for session validation
           tokens: {
             access: localStorage.getItem('access_token'),
             refresh: localStorage.getItem('refresh_token')

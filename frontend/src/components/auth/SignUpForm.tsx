@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserIcon, EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import FormInput from './FormInput';
-import ContinueWithoutAccount from './SocialButtons';
 import EmailVerificationModal from './EmailVerificationModal';
 import { useAuthStore } from '../../stores/authStore';
 import { authService } from '../../services/auth.service';
@@ -113,18 +112,6 @@ const SignUpForm: React.FC = () => {
     localStorage.removeItem('pendingRegistrationData');
   };
 
-  const handleContinueWithoutAccount = () => {
-    setError('');
-    
-    try {
-      // Use the new continueWithoutAccount method from auth store
-      const { continueWithoutAccount } = useAuthStore.getState();
-      continueWithoutAccount();
-      navigate('/home');
-    } catch (err) {
-      setError('Failed to continue without account. Please try again.');
-    }
-  };
 
   return (
     <>
@@ -212,15 +199,6 @@ const SignUpForm: React.FC = () => {
         )}
       </button>
 
-      {/* Divider */}
-      <div className="auth-divider">
-        <span>Or</span>
-      </div>
-
-      {/* Continue Without Account */}
-      <ContinueWithoutAccount
-        onContinueWithoutAccount={handleContinueWithoutAccount}
-      />
 
       {/* Legal Text */}
       <p className="auth-legal">
