@@ -174,6 +174,7 @@ urlpatterns = [
     path('admin/profanity/<int:word_id>/delete/', admin_profanity.delete_profanity_word, name='delete_profanity_word'),
     path('admin/profanity/bulk-add/', admin_profanity.bulk_add_profanity_words, name='bulk_add_profanity_words'),
     path('admin/profanity/stats/', admin_profanity.get_profanity_stats, name='get_profanity_stats'),
+    path('admin/profanity/import/', admin_profanity.import_profanity_words_from_file, name='import_profanity_words_from_file'),
     
     # Public endpoint for frontend profanity filter
     path('profanity/active/', admin_profanity.get_active_profanity_words, name='get_active_profanity_words'),

@@ -152,6 +152,20 @@ const profanityService = {
     });
     return response.data.words;
   },
+
+  /**
+   * Import profanity words from export file (admin only)
+   * This triggers the backend to import words from profanity_words_export.json
+   */
+  async importProfanityWordsFromFile(): Promise<{
+    added: number;
+    updated: number;
+    skipped: number;
+    total_in_database: number;
+  }> {
+    const response = await profanityApi.post('/admin/profanity/import/');
+    return response.data.results;
+  },
 };
 
 export default profanityService;

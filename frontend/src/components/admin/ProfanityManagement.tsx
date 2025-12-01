@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Trash2, Edit2, Filter, AlertCircle, Check, X, Upload } from 'lucide-react';
+import { Plus, Search, Trash2, Edit2, Filter, AlertCircle, Check, X, Upload, Download } from 'lucide-react';
 import profanityService, { ProfanityWord, ProfanityStats } from '../../services/profanity.service';
 import { useThemeStore } from '../../stores/themeStore';
 
@@ -146,6 +146,31 @@ export default function ProfanityManagement({ onClose }: ProfanityManagementProp
     }
   };
 
+  const handleImportFromFile = async () => {
+    if (!confirm('Import profanity words from the export file? This will add any missing words from the repository.')) {
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      const result = await profanityService.importProfanityWordsFromFile();
+      alert(
+        `Import completed successfully!\n\n` +
+        `✅ Added: ${result.added} new words\n` +
+        `🔄 Updated: ${result.updated} words\n` +
+        `⏭️ Skipped: ${result.skipped} words (already up to date)\n` +
+        `📊 Total in database: ${result.total_in_database} words`
+      );
+      loadWords();
+      loadStats();
+    } catch (err: any) {
+      console.error('Import error:', err);
+      alert(err.response?.data?.error || 'Failed to import profanity words. Make sure the export file exists in the repository.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const openEditModal = (word: ProfanityWord) => {
     setEditingWord(word);
     setFormData({
@@ -165,6 +190,10 @@ export default function ProfanityManagement({ onClose }: ProfanityManagementProp
           <p>Manage inappropriate words filtered in the app</p>
         </div>
         <div className="profanity-header-actions">
+          <button onClick={handleImportFromFile} className="btn-secondary" title="Import words from repository">
+            <Download size={18} />
+            Import from File
+          </button>
           <button onClick={() => setShowBulkModal(true)} className="btn-secondary">
             <Upload size={18} />
             Bulk Add

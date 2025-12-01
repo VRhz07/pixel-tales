@@ -373,8 +373,8 @@ export default function AdminDashboardPage() {
                       await adminAuthService.logout();
                       setIsAdminAuthenticated(false);
                       setAdminUser(null);
-                      // Force page reload to clear all state
-                      window.location.reload();
+                      // Redirect to admin login page
+                      window.location.href = '/admin/login';
                     }}
                     className="admin-dropdown-logout-btn"
                   >

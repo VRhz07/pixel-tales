@@ -362,3 +362,88 @@ def get_profanity_stats(request):
             }
         }
     })
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@admin_required
+def import_profanity_words_from_file(request):
+    """
+    Import profanity words from the export file
+    This endpoint allows admins to trigger import via API (for Render free tier)
+    """
+    import json
+    import os
+    
+    filename = 'profanity_words_export.json'
+    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), filename)
+    
+    # Check if file exists
+    if not os.path.exists(file_path):
+        return Response({
+            'success': False,
+            'error': f'Export file not found at: {file_path}'
+        }, status=status.HTTP_404_NOT_FOUND)
+    
+    # Read file
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': f'Failed to read export file: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    words_data = data.get('words', [])
+    
+    if not words_data:
+        return Response({
+            'success': False,
+            'error': 'No words found in export file'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Import words
+    added = 0
+    updated = 0
+    skipped = 0
+    
+    for word_data in words_data:
+        word_text = word_data['word'].lower().strip()
+        
+        existing = ProfanityWord.objects.filter(word=word_text).first()
+        
+        if existing:
+            needs_update = (
+                existing.language != word_data['language'] or
+                existing.severity != word_data['severity'] or
+                existing.is_active != word_data['is_active']
+            )
+            
+            if needs_update:
+                existing.language = word_data['language']
+                existing.severity = word_data['severity']
+                existing.is_active = word_data['is_active']
+                existing.save()
+                updated += 1
+            else:
+                skipped += 1
+        else:
+            ProfanityWord.objects.create(
+                word=word_text,
+                language=word_data['language'],
+                severity=word_data['severity'],
+                is_active=word_data['is_active']
+            )
+            added += 1
+    
+    return Response({
+        'success': True,
+        'message': 'Import completed successfully',
+        'results': {
+            'added': added,
+            'updated': updated,
+            'skipped': skipped,
+            'total_in_database': ProfanityWord.objects.count()
+        }
+    }, status=status.HTTP_201_CREATED)
