@@ -21,6 +21,10 @@ class UserProfile(models.Model):
     last_seen = models.DateTimeField(auto_now=True)  # Last activity timestamp
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # Gamification fields
+    experience_points = models.PositiveIntegerField(default=0)  # Total XP earned (never decreases)
+    level = models.PositiveIntegerField(default=1)  # Current level based on XP
 
     # Moderation fields
     violation_count = models.PositiveIntegerField(default=0)
@@ -48,6 +52,44 @@ class UserProfile(models.Model):
     @property
     def is_teacher(self):
         return self.user_type == 'teacher'
+    
+    def add_experience(self, amount):
+        """Add XP and update level accordingly (XP never decreases)"""
+        if amount <= 0:
+            return
+        
+        self.experience_points += amount
+        
+        # Calculate new level (500 XP per level)
+        new_level = (self.experience_points // 500) + 1
+        
+        # Check if leveled up
+        leveled_up = new_level > self.level
+        self.level = new_level
+        
+        self.save(update_fields=['experience_points', 'level'])
+        
+        return {
+            'xp_gained': amount,
+            'total_xp': self.experience_points,
+            'level': self.level,
+            'leveled_up': leveled_up
+        }
+    
+    @property
+    def xp_for_next_level(self):
+        """Calculate XP needed for next level"""
+        return self.level * 500
+    
+    @property
+    def xp_progress_in_current_level(self):
+        """Calculate XP progress within current level"""
+        return self.experience_points % 500
+    
+    @property
+    def xp_progress_percentage(self):
+        """Calculate percentage progress to next level"""
+        return (self.xp_progress_in_current_level / 500) * 100
     
     def get_children(self):
         """Return all children associated with this parent account"""

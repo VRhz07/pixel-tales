@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useI18nStore } from '../stores/i18nStore';
+import { TextToSpeech } from '@capacitor-community/text-to-speech';
+import { Capacitor } from '@capacitor/core';
 
 interface TextToSpeechOptions {
   rate?: number; // 0.1 to 10, default 1
@@ -45,15 +47,22 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
   const currentWordRef = useRef(0);
   const fullTextRef = useRef<string>('');
   const wordsArrayRef = useRef<string[]>([]);
+  
+  const isNativePlatform = Capacitor.isNativePlatform();
 
-  // Check if browser supports Web Speech API
-  const isSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
+  // Check if TTS is supported (always true on mobile with plugin, check Web Speech API on web)
+  const isSupported = isNativePlatform || (typeof window !== 'undefined' && 'speechSynthesis' in window);
 
   // Load available voices
   useEffect(() => {
     if (!isSupported) return;
+    
+    // Skip voice loading on native platform (uses Capacitor TTS)
+    if (isNativePlatform) return;
 
     const loadVoices = () => {
+      if (typeof window === 'undefined' || !window.speechSynthesis) return;
+      
       const availableVoices = window.speechSynthesis.getVoices();
       setVoices(availableVoices);
 
@@ -68,15 +77,19 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
     };
 
     loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
 
     return () => {
-      window.speechSynthesis.onvoiceschanged = null;
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.onvoiceschanged = null;
+      }
     };
-  }, [isSupported, language, currentVoice]);
+  }, [isSupported, isNativePlatform, language, currentVoice]);
 
   // Speak text
-  const speak = useCallback((text: string, options?: TextToSpeechOptions) => {
+  const speak = useCallback(async (text: string, options?: TextToSpeechOptions) => {
     if (!isSupported || !text.trim()) return;
 
     // Store full text for seeking
@@ -86,75 +99,153 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
     totalWordsRef.current = words.length;
     currentWordRef.current = 0;
 
-    // Stop any ongoing speech
-    window.speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = options?.rate ?? rate;
-    utterance.pitch = options?.pitch ?? pitch;
-    utterance.volume = options?.volume ?? volume;
-    utterance.voice = options?.voice ?? currentVoice;
-
-    utterance.onstart = () => {
-      setIsSpeaking(true);
-      setIsPaused(false);
-      setProgress(0);
-    };
-
-    utterance.onboundary = (event) => {
-      if (event.name === 'word') {
-        currentWordRef.current++;
-        const newProgress = (currentWordRef.current / totalWordsRef.current) * 100;
-        setProgress(Math.min(newProgress, 100));
+    if (isNativePlatform) {
+      // Use Capacitor TTS for mobile
+      try {
+        // Stop any ongoing speech
+        await TextToSpeech.stop();
+        
+        setIsSpeaking(true);
+        setIsPaused(false);
+        setProgress(0);
+        
+        await TextToSpeech.speak({
+          text: text,
+          lang: language === 'tl' ? 'fil-PH' : 'en-US',
+          rate: options?.rate ?? rate,
+          pitch: options?.pitch ?? pitch,
+          volume: options?.volume ?? volume,
+          category: 'ambient',
+        });
+        
+        // On mobile, we don't get word-by-word progress, so simulate it
+        const estimatedDuration = (text.length / 15) * 1000; // ~15 chars per second
+        const progressInterval = setInterval(() => {
+          setProgress(prev => {
+            const next = prev + 2;
+            if (next >= 100) {
+              clearInterval(progressInterval);
+              setIsSpeaking(false);
+              setProgress(100);
+              return 100;
+            }
+            return next;
+          });
+        }, estimatedDuration / 50);
+        
+      } catch (error) {
+        console.error('Capacitor TTS error:', error);
+        setIsSpeaking(false);
+        setIsPaused(false);
+        setProgress(0);
       }
-    };
+    } else {
+      // Use Web Speech API for web
+      if (typeof window === 'undefined' || !window.speechSynthesis) {
+        console.error('Web Speech API not available');
+        return;
+      }
+      
+      // Stop any ongoing speech
+      window.speechSynthesis.cancel();
 
-    utterance.onend = () => {
-      setIsSpeaking(false);
-      setIsPaused(false);
-      setProgress(100);
-      utteranceRef.current = null;
-    };
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = options?.rate ?? rate;
+      utterance.pitch = options?.pitch ?? pitch;
+      utterance.volume = options?.volume ?? volume;
+      utterance.voice = options?.voice ?? currentVoice;
 
-    utterance.onerror = (event) => {
-      console.error('Speech synthesis error:', event);
-      setIsSpeaking(false);
-      setIsPaused(false);
-      setProgress(0);
-      utteranceRef.current = null;
-    };
+      utterance.onstart = () => {
+        setIsSpeaking(true);
+        setIsPaused(false);
+        setProgress(0);
+      };
 
-    utteranceRef.current = utterance;
-    window.speechSynthesis.speak(utterance);
-  }, [isSupported, rate, pitch, volume, currentVoice]);
+      utterance.onboundary = (event) => {
+        if (event.name === 'word') {
+          currentWordRef.current++;
+          const newProgress = (currentWordRef.current / totalWordsRef.current) * 100;
+          setProgress(Math.min(newProgress, 100));
+        }
+      };
+
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        setIsPaused(false);
+        setProgress(100);
+        utteranceRef.current = null;
+      };
+
+      utterance.onerror = (event) => {
+        console.error('Speech synthesis error:', event);
+        setIsSpeaking(false);
+        setIsPaused(false);
+        setProgress(0);
+        utteranceRef.current = null;
+      };
+
+      utteranceRef.current = utterance;
+      window.speechSynthesis.speak(utterance);
+    }
+  }, [isSupported, isNativePlatform, rate, pitch, volume, currentVoice, language]);
 
   // Pause speech
-  const pause = useCallback(() => {
+  const pause = useCallback(async () => {
     if (!isSupported || !isSpeaking) return;
-    window.speechSynthesis.pause();
-    setIsPaused(true);
-  }, [isSupported, isSpeaking]);
+    
+    if (isNativePlatform) {
+      // Capacitor TTS doesn't support pause, so we'll just stop
+      await TextToSpeech.stop();
+      setIsSpeaking(false);
+      setIsPaused(false);
+      setProgress(0);
+    } else {
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.pause();
+        setIsPaused(true);
+      }
+    }
+  }, [isSupported, isNativePlatform, isSpeaking]);
 
   // Resume speech
   const resume = useCallback(() => {
     if (!isSupported || !isPaused) return;
-    window.speechSynthesis.resume();
-    setIsPaused(false);
-  }, [isSupported, isPaused]);
+    
+    if (isNativePlatform) {
+      // On mobile, we can't resume, so just note that it's not paused
+      setIsPaused(false);
+    } else {
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.resume();
+        setIsPaused(false);
+      }
+    }
+  }, [isSupported, isNativePlatform, isPaused]);
 
   // Stop speech
-  const stop = useCallback(() => {
+  const stop = useCallback(async () => {
     if (!isSupported) return;
-    window.speechSynthesis.cancel();
+    
+    if (isNativePlatform) {
+      await TextToSpeech.stop();
+    } else {
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    }
+    
     setIsSpeaking(false);
     setIsPaused(false);
     setProgress(0);
     utteranceRef.current = null;
-  }, [isSupported]);
+  }, [isSupported, isNativePlatform]);
 
   // Seek to specific position (0-100)
   const seek = useCallback((progressPercent: number) => {
     if (!isSupported || !fullTextRef.current) return;
+    
+    // Seeking not supported on native platform
+    if (isNativePlatform) return;
     
     // Clamp progress between 0 and 100
     const clampedProgress = Math.max(0, Math.min(100, progressPercent));
@@ -176,7 +267,9 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
     setProgress(clampedProgress);
     
     // Stop current speech and start from new position
-    window.speechSynthesis.cancel();
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
     
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.rate = rate;
@@ -212,17 +305,19 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
     };
     
     utteranceRef.current = utterance;
-    window.speechSynthesis.speak(utterance);
-  }, [isSupported, rate, pitch, volume, currentVoice, stop]);
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.speak(utterance);
+    }
+  }, [isSupported, isNativePlatform, rate, pitch, volume, currentVoice, stop]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (isSupported) {
+      if (isSupported && !isNativePlatform && typeof window !== 'undefined' && window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
     };
-  }, [isSupported]);
+  }, [isSupported, isNativePlatform]);
 
   return {
     speak,

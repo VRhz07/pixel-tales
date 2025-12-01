@@ -3,7 +3,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.pixeltales.app',
   appName: 'Pixel Tales',
-  webDir: 'dist',
+  webDir: 'frontend/dist',
   server: {
     androidScheme: 'https'
   },

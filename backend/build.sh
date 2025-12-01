@@ -23,4 +23,10 @@ if [ -f "create_superuser.py" ]; then
     python create_superuser.py
 fi
 
+# Run deployment setup (includes profanity import)
+if [ -f "deploy_setup.py" ]; then
+    echo "Running deployment setup..."
+    python deploy_setup.py
+fi
+
 echo "Build completed successfully!"

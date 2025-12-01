@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LockClosedIcon, XMarkIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { authService } from '../../services/auth.service';
+import { storage } from '../../utils/storage';
 
 interface ParentPasswordVerificationModalProps {
   isOpen: boolean;
@@ -71,7 +72,7 @@ export const ParentPasswordVerificationModal: React.FC<ParentPasswordVerificatio
 
     try {
       // Get parent session data
-      const parentSessionStr = localStorage.getItem('parent_session');
+      const parentSessionStr = storage.getItemSync('parent_session');
       if (!parentSessionStr) {
         throw new Error('Parent session not found');
       }

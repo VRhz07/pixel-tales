@@ -366,7 +366,7 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
           });
 
-          // Set current user in story store and initialize demo data if needed
+          // Set current user in story store and load stories from backend
           import('../stores/storyStore').then(({ useStoryStore }) => {
             const storyStore = useStoryStore.getState();
             
@@ -375,19 +375,27 @@ export const useAuthStore = create<AuthState>()(
               storyStore.setCurrentUser(storedUser.id);
             }
             
-            if (storedUser.email === 'john.doe@pixeltales.com') {
-              storyStore.initializeDemoData();
-            }
+            // Load stories from backend on every auth check
+            // This ensures stories are loaded when app reopens
+            storyStore.loadStoriesFromBackend().catch(err => {
+              console.warn('Failed to load stories from backend during checkAuth:', err);
+              
+              // If loading fails and this is John Doe, fallback to demo data
+              if (storedUser.email === 'john.doe@pixeltales.com') {
+                console.log('Loading demo data as fallback for John Doe');
+                storyStore.initializeDemoData();
+              }
+            });
           });
 
-          // Try to refresh user profile
-          try {
-            await get().loadUserProfile();
-            return true;
-          } catch (error) {
-            // If refresh fails, keep stored data but mark as potentially stale
-            return true;
-          }
+          // Try to refresh user profile in background (don't block auth)
+          // This allows offline access and prevents logout on network issues
+          get().loadUserProfile().catch(error => {
+            console.warn('Failed to refresh user profile, using cached data:', error);
+            // Keep user authenticated with cached data
+          });
+          
+          return true;
         } else if (storedUser?.id === 'anonymous') {
           // Anonymous session exists
           set({

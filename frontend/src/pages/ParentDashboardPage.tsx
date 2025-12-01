@@ -25,6 +25,7 @@ import parentDashboardService, { Child, ChildStatistics, Activity, Goal, ChildFo
 import AddChildModal from '../components/parent/AddChildModal';
 import UnifiedProfileSwitcher from '../components/parent/UnifiedProfileSwitcher';
 import { useAccountSwitchStore } from '../stores/accountSwitchStore';
+import { storage } from '../utils/storage';
 import './ParentDashboardPage.css';
 
 interface StatCardProps {
@@ -332,7 +333,7 @@ const ParentDashboardPage: React.FC = () => {
       
       if (response.success && response.tokens) {
         // Store parent info in localStorage before switching (including full user data)
-        const currentUserData = localStorage.getItem('user_data');
+        const currentUserData = storage.getItemSync('user_data');
         const parentUserType = user?.user_type || user?.profile?.user_type;
         const parentInfo = {
           id: user?.id,
@@ -341,18 +342,18 @@ const ParentDashboardPage: React.FC = () => {
           parentUserType: parentUserType, // SECURITY: Store actual user type for validation
           timestamp: Date.now(), // SECURITY: Add timestamp for session validation
           tokens: {
-            access: localStorage.getItem('access_token'),
-            refresh: localStorage.getItem('refresh_token')
+            access: storage.getItemSync('access_token'),
+            refresh: storage.getItemSync('refresh_token')
           },
           userData: currentUserData ? JSON.parse(currentUserData) : null
         };
-        localStorage.setItem('parent_session', JSON.stringify(parentInfo));
+        storage.setItemSync('parent_session', JSON.stringify(parentInfo));
         
         // Update tokens to child's tokens
-        localStorage.setItem('access_token', response.tokens.access);
-        localStorage.setItem('refresh_token', response.tokens.refresh);
+        storage.setItemSync('access_token', response.tokens.access);
+        storage.setItemSync('refresh_token', response.tokens.refresh);
         
-        // Also update the user data in localStorage so auth store picks up the child's profile
+        // Also update the user data in storage so auth store picks up the child's profile
         if (response.user) {
           const childUserData = {
             id: response.user.id.toString(),
@@ -366,7 +367,7 @@ const ParentDashboardPage: React.FC = () => {
             created_at: new Date().toISOString(),
             profile: response.user.profile
           };
-          localStorage.setItem('user_data', JSON.stringify(childUserData));
+          storage.setItemSync('user_data', JSON.stringify(childUserData));
         }
         
         // Set active account as child in the account switch store

@@ -18503,9 +18503,7 @@ body.dark .magical-home p {
 
 /* Top Bar - Light Mode */
 .story-reader-top-bar.light {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 10 !important;
+  position: relative !important;
   background: var(--story-reader-bg-light) !important;
   border-bottom: 1px solid var(--story-reader-gray-200) !important;
   padding: 16px !important;
@@ -18516,9 +18514,7 @@ body.dark .magical-home p {
 
 /* Top Bar - Dark Mode */
 .story-reader-top-bar.dark {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 10 !important;
+  position: relative !important;
   background: var(--story-reader-gray-900) !important;
   border-bottom: 1px solid var(--story-reader-gray-800) !important;
   padding: 16px !important;

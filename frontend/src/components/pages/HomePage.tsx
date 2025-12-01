@@ -10,6 +10,7 @@ import { StoryModeSelectionModal } from '../collaboration/StoryModeSelectionModa
 import CollaborationModeModal from '../collaboration/CollaborationModeModal';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
+import { storage } from '../../utils/storage';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const HomePage = () => {
     // SECURITY FIX: Only set account type based on actual authentication, not persisted state
     if (!user) return;
     
-    const parentSession = localStorage.getItem('parent_session');
+    const parentSession = storage.getItemSync('parent_session');
     const userType = user?.profile?.user_type || user?.user_type;
     
     // If there's a parent session, this means a parent is viewing as a child
@@ -45,11 +46,11 @@ const HomePage = () => {
         } else {
           // Invalid parent session - clear it
           console.warn('Invalid parent_session detected - clearing');
-          localStorage.removeItem('parent_session');
+          storage.removeItemSync('parent_session');
         }
       } catch (e) {
         // Corrupted parent session - clear it
-        localStorage.removeItem('parent_session');
+        storage.removeItemSync('parent_session');
       }
     }
     

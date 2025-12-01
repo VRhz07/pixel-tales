@@ -32,6 +32,11 @@ export interface User {
   is_staff?: boolean;
   is_superuser?: boolean;
   created_at: string;
+  experience_points?: number;
+  level?: number;
+  xp_for_next_level?: number;
+  xp_progress?: number;
+  xp_progress_percentage?: number;
   profile?: {
     user_type: 'child' | 'parent' | 'teacher';
     display_name?: string;

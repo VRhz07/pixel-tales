@@ -17,6 +17,7 @@
     "build:mobile": "npm run build && npm run cap:sync"
   },
   "dependencies": {
+    "@capacitor-community/text-to-speech": "^6.1.0",
     "@capacitor/app": "^7.1.0",
     "@capacitor/filesystem": "^7.1.5",
     "@capacitor/keyboard": "^7.0.3",

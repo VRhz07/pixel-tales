@@ -303,19 +303,12 @@ class SoundService {
   private initBackgroundMusic() {
     try {
       this.backgroundMusic = new Audio('/sounds/background-music.mp3');
-      this.backgroundMusic.loop = true;
+      this.backgroundMusic.loop = true; // Native loop - let browser handle it
       this.backgroundMusic.volume = this.backgroundMusicVolume;
       this.backgroundMusic.preload = 'auto';
       
-      // Ensure proper looping by handling ended event as fallback
-      this.backgroundMusic.addEventListener('ended', () => {
-        if (this.backgroundMusicEnabled && this.isMusicPlaying) {
-          this.backgroundMusic!.currentTime = 0;
-          this.backgroundMusic!.play().catch(err => {
-            console.debug('Could not restart background music', err);
-          });
-        }
-      });
+      // Don't add 'ended' event listener - it interferes with native loop
+      // The browser's native loop is more reliable than manual restart
       
       // Handle page visibility changes
       document.addEventListener('visibilitychange', () => {

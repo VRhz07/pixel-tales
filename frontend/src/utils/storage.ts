@@ -71,36 +71,19 @@ class StorageService {
   }
 
   /**
-   * Synchronous version for backward compatibility (only works on web)
-   * Use async methods for mobile compatibility
+   * Synchronous version - just uses localStorage directly
+   * Capacitor automatically persists localStorage on mobile
    */
   setItemSync(key: string, value: string): void {
-    if (!this.isNativePlatform) {
-      localStorage.setItem(key, value);
-    } else {
-      console.warn('setItemSync called on native platform, use setItem instead');
-      // Fallback to async but don't wait
-      this.setItem(key, value);
-    }
+    localStorage.setItem(key, value);
   }
 
   getItemSync(key: string): string | null {
-    if (!this.isNativePlatform) {
-      return localStorage.getItem(key);
-    } else {
-      console.warn('getItemSync called on native platform, use getItem instead');
-      return null;
-    }
+    return localStorage.getItem(key);
   }
 
   removeItemSync(key: string): void {
-    if (!this.isNativePlatform) {
-      localStorage.removeItem(key);
-    } else {
-      console.warn('removeItemSync called on native platform, use removeItem instead');
-      // Fallback to async but don't wait
-      this.removeItem(key);
-    }
+    localStorage.removeItem(key);
   }
 }
 

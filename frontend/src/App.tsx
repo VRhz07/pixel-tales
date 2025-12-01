@@ -64,6 +64,9 @@ function AppContent() {
   // Initialize authentication and theme on mount
   useEffect(() => {
     const initialize = async () => {
+      // Wait a bit for Capacitor storage to be ready on mobile
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Skip user auth check if on admin page (admin has separate auth)
       if (location.pathname !== '/admin') {
         await checkAuth();

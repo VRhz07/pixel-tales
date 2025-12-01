@@ -21,6 +21,7 @@ import { EmailChangeModal } from '../settings/EmailChangeModal';
 import { PasswordUpdateModal } from '../settings/PasswordUpdateModal';
 import { ParentPasswordVerificationModal } from '../settings/ParentPasswordVerificationModal';
 import { CustomDropdown } from '../common/CustomDropdown';
+import { storage } from '../../utils/storage';
 import { authService } from '../../services/auth.service';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
 import soundService from '../../services/soundService';
@@ -52,7 +53,7 @@ const SettingsPage = () => {
   const [parentName, setParentName] = useState('');
   
   useEffect(() => {
-    const parentSession = localStorage.getItem('parent_session');
+    const parentSession = storage.getItemSync('parent_session');
     if (parentSession) {
       try {
         const parentInfo = JSON.parse(parentSession);
@@ -131,8 +132,8 @@ const SettingsPage = () => {
   
   const handleParentPasswordVerified = () => {
     try {
-      // Retrieve parent session from localStorage
-      const parentSessionStr = localStorage.getItem('parent_session');
+      // Retrieve parent session from storage
+      const parentSessionStr = storage.getItemSync('parent_session');
       if (!parentSessionStr) {
         console.error('No parent session found');
         return;
@@ -152,7 +153,7 @@ const SettingsPage = () => {
       }
       
       // Remove parent session
-      localStorage.removeItem('parent_session');
+      storage.removeItemSync('parent_session');
       
       // Update account switch store to parent mode
       setActiveAccount('parent');

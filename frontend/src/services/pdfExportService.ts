@@ -620,17 +620,28 @@ class PDFExportService {
         return;
       }
 
-      // If it's already a data URL, return it
+      // If it's already a data URL, return it directly (no need to process)
       if (dataUrl.startsWith('data:')) {
         resolve(dataUrl);
         return;
       }
 
-      // If it's a URL, load it
+      // If it's a URL, try to load it
       const img = new Image();
-      img.crossOrigin = 'anonymous';
+      
+      // Don't set crossOrigin on mobile - it can cause CORS issues
+      const isNative = Capacitor.isNativePlatform();
+      if (!isNative) {
+        img.crossOrigin = 'anonymous';
+      }
+      
+      // Set timeout for image loading (5 seconds)
+      const timeout = setTimeout(() => {
+        reject(new Error('Image load timeout'));
+      }, 5000);
       
       img.onload = () => {
+        clearTimeout(timeout);
         try {
           const canvas = document.createElement('canvas');
           canvas.width = img.width;
@@ -647,7 +658,9 @@ class PDFExportService {
         }
       };
 
-      img.onerror = () => {
+      img.onerror = (error) => {
+        clearTimeout(timeout);
+        console.error('Image load error:', error);
         reject(new Error('Failed to load image'));
       };
 
@@ -662,14 +675,22 @@ class PDFExportService {
     return new Promise((resolve, reject) => {
       const img = new Image();
       
+      // Set timeout for image loading (5 seconds)
+      const timeout = setTimeout(() => {
+        reject(new Error('Image dimensions timeout'));
+      }, 5000);
+      
       img.onload = () => {
+        clearTimeout(timeout);
         resolve({
           width: img.width,
           height: img.height
         });
       };
 
-      img.onerror = () => {
+      img.onerror = (error) => {
+        clearTimeout(timeout);
+        console.error('Image dimensions error:', error);
         reject(new Error('Failed to load image for dimensions'));
       };
 

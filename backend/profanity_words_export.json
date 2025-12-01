@@ -1,0 +1,366 @@
+{
+  "exported_at": "2025-12-01T19:23:19.044836",
+  "total_words": 60,
+  "words": [
+    {
+      "word": "ass",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "asshole",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "bastard",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "bitch",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "boobs",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "cock",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "crap",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "damn",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "dick",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "dumb",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "fag",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "fuck",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "hell",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "idiot",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "imbecile",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "jackass",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "moron",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "nigga",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "nigger",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "piss",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "pussy",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "retard",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "shit",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "slut",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "stupid",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "tits",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "whore",
+      "language": "en",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "betlog",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "bobo",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "bulbol",
+      "language": "tl",
+      "severity": "mild",
+      "is_active": true
+    },
+    {
+      "word": "buwisit",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "chupa",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "gago",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "hinayupak",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "inutil",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "kantot",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "kinakantot",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "kingina",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "kupal",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "leche",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "peste",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "pokpok",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "puday",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "pukingina",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "punyeta",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "puta",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "putang ina",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "putangina",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "shunga",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "tamod",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "tanga",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "tangina",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "tarantado",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "tite",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "tsupa",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "ulol",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "utong",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "walang hiya",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "walang kwenta",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    },
+    {
+      "word": "yawa",
+      "language": "tl",
+      "severity": "moderate",
+      "is_active": true
+    }
+  ]
+}

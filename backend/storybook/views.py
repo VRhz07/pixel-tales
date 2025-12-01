@@ -156,14 +156,21 @@ def story_list(request):
 @permission_classes([IsAuthenticated])
 def create_story(request):
     """Create a new story"""
+    from .xp_service import award_xp
+    
     serializer = StorySerializer(data=request.data)
     
     if serializer.is_valid():
         story = serializer.save(author=request.user)
+        
+        # Award XP for creating a story
+        xp_result = award_xp(request.user, 'story_created')
+        
         return Response({
             'success': True,
             'message': 'Story created successfully',
-            'story': StorySerializer(story, context={'request': request}).data
+            'story': StorySerializer(story, context={'request': request}).data,
+            'xp_earned': xp_result if xp_result else None
         }, status=status.HTTP_201_CREATED)
     else:
         return Response({
@@ -244,6 +251,8 @@ def delete_story(request, story_id):
 @permission_classes([IsAuthenticated])
 def publish_story(request, story_id):
     """Publish a story (make it visible in public library)"""
+    from .xp_service import award_xp
+    
     story = get_object_or_404(Story, id=story_id, author=request.user)
     
     if story.is_published:
@@ -255,10 +264,14 @@ def publish_story(request, story_id):
     story.is_published = True
     story.save()
     
+    # Award XP for publishing a story
+    xp_result = award_xp(request.user, 'story_published')
+    
     return Response({
         'success': True,
         'message': 'Story published successfully',
-        'story_id': story.id
+        'story_id': story.id,
+        'xp_earned': xp_result if xp_result else None
     })
 
 
@@ -427,13 +440,15 @@ def create_comment(request, story_id):
 @permission_classes([IsAuthenticated])
 def like_story(request, story_id):
     """Like a story (toggle like/unlike)"""
+    from .xp_service import award_xp
+    
     story = get_object_or_404(Story, id=story_id, is_published=True)
     
     # Check if user already liked this story
     like = Like.objects.filter(story=story, user=request.user).first()
     
     if like:
-        # Unlike - remove the like
+        # Unlike - remove the like (no XP deduction)
         like.delete()
         return Response({
             'success': True,
@@ -444,6 +459,11 @@ def like_story(request, story_id):
     else:
         # Like - create new like
         like = Like.objects.create(story=story, user=request.user)
+        
+        # Award XP to the story author (not the liker)
+        if story.author != request.user:
+            award_xp(story.author, 'story_liked', create_notification=False)
+        
         return Response({
             'success': True,
             'message': 'Story liked',
@@ -633,6 +653,12 @@ def achievement_progress(request):
         # Characters created
         characters_created = Character.objects.filter(creator=user).count()
         
+        # Collaboration count - count stories where user is a co-author (has saved collaborative stories)
+        collaboration_count = Story.objects.filter(
+            is_collaborative=True,
+            authors=user
+        ).count()
+        
         # Leaderboard rank (simplified - based on published stories)
         users_with_more_stories = User.objects.annotate(
             story_count=Count('stories', filter=Q(stories__is_published=True))
@@ -651,6 +677,7 @@ def achievement_progress(request):
             'views_received': views_received,
             'stories_read': stories_read_count,
             'characters_created': characters_created,
+            'collaboration_count': collaboration_count,
             'leaderboard_rank': leaderboard_rank,
         }
         

@@ -84,6 +84,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 'user_type': profile.user_type,
                 'display_name': profile.display_name,
                 'avatar': profile.avatar_emoji or (profile.avatar.url if profile.avatar else '📚'),
+                'experience_points': profile.experience_points,
+                'level': profile.level,
             }
         except UserProfile.DoesNotExist:
             user_data = {
@@ -96,6 +98,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 'user_type': 'child',  # default
                 'display_name': self.user.get_full_name() or self.user.username,
                 'avatar': '📚',
+                'experience_points': 0,
+                'level': 1,
             }
 
         return {
@@ -304,6 +308,11 @@ def jwt_user_profile(request):
                 'bio': profile.bio,
                 'date_of_birth': profile.date_of_birth,
                 'created_at': profile.created_at,
+                'experience_points': profile.experience_points,
+                'level': profile.level,
+                'xp_for_next_level': profile.xp_for_next_level,
+                'xp_progress': profile.xp_progress_in_current_level,
+                'xp_progress_percentage': profile.xp_progress_percentage,
             }
             
             return Response({

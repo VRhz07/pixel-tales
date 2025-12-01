@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { storage } from '../utils/storage';
 
 interface AccountSwitchState {
   // Current active account type
@@ -28,7 +29,7 @@ export const useAccountSwitchStore = create<AccountSwitchState>()(
         // SECURITY FIX: Additional validation
         if (type === 'child') {
           // When setting child mode, verify parent_session exists
-          const parentSession = localStorage.getItem('parent_session');
+          const parentSession = storage.getItemSync('parent_session');
           if (!parentSession) {
             console.warn('⚠️ SECURITY: Attempting to set child mode without parent_session');
             // Still allow it for real child accounts, but log it
@@ -52,7 +53,7 @@ export const useAccountSwitchStore = create<AccountSwitchState>()(
 
       isViewingAsChild: () => {
         const state = get();
-        return state.activeAccountType === 'child' && !!localStorage.getItem('parent_session');
+        return state.activeAccountType === 'child' && !!storage.getItemSync('parent_session');
       },
     }),
     {

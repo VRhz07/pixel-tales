@@ -38,7 +38,7 @@ interface StoryFormData {
 const AIStoryModal = ({ isOpen, onClose }: AIStoryModalProps) => {
   const navigate = useNavigate();
   const { isDarkMode } = useThemeStore();
-  const { createStory, updateStory, addPage, updatePage } = useStoryStore();
+  const { createStory, updateStory, addPage, updatePage, syncStoryToBackend } = useStoryStore();
   const { language, t } = useI18nStore();
   const { playSound, playSuccess, playError } = useSoundEffects();
   const [formData, setFormData] = useState<StoryFormData>({
@@ -397,6 +397,19 @@ Each page should have text and an imagePrompt for illustration generation.
         isPublished: false, // Keep in private library - user can publish later
         isDraft: false // Mark as complete work
       });
+      
+      // CRITICAL: Immediately sync AI-generated story to backend
+      // Don't wait for the debounce timer - sync now to prevent data loss
+      setGenerationStage('💾 Saving to cloud...');
+      setGenerationProgress(90);
+      
+      try {
+        await syncStoryToBackend(newStory.id);
+        console.log('✅ AI story synced to backend immediately');
+      } catch (error) {
+        console.warn('⚠️ Failed to sync AI story to backend:', error);
+        // Don't fail the generation - story is still safe in localStorage
+      }
       
       // Small delay to show the stage
       await new Promise(resolve => setTimeout(resolve, 500));

@@ -2,15 +2,32 @@ import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { useAccountSwitchStore } from '../../stores/accountSwitchStore';
+import { storage } from '../../utils/storage';
 
 interface ParentRouteProps {
   children: React.ReactNode;
 }
 
 const ParentRoute: React.FC<ParentRouteProps> = ({ children }) => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, isLoading } = useAuthStore();
   const { activeAccountType } = useAccountSwitchStore();
   const location = useLocation();
+
+  // Show loading while checking auth
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        fontSize: '18px',
+        color: '#666'
+      }}>
+        Loading...
+      </div>
+    );
+  }
 
   // Check if user is authenticated
   if (!isAuthenticated) {
@@ -44,7 +61,7 @@ const ParentRoute: React.FC<ParentRouteProps> = ({ children }) => {
   }
   
   // Validate parent_session if it exists
-  const parentSession = localStorage.getItem('parent_session');
+  const parentSession = storage.getItemSync('parent_session');
   if (parentSession) {
     try {
       const sessionData = JSON.parse(parentSession);
@@ -54,12 +71,12 @@ const ParentRoute: React.FC<ParentRouteProps> = ({ children }) => {
           sessionParentId: sessionData.parentId,
           currentUserId: user?.id
         });
-        localStorage.removeItem('parent_session');
+        storage.removeItemSync('parent_session');
         // Continue anyway since actual user is parent/teacher
       }
     } catch (e) {
       // Corrupted session
-      localStorage.removeItem('parent_session');
+      storage.removeItemSync('parent_session');
     }
   }
 

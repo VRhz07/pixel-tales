@@ -4,7 +4,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { useStoryStore } from '../../stores/storyStore';
 import { 
   BookOpenIcon,
-  UserIcon,
+  UserGroupIcon,
   HeartIcon,
   CalendarIcon,
   TrophyIcon
@@ -38,6 +38,7 @@ interface UserStats {
   comments_received: number;
   stories_read: number;
   characters_created: number;
+  collaboration_count: number;
   leaderboard_rank: number;
 }
 
@@ -87,18 +88,20 @@ const ProfilePage = () => {
   const storyStats = getStats();
   const displayStats = {
     storiesCreated: storyStats.totalStories,
-    charactersCreated: storyStats.totalCharacters,
+    collaborationCount: userStats?.collaboration_count || 0,
     totalLikes: userStats?.likes_received || 0,
-    daysActive: Math.floor((new Date().getTime() - new Date('2024-01-01').getTime()) / (1000 * 60 * 60 * 24))
+    daysActive: user?.created_at 
+      ? Math.floor((new Date().getTime() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24))
+      : 0
   };
 
-  // Calculate user level based on activity
-  const totalXP = (displayStats.storiesCreated * 100) + (displayStats.charactersCreated * 25) + (displayStats.totalLikes * 5);
+  // Use persistent XP from backend (never decreases)
   const userLevel = {
-    level: Math.floor(totalXP / 500) + 1,
-    currentXP: totalXP,
-    nextLevelXP: (Math.floor(totalXP / 500) + 1) * 500,
-    progressPercent: ((totalXP % 500) / 500) * 100
+    level: user?.level || 1,
+    currentXP: user?.experience_points || 0,
+    nextLevelXP: user?.xp_for_next_level || 500,
+    currentLevelProgress: user?.xp_progress || 0,
+    progressPercent: user?.xp_progress_percentage || 0
   };
 
   // Group achievements by status
@@ -150,7 +153,7 @@ const ProfilePage = () => {
           ></div>
         </div>
         <p className="profile-progress-text">
-          {userLevel.nextLevelXP - userLevel.currentXP} XP until Level {userLevel.level + 1}
+          {userLevel.nextLevelXP - userLevel.currentLevelProgress} XP until Level {userLevel.level + 1}
         </p>
       </div>
 
@@ -163,9 +166,9 @@ const ProfilePage = () => {
         </div>
         
         <div className="profile-stat-card">
-          <UserIcon className="profile-stat-icon" />
-          <div className="profile-stat-value">{displayStats.charactersCreated}</div>
-          <div className="profile-stat-label">Characters Made</div>
+          <UserGroupIcon className="profile-stat-icon" />
+          <div className="profile-stat-value">{displayStats.collaborationCount}</div>
+          <div className="profile-stat-label">Collaborations</div>
         </div>
         
         <div className="profile-stat-card">
