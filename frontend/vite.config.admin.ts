@@ -14,6 +14,8 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  // Specify public directory to copy static files
+  publicDir: 'public',
   build: {
     outDir: 'dist-admin',
     emptyOutDir: true,
