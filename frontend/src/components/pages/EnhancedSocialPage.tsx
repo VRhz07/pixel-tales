@@ -1176,8 +1176,7 @@ const EnhancedSocialPage = () => {
                             className="search-btn-add"
                             onClick={() => handleSendFriendRequest(user.id)}
                           >
-                            <UserPlusIcon className="btn-icon" />
-                            Add
+                            <span>Add</span>
                           </button>
                         )}
                       </div>

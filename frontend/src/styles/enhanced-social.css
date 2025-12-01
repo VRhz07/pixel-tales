@@ -367,6 +367,7 @@
   flex: 1;
   white-space: nowrap;
   outline: none;
+  line-height: 1;
 }
 
 .add-friends-btn-large:hover { 
@@ -384,11 +385,17 @@
 .btn-icon-large { 
   width: 1.25rem; 
   height: 1.25rem; 
+  flex-shrink: 0;
+  display: block;
+  margin-top: -2px;
 }
 
 .btn-icon { 
   width: 1.1rem; 
   height: 1.1rem; 
+  flex-shrink: 0;
+  display: block;
+  margin-top: -2px;
 }
 
 /* Friend Requests - Soft Yellow Theme */
@@ -1526,8 +1533,50 @@
 .search-result-name { font-size: 1.125rem; font-weight: 700; color: #1F2937; margin-bottom: 0.25rem; }
 .search-result-stats { font-size: 0.875rem; color: #6B7280; }
 .search-result-action { flex-shrink: 0; }
-.search-btn-add { display: flex; align-items: center; gap: 0.4rem; padding: 0.75rem 1rem; background: var(--soft-green-light); color: #166534; border: 2px solid var(--soft-green); border-radius: 0.875rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(187,247,208,0.25); }
-.search-btn-add:hover { transform: scale(1.05); box-shadow: 0 6px 16px rgba(16,185,129,0.4); }
+button.search-btn-add,
+.search-btn-add { 
+  display: flex !important; 
+  flex-direction: row !important;
+  align-items: center !important; 
+  justify-content: center !important;
+  gap: 0.5rem !important; 
+  padding: 0.75rem 1rem !important; 
+  background: var(--soft-green-light) !important; 
+  color: #166534 !important; 
+  border: 2px solid var(--soft-green) !important; 
+  border-radius: 0.875rem !important; 
+  font-size: 0.9rem !important; 
+  font-weight: 600 !important; 
+  cursor: pointer !important; 
+  transition: all 0.2s ease !important; 
+  box-shadow: 0 2px 6px rgba(187,247,208,0.25) !important; 
+  line-height: 1 !important;
+}
+button.search-btn-add span,
+.search-btn-add span {
+  display: inline-block !important;
+  white-space: nowrap !important;
+}
+button.search-btn-add .btn-icon,
+.search-btn-add .btn-icon {
+  width: 0.9rem !important;
+  height: 0.9rem !important;
+  flex-shrink: 0 !important;
+  display: block !important;
+}
+button.search-btn-add svg,
+.search-btn-add svg {
+  width: 0.9rem !important;
+  height: 0.9rem !important;
+  display: block !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  transform: translateY(-1px) !important;
+}
+.search-btn-add:hover { 
+  transform: scale(1.05); 
+  box-shadow: 0 6px 16px rgba(16,185,129,0.4); 
+}
 .search-btn-disabled { padding: 0.75rem 1rem; background: #F3F4F6; color: #9CA3AF; border: 2px solid #E5E7EB; border-radius: 0.875rem; font-size: 0.875rem; font-weight: 700; cursor: not-allowed; }
 
 /* Dark Mode Support */

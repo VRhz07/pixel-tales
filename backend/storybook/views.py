@@ -826,8 +826,14 @@ def search_users(request):
             else:
                 pending_received_ids.add(friendship.sender_id)
     
-    # Build base query
+    # Build base query - exclude current user, admins/staff, and parent accounts
     users_query = User.objects.exclude(id=request.user.id).select_related('profile')
+    
+    # Exclude admin and staff users
+    users_query = users_query.exclude(is_staff=True).exclude(is_superuser=True)
+    
+    # Exclude parent accounts (only show child accounts)
+    users_query = users_query.exclude(profile__user_type='parent')
     
     # Exclude friends if requested
     if exclude_friends:
