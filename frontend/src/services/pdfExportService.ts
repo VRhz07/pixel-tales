@@ -1,5 +1,8 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
+import { Capacitor } from '@capacitor/core';
 import { 
   TemplateTheme, 
   PrintOptimization, 
@@ -78,7 +81,7 @@ class PDFExportService {
 
       // Save the PDF
       const fileName = `${this.sanitizeFileName(story.title)}.pdf`;
-      pdf.save(fileName);
+      await this.savePDF(pdf, fileName);
       
       console.log('✅ PDF exported successfully:', fileName);
     } catch (error) {
@@ -137,7 +140,7 @@ class PDFExportService {
       }
 
       // Save the PDF
-      pdf.save(this.sanitizeFileName(fileName));
+      await this.savePDF(pdf, this.sanitizeFileName(fileName));
       
       console.log('✅ Multiple stories exported successfully:', fileName);
     } catch (error) {
@@ -672,6 +675,50 @@ class PDFExportService {
 
       img.src = dataUrl;
     });
+  }
+
+  /**
+   * Save PDF - handles both web and mobile platforms
+   */
+  private async savePDF(pdf: jsPDF, fileName: string): Promise<void> {
+    const isNative = Capacitor.isNativePlatform();
+    
+    if (isNative) {
+      // Mobile: Save to file system and share
+      try {
+        // Get PDF as base64
+        const pdfOutput = pdf.output('datauristring');
+        const base64Data = pdfOutput.split(',')[1];
+        
+        // Ensure filename has .pdf extension
+        const finalFileName = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
+        
+        // Save to Documents directory (user accessible)
+        const result = await Filesystem.writeFile({
+          path: finalFileName,
+          data: base64Data,
+          directory: Directory.Documents,
+          recursive: true
+        });
+        
+        console.log('✅ PDF saved to:', result.uri);
+        
+        // Share the file so user can save it or open it
+        await Share.share({
+          title: 'Export Story PDF',
+          text: 'Your story has been exported!',
+          url: result.uri,
+          dialogTitle: 'Save or Share PDF'
+        });
+        
+      } catch (error) {
+        console.error('❌ Error saving PDF on mobile:', error);
+        throw new Error('Failed to save PDF on mobile device');
+      }
+    } else {
+      // Web: Use standard download
+      pdf.save(fileName);
+    }
   }
 
   /**

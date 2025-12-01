@@ -5,6 +5,7 @@
 
 import { api } from './api';
 import { API_ENDPOINTS, STORAGE_KEYS } from '@/config/constants';
+import { storage } from '@/utils/storage';
 import type {
   LoginRequest,
   RegisterRequest,
@@ -336,7 +337,7 @@ class AuthService {
    * Get stored user data
    */
   getUserData(): UserProfile | null {
-    const userData = localStorage.getItem(STORAGE_KEYS.USER_DATA);
+    const userData = storage.getItemSync(STORAGE_KEYS.USER_DATA);
     if (userData) {
       try {
         return JSON.parse(userData);
@@ -399,7 +400,7 @@ class AuthService {
    * Save user data to storage
    */
   private saveUserData(user: any): void {
-    localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+    storage.setItemSync(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
   }
 
   /**
@@ -428,15 +429,15 @@ class AuthService {
     this.saveUserData(anonymousUser);
     
     // Track browse start time for anonymous session limits
-    localStorage.setItem(STORAGE_KEYS.BROWSE_START_TIME, Date.now().toString());
-    localStorage.setItem(STORAGE_KEYS.ANONYMOUS_SESSION, 'true');
+    storage.setItemSync(STORAGE_KEYS.BROWSE_START_TIME, Date.now().toString());
+    storage.setItemSync(STORAGE_KEYS.ANONYMOUS_SESSION, 'true');
   }
 
   /**
    * Check if anonymous session has expired
    */
   isAnonymousSessionExpired(): boolean {
-    const startTime = localStorage.getItem(STORAGE_KEYS.BROWSE_START_TIME);
+    const startTime = storage.getItemSync(STORAGE_KEYS.BROWSE_START_TIME);
     if (!startTime) return false;
 
     const elapsed = Date.now() - parseInt(startTime);
@@ -449,9 +450,9 @@ class AuthService {
    * Clear anonymous session
    */
   clearAnonymousSession(): void {
-    localStorage.removeItem(STORAGE_KEYS.BROWSE_START_TIME);
-    localStorage.removeItem(STORAGE_KEYS.ANONYMOUS_SESSION);
-    localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+    storage.removeItemSync(STORAGE_KEYS.BROWSE_START_TIME);
+    storage.removeItemSync(STORAGE_KEYS.ANONYMOUS_SESSION);
+    storage.removeItemSync(STORAGE_KEYS.USER_DATA);
   }
 }
 

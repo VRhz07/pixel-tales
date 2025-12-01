@@ -5,6 +5,7 @@
 
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { API_BASE_URL, STORAGE_KEYS, ERROR_MESSAGES } from '@/config/constants';
+import { storage } from '@/utils/storage';
 import type { ApiError, ApiResponse } from '@/types/api.types';
 
 class ApiService {
@@ -273,25 +274,25 @@ class ApiService {
    * Token management methods
    */
   getAccessToken(): string | null {
-    return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    return storage.getItemSync(STORAGE_KEYS.ACCESS_TOKEN);
   }
 
   setAccessToken(token: string): void {
-    localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
+    storage.setItemSync(STORAGE_KEYS.ACCESS_TOKEN, token);
   }
 
   getRefreshToken(): string | null {
-    return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+    return storage.getItemSync(STORAGE_KEYS.REFRESH_TOKEN);
   }
 
   setRefreshToken(token: string): void {
-    localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, token);
+    storage.setItemSync(STORAGE_KEYS.REFRESH_TOKEN, token);
   }
 
   clearAuth(): void {
-    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+    storage.removeItemSync(STORAGE_KEYS.ACCESS_TOKEN);
+    storage.removeItemSync(STORAGE_KEYS.REFRESH_TOKEN);
+    storage.removeItemSync(STORAGE_KEYS.USER_DATA);
   }
 
   /**

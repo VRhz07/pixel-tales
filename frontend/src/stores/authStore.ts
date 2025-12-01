@@ -3,6 +3,8 @@ import { persist } from 'zustand/middleware';
 import { authService } from '@/services/auth.service';
 import { featureAccessService } from '@/services/featureAccess.service';
 import type { User, FeatureAccess, UserLimits, ApiError } from '@/types/api.types';
+import { createCapacitorStorage } from '@/utils/capacitorStorage';
+import { storage } from '@/utils/storage';
 
 interface AuthState {
   user: User | null;
@@ -42,16 +44,16 @@ export const useAuthStore = create<AuthState>()(
           
           // Store remember me preference
           if (rememberMe) {
-            localStorage.setItem('rememberMe', 'true');
+            storage.setItemSync('rememberMe', 'true');
           } else {
-            localStorage.setItem('rememberMe', 'false');
+            storage.setItemSync('rememberMe', 'false');
             // Set session expiry for non-remembered sessions (24 hours)
             const expiryTime = Date.now() + (24 * 60 * 60 * 1000);
-            localStorage.setItem('sessionExpiry', expiryTime.toString());
+            storage.setItemSync('sessionExpiry', expiryTime.toString());
           }
           
           // SECURITY FIX: Clear any leftover parent_session from previous sessions
-          localStorage.removeItem('parent_session');
+          storage.removeItemSync('parent_session');
           
           // SECURITY FIX: Clear account switch state to prevent confusion
           import('../stores/accountSwitchStore').then(({ useAccountSwitchStore }) => {
@@ -163,11 +165,11 @@ export const useAuthStore = create<AuthState>()(
           });
           
           // Clear parent session if exists
-          localStorage.removeItem('parent_session');
+          storage.removeItemSync('parent_session');
           
           // Clear remember me and session expiry
-          localStorage.removeItem('rememberMe');
-          localStorage.removeItem('sessionExpiry');
+          storage.removeItemSync('rememberMe');
+          storage.removeItemSync('sessionExpiry');
           
           set({ 
             user: null, 
@@ -261,8 +263,8 @@ export const useAuthStore = create<AuthState>()(
         const isAuthenticated = authService.isAuthenticated();
         
         // Check if session has expired (for non-remembered sessions)
-        const rememberMe = localStorage.getItem('rememberMe') === 'true';
-        const sessionExpiry = localStorage.getItem('sessionExpiry');
+        const rememberMe = storage.getItemSync('rememberMe') === 'true';
+        const sessionExpiry = storage.getItemSync('sessionExpiry');
         
         if (!rememberMe && sessionExpiry) {
           const expiryTime = parseInt(sessionExpiry);
@@ -275,7 +277,7 @@ export const useAuthStore = create<AuthState>()(
 
         if (storedUser && isAuthenticated) {
           // CRITICAL FIX: Check if there's a parent_session
-          const parentSession = localStorage.getItem('parent_session');
+          const parentSession = storage.getItemSync('parent_session');
           
           if (parentSession) {
             // We have a parent session - this means we were viewing as child
@@ -286,23 +288,23 @@ export const useAuthStore = create<AuthState>()(
               if (!sessionData.parentId || !sessionData.parentUserType) {
                 // Invalid session structure - clear it and restore parent
                 console.warn('🔒 Invalid parent_session structure - restoring parent account');
-                localStorage.removeItem('parent_session');
+                storage.removeItemSync('parent_session');
                 
                 // Restore parent user data if available
                 if (sessionData.userData) {
                   const parentUserData = typeof sessionData.userData === 'string' 
                     ? JSON.parse(sessionData.userData) 
                     : sessionData.userData;
-                  localStorage.setItem('user_data', JSON.stringify(parentUserData));
+                  storage.setItemSync('user_data', JSON.stringify(parentUserData));
                 }
                 
                 // Restore parent tokens if available
                 if (sessionData.tokens) {
                   if (sessionData.tokens.access) {
-                    localStorage.setItem('access_token', sessionData.tokens.access);
+                    storage.setItemSync('access_token', sessionData.tokens.access);
                   }
                   if (sessionData.tokens.refresh) {
-                    localStorage.setItem('refresh_token', sessionData.tokens.refresh);
+                    storage.setItemSync('refresh_token', sessionData.tokens.refresh);
                   }
                 }
                 
@@ -338,7 +340,7 @@ export const useAuthStore = create<AuthState>()(
             } catch (e) {
               // Corrupted parent session - clear it
               console.error('🔒 Corrupted parent_session - clearing:', e);
-              localStorage.removeItem('parent_session');
+              storage.removeItemSync('parent_session');
               
               // Clear account switch state
               import('../stores/accountSwitchStore').then(({ useAccountSwitchStore }) => {
@@ -412,12 +414,13 @@ export const useAuthStore = create<AuthState>()(
 
       setUser: (user: User) => {
         set({ user });
-        // Also update localStorage
-        localStorage.setItem('user_data', JSON.stringify(user));
+        // Also update storage
+        storage.setItemSync('user_data', JSON.stringify(user));
       },
     }),
     {
       name: 'auth-storage',
+      storage: createCapacitorStorage(),
       partialize: (state) => ({ 
         user: state.user, 
         isAuthenticated: state.isAuthenticated,
