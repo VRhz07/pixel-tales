@@ -3,8 +3,12 @@
  * Post-build script for admin dashboard
  * Renames index.admin.html to index.html for deployment
  */
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const distPath = path.join(__dirname, 'dist-admin');
 const adminHtmlPath = path.join(distPath, 'index.admin.html');
