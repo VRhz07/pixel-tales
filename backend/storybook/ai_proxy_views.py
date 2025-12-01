@@ -15,9 +15,9 @@ from io import BytesIO
 
 
 # Gemini API Configuration
-# Updated to use gemini-1.5-flash (gemini-pro is deprecated)
-GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
-GEMINI_VISION_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
+# Updated to use gemini-2.5-flash (latest and fastest model available)
+GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent'
+GEMINI_VISION_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent'
 GEMINI_API_KEY = settings.GOOGLE_AI_API_KEY
 
 
