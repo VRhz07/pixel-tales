@@ -56,10 +56,23 @@ def admin_login(request):
             'error': 'Email and password are required'
         }, status=status.HTTP_400_BAD_REQUEST)
     
-    # Find user by email
+    # Find user by email (prioritize superuser if multiple exist)
     try:
-        user = User.objects.get(email=email)
-        print(f'✅ User found: {user.username}')
+        # Try to get superuser first
+        user = User.objects.filter(email=email, is_superuser=True).first()
+        
+        if not user:
+            # Fall back to staff user
+            user = User.objects.filter(email=email, is_staff=True).first()
+        
+        if not user:
+            # Fall back to any user with this email
+            user = User.objects.filter(email=email).first()
+        
+        if not user:
+            raise User.DoesNotExist
+            
+        print(f'✅ User found: {user.username} (superuser: {user.is_superuser}, staff: {user.is_staff})')
     except User.DoesNotExist:
         print(f'❌ No user found with email: {email}')
         return Response({
