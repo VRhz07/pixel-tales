@@ -28,6 +28,7 @@ import ParentDashboardPage from './pages/ParentDashboardPage';
 import ParentSettingsPage from './pages/ParentSettingsPage';
 import { useAuthStore } from './stores/authStore';
 import { useThemeStore } from './stores/themeStore';
+import { storage } from './utils/storage';
 import { CollaborationInvitationsContainer, CollaborationInvite } from './components/collaboration/CollaborationInvitation';
 import CollaborationInviteNotification from './components/collaboration/CollaborationInviteNotification';
 import CollaborationWaitingScreen from './components/collaboration/CollaborationWaitingScreen';
@@ -73,8 +74,42 @@ function AppContent() {
       // Skip user auth check if on admin page (admin has separate auth)
       if (location.pathname !== '/admin') {
         console.log('🚀 Checking authentication...');
-        await checkAuth();
-        console.log('🚀 Authentication check complete');
+        const isAuth = await checkAuth();
+        console.log('🚀 Authentication check complete, isAuth:', isAuth);
+        
+        // If authenticated and on auth page or root, redirect based on account state
+        if (isAuth && (location.pathname === '/auth' || location.pathname === '/')) {
+          // Check if user was viewing as parent or child
+          const { useAccountSwitchStore } = await import('./stores/accountSwitchStore');
+          const accountState = useAccountSwitchStore.getState();
+          const { useAuthStore } = await import('./stores/authStore');
+          const userType = useAuthStore.getState().user?.user_type;
+          
+          console.log('🔐 Account state:', {
+            activeAccountType: accountState.activeAccountType,
+            userType: userType,
+            hasParentSession: !!storage.getItemSync('parent_session')
+          });
+          
+          // Determine where to navigate based on account state
+          if (accountState.activeAccountType === 'parent' || userType === 'parent' || userType === 'teacher') {
+            // Was in parent view or is parent account
+            const hasParentSession = storage.getItemSync('parent_session');
+            if (hasParentSession) {
+              // Parent was viewing a child account
+              console.log('🚀 Parent was viewing as child, redirecting to home (child view)...');
+              navigate('/home', { replace: true });
+            } else {
+              // Parent in their own account
+              console.log('🚀 Parent account, redirecting to parent dashboard...');
+              navigate('/parent-dashboard', { replace: true });
+            }
+          } else {
+            // Regular child account
+            console.log('🚀 Child account, redirecting to home...');
+            navigate('/home', { replace: true });
+          }
+        }
       }
       initializeTheme();
       

@@ -349,31 +349,38 @@ export const addTitleOverlayToCover = async (
     const ctx = canvas.getContext('2d');
     
     if (!ctx) {
+      console.warn('❌ Canvas context not available, using base image');
       resolve(baseImageUrl); // Fallback to original image
       return;
     }
     
     const img = new Image();
+    // CRITICAL: Use anonymous crossOrigin for CORS
     img.crossOrigin = 'anonymous';
     
     img.onload = () => {
-      // Set canvas size to match image
+      console.log('✅ Cover image loaded successfully, adding title overlay...');
+      
+      // Calculate space needed for title (roughly 15% of image height)
+      const titleAreaHeight = Math.floor(img.height * 0.15);
+      
+      // Set canvas size to be taller to accommodate title at top
       canvas.width = img.width;
-      canvas.height = img.height;
+      canvas.height = img.height + titleAreaHeight;
       
-      // Draw the base image
-      ctx.drawImage(img, 0, 0);
+      // Fill title area with gradient background
+      const titleGradient = ctx.createLinearGradient(0, 0, 0, titleAreaHeight);
+      titleGradient.addColorStop(0, '#667eea');
+      titleGradient.addColorStop(1, '#764ba2');
+      ctx.fillStyle = titleGradient;
+      ctx.fillRect(0, 0, canvas.width, titleAreaHeight);
       
-      // Add semi-transparent overlay at top for better text readability
-      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.4);
-      gradient.addColorStop(0, 'rgba(0, 0, 0, 0.5)');
-      gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height * 0.4);
+      // Draw the base image BELOW the title area
+      ctx.drawImage(img, 0, titleAreaHeight);
       
       // Configure text styling - playful and bold
-      const baseFontSize = Math.floor(canvas.width / 12);
-      const maxWidth = canvas.width * 0.85; // 85% of canvas width for padding
+      const baseFontSize = Math.floor(canvas.width / 14);
+      const maxWidth = canvas.width * 0.9; // 90% of canvas width for padding
       
       // Function to wrap text into lines
       const wrapText = (text: string, maxWidth: number, fontSize: number): string[] => {
@@ -403,70 +410,139 @@ export const addTitleOverlayToCover = async (
       let fontSize = baseFontSize;
       let lines = wrapText(title, maxWidth, fontSize);
       
-      // If we have too many lines (more than 3), reduce font size
-      while (lines.length > 3 && fontSize > 30) {
-        fontSize -= 4;
+      // If we have too many lines (more than 2 for title area), reduce font size
+      while (lines.length > 2 && fontSize > 24) {
+        fontSize -= 3;
         lines = wrapText(title, maxWidth, fontSize);
       }
       
       // Set final font
       ctx.font = `bold ${fontSize}px "Comic Sans MS", "Chalkboard SE", "Arial Rounded MT Bold", cursive, sans-serif`;
       ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
+      ctx.textBaseline = 'middle';
       
       // Add text shadow for better visibility
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-      ctx.shadowBlur = 15;
-      ctx.shadowOffsetX = 3;
-      ctx.shadowOffsetY = 3;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
       
-      // Calculate starting Y position
+      // Calculate starting Y position - center text in title area
       const lineHeight = fontSize * 1.2;
-      let titleY = canvas.height * 0.08;
+      const totalTextHeight = lines.length * lineHeight;
+      let titleY = (titleAreaHeight - totalTextHeight) / 2 + lineHeight / 2;
       
       // Draw each line
       lines.forEach((line, index) => {
         const y = titleY + (index * lineHeight);
         
-        // Stroke (outline) - purple
-        ctx.strokeStyle = '#8B5CF6';
-        ctx.lineWidth = fontSize / 10;
+        // Stroke (outline) - white with thicker border
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = fontSize / 8;
         ctx.strokeText(line, canvas.width / 2, y);
         
-        // Fill (main text) - white
-        ctx.fillStyle = '#FFFFFF';
+        // Fill (main text) - purple gradient
+        const textGradient = ctx.createLinearGradient(0, y - fontSize/2, 0, y + fontSize/2);
+        textGradient.addColorStop(0, '#FCD34D');
+        textGradient.addColorStop(1, '#F59E0B');
+        ctx.fillStyle = textGradient;
         ctx.fillText(line, canvas.width / 2, y);
       });
       
-      // Add "An AI Story" subtitle below the title
-      const subtitleSize = Math.floor(fontSize * 0.4);
-      const subtitleY = titleY + (lines.length * lineHeight) + 5;
-      ctx.font = `italic ${subtitleSize}px "Comic Sans MS", cursive, sans-serif`;
-      ctx.shadowBlur = 10;
-      ctx.fillStyle = '#FCD34D'; // Yellow
-      ctx.fillText('An AI Story', canvas.width / 2, subtitleY);
-      
       // Convert canvas to base64
-      const coverImageWithText = canvas.toDataURL('image/jpeg', 0.95);
+      const coverImageWithText = canvas.toDataURL('image/png', 0.95);
+      console.log('✅ Cover with title overlay created successfully');
       resolve(coverImageWithText);
     };
     
     img.onerror = (error) => {
-      console.error('Failed to load image for title overlay:', error);
+      console.error('❌ Failed to load image for title overlay:', error);
       console.error('Image URL that failed:', baseImageUrl);
-      console.warn('This is usually a CORS issue with Pollinations AI. Returning original URL.');
-      resolve(baseImageUrl); // Fallback to original image
+      console.warn('⚠️ CORS issue detected - trying alternative method...');
+      
+      // Try to create title-only overlay as fallback
+      try {
+        // Create a colored background with title text
+        canvas.width = 512;
+        canvas.height = 683;
+        
+        // Create gradient background as fallback
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, '#667eea');
+        gradient.addColorStop(1, '#764ba2');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Add title text
+        const baseFontSize = Math.floor(canvas.width / 10);
+        ctx.font = `bold ${baseFontSize}px "Comic Sans MS", "Chalkboard SE", "Arial Rounded MT Bold", cursive, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 15;
+        ctx.fillStyle = '#FFFFFF';
+        
+        // Wrap text
+        const words = title.split(' ');
+        const lines: string[] = [];
+        let currentLine = '';
+        const maxWidth = canvas.width * 0.85;
+        
+        for (const word of words) {
+          const testLine = currentLine ? currentLine + ' ' + word : word;
+          const testWidth = ctx.measureText(testLine).width;
+          if (testWidth > maxWidth && currentLine) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        }
+        if (currentLine) lines.push(currentLine);
+        
+        const lineHeight = baseFontSize * 1.3;
+        const startY = canvas.height / 2 - (lines.length * lineHeight) / 2;
+        
+        lines.forEach((line, index) => {
+          ctx.fillText(line, canvas.width / 2, startY + (index * lineHeight));
+        });
+        
+        const fallbackCover = canvas.toDataURL('image/png', 0.95);
+        console.log('✅ Created fallback cover with title');
+        resolve(fallbackCover);
+      } catch (fallbackError) {
+        console.error('❌ Fallback cover creation failed:', fallbackError);
+        resolve(baseImageUrl); // Last resort: return original URL
+      }
     };
     
     // Add timeout to prevent hanging
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       if (!img.complete) {
-        console.warn('Image loading timeout, using original URL');
-        resolve(baseImageUrl);
+        console.warn('⚠️ Image loading timeout (15s), creating fallback cover...');
+        img.onerror(new Error('Timeout'));
       }
-    }, 10000); // 10 second timeout
+    }, 15000); // 15 second timeout (Pollinations can be slow)
     
-    img.src = baseImageUrl;
+    // IMPORTANT: Use CORS proxy to avoid CORS issues with Pollinations AI
+    // Try multiple approaches for maximum compatibility
+    const tryLoadImage = () => {
+      // Method 1: Try with cache-busting first
+      const cacheBustUrl = baseImageUrl + (baseImageUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+      img.src = cacheBustUrl;
+      
+      // Method 2: If that fails after 5s, try with CORS proxy
+      setTimeout(() => {
+        if (!img.complete) {
+          console.log('🔄 Trying with CORS proxy...');
+          // Use allorigins.win as CORS proxy
+          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(baseImageUrl)}`;
+          img.src = proxyUrl;
+        }
+      }, 5000);
+    };
+    
+    tryLoadImage();
   });
 };
 
@@ -489,12 +565,15 @@ export const generateCoverIllustration = async (
 
   const styleText = stylePrompts[artStyle] || stylePrompts.cartoon;
   
-  // Create cover-specific prompt with character
-  const characterText = characterDescription ? `Featuring: ${characterDescription}. ` : '';
+  // Create cover-specific prompt with character and story description
+  const characterText = characterDescription ? `Main character: ${characterDescription}. ` : '';
   const colorText = colorScheme ? `Color palette: ${colorScheme}. ` : '';
   
+  // IMPORTANT: Include story description prominently so cover relates to story
+  const storyContext = `Story is about: ${storyDescription}. `;
+  
   // Cover composition guidelines - WIDE SHOT for better cover look
-  const coverComposition = 'BOOK COVER COMPOSITION, WIDE ESTABLISHING SHOT showing the main setting and atmosphere, main character visible in the scene, inviting composition perfect for a children\'s book cover, balanced layout, environmental elements suggesting story world';
+  const coverComposition = 'BOOK COVER COMPOSITION, WIDE ESTABLISHING SHOT showing the main story setting and atmosphere based on the story description, main character visible in the scene doing something related to the story, inviting composition perfect for a children\'s book cover, balanced layout, environmental elements that reflect the story theme and plot';
   
   // Enhanced cover prompt with comprehensive anatomy quality requirements
   const coverNegativePrompts = [
@@ -505,7 +584,7 @@ export const generateCoverIllustration = async (
     'mutation', 'gross proportions', 'malformed', 'ugly', 'bad quality', 'text', 'words', 'title'
   ].join(', ');
   
-  const coverPrompt = `${styleText}, ${characterText}${colorText}${coverComposition}. Story theme: ${storyDescription}. CRITICAL QUALITY: correct anatomy, proper proportions, accurate limb count, well-drawn hands and feet, symmetrical body, professional character design. Professional children\'s book cover illustration, eye-catching design, inviting and appealing to children, masterpiece quality, best quality, high resolution cover art, marketable book cover, detailed background suggesting story world, safe for children, NO TEXT, NO TITLE, NO WORDS on the image - just the illustration. NEGATIVE PROMPTS TO AVOID: ${coverNegativePrompts}`;
+  const coverPrompt = `${styleText}, ${storyContext}${characterText}${colorText}${coverComposition}. COVER MUST VISUALLY REPRESENT THE STORY: ${storyDescription}. The illustration should clearly show elements from the story description. CRITICAL QUALITY: correct anatomy, proper proportions, accurate limb count, well-drawn hands and feet, symmetrical body, professional character design. Professional children\'s book cover illustration that captures the essence of the story, eye-catching design, inviting and appealing to children, masterpiece quality, best quality, high resolution cover art, marketable book cover, detailed background that matches story theme and setting world, safe for children, NO TEXT, NO TITLE, NO WORDS on the image - just the illustration. NEGATIVE PROMPTS TO AVOID: ${coverNegativePrompts}`;
   
   // Use consistent seed based on title for reproducibility
   const titleSeed = storyTitle.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);

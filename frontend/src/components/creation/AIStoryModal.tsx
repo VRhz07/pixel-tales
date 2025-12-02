@@ -302,9 +302,15 @@ Each page should have text and an imagePrompt for illustration generation.
       const warnings: string[] = [];
       
       try {
+        // Use AI-generated description for cover (not user's raw idea)
+        // This ensures cover matches the actual story content
+        const coverDescription = storyData.description || formData.storyIdea;
+        
+        console.log('🎨 Generating cover with description:', coverDescription);
+        
         coverUrl = await generateCoverIllustration(
           storyData.title || 'AI Generated Story',
-          formData.storyIdea,
+          coverDescription,  // Use AI-generated description
           formData.selectedArtStyle || 'cartoon',
           storyData.characterDescription,
           storyData.colorScheme

@@ -38,7 +38,9 @@ export const useAuthStore = create<AuthState>()(
 
       signIn: async (email: string, password: string, rememberMe: boolean = true) => {
         console.log('🔐 Signing in...');
-        set({ isLoading: true, error: null });
+        // Don't set isLoading to true - it blocks the UI
+        // We'll set it to false immediately after successful login
+        set({ error: null });
         
         try {
           const response = await authService.login(email, password);
@@ -96,6 +98,8 @@ export const useAuthStore = create<AuthState>()(
 
           // Update feature access after login
           get().updateFeatureAccess();
+          
+          // Navigation is now handled by App.tsx after checkAuth
         } catch (error) {
           const apiError = error as ApiError;
           set({ 
@@ -107,7 +111,8 @@ export const useAuthStore = create<AuthState>()(
       },
 
       signUp: async (name: string, email: string, password: string, userType: 'child' | 'parent' | 'teacher') => {
-        set({ isLoading: true, error: null });
+        // Don't set isLoading to true - it blocks the UI
+        set({ error: null });
         
         try {
           const response = await authService.register({
@@ -147,7 +152,8 @@ export const useAuthStore = create<AuthState>()(
       },
 
       signOut: async () => {
-        set({ isLoading: true });
+        // Don't block UI during signout
+        set({ isLoading: false });
         
         try {
           await authService.logout();
