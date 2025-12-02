@@ -5,13 +5,13 @@ import {
   UserIcon,
   QuestionMarkCircleIcon,
   SpeakerWaveIcon,
-  BookOpenIcon,
   ChevronRightIcon,
   ArrowRightOnRectangleIcon,
   TrashIcon,
   SwatchIcon,
   ArrowLeftIcon
 } from '@heroicons/react/24/outline';
+import Logo from '../common/Logo';
 import { useAuthStore } from '../../stores/authStore';
 import { useThemeStore } from '../../stores/themeStore';
 import { useI18nStore } from '../../stores/i18nStore';
@@ -31,7 +31,7 @@ const SettingsPage = () => {
   const { user: currentUser, isAuthenticated, signOut } = useAuthStore();
   const { theme, setTheme, animationsEnabled, setAnimationsEnabled } = useThemeStore();
   const { language, setLanguage, t } = useI18nStore();
-  const { activeAccountType, activeChildName, setActiveAccount } = useAccountSwitchStore();
+  const { setActiveAccount } = useAccountSwitchStore();
   const { playButtonClick, playButtonToggle } = useSoundEffects();
   const isAnonymous = currentUser?.id === 'anonymous' || !isAuthenticated;
   
@@ -64,14 +64,6 @@ const SettingsPage = () => {
       }
     }
   }, []);
-
-  // Set account type when on settings page (child user viewing their settings)
-  useEffect(() => {
-    if (currentUser && currentUser.user_type === 'child' && !isViewingAsChild) {
-      // This is a direct child login, not a parent viewing as child
-      setActiveAccount('child', undefined, currentUser.name);
-    }
-  }, [currentUser, isViewingAsChild, setActiveAccount]);
   
   // Debug logging
   useEffect(() => {
@@ -246,52 +238,6 @@ const SettingsPage = () => {
         </div>
       )}
 
-      {/* Back to Parent Dashboard - Only when viewing as child */}
-      {isViewingAsChild && !isAnonymous && (
-        <div 
-          className="mx-6 mb-4 p-4 rounded-xl"
-          style={{
-            background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
-            border: '2px solid rgba(102, 126, 234, 0.3)',
-          }}
-        >
-          <p className="text-sm font-semibold mb-2" style={{ color: '#667eea' }}>
-            👨‍👩‍👧‍👦 Viewing as Child Account
-          </p>
-          <p className="text-xs mb-3" style={{ color: '#764ba2', opacity: 0.9 }}>
-            You are currently viewing the app from your child's perspective. Click below to return to your parent dashboard.
-          </p>
-          <button
-            onClick={handleBackToParentDashboard}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '10px 16px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '10px',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
-            }}
-          >
-            <ArrowLeftIcon className="w-4 h-4" />
-            Back to {parentName}
-          </button>
-        </div>
-      )}
 
       {/* Account Section - Only for authenticated non-child users */}
       {!isAnonymous && currentUser?.user_type !== 'child' && (
@@ -629,10 +575,56 @@ const SettingsPage = () => {
         </div>
       )}
 
+      {/* Back to Parent Dashboard - Only when viewing as child - BEFORE APP INFO */}
+      {isViewingAsChild && !isAnonymous && (
+        <div 
+          className="mx-6 mb-6 p-4 rounded-xl"
+          style={{
+            background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+            border: '2px solid rgba(102, 126, 234, 0.3)',
+          }}
+        >
+          <p className="text-sm font-semibold mb-2" style={{ color: '#667eea' }}>
+            👨‍👩‍👧‍👦 Viewing as Child Account
+          </p>
+          <p className="text-xs mb-3" style={{ color: '#764ba2', opacity: 0.9 }}>
+            You are currently viewing the app from your child's perspective. Click below to return to your parent dashboard.
+          </p>
+          <button
+            onClick={handleBackToParentDashboard}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 16px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '10px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
+            }}
+          >
+            <ArrowLeftIcon className="w-4 h-4" />
+            Back to {parentName}
+          </button>
+        </div>
+      )}
+
       {/* App Info Footer */}
       <div className="settings-app-info">
-        <BookOpenIcon className="settings-app-icon" />
-        <div className="settings-app-name">Pixel Tales</div>
+        <Logo className="settings-app-icon" width="150px" height="150px" />
         <div className="settings-app-version">Version 1.0.0</div>
         <div className="settings-app-tagline">
           <span>Made with</span>

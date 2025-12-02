@@ -17,6 +17,7 @@ import {
   BellIcon,
   BookmarkIcon
 } from '@heroicons/react/24/outline';
+import Logo from '../components/common/Logo';
 import { useAuthStore } from '../stores/authStore';
 import { useThemeStore } from '../stores/themeStore';
 import { useI18nStore } from '../stores/i18nStore';
@@ -565,7 +566,7 @@ const ParentDashboardPage: React.FC = () => {
         <div className="parent-top-bar-content">
           <div className="parent-nav-logo">
             <div className="parent-logo-icon">
-              <BookOpenIcon />
+              <Logo style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <span className="parent-logo-text">Pixel Tales</span>
           </div>

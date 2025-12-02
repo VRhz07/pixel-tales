@@ -1,0 +1,566 @@
+/* Story Reader Page - Mobile-Optimized Styles */
+
+/* Main container */
+.story-reader-page {
+  min-height: 100vh;
+  padding-bottom: 5rem; /* Space for bottom navigation */
+}
+
+.story-reader-page.dark {
+  background-color: #1a1625;
+  color: #f3f4f6;
+}
+
+.story-reader-page.light {
+  background-color: #f9fafb;
+  color: #1f2937;
+}
+
+/* Top bar */
+.story-reader-top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(10px);
+}
+
+.story-reader-top-bar.dark {
+  background-color: rgba(26, 22, 37, 0.95);
+  border-bottom: 1px solid #2a2435;
+}
+
+.story-reader-top-bar.light {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.story-reader-back-button,
+.story-reader-more-button {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.story-reader-back-button.dark,
+.story-reader-more-button.dark {
+  background-color: #2a2435;
+  color: #d1d5db;
+}
+
+.story-reader-back-button.light,
+.story-reader-more-button.light {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.story-reader-back-icon,
+.story-reader-more-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.story-reader-title-container {
+  flex: 1;
+  margin: 0 1rem;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+}
+
+.story-reader-title {
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: normal; /* Allow wrapping */
+  overflow: visible;
+  line-height: 1.3;
+  margin: 0;
+  max-width: 100%;
+}
+
+/* Header section */
+.story-reader-header {
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.story-reader-header.dark {
+  background-color: #2a2435;
+}
+
+.story-reader-header.light {
+  background-color: white;
+}
+
+.story-reader-cover-container {
+  width: 100%;
+  max-width: 250px;
+  margin: 0 auto 1rem;
+}
+
+.story-reader-cover-image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 1rem;
+}
+
+.story-reader-details {
+  margin-top: 1rem;
+}
+
+.story-reader-detail-item {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.story-reader-detail-label {
+  font-weight: 600;
+  color: #8b5cf6;
+}
+
+.story-reader-description {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin-top: 0.75rem;
+}
+
+.story-reader-description.dark {
+  color: #d1d5db;
+}
+
+.story-reader-description.light {
+  color: #6b7280;
+}
+
+/* Interactions bar */
+.story-reader-interactions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  padding: 0.75rem 0;
+}
+
+.story-reader-interaction-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.story-reader-interaction-btn.dark {
+  background-color: #1a1625;
+  color: #d1d5db;
+}
+
+.story-reader-interaction-btn.light {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.story-reader-interaction-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.story-reader-interaction-count,
+.story-reader-interaction-label {
+  font-size: 0.875rem;
+}
+
+/* Vertical scroll mode - MOBILE OPTIMIZED */
+.story-reader-vertical-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  padding-bottom: 8rem; /* Extra space for TTS controls */
+}
+
+.story-reader-page-card {
+  border-radius: 1rem;
+  padding: 1rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+}
+
+.story-reader-page-card.dark {
+  background-color: #2a2435;
+  border: 1px solid #3a3445;
+}
+
+.story-reader-page-card.light {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+}
+
+.story-reader-page-number-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.story-reader-page-number-badge {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* MOBILE OPTIMIZED: Compact illustration container */
+.story-reader-illustration-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto 0.75rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.story-reader-illustration {
+  width: 100%;
+  height: auto;
+  max-height: 250px; /* Reduced from default to save vertical space */
+  object-fit: contain;
+  display: block;
+  background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+}
+
+.story-reader-text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.story-reader-text.dark {
+  color: #f3f4f6;
+  background-color: rgba(139, 92, 246, 0.05);
+}
+
+.story-reader-text.light {
+  color: #374151;
+  background-color: rgba(139, 92, 246, 0.02);
+}
+
+/* Horizontal scroll mode - MOBILE OPTIMIZED */
+.story-reader-horizontal-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 12rem); /* Account for header and bottom controls */
+  padding: 0.25rem; /* Minimal padding to maximize card space */
+  padding-bottom: 8rem; /* Extra space for TTS controls */
+  position: relative; /* Create positioning context for nav arrows */
+}
+
+.story-reader-horizontal-page-card {
+  width: 95vw; /* Use 95% of viewport width for maximum space */
+  max-width: 95vw;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  min-height: 65vh; /* 65% of viewport height */
+  max-height: 68vh; /* 68% of viewport height to avoid TTS overlap */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+}
+
+.story-reader-horizontal-page-card.dark {
+  background-color: #2a2435;
+  border: 1px solid #3a3445;
+}
+
+.story-reader-horizontal-page-card.light {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+}
+
+/* MOBILE OPTIMIZED: Compact horizontal illustration */
+.story-reader-horizontal-illustration {
+  width: 100%;
+  height: auto;
+  max-height: 35vh; /* Use viewport height for responsive sizing */
+  object-fit: contain;
+  border-radius: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+  flex-shrink: 0; /* Don't shrink illustration */
+}
+
+.story-reader-horizontal-text {
+  font-size: 0.875rem; /* Smaller font to fit more text */
+  line-height: 1.5;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0; /* Allow text to shrink if needed */
+}
+
+.story-reader-horizontal-text.dark {
+  color: #f3f4f6;
+  background-color: rgba(139, 92, 246, 0.05);
+}
+
+.story-reader-horizontal-text.light {
+  color: #374151;
+  background-color: rgba(139, 92, 246, 0.02);
+}
+
+/* Navigation arrows - positioned relative to card */
+.story-reader-nav-arrow {
+  position: absolute !important; /* Absolute within container */
+  top: 50% !important; /* Center of container */
+  transform: translateY(-50%) !important;
+  z-index: 40;
+}
+
+.story-reader-nav-left {
+  left: 0.5rem !important;
+}
+
+.story-reader-nav-right {
+  right: 0.5rem !important;
+}
+
+.story-reader-nav-button {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s;
+}
+
+.story-reader-nav-button.dark {
+  background-color: #8b5cf6;
+  color: white;
+}
+
+.story-reader-nav-button.light {
+  background-color: #8b5cf6;
+  color: white;
+}
+
+.story-reader-nav-button:hover {
+  transform: scale(1.1);
+}
+
+.story-reader-nav-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+/* Page indicators */
+.story-reader-page-indicators {
+  position: fixed;
+  bottom: 5.5rem; /* Above TTS controls */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 40;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.story-reader-page-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+
+.story-reader-page-dot.active {
+  background-color: #8b5cf6;
+  transform: scale(1.3);
+}
+
+.story-reader-page-dot.inactive.dark {
+  background-color: rgba(209, 213, 219, 0.3);
+}
+
+.story-reader-page-dot.inactive.light {
+  background-color: rgba(107, 114, 128, 0.3);
+}
+
+/* End card */
+.story-reader-end-card {
+  border-radius: 1rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.story-reader-end-card.dark {
+  background: linear-gradient(135deg, #2a2435, #3a3445);
+}
+
+.story-reader-end-card.light {
+  background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+}
+
+.story-reader-end-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.story-reader-end-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.story-reader-end-title.dark {
+  color: #a78bfa;
+}
+
+.story-reader-end-title.light {
+  color: #8b5cf6;
+}
+
+.story-reader-end-subtitle {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.story-reader-end-subtitle.dark {
+  color: #d1d5db;
+}
+
+.story-reader-end-subtitle.light {
+  color: #6b7280;
+}
+
+/* View controls dropdown */
+.story-reader-view-controls {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem;
+  min-width: 200px;
+  z-index: 60;
+}
+
+.story-reader-toggle-button,
+.story-reader-action-button {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.story-reader-toggle-button:hover,
+.story-reader-action-button:hover {
+  background-color: rgba(139, 92, 246, 0.1);
+}
+
+.story-reader-toggle-button.active {
+  background-color: rgba(139, 92, 246, 0.15);
+  color: #8b5cf6;
+  font-weight: 600;
+}
+
+.story-reader-toggle-icon,
+.story-reader-action-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.story-reader-toggle-checkmark {
+  width: 1rem;
+  height: 1rem;
+  margin-left: auto;
+  color: #8b5cf6;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .story-reader-page-card {
+    padding: 1.5rem;
+  }
+  
+  .story-reader-illustration {
+    max-height: 400px;
+  }
+  
+  .story-reader-horizontal-illustration {
+    max-height: 40vh;
+  }
+  
+  .story-reader-horizontal-page-card {
+    max-width: 80vw;
+    padding: 1.5rem;
+    min-height: 65vh;
+    max-height: 75vh;
+  }
+  
+  .story-reader-text {
+    font-size: 1.05rem;
+  }
+  
+  .story-reader-horizontal-text {
+    font-size: 0.95rem; /* Slightly larger on tablet but still compact */
+  }
+}
+
+/* Larger screens */
+@media (min-width: 1024px) {
+  .story-reader-horizontal-page-card {
+    max-width: 900px;
+  }
+  
+  .story-reader-horizontal-text {
+    font-size: 1rem;
+  }
+}
+
+/* Animation keyframes */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

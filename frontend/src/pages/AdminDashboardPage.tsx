@@ -12,6 +12,7 @@ import AddRelationshipModal from '../components/admin/AddRelationshipModal';
 import EmptyState from '../components/admin/EmptyState';
 import AdminLoginPage from '../components/admin/AdminLoginPage';
 import ProfanityManagement from '../components/admin/ProfanityManagement';
+import Logo from '../components/common/Logo';
 import '../components/admin/ProfanityManagement.css';
 import './AdminDashboardPage.css';
 
@@ -293,6 +294,8 @@ export default function AdminDashboardPage() {
     return (
       <AdminLoginPage 
         onLoginSuccess={() => {
+          const user = adminAuthService.getAdminUser();
+          setAdminUser(user);
           setIsAdminAuthenticated(true);
           loadDashboardStats();
         }} 
@@ -319,7 +322,7 @@ export default function AdminDashboardPage() {
         <div className="admin-header-left">
           <div className="admin-logo">
             <div className="admin-logo-icon">
-              <Shield />
+              <Logo style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <span className="admin-logo-text">Admin Dashboard</span>
           </div>

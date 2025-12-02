@@ -190,7 +190,7 @@ function AppContent() {
         if ('Notification' in window && Notification.permission === 'granted') {
           new Notification('Collaboration Invite', {
             body: `${invite.inviter_name} invited you to collaborate on "${invite.story_title}"`,
-            icon: '/placeholder.svg',
+            icon: '/logo.png',
             tag: 'collaboration-invite'
           });
         }

@@ -28,6 +28,7 @@ import { TTSControls } from '../components/common/TTSControls';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import pdfExportService from '../services/pdfExportService';
 import { useSoundEffects } from '../hooks/useSoundEffects';
+import './StoryReaderPage.css';
 
 type ReadingMode = 'verticalScroll' | 'leftToRight';
 
@@ -68,6 +69,7 @@ const StoryReaderPage: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set());
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const horizontalCardRef = React.useRef<HTMLDivElement>(null);
   
   // Load story from local store or backend API
   useEffect(() => {
@@ -483,6 +485,17 @@ const StoryReaderPage: React.FC = () => {
     if (currentPage > 0) {
       playPageTurn();
       setCurrentPage(currentPage - 1);
+      // Scroll card back to top - use requestAnimationFrame for better timing
+      requestAnimationFrame(() => {
+        if (horizontalCardRef.current) {
+          horizontalCardRef.current.scrollTop = 0;
+          // Also scroll any child elements
+          const textElements = horizontalCardRef.current.querySelectorAll('.story-reader-horizontal-text');
+          textElements.forEach(el => {
+            (el as HTMLElement).scrollTop = 0;
+          });
+        }
+      });
     }
   };
 
@@ -490,6 +503,17 @@ const StoryReaderPage: React.FC = () => {
     if (currentPage < story.pages.length) {
       playPageTurn();
       setCurrentPage(currentPage + 1);
+      // Scroll card back to top - use requestAnimationFrame for better timing
+      requestAnimationFrame(() => {
+        if (horizontalCardRef.current) {
+          horizontalCardRef.current.scrollTop = 0;
+          // Also scroll any child elements
+          const textElements = horizontalCardRef.current.querySelectorAll('.story-reader-horizontal-text');
+          textElements.forEach(el => {
+            (el as HTMLElement).scrollTop = 0;
+          });
+        }
+      });
     }
   };
 
@@ -618,7 +642,7 @@ const StoryReaderPage: React.FC = () => {
     return (
       <div className="story-reader-horizontal-container">
         {/* Current Page Card or The End Card */}
-        <div className={`story-reader-horizontal-page-card ${isDarkMode ? 'dark' : 'light'}`}>
+        <div ref={horizontalCardRef} className={`story-reader-horizontal-page-card ${isDarkMode ? 'dark' : 'light'}`}>
           {isLastPage ? (
             // The End Card
             <div className="story-reader-end-content">

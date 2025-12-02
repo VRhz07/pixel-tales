@@ -11,6 +11,7 @@ import CollaborationModeModal from '../collaboration/CollaborationModeModal';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
 import { storage } from '../../utils/storage';
+import Logo from '../common/Logo';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -114,11 +115,10 @@ const HomePage = () => {
     <div className="magical-home">
       {/* Magical Hero Section */}
       <div className="magical-hero">
-        <div className="floating-book">📖</div>
-        <h1 className="hero-title">
-          {t('home.title')}
-        </h1>
-        <p className="hero-subtitle">
+        <div className="floating-book">
+          <Logo width="200px" height="200px" style={{ display: 'block' }} />
+        </div>
+        <p className="hero-subtitle" style={{ marginTop: '0rem' }}>
           {t('home.heroSubtitle')}
         </p>
         <div className="magical-sparkles">✨ 🌟 ✨</div>

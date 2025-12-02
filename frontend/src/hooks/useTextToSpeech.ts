@@ -64,6 +64,7 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
       if (typeof window === 'undefined' || !window.speechSynthesis) return;
       
       const availableVoices = window.speechSynthesis.getVoices();
+      console.log('📢 TTS: Available voices:', availableVoices.length, availableVoices);
       setVoices(availableVoices);
 
       // Auto-select voice based on current language
@@ -72,16 +73,26 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
         const preferredVoice = availableVoices.find(v => 
           v.lang.startsWith(langCode) || v.lang.startsWith(language)
         ) || availableVoices[0];
+        console.log('📢 TTS: Selected voice:', preferredVoice);
         setCurrentVoice(preferredVoice);
       }
     };
 
+    // Try loading voices immediately
     loadVoices();
+    
+    // Also listen for voiceschanged event (needed on some browsers/devices)
     if (window.speechSynthesis) {
       window.speechSynthesis.onvoiceschanged = loadVoices;
     }
+    
+    // Retry after a delay (Android WebView sometimes needs this)
+    const retryTimer = setTimeout(() => {
+      loadVoices();
+    }, 1000);
 
     return () => {
+      clearTimeout(retryTimer);
       if (typeof window !== 'undefined' && window.speechSynthesis) {
         window.speechSynthesis.onvoiceschanged = null;
       }
@@ -102,6 +113,9 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
     if (isNativePlatform) {
       // Use Capacitor TTS for mobile
       try {
+        console.log('📢 TTS: Using Capacitor TTS on native platform');
+        console.log('📢 TTS: Text length:', text.length, 'Language:', language);
+        
         // Stop any ongoing speech
         await TextToSpeech.stop();
         
@@ -109,14 +123,18 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
         setIsPaused(false);
         setProgress(0);
         
-        await TextToSpeech.speak({
+        const ttsOptions = {
           text: text,
           lang: language === 'tl' ? 'fil-PH' : 'en-US',
           rate: options?.rate ?? rate,
           pitch: options?.pitch ?? pitch,
           volume: options?.volume ?? volume,
           category: 'ambient',
-        });
+        };
+        
+        console.log('📢 TTS: Speaking with options:', ttsOptions);
+        await TextToSpeech.speak(ttsOptions);
+        console.log('📢 TTS: Speech completed successfully');
         
         // On mobile, we don't get word-by-word progress, so simulate it
         const estimatedDuration = (text.length / 15) * 1000; // ~15 chars per second
@@ -134,10 +152,14 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
         }, estimatedDuration / 50);
         
       } catch (error) {
-        console.error('Capacitor TTS error:', error);
+        console.error('📢 TTS Error on native platform:', error);
+        console.error('📢 TTS Error details:', JSON.stringify(error));
         setIsSpeaking(false);
         setIsPaused(false);
         setProgress(0);
+        
+        // Show user-friendly error
+        alert('Text-to-Speech is not available. Please ensure a TTS engine (like Google Text-to-Speech) is installed and enabled on your device.');
       }
     } else {
       // Use Web Speech API for web

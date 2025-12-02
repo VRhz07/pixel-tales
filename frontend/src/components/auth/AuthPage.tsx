@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { BookOpenIcon, SparklesIcon } from '@heroicons/react/24/solid';
+import { SparklesIcon } from '@heroicons/react/24/solid';
 import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
+import Logo from '../common/Logo';
 import './auth.css';
 
 const AuthPage: React.FC = () => {
@@ -14,14 +15,11 @@ const AuthPage: React.FC = () => {
       <div className="auth-page-wrapper">
         {/* Logo Section */}
         <div className="auth-logo-section">
-          <div className="auth-logo-icons">
-            <BookOpenIcon />
+          <div className="auth-logo-icons" style={{ marginBottom: '0' }}>
+            <Logo width="200px" height="200px" />
             <SparklesIcon />
           </div>
-          <h1 className="auth-logo-title">
-            Pixel Tales
-          </h1>
-          <p className="auth-logo-subtitle">
+          <p className="auth-logo-subtitle" style={{ marginTop: '-3.5rem' }}>
             Where stories come to life
           </p>
         </div>

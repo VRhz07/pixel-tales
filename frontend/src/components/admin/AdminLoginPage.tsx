@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Shield, Lock, User, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import adminAuthService from '../../services/adminAuth.service';
+import Logo from '../common/Logo';
 
 interface AdminLoginPageProps {
   onLoginSuccess: () => void;
@@ -59,8 +60,13 @@ export default function AdminLoginPage({ onLoginSuccess }: AdminLoginPageProps) 
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ 
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+    <div className="min-h-screen h-full flex items-center justify-center p-4 relative overflow-hidden" style={{ 
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0
     }}>
       {/* Animated Background Circles */}
       <div className="absolute inset-0 overflow-hidden">
@@ -91,20 +97,13 @@ export default function AdminLoginPage({ onLoginSuccess }: AdminLoginPageProps) 
       <div className="max-w-md w-full relative z-10">
         {/* Logo/Header */}
         <div className="text-center mb-8">
-          <div 
-            className="inline-flex items-center justify-center w-24 h-24 rounded-full mb-6"
-            style={{
-              background: 'rgba(255, 255, 255, 0.15)',
-              backdropFilter: 'blur(10px)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.3)',
-              border: '2px solid rgba(255, 255, 255, 0.2)'
-            }}
-          >
-            <Shield className="w-12 h-12 text-white" strokeWidth={2} />
+          <div className="inline-flex items-center justify-center" style={{ marginBottom: '0' }}>
+            <Logo width="120px" height="120px" style={{ objectFit: 'contain' }} />
           </div>
           <h1 className="text-4xl font-bold mb-2" style={{ 
             color: 'white',
-            textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            marginTop: '-2.5rem'
           }}>Admin Portal</h1>
           <p className="text-lg" style={{ 
             color: 'rgba(255, 255, 255, 0.8)',
