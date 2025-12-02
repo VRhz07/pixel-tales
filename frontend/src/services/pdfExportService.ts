@@ -49,9 +49,22 @@ class PDFExportService {
   private printOptimization: PrintOptimization = 'screen';
   
   /**
-   * Export a single story to PDF
+   * Export a single story to PDF (Legacy - kept for backward compatibility)
    */
   async exportStoryToPDF(story: Story, options: ExportOptions = {}): Promise<void> {
+    // Default behavior: share on mobile, download on web
+    const isNative = Capacitor.isNativePlatform();
+    if (isNative) {
+      return this.shareStoryAsPDF(story, options);
+    } else {
+      return this.downloadStoryAsPDF(story, options);
+    }
+  }
+
+  /**
+   * Share a story as PDF (opens share dialog)
+   */
+  async shareStoryAsPDF(story: Story, options: ExportOptions = {}): Promise<void> {
     this.template = options.template || 'classic';
     this.printOptimization = options.printOptimization || 'screen';
     
@@ -59,6 +72,7 @@ class PDFExportService {
     const printConfig = PRINT_OPTIMIZATIONS[this.printOptimization];
     this.margin = printConfig.margins.left;
     this.contentWidth = this.PAGE_WIDTH - printConfig.margins.left - printConfig.margins.right;
+    
     try {
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -79,13 +93,56 @@ class PDFExportService {
         await this.addStoryPage(pdf, story.pages[i], i + 1, story.pages.length);
       }
 
-      // Save the PDF
+      // Share the PDF
       const fileName = `${this.sanitizeFileName(story.title)}.pdf`;
-      await this.savePDF(pdf, fileName);
+      await this.sharePDF(pdf, fileName);
       
-      console.log('✅ PDF exported successfully:', fileName);
+      console.log('✅ PDF shared successfully:', fileName);
     } catch (error) {
-      console.error('❌ Error exporting PDF:', error);
+      console.error('❌ Error sharing PDF:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Download a story as PDF (saves to device storage)
+   */
+  async downloadStoryAsPDF(story: Story, options: ExportOptions = {}): Promise<void> {
+    this.template = options.template || 'classic';
+    this.printOptimization = options.printOptimization || 'screen';
+    
+    // Update margins based on print optimization
+    const printConfig = PRINT_OPTIMIZATIONS[this.printOptimization];
+    this.margin = printConfig.margins.left;
+    this.contentWidth = this.PAGE_WIDTH - printConfig.margins.left - printConfig.margins.right;
+    
+    try {
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      // Page 1: Full-page cover image (book cover)
+      await this.addFullPageCover(pdf, story);
+      
+      // Page 2: Title page with title, author, and metadata
+      pdf.addPage();
+      this.addTitlePage(pdf, story);
+      
+      // Add story pages
+      for (let i = 0; i < story.pages.length; i++) {
+        pdf.addPage();
+        await this.addStoryPage(pdf, story.pages[i], i + 1, story.pages.length);
+      }
+
+      // Download the PDF
+      const fileName = `${this.sanitizeFileName(story.title)}.pdf`;
+      await this.downloadPDF(pdf, fileName);
+      
+      console.log('✅ PDF downloaded successfully:', fileName);
+    } catch (error) {
+      console.error('❌ Error downloading PDF:', error);
       throw error;
     }
   }
@@ -614,7 +671,7 @@ class PDFExportService {
    * Load and process image
    */
   private async loadImage(dataUrl: string): Promise<string> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (!dataUrl || dataUrl === '') {
         reject(new Error('Empty image data'));
         return;
@@ -626,19 +683,51 @@ class PDFExportService {
         return;
       }
 
-      // If it's a URL, try to load it
+      const isNative = Capacitor.isNativePlatform();
+      
+      // On mobile, fetch the image as blob and convert to data URL
+      if (isNative && (dataUrl.startsWith('http://') || dataUrl.startsWith('https://'))) {
+        try {
+          console.log('📱 Fetching image for PDF on mobile:', dataUrl.substring(0, 50) + '...');
+          
+          const response = await fetch(dataUrl);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch image: ${response.status}`);
+          }
+          
+          const blob = await response.blob();
+          const reader = new FileReader();
+          
+          reader.onloadend = () => {
+            const base64data = reader.result as string;
+            console.log('✅ Image converted to base64 for PDF');
+            resolve(base64data);
+          };
+          
+          reader.onerror = () => {
+            reject(new Error('Failed to convert image to base64'));
+          };
+          
+          reader.readAsDataURL(blob);
+        } catch (error) {
+          console.error('❌ Error fetching image on mobile:', error);
+          reject(error);
+        }
+        return;
+      }
+
+      // Web or file:// URLs: Load with Image element
       const img = new Image();
       
-      // Don't set crossOrigin on mobile - it can cause CORS issues
-      const isNative = Capacitor.isNativePlatform();
+      // Set crossOrigin for web
       if (!isNative) {
         img.crossOrigin = 'anonymous';
       }
       
-      // Set timeout for image loading (5 seconds)
+      // Set timeout for image loading (10 seconds for mobile)
       const timeout = setTimeout(() => {
         reject(new Error('Image load timeout'));
-      }, 5000);
+      }, isNative ? 10000 : 5000);
       
       img.onload = () => {
         clearTimeout(timeout);
@@ -649,18 +738,21 @@ class PDFExportService {
           const ctx = canvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(img, 0, 0);
-            resolve(canvas.toDataURL('image/png'));
+            const base64 = canvas.toDataURL('image/png');
+            console.log('✅ Image loaded and converted to canvas');
+            resolve(base64);
           } else {
             reject(new Error('Could not get canvas context'));
           }
         } catch (error) {
+          console.error('❌ Error converting image to canvas:', error);
           reject(error);
         }
       };
 
       img.onerror = (error) => {
         clearTimeout(timeout);
-        console.error('Image load error:', error);
+        console.error('❌ Image load error:', error);
         reject(new Error('Failed to load image'));
       };
 
@@ -699,47 +791,136 @@ class PDFExportService {
   }
 
   /**
-   * Save PDF - handles both web and mobile platforms
+   * Share PDF - opens share dialog on mobile, downloads on web
    */
-  private async savePDF(pdf: jsPDF, fileName: string): Promise<void> {
+  private async sharePDF(pdf: jsPDF, fileName: string): Promise<void> {
     const isNative = Capacitor.isNativePlatform();
     
     if (isNative) {
-      // Mobile: Save to file system and share
+      // Mobile: Write to cache and share
       try {
-        // Get PDF as base64
-        const pdfOutput = pdf.output('datauristring');
-        const base64Data = pdfOutput.split(',')[1];
-        
-        // Ensure filename has .pdf extension
         const finalFileName = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
         
-        // Save to Documents directory (user accessible)
-        const result = await Filesystem.writeFile({
+        console.log('📱 Sharing PDF on mobile...');
+        
+        // Get PDF as base64 (without data URI prefix)
+        const pdfBase64 = pdf.output('datauristring').split(',')[1];
+        
+        // Write to cache directory (doesn't require permissions)
+        const writeResult = await Filesystem.writeFile({
           path: finalFileName,
-          data: base64Data,
+          data: pdfBase64,
+          directory: Directory.Cache,
+          recursive: true
+        });
+        
+        console.log('✅ PDF written to cache:', writeResult.uri);
+        
+        // Share the file using its URI
+        await Share.share({
+          title: 'Share Story',
+          text: 'Check out this story!',
+          url: writeResult.uri,
+          dialogTitle: 'Share Story PDF'
+        });
+        
+        console.log('✅ PDF shared successfully');
+        
+      } catch (error) {
+        console.error('❌ Error sharing PDF on mobile:', error);
+        throw new Error('Failed to share PDF');
+      }
+    } else {
+      // Web: Download the file
+      pdf.save(fileName);
+    }
+  }
+
+  /**
+   * Download PDF - saves to device storage
+   */
+  private async downloadPDF(pdf: jsPDF, fileName: string): Promise<void> {
+    const isNative = Capacitor.isNativePlatform();
+    
+    if (isNative) {
+      // Mobile: Save to Documents and use native file manager to show it
+      try {
+        const finalFileName = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
+        
+        console.log('📱 Saving PDF to device...');
+        
+        // Get PDF as base64 (without data URI prefix)
+        const pdfBase64 = pdf.output('datauristring').split(',')[1];
+        
+        // Save to Documents directory (most reliable on Android)
+        const writeResult = await Filesystem.writeFile({
+          path: finalFileName,
+          data: pdfBase64,
           directory: Directory.Documents,
           recursive: true
         });
         
-        console.log('✅ PDF saved to:', result.uri);
+        console.log('✅ PDF saved to Documents:', writeResult.uri);
         
-        // Share the file so user can save it or open it
-        await Share.share({
-          title: 'Export Story PDF',
-          text: 'Your story has been exported!',
-          url: result.uri,
-          dialogTitle: 'Save or Share PDF'
-        });
+        // Create a detailed message for the user
+        const message = 
+          `✅ PDF Downloaded Successfully!\n\n` +
+          `📄 File: ${finalFileName}\n` +
+          `📁 Location: Documents folder\n\n` +
+          `To access your PDF:\n` +
+          `1. Open your File Manager app\n` +
+          `2. Look for "Documents" folder\n` +
+          `3. Find "${finalFileName}"\n\n` +
+          `You can now read, share, or move the file.`;
+        
+        alert(message);
+        
+        console.log('✅ PDF saved successfully to Documents folder');
         
       } catch (error) {
-        console.error('❌ Error saving PDF on mobile:', error);
-        throw new Error('Failed to save PDF on mobile device');
+        console.error('❌ Error downloading PDF on mobile:', error);
+        
+        // Fallback: Try to save via share dialog
+        try {
+          console.log('⚠️ Attempting fallback: save via share...');
+          const finalFileName = fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`;
+          const pdfBase64 = pdf.output('datauristring').split(',')[1];
+          
+          const writeResult = await Filesystem.writeFile({
+            path: finalFileName,
+            data: pdfBase64,
+            directory: Directory.Cache,
+            recursive: true
+          });
+          
+          console.log('✅ PDF written to cache:', writeResult.uri);
+          
+          // Open share dialog so user can save it
+          await Share.share({
+            title: 'Save PDF',
+            text: `Save ${finalFileName} to your device`,
+            url: writeResult.uri,
+            dialogTitle: 'Save PDF to Device'
+          });
+          
+        } catch (fallbackError) {
+          console.error('❌ Fallback also failed:', fallbackError);
+          throw new Error('Failed to download PDF');
+        }
       }
     } else {
-      // Web: Use standard download
+      // Web: Standard download
       pdf.save(fileName);
     }
+  }
+
+  /**
+   * Save PDF - handles both web and mobile platforms (Legacy method)
+   * @deprecated Use sharePDF or downloadPDF instead
+   */
+  private async savePDF(pdf: jsPDF, fileName: string): Promise<void> {
+    // Default to share behavior
+    return this.sharePDF(pdf, fileName);
   }
 
   /**

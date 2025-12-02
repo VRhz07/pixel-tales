@@ -287,10 +287,25 @@ const StoryReaderPage: React.FC = () => {
     }
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     setShowViewControls(false);
-    // Show share options
-    console.log('Share story');
+    try {
+      // Create a complete story object with author information
+      const storyWithAuthor = {
+        ...story,
+        author: storyAuthor || user?.username || 'Unknown Author'
+      };
+      
+      // Share the story as PDF
+      await pdfExportService.shareStoryAsPDF(storyWithAuthor, {
+        template: 'classic',
+        printOptimization: 'screen'
+      });
+      console.log('✅ Story shared successfully');
+    } catch (error) {
+      console.error('❌ Failed to share story:', error);
+      alert('Failed to share story. Please try again.');
+    }
   };
 
   const handleExportPDF = async () => {
@@ -302,15 +317,15 @@ const StoryReaderPage: React.FC = () => {
         author: storyAuthor || user?.username || 'Unknown Author'
       };
       
-      // Export the current story to PDF
-      await pdfExportService.exportStoryToPDF(storyWithAuthor, {
+      // Export/download the story as PDF
+      await pdfExportService.downloadStoryAsPDF(storyWithAuthor, {
         template: 'classic',
         printOptimization: 'screen'
       });
-      console.log('✅ Story exported to PDF successfully');
+      console.log('✅ Story downloaded to PDF successfully');
     } catch (error) {
-      console.error('❌ Failed to export story to PDF:', error);
-      alert('Failed to export PDF. Please try again.');
+      console.error('❌ Failed to download story as PDF:', error);
+      alert('Failed to download PDF. Please try again.');
     }
   };
 
