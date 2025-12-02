@@ -37,10 +37,12 @@ export const useAuthStore = create<AuthState>()(
       userLimits: null,
 
       signIn: async (email: string, password: string, rememberMe: boolean = true) => {
+        console.log('🔐 Signing in...');
         set({ isLoading: true, error: null });
         
         try {
           const response = await authService.login(email, password);
+          console.log('🔐 Login successful');
           
           // Store remember me preference
           if (rememberMe) {
@@ -205,13 +207,17 @@ export const useAuthStore = create<AuthState>()(
 
       loadUserProfile: async () => {
         if (!authService.isAuthenticated()) {
+          console.log('🔐 loadUserProfile: Not authenticated, skipping');
           return;
         }
 
-        set({ isLoading: true });
+        console.log('🔐 loadUserProfile: Starting...');
+        // Don't set isLoading to true here - it causes UI blocking
+        // The user is already logged in with cached data
 
         try {
           const profile = await authService.getProfile();
+          console.log('🔐 loadUserProfile: Profile loaded successfully');
           set({
             user: profile,
             isAuthenticated: true,
@@ -223,8 +229,10 @@ export const useAuthStore = create<AuthState>()(
           get().updateFeatureAccess();
         } catch (error) {
           const apiError = error as ApiError;
+          console.warn('🔐 loadUserProfile: Failed to load profile:', apiError);
+          
+          // Don't set isLoading here either - keep UI responsive
           set({
-            isLoading: false,
             error: apiError.message,
           });
           
@@ -237,7 +245,10 @@ export const useAuthStore = create<AuthState>()(
           
           if (apiError.status === 401 && !isNetworkError) {
             // Real authentication failure - sign out
+            console.log('🔐 loadUserProfile: Real auth failure, signing out');
             get().signOut();
+          } else {
+            console.log('🔐 loadUserProfile: Network error or offline, keeping user logged in');
           }
           // If network error, keep user logged in for offline access
         }
@@ -258,9 +269,14 @@ export const useAuthStore = create<AuthState>()(
       },
 
       checkAuth: async () => {
+        console.log('🔐 Starting checkAuth...');
+        
         // Check if we have stored auth data
         const storedUser = authService.getUserData();
         const isAuthenticated = authService.isAuthenticated();
+        
+        console.log('🔐 Stored user:', storedUser?.email);
+        console.log('🔐 Is authenticated:', isAuthenticated);
         
         // Check if session has expired (for non-remembered sessions)
         const rememberMe = storage.getItemSync('rememberMe') === 'true';
@@ -270,12 +286,15 @@ export const useAuthStore = create<AuthState>()(
           const expiryTime = parseInt(sessionExpiry);
           if (Date.now() > expiryTime) {
             // Session expired, sign out
+            console.log('🔐 Session expired, signing out');
             await get().signOut();
             return false;
           }
         }
 
         if (storedUser && isAuthenticated) {
+          console.log('🔐 User found in storage, restoring session immediately...');
+          
           // CRITICAL FIX: Check if there's a parent_session
           const parentSession = storage.getItemSync('parent_session');
           
@@ -361,12 +380,16 @@ export const useAuthStore = create<AuthState>()(
             });
           }
           
+          // INSTANT RESTORE: Set user immediately without waiting for backend
           set({
             user: storedUser,
             isAuthenticated: true,
+            isLoading: false, // Ensure loading is false
           });
 
-          // Set current user in story store and load stories from backend
+          console.log('🔐 ✅ User session restored instantly!');
+
+          // Set current user in story store IMMEDIATELY (don't wait)
           import('../stores/storyStore').then(({ useStoryStore }) => {
             const storyStore = useStoryStore.getState();
             
@@ -375,32 +398,71 @@ export const useAuthStore = create<AuthState>()(
               storyStore.setCurrentUser(storedUser.id);
             }
             
-            // Load stories from backend on every auth check
-            // This ensures stories are loaded when app reopens
+            // Load stories from backend in background (don't await - let it happen async)
+            // This won't block the UI and will sync when backend wakes up
+            console.log('🔐 Loading stories in background...');
             storyStore.loadStoriesFromBackend().catch(err => {
-              console.warn('Failed to load stories from backend during checkAuth:', err);
+              console.warn('🔐 Failed to load stories from backend (will retry):', err);
               
               // If loading fails and this is John Doe, fallback to demo data
               if (storedUser.email === 'john.doe@pixeltales.com') {
-                console.log('Loading demo data as fallback for John Doe');
+                console.log('🔐 Loading demo data as fallback for John Doe');
                 storyStore.initializeDemoData();
               }
             });
           });
 
-          // Try to refresh user profile in background (don't block auth)
-          // This allows offline access and prevents logout on network issues
-          get().loadUserProfile().catch(error => {
-            console.warn('Failed to refresh user profile, using cached data:', error);
-            // Keep user authenticated with cached data
+          // BACKGROUND VALIDATION: Try to refresh user profile in background with timeout
+          // This won't block auth - just validates token and syncs profile updates
+          console.log('🔐 Validating token in background...');
+          
+          // Wake up the backend without blocking (helps with Render free tier)
+          // This sends a lightweight request to wake up the server
+          const wakeUpBackend = async () => {
+            try {
+              // Send a simple ping to wake up the backend
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 3000);
+              
+              await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/auth/profile/`, {
+                method: 'HEAD', // HEAD request is lighter than GET
+                headers: {
+                  'Authorization': `Bearer ${storage.getItemSync('access_token')}`
+                },
+                signal: controller.signal
+              }).catch(() => {
+                console.log('🔐 Backend wake-up ping sent (might be sleeping)');
+              });
+              
+              clearTimeout(timeoutId);
+            } catch (err) {
+              // Ignore errors - this is just a wake-up call
+            }
+          };
+          
+          // Start backend wake-up immediately (don't await)
+          wakeUpBackend();
+          
+          // Then validate profile with timeout (5 seconds)
+          Promise.race([
+            get().loadUserProfile(),
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Profile load timeout')), 5000)
+            )
+          ]).catch(error => {
+            console.warn('🔐 Background profile validation failed (using cached data):', error);
+            // Keep user authenticated with cached data - this is fine!
+            // Backend will sync once it wakes up
           });
           
           return true;
         } else if (storedUser?.id === 'anonymous') {
+          console.log('🔐 Anonymous session found');
           // Anonymous session exists
           set({
             user: storedUser,
             isAuthenticated: false,
+            isLoading: false,
           });
           
           // Set anonymous user in story store
@@ -417,6 +479,7 @@ export const useAuthStore = create<AuthState>()(
           return false;
         }
 
+        console.log('🔐 No stored session found');
         return false;
       },
 

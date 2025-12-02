@@ -64,15 +64,23 @@ function AppContent() {
   // Initialize authentication and theme on mount
   useEffect(() => {
     const initialize = async () => {
-      // Wait a bit for Capacitor storage to be ready on mobile
-      await new Promise(resolve => setTimeout(resolve, 100));
+      console.log('🚀 App initializing...');
+      
+      // Wait a tiny bit for Capacitor storage to be ready on mobile
+      // Reduced from 100ms to 50ms for faster startup
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       // Skip user auth check if on admin page (admin has separate auth)
       if (location.pathname !== '/admin') {
+        console.log('🚀 Checking authentication...');
         await checkAuth();
+        console.log('🚀 Authentication check complete');
       }
       initializeTheme();
+      
+      // Set initializing to false immediately - don't wait for backend
       setIsInitializing(false);
+      console.log('🚀 App ready!');
     };
     initialize();
   }, [checkAuth, initializeTheme, location.pathname]);
