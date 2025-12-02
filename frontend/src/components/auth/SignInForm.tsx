@@ -124,11 +124,11 @@ const SignInForm: React.FC = () => {
       {/* Legal Text */}
       <p className="auth-legal">
         By signing in, you agree to our{' '}
-        <a href="#" className="auth-link">
+        <a href="/terms" className="auth-link underline">
           Terms of Service
         </a>{' '}
         and{' '}
-        <a href="#" className="auth-link">
+        <a href="/privacy" className="auth-link underline">
           Privacy Policy
         </a>
       </p>

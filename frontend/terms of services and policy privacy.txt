@@ -1,0 +1,124 @@
+PIXEL TALES — TERMS AND CONDITIONS
+
+Last Updated: 12/02/2025
+
+Welcome to Pixel Tales, a mobile application designed to help children create and share stories with the guidance of parents or teachers. Please read these Terms and Conditions carefully before using the app. By accessing or using Pixel Tales, you agree to be bound by these terms.
+
+1. Acceptance of Terms
+
+By downloading or using the app, you agree to follow these Terms and Conditions. If you do not agree with any part of these terms, please discontinue use of the application.
+
+2. Purpose of the Application
+
+Pixel Tales is designed for educational and creative purposes. It allows children to write stories, draw illustrations, and collaborate safely with the supervision of parents or teachers.
+
+3. User Accounts
+
+Parents or teachers must create an account to manage and supervise child users.
+
+Children’s profiles are created within the parent or teacher account.
+
+You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.
+
+4. Acceptable Use
+
+You agree to use Pixel Tales only for lawful, educational, and creative purposes. You may not:
+
+Upload, post, or share any inappropriate or harmful content.
+
+Attempt to hack, reverse-engineer, or interfere with the system.
+
+Use the app to harass, impersonate, or harm others.
+
+Violation of these rules may result in account suspension or deletion.
+
+5. Intellectual Property
+
+All materials, logos, designs, and features of Pixel Tales are the property of the developers. Users retain ownership of their own stories and illustrations but grant the app permission to display their work within the platform (e.g., in the “Discover” section).
+
+6. Content Responsibility
+
+Parents and teachers are responsible for monitoring the content created by their children or students. The developers are not liable for user-generated content posted or shared through the app.
+
+7. Limitation of Liability
+
+The developers are not responsible for data loss, app malfunction, or user misuse. Pixel Tales is provided “as is” without any warranties, either express or implied.
+
+8. Modifications to the App
+
+The developers reserve the right to update, modify, or discontinue features of Pixel Tales at any time without prior notice to improve user experience or ensure compliance with privacy standards.
+
+9. Termination
+
+You may stop using Pixel Tales at any time. The developers may suspend or terminate your access if you violate these Terms and Conditions.
+
+10. Contact Information
+
+For questions or support, please contact:
+📧 werpixeltales@gmail.com
+
+PIXEL TALES — PRIVACY POLICY
+
+Last Updated: [Insert Date]
+
+This Privacy Policy explains how Pixel Tales collects, uses, and protects your information. By using this app, you agree to the collection and use of information as described below.
+
+1. Information We Collect
+
+Pixel Tales collects the following information:
+
+Parent/Teacher Account Information: Name, email address, and password for login and account management.
+
+Child User Information: Display name, username, and optional date of birth (used only for age-based personalization).
+
+Story Data: User-generated stories, illustrations, and preferences stored securely in our database.
+
+Usage Information: Device type, app activity, and performance data used to improve app functionality.
+
+2. How We Use Your Information
+
+Collected data is used to:
+
+Provide personalized story and illustration features.
+
+Allow parents and teachers to monitor children’s progress.
+
+Maintain system security and improve user experience.
+
+Store and manage stories within the user’s account.
+
+We do not sell, trade, or share personal information with third parties.
+
+3. Parental and Teacher Supervision
+
+All child users must be registered and supervised by a parent or teacher account.
+Pixel Tales does not allow direct communication or account creation by unsupervised minors.
+
+4. Data Security
+
+We implement appropriate technical and organizational measures to protect user data against unauthorized access, alteration, or deletion. Passwords are encrypted, and data transmission is secured.
+
+5. Data Retention
+
+User data is stored only as long as the account remains active. When an account is deleted, all associated stories and child profiles are permanently removed from the system.
+
+6. User Rights
+
+Users have the right to:
+
+Access and review their stored information.
+
+Request correction or deletion of inaccurate data.
+
+Withdraw consent or delete their account at any time.
+
+Requests may be made through the app or by contacting the developers directly.
+
+7. Updates to This Policy
+
+We may revise this Privacy Policy from time to time. Any updates will be posted within the app, and continued use of the app means acceptance of the revised terms.
+
+8. Contact Us
+
+If you have any concerns or questions regarding your privacy, contact us at:
+📧 werpixeltales@gmail.com

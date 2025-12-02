@@ -26,6 +26,8 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import CollaborationWaitingPage from './pages/CollaborationWaitingPage';
 import ParentDashboardPage from './pages/ParentDashboardPage';
 import ParentSettingsPage from './pages/ParentSettingsPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import { useAuthStore } from './stores/authStore';
 import { useThemeStore } from './stores/themeStore';
 import { storage } from './utils/storage';
@@ -596,6 +598,8 @@ function AppContent() {
             <ParentSettingsPage />
           </ParentRoute>
         } />
+        <Route path="/terms" element={<TermsOfServicePage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/" element={<AuthPage />} />
       </Routes>
       {showBottomNav && <BottomNav />}

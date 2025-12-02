@@ -458,91 +458,30 @@ export const addTitleOverlayToCover = async (
     img.onerror = (error) => {
       console.error('❌ Failed to load image for title overlay:', error);
       console.error('Image URL that failed:', baseImageUrl);
-      console.warn('⚠️ CORS issue detected - trying alternative method...');
+      console.warn('⚠️ CORS issue detected - returning original image URL');
       
-      // Try to create title-only overlay as fallback
-      try {
-        // Create a colored background with title text
-        canvas.width = 512;
-        canvas.height = 683;
-        
-        // Create gradient background as fallback
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, '#667eea');
-        gradient.addColorStop(1, '#764ba2');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Add title text
-        const baseFontSize = Math.floor(canvas.width / 10);
-        ctx.font = `bold ${baseFontSize}px "Comic Sans MS", "Chalkboard SE", "Arial Rounded MT Bold", cursive, sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        ctx.shadowBlur = 15;
-        ctx.fillStyle = '#FFFFFF';
-        
-        // Wrap text
-        const words = title.split(' ');
-        const lines: string[] = [];
-        let currentLine = '';
-        const maxWidth = canvas.width * 0.85;
-        
-        for (const word of words) {
-          const testLine = currentLine ? currentLine + ' ' + word : word;
-          const testWidth = ctx.measureText(testLine).width;
-          if (testWidth > maxWidth && currentLine) {
-            lines.push(currentLine);
-            currentLine = word;
-          } else {
-            currentLine = testLine;
-          }
-        }
-        if (currentLine) lines.push(currentLine);
-        
-        const lineHeight = baseFontSize * 1.3;
-        const startY = canvas.height / 2 - (lines.length * lineHeight) / 2;
-        
-        lines.forEach((line, index) => {
-          ctx.fillText(line, canvas.width / 2, startY + (index * lineHeight));
-        });
-        
-        const fallbackCover = canvas.toDataURL('image/png', 0.95);
-        console.log('✅ Created fallback cover with title');
-        resolve(fallbackCover);
-      } catch (fallbackError) {
-        console.error('❌ Fallback cover creation failed:', fallbackError);
-        resolve(baseImageUrl); // Last resort: return original URL
-      }
+      // Return the original image URL without title overlay
+      // The image will load naturally in the UI like any other image
+      // No gradient fallback - just let the image load on its own
+      resolve(baseImageUrl);
     };
     
-    // Add timeout to prevent hanging
+    // Add timeout to prevent infinite waiting
+    // If canvas loading times out, just return the original URL
+    // The image will load naturally in the UI
     const timeoutId = setTimeout(() => {
       if (!img.complete) {
-        console.warn('⚠️ Image loading timeout (15s), creating fallback cover...');
-        img.onerror(new Error('Timeout'));
+        console.warn('⚠️ Canvas title overlay timeout - returning original image URL');
+        console.log('Image will load naturally in the UI without title overlay');
+        clearTimeout(timeoutId);
+        resolve(baseImageUrl); // Return original URL, let it load naturally
       }
-    }, 15000); // 15 second timeout (Pollinations can be slow)
+    }, 10000); // 10 second timeout for canvas operations only
     
-    // IMPORTANT: Use CORS proxy to avoid CORS issues with Pollinations AI
-    // Try multiple approaches for maximum compatibility
-    const tryLoadImage = () => {
-      // Method 1: Try with cache-busting first
-      const cacheBustUrl = baseImageUrl + (baseImageUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
-      img.src = cacheBustUrl;
-      
-      // Method 2: If that fails after 5s, try with CORS proxy
-      setTimeout(() => {
-        if (!img.complete) {
-          console.log('🔄 Trying with CORS proxy...');
-          // Use allorigins.win as CORS proxy
-          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(baseImageUrl)}`;
-          img.src = proxyUrl;
-        }
-      }, 5000);
-    };
-    
-    tryLoadImage();
+    // Try to load image with cache-busting for title overlay
+    // If this fails (CORS), img.onerror will return the original URL
+    const cacheBustUrl = baseImageUrl + (baseImageUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+    img.src = cacheBustUrl;
   });
 };
 

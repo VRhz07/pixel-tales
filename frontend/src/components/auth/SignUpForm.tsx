@@ -203,11 +203,11 @@ const SignUpForm: React.FC = () => {
       {/* Legal Text */}
       <p className="auth-legal">
         By creating an account, you agree to our{' '}
-        <a href="#" className="auth-link">
+        <a href="/terms" className="auth-link underline">
           Terms of Service
         </a>{' '}
         and{' '}
-        <a href="#" className="auth-link">
+        <a href="/privacy" className="auth-link underline">
           Privacy Policy
         </a>
         . You also consent to receive product updates and marketing communications.
