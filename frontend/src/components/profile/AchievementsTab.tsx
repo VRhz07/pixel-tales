@@ -30,7 +30,13 @@ const AchievementsTab = () => {
       setLoading(true);
       setError(null);
       const response = await api.get('/achievements/progress/');
-      setAchievements(response.data);
+      
+      // API returns { success: true, achievements: [...], user_stats: {...} }
+      if (response.data && response.data.achievements) {
+        setAchievements(response.data.achievements);
+      } else {
+        setAchievements([]);
+      }
     } catch (error: any) {
       console.error('Error fetching achievements:', error);
       setError(error.response?.data?.message || 'Failed to load achievements');

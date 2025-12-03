@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Render Backend Achievements</title>
+</head>
+<body>
+    <h1>Render Backend Achievement Test</h1>
+    <button onclick="testAchievements()">Test Achievements API</button>
+    <button onclick="testLogin()">Test Login First</button>
+    <pre id="output"></pre>
+
+    <script>
+        const BACKEND_URL = 'https://pixeltales-backend.onrender.com';
+        
+        function log(msg) {
+            document.getElementById('output').textContent += msg + '\n';
+            console.log(msg);
+        }
+
+        async function testLogin() {
+            log('=== Testing Login ===');
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/auth/login/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: 'test', // Replace with your username
+                        password: 'test123' // Replace with your password
+                    })
+                });
+                
+                const data = await response.json();
+                log('Login Response: ' + JSON.stringify(data, null, 2));
+                
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    log('✅ Token saved! Now test achievements.');
+                }
+            } catch (err) {
+                log('❌ Error: ' + err.message);
+            }
+        }
+
+        async function testAchievements() {
+            log('=== Testing Achievements API ===');
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                log('❌ No token found. Login first!');
+                return;
+            }
+            
+            try {
+                // Test 1: Check if endpoint exists
+                log('1. Testing endpoint...');
+                const response = await fetch(`${BACKEND_URL}/api/achievements/progress/`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                log(`Status: ${response.status} ${response.statusText}`);
+                
+                // Test 2: Parse response
+                const data = await response.json();
+                log('2. Response structure:');
+                log(`   - success: ${data.success}`);
+                log(`   - achievements: ${data.achievements ? 'EXISTS' : 'MISSING'}`);
+                log(`   - achievement count: ${data.achievements?.length || 0}`);
+                
+                // Test 3: Show first achievement
+                if (data.achievements && data.achievements.length > 0) {
+                    log('3. First achievement:');
+                    log(JSON.stringify(data.achievements[0], null, 2));
+                    log('\n✅ BACKEND HAS ACHIEVEMENTS!');
+                } else {
+                    log('\n❌ BACKEND HAS 0 ACHIEVEMENTS!');
+                    log('Render did not populate yet.');
+                }
+                
+                // Test 4: Show user stats
+                if (data.user_stats) {
+                    log('4. User stats:');
+                    log(JSON.stringify(data.user_stats, null, 2));
+                }
+                
+            } catch (err) {
+                log('❌ Error: ' + err.message);
+            }
+        }
+    </script>
+</body>
+</html>
