@@ -72,6 +72,31 @@ def import_profanity_words():
     except Exception as e:
         print(f"❌ Error importing profanity words: {str(e)}")
 
+def populate_achievements():
+    """Populate achievements if not already present"""
+    print("\n📊 Checking achievements...")
+    
+    try:
+        from storybook.models import Achievement
+        from django.core.management import call_command
+        
+        existing_count = Achievement.objects.count()
+        print(f"   Found {existing_count} existing achievements")
+        
+        if existing_count >= 100:
+            print("✅ Achievements already populated!")
+            return
+        
+        print("   Populating achievements...")
+        call_command('populate_achievements')
+        
+        final_count = Achievement.objects.count()
+        print(f"✅ Achievement population complete! Total: {final_count}")
+        
+    except Exception as e:
+        print(f"⚠️ Warning: Could not populate achievements: {str(e)}")
+        print("   You can run manually: python manage.py populate_achievements")
+
 def main():
     """Main deployment setup"""
     print("=" * 50)
@@ -82,6 +107,9 @@ def main():
     
     # Import profanity words if available
     import_profanity_words()
+    
+    # Populate achievements
+    populate_achievements()
     
     print("\n" + "=" * 50)
     print("✅ Deployment setup complete!")

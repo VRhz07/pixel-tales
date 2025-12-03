@@ -16,15 +16,23 @@ class UserProfileSerializer(serializers.ModelSerializer):
     email = serializers.CharField(source='user.email', read_only=True)
     first_name = serializers.CharField(source='user.first_name', read_only=True)
     last_name = serializers.CharField(source='user.last_name', read_only=True)
+    
+    # XP and Level fields
+    xp_for_next_level = serializers.IntegerField(read_only=True)
+    xp_progress_in_current_level = serializers.IntegerField(read_only=True)
+    xp_progress_percentage = serializers.FloatField(read_only=True)
 
     class Meta:
         model = UserProfile
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name',
-            'user_type', 'display_name', 'avatar', 'bio', 
-            'date_of_birth', 'is_online', 'last_seen', 'created_at', 'updated_at'
+            'user_type', 'display_name', 'avatar', 'avatar_emoji', 'bio', 
+            'date_of_birth', 'is_online', 'last_seen', 'created_at', 'updated_at',
+            'experience_points', 'level', 'xp_for_next_level', 
+            'xp_progress_in_current_level', 'xp_progress_percentage'
         ]
-        read_only_fields = ['id', 'is_online', 'last_seen', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'is_online', 'last_seen', 'created_at', 'updated_at', 
+                           'experience_points', 'level']
 
 
 class UserSerializer(serializers.ModelSerializer):
