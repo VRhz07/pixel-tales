@@ -132,7 +132,8 @@ class TTSService:
             # Build the voice request
             voice = texttospeech.VoiceSelectionParams(
                 language_code=language_code,
-                name=voice_name
+                name=voice_name,
+                ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL  # Let the voice name determine gender
             )
             
             # Select the audio config
@@ -143,7 +144,12 @@ class TTSService:
                 volume_gain_db=max(-96.0, min(16.0, volume))  # Clamp between -96 and 16
             )
             
-            logger.info(f"🎙️ Synthesizing speech: {len(text)} characters, voice: {voice_name}")
+            logger.info(f"🎙️ Synthesizing speech:")
+            logger.info(f"   - Text: {len(text)} characters")
+            logger.info(f"   - Voice: {voice_name}")
+            logger.info(f"   - Language: {language_code}")
+            logger.info(f"   - Voice ID: {voice_id}")
+            logger.info(f"   - Rate: {rate}, Pitch: {pitch}, Volume: {volume}")
             
             # Perform the text-to-speech request
             response = self.client.synthesize_speech(

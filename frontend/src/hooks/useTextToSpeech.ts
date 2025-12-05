@@ -196,6 +196,16 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
       // Determine language code
       const lang = language === 'tl' ? 'fil' : 'en';
       
+      // Log the request for debugging
+      console.log('🌥️ TTS: Cloud request:', {
+        voice_id: cloudVoiceId,
+        language: lang,
+        text_length: text.length,
+        rate,
+        pitch,
+        volume
+      });
+      
       // Call backend API
       const response = await fetch(`${API_BASE_URL}/api/tts/synthesize/`, {
         method: 'POST',
@@ -211,6 +221,8 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
           volume: volume
         })
       });
+      
+      console.log('🌥️ TTS: Response status:', response.status);
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));

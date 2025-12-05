@@ -2,7 +2,7 @@
  * Application Constants and Configuration
  */
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://pixeltales-backend.onrender.com/api';
 export const GOOGLE_AI_KEY = import.meta.env.VITE_GOOGLE_AI_KEY || '';
 
 // Feature Flags
