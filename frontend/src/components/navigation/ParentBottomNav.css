@@ -9,6 +9,12 @@
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
   z-index: 100;
   height: 70px;
+  transition: transform 0.3s ease;
+  transform: translateY(0);
+}
+
+.parent-bottom-nav.keyboard-visible {
+  transform: translateY(100%);
 }
 
 .parent-bottom-nav-container {

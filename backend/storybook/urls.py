@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .jwt_auth import CustomTokenObtainPairView, jwt_register, jwt_logout, jwt_user_profile, jwt_create_session, verify_email, resend_verification_code, verify_password, send_password_reset_code, verify_password_reset_code, reset_password, change_password, delete_account
-from . import views, admin_views, admin_auth, admin_features, admin_profanity, ai_proxy_views
+from . import views, admin_views, admin_auth, admin_features, admin_profanity, ai_proxy_views, tts_views
 
 # Create a router for ViewSets (we'll add these later)
 router = DefaultRouter()
@@ -185,6 +185,11 @@ urlpatterns = [
     path('ai/gemini/analyze-image/', ai_proxy_views.analyze_image_with_gemini, name='analyze_image_with_gemini'),
     path('ai/ocr/process/', ai_proxy_views.ocr_image, name='ocr_image'),
     path('ai/status/', ai_proxy_views.check_ai_service_status, name='check_ai_service_status'),
+    
+    # Text-to-Speech endpoints (Google Cloud TTS)
+    path('tts/synthesize/', tts_views.synthesize_speech, name='synthesize_speech'),
+    path('tts/voices/', tts_views.get_available_voices, name='get_available_voices'),
+    path('tts/status/', tts_views.check_tts_status, name='check_tts_status'),
     
     # Parent/Teacher Dashboard endpoints
     path('parent/children/', views.get_parent_children, name='get_parent_children'),

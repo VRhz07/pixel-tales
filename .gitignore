@@ -42,6 +42,17 @@ backend/db.sqlite3.backup
 .env
 backend/.env
 
+# Google Cloud Service Account Keys (NEVER COMMIT THESE!)
+*-key.json
+Google Cloud Text to Speech.json
+pixeltales-tts-key.json
+base64_credentials.txt
+*service-account*.json
+*credentials*.json
+
+# Screenshots (may contain sensitive info)
+screenshots/
+
 # Node / Frontend
 node_modules/
 frontend/node_modules/

@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useI18nStore } from '../stores/i18nStore';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { Capacitor } from '@capacitor/core';
+import { useOnlineStatus } from './useOnlineStatus';
+import { API_BASE_URL } from '../config/constants';
 
 interface TextToSpeechOptions {
   rate?: number; // 0.1 to 10, default 1
@@ -29,6 +31,11 @@ interface UseTextToSpeechReturn {
   volume: number;
   setVolume: (volume: number) => void;
   progress: number; // 0 to 100
+  voiceGender: 'female' | 'male';
+  setVoiceGender: (gender: 'female' | 'male') => void;
+  useCloudTTS: boolean;
+  setUseCloudTTS: (use: boolean) => void;
+  isOnline: boolean;
 }
 
 export const useTextToSpeech = (): UseTextToSpeechReturn => {
@@ -41,6 +48,9 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
   const [pitch, setPitch] = useState(1);
   const [volume, setVolume] = useState(1);
   const [progress, setProgress] = useState(0);
+  const [voiceGender, setVoiceGender] = useState<'female' | 'male'>('female');
+  const [useCloudTTS, setUseCloudTTS] = useState(true); // Default to cloud when available
+  const isOnline = useOnlineStatus();
   
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const totalWordsRef = useRef(0);
@@ -57,47 +67,164 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
   useEffect(() => {
     if (!isSupported) return;
     
-    // Skip voice loading on native platform (uses Capacitor TTS)
-    if (isNativePlatform) return;
+    const loadVoices = async () => {
+      if (isNativePlatform) {
+        // Load native platform voices using Capacitor TTS
+        try {
+          console.log('📢 TTS: Loading native voices from device...');
+          const result = await TextToSpeech.getSupportedVoices();
+          console.log('📢 TTS: Native voices loaded:', result.voices.length, result.voices);
+          
+          if (result.voices && result.voices.length > 0) {
+            setVoices(result.voices);
+            
+            // Auto-select voice based on current language
+            if (!currentVoice) {
+              // For Tagalog, look for Filipino voices
+              const langCode = language === 'tl' ? 'fil' : language;
+              const preferredVoice = result.voices.find(v => 
+                v.lang && (
+                  v.lang.toLowerCase().includes(langCode) || 
+                  v.lang.toLowerCase().startsWith('fil') ||
+                  (language === 'tl' && v.lang.toLowerCase().includes('ph'))
+                )
+              ) || result.voices[0];
+              
+              console.log('📢 TTS: Auto-selected voice:', preferredVoice);
+              setCurrentVoice(preferredVoice);
+            }
+          } else {
+            console.warn('📢 TTS: No native voices found. User may need to install a TTS engine.');
+          }
+        } catch (error) {
+          console.error('📢 TTS: Error loading native voices:', error);
+          // Fall back to empty array - user needs to install TTS engine
+          setVoices([]);
+        }
+      } else {
+        // Load web voices
+        if (typeof window === 'undefined' || !window.speechSynthesis) return;
+        
+        const availableVoices = window.speechSynthesis.getVoices();
+        console.log('📢 TTS: Available web voices:', availableVoices.length, availableVoices);
+        setVoices(availableVoices);
 
-    const loadVoices = () => {
-      if (typeof window === 'undefined' || !window.speechSynthesis) return;
-      
-      const availableVoices = window.speechSynthesis.getVoices();
-      console.log('📢 TTS: Available voices:', availableVoices.length, availableVoices);
-      setVoices(availableVoices);
-
-      // Auto-select voice based on current language
-      if (availableVoices.length > 0 && !currentVoice) {
-        const langCode = language === 'tl' ? 'fil' : 'en'; // Filipino or English
-        const preferredVoice = availableVoices.find(v => 
-          v.lang.startsWith(langCode) || v.lang.startsWith(language)
-        ) || availableVoices[0];
-        console.log('📢 TTS: Selected voice:', preferredVoice);
-        setCurrentVoice(preferredVoice);
+        // Auto-select voice based on current language
+        if (availableVoices.length > 0 && !currentVoice) {
+          const langCode = language === 'tl' ? 'fil' : 'en'; // Filipino or English
+          const preferredVoice = availableVoices.find(v => 
+            v.lang.startsWith(langCode) || v.lang.startsWith(language)
+          ) || availableVoices[0];
+          console.log('📢 TTS: Selected web voice:', preferredVoice);
+          setCurrentVoice(preferredVoice);
+        }
       }
     };
 
     // Try loading voices immediately
     loadVoices();
     
-    // Also listen for voiceschanged event (needed on some browsers/devices)
-    if (window.speechSynthesis) {
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-    }
-    
-    // Retry after a delay (Android WebView sometimes needs this)
-    const retryTimer = setTimeout(() => {
-      loadVoices();
-    }, 1000);
-
-    return () => {
-      clearTimeout(retryTimer);
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.onvoiceschanged = null;
+    if (!isNativePlatform) {
+      // Also listen for voiceschanged event (needed on some browsers/devices)
+      if (window.speechSynthesis) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
       }
-    };
+      
+      // Retry after a delay (Android WebView sometimes needs this)
+      const retryTimer = setTimeout(() => {
+        loadVoices();
+      }, 1000);
+
+      return () => {
+        clearTimeout(retryTimer);
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+          window.speechSynthesis.onvoiceschanged = null;
+        }
+      };
+    }
   }, [isSupported, isNativePlatform, language, currentVoice]);
+
+  // Speak with Google Cloud TTS
+  const speakWithCloudTTS = useCallback(async (text: string) => {
+    try {
+      console.log('🌥️ TTS: Using Google Cloud TTS');
+      
+      setIsSpeaking(true);
+      setIsPaused(false);
+      setProgress(0);
+      
+      // Determine language code
+      const lang = language === 'tl' ? 'fil' : 'en';
+      
+      // Call backend API
+      const response = await fetch(`${API_BASE_URL}/api/tts/synthesize/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text,
+          language: lang,
+          gender: voiceGender,
+          rate: rate,
+          pitch: pitch,
+          volume: volume
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        
+        // If cloud TTS fails and fallback is suggested, use device TTS
+        if (errorData.fallback) {
+          console.log('🌥️ TTS: Cloud TTS not available, falling back to device TTS');
+          return false; // Indicate fallback needed
+        }
+        
+        throw new Error(`Cloud TTS failed: ${response.status}`);
+      }
+      
+      // Get audio blob
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      // Play audio
+      const audio = new Audio(audioUrl);
+      
+      audio.onloadedmetadata = () => {
+        console.log('🌥️ TTS: Audio loaded, duration:', audio.duration);
+      };
+      
+      audio.ontimeupdate = () => {
+        if (audio.duration) {
+          const progressPercent = (audio.currentTime / audio.duration) * 100;
+          setProgress(progressPercent);
+        }
+      };
+      
+      audio.onended = () => {
+        console.log('🌥️ TTS: Audio playback completed');
+        setIsSpeaking(false);
+        setProgress(100);
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      audio.onerror = (error) => {
+        console.error('🌥️ TTS: Audio playback error:', error);
+        setIsSpeaking(false);
+        setProgress(0);
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      await audio.play();
+      console.log('🌥️ TTS: Cloud TTS playback started');
+      return true; // Success
+      
+    } catch (error) {
+      console.error('🌥️ TTS: Cloud TTS error:', error);
+      return false; // Indicate fallback needed
+    }
+  }, [language, voiceGender, rate, pitch, volume]);
 
   // Speak text
   const speak = useCallback(async (text: string, options?: TextToSpeechOptions) => {
@@ -110,11 +237,22 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
     totalWordsRef.current = words.length;
     currentWordRef.current = 0;
 
+    // Try cloud TTS first if enabled and online
+    if (useCloudTTS && isOnline) {
+      const success = await speakWithCloudTTS(text);
+      if (success) {
+        return; // Cloud TTS worked, we're done
+      }
+      // If cloud TTS failed, fall through to device TTS
+      console.log('📢 TTS: Falling back to device TTS');
+    }
+
     if (isNativePlatform) {
       // Use Capacitor TTS for mobile
       try {
         console.log('📢 TTS: Using Capacitor TTS on native platform');
         console.log('📢 TTS: Text length:', text.length, 'Language:', language);
+        console.log('📢 TTS: Selected voice:', currentVoice);
         
         // Stop any ongoing speech
         await TextToSpeech.stop();
@@ -123,7 +261,12 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
         setIsPaused(false);
         setProgress(0);
         
-        const ttsOptions = {
+        // Get voice index if a voice is selected
+        const voiceIndex = currentVoice ? voices.findIndex(v => 
+          v.name === currentVoice.name && v.lang === currentVoice.lang
+        ) : undefined;
+        
+        const ttsOptions: any = {
           text: text,
           lang: language === 'tl' ? 'fil-PH' : 'en-US',
           rate: options?.rate ?? rate,
@@ -131,6 +274,12 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
           volume: options?.volume ?? volume,
           category: 'ambient',
         };
+        
+        // Add voice index if available
+        if (voiceIndex !== undefined && voiceIndex >= 0) {
+          ttsOptions.voice = voiceIndex;
+          console.log('📢 TTS: Using voice index:', voiceIndex);
+        }
         
         console.log('📢 TTS: Speaking with options:', ttsOptions);
         await TextToSpeech.speak(ttsOptions);
@@ -158,8 +307,21 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
         setIsPaused(false);
         setProgress(0);
         
-        // Show user-friendly error
-        alert('Text-to-Speech is not available. Please ensure a TTS engine (like Google Text-to-Speech) is installed and enabled on your device.');
+        // Show user-friendly error with option to install TTS engine
+        const install = confirm(
+          'Text-to-Speech is not available or no voices are installed.\n\n' +
+          'Would you like to install a TTS engine?\n\n' +
+          'Recommended: Google Text-to-Speech (supports Filipino voices)'
+        );
+        
+        if (install) {
+          try {
+            await TextToSpeech.openInstall();
+          } catch (installError) {
+            console.error('📢 TTS: Could not open install page:', installError);
+            alert('Please install "Google Text-to-Speech" from the Play Store for better voice quality, including Filipino voices.');
+          }
+        }
       }
     } else {
       // Use Web Speech API for web
@@ -209,7 +371,7 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
       utteranceRef.current = utterance;
       window.speechSynthesis.speak(utterance);
     }
-  }, [isSupported, isNativePlatform, rate, pitch, volume, currentVoice, language]);
+  }, [isSupported, isNativePlatform, rate, pitch, volume, currentVoice, language, useCloudTTS, isOnline, speakWithCloudTTS]);
 
   // Pause speech
   const pause = useCallback(async () => {
@@ -360,5 +522,10 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
     volume,
     setVolume,
     progress,
+    voiceGender,
+    setVoiceGender,
+    useCloudTTS,
+    setUseCloudTTS,
+    isOnline
   };
 };

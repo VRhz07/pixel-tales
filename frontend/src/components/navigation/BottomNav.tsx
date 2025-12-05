@@ -1,10 +1,11 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../stores/authStore';
 import { useNotificationStore } from '../../stores/notificationStore';
 import { useI18nStore } from '../../stores/i18nStore';
 import { HomeIcon, BookOpenIcon, UserIcon, UsersIcon, CogIcon } from '@heroicons/react/24/outline';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
+import { Keyboard } from '@capacitor/keyboard';
 
 const BottomNav = () => {
   const location = useLocation();
@@ -13,11 +14,28 @@ const BottomNav = () => {
   const { counts, fetchNotificationCounts } = useNotificationStore();
   const { t } = useI18nStore();
   const { playSound } = useSoundEffects();
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   
   const handleLogout = () => {
     signOut();
     navigate('/auth');
   };
+
+  // Hide bottom nav when keyboard is visible
+  useEffect(() => {
+    const showListener = Keyboard.addListener('keyboardWillShow', () => {
+      setIsKeyboardVisible(true);
+    });
+
+    const hideListener = Keyboard.addListener('keyboardWillHide', () => {
+      setIsKeyboardVisible(false);
+    });
+
+    return () => {
+      showListener.remove();
+      hideListener.remove();
+    };
+  }, []);
 
   // Fetch notification counts when authenticated
   useEffect(() => {
@@ -119,7 +137,7 @@ const BottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 nav-glass z-50 safe-area-inset-bottom">
+    <nav className={`fixed bottom-0 left-0 right-0 nav-glass z-50 safe-area-inset-bottom transition-transform duration-300 ${isKeyboardVisible ? 'translate-y-full' : 'translate-y-0'}`}>
       {/* Navigation Items */}
       <div className="px-4 py-3">
         <div className="flex justify-around items-center max-w-md mx-auto">

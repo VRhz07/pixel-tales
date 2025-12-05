@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   UserGroupIcon,
@@ -8,11 +8,29 @@ import {
 } from '@heroicons/react/24/outline';
 import './ParentBottomNav.css';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
+import { Keyboard } from '@capacitor/keyboard';
 
 const ParentBottomNav: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { playSound } = useSoundEffects();
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  // Hide bottom nav when keyboard is visible
+  useEffect(() => {
+    const showListener = Keyboard.addListener('keyboardWillShow', () => {
+      setIsKeyboardVisible(true);
+    });
+
+    const hideListener = Keyboard.addListener('keyboardWillHide', () => {
+      setIsKeyboardVisible(false);
+    });
+
+    return () => {
+      showListener.remove();
+      hideListener.remove();
+    };
+  }, []);
 
   const navItems = [
     {
@@ -64,7 +82,7 @@ const ParentBottomNav: React.FC = () => {
   ];
 
   return (
-    <nav className="parent-bottom-nav">
+    <nav className={`parent-bottom-nav ${isKeyboardVisible ? 'keyboard-visible' : ''}`}>
       <div className="parent-bottom-nav-container">
         {navItems.map((item, index) => {
           const Icon = item.icon;

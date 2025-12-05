@@ -16,6 +16,21 @@ body.capacitor {
   padding-top: env(safe-area-inset-top);
 }
 
+/* Fix keyboard gray gap issue on Android */
+html, body {
+  height: 100%;
+  overflow: auto;
+}
+
+body {
+  background-color: #0f172a;
+}
+
+#root {
+  min-height: 100%;
+  background-color: #0f172a;
+}
+
 /* Canvas pages should be full screen without status bar padding */
 .capacitor .canvas-drawing-page,
 .capacitor .cover-canvas-page {

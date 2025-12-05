@@ -204,6 +204,38 @@ SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 FROM_EMAIL = os.getenv('FROM_EMAIL', 'noreply@pixeltales.com')
 EMAIL_VERIFICATION_EXPIRY_MINUTES = int(os.getenv('EMAIL_VERIFICATION_EXPIRY_MINUTES', 15))
 
+# Google Cloud Text-to-Speech Configuration
+# Handle both local development (file path) and production (base64 encoded JSON)
+import base64
+import json
+import tempfile
+
+GOOGLE_CLOUD_CREDENTIALS_BASE64 = os.getenv('GOOGLE_CLOUD_CREDENTIALS_BASE64')
+GOOGLE_APPLICATION_CREDENTIALS = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+
+if GOOGLE_CLOUD_CREDENTIALS_BASE64:
+    # Production: Decode base64 and write to temp file
+    try:
+        credentials_json = base64.b64decode(GOOGLE_CLOUD_CREDENTIALS_BASE64).decode('utf-8')
+        credentials_dict = json.loads(credentials_json)
+        
+        # Write to temporary file
+        temp_credentials_path = '/tmp/google-credentials.json'
+        with open(temp_credentials_path, 'w') as f:
+            json.dump(credentials_dict, f)
+        
+        # Set environment variable for Google Cloud libraries
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = temp_credentials_path
+        print(f"✅ Google Cloud credentials loaded from base64 (production mode)")
+    except Exception as e:
+        print(f"❌ Failed to decode Google Cloud credentials: {e}")
+elif GOOGLE_APPLICATION_CREDENTIALS and os.path.exists(GOOGLE_APPLICATION_CREDENTIALS):
+    # Local development: Use file path directly
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = GOOGLE_APPLICATION_CREDENTIALS
+    print(f"✅ Google Cloud credentials loaded from file: {GOOGLE_APPLICATION_CREDENTIALS}")
+else:
+    print("⚠️ Google Cloud TTS credentials not configured. TTS features will be disabled.")
+
 # Channels Configuration
 CHANNEL_LAYERS = {
     'default': {

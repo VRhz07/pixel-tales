@@ -10,6 +10,8 @@ import {
 import { useTextToSpeech } from '../../hooks/useTextToSpeech';
 import { useI18nStore } from '../../stores/i18nStore';
 import { CustomDropdown } from './CustomDropdown';
+import { TextToSpeech } from '@capacitor-community/text-to-speech';
+import { Capacitor } from '@capacitor/core';
 
 interface TTSControlsProps {
   text: string;
@@ -42,9 +44,29 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
     volume,
     setVolume,
     progress,
+    voiceGender,
+    setVoiceGender,
+    useCloudTTS,
+    setUseCloudTTS,
+    isOnline
   } = useTextToSpeech();
 
   const [showSettings, setShowSettings] = useState(false);
+  const isNativePlatform = Capacitor.isNativePlatform();
+  
+  const handleInstallTTS = async () => {
+    if (!isNativePlatform) {
+      alert('This feature is only available on mobile devices.');
+      return;
+    }
+    
+    try {
+      await TextToSpeech.openInstall();
+    } catch (error) {
+      console.error('Error opening TTS install:', error);
+      alert('Please install "Google Text-to-Speech" from the Play Store for better voice quality, including Filipino voices.');
+    }
+  };
 
   // Auto-play on mount if enabled
   React.useEffect(() => {
@@ -196,19 +218,95 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
           </div>
 
           <div className="tts-settings-content">
-            {/* Voice Selection */}
+            {/* TTS Provider Selection */}
             <div className="tts-setting-item">
-              <label htmlFor="tts-voice">{t('tts.voice')}</label>
+              <label htmlFor="tts-provider">Voice Quality</label>
               <CustomDropdown
-                options={voices.map((voice) => ({
-                  value: voice.name,
-                  label: `${voice.name} (${voice.lang})`
-                }))}
-                value={currentVoice?.name || ''}
-                onChange={handleVoiceChange}
+                options={[
+                  { value: 'cloud', label: `☁️ Cloud Voice (${isOnline ? 'Online' : 'Offline'})` },
+                  { value: 'device', label: '📱 Device Voice (Offline)' }
+                ]}
+                value={useCloudTTS ? 'cloud' : 'device'}
+                onChange={(value) => setUseCloudTTS(value === 'cloud')}
                 className="tts-select"
               />
+              <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>
+                {useCloudTTS 
+                  ? isOnline 
+                    ? '✅ Premium quality (Google WaveNet)' 
+                    : '⚠️ Offline - will use device voice'
+                  : '📱 Uses installed TTS engine'}
+              </p>
             </div>
+
+            {/* Voice Gender Selection (for Cloud TTS) */}
+            {useCloudTTS && (
+              <div className="tts-setting-item">
+                <label htmlFor="tts-gender">Voice Gender</label>
+                <CustomDropdown
+                  options={[
+                    { value: 'female', label: '👩 Female Voice' },
+                    { value: 'male', label: '👨 Male Voice' }
+                  ]}
+                  value={voiceGender}
+                  onChange={(value) => setVoiceGender(value as 'female' | 'male')}
+                  className="tts-select"
+                />
+              </div>
+            )}
+
+            {/* Device Voice Selection (for Device TTS) */}
+            {!useCloudTTS && (
+              <div className="tts-setting-item">
+                <label htmlFor="tts-voice">{t('tts.voice')}</label>
+                {voices.length === 0 ? (
+                  <div className="tts-no-voices">
+                    <p style={{ color: '#f59e0b', marginBottom: '8px', fontSize: '14px' }}>
+                      ⚠️ No voices available. Install a TTS engine for better quality.
+                    </p>
+                    {isNativePlatform && (
+                      <button
+                        onClick={handleInstallTTS}
+                        className="tts-button-primary"
+                        style={{ padding: '8px 16px', fontSize: '14px' }}
+                      >
+                        📥 Install TTS Engine
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <CustomDropdown
+                      options={voices.map((voice) => ({
+                        value: voice.name,
+                        label: `${voice.name} (${voice.lang})`
+                      }))}
+                      value={currentVoice?.name || ''}
+                      onChange={handleVoiceChange}
+                      className="tts-select"
+                    />
+                    {isNativePlatform && (
+                      <button
+                        onClick={handleInstallTTS}
+                        style={{ 
+                          marginTop: '8px', 
+                          padding: '6px 12px', 
+                          fontSize: '12px',
+                          background: '#4b5563',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          width: '100%'
+                        }}
+                      >
+                        🔊 Need more Filipino voices? Install from Play Store
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Speed Control */}
             <div className="tts-setting-item">
