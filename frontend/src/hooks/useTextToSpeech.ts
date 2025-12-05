@@ -78,13 +78,13 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
           console.log('📢 TTS: Native voices loaded:', result.voices.length, result.voices);
           
           if (result.voices && result.voices.length > 0) {
-            // Filter to show only English and Filipino voices
+            // Filter to show only EN-US and Filipino voices
             const filteredVoices = result.voices.filter(v => {
               if (!v.lang) return false;
               const langLower = v.lang.toLowerCase();
               
-              // Include English voices (en, en-US, en-GB, etc.)
-              const isEnglish = langLower.startsWith('en');
+              // Include ONLY English US voices (en-US specifically)
+              const isEnglishUS = langLower === 'en-us' || langLower === 'en_us';
               
               // Include Filipino/Tagalog voices (fil, fil-PH, tl, tl-PH)
               const isFilipino = langLower.startsWith('fil') || 
@@ -93,7 +93,7 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
                                  langLower.includes('filipino') ||
                                  langLower.includes('tagalog');
               
-              return isEnglish || isFilipino;
+              return isEnglishUS || isFilipino;
             });
             
             console.log('📢 TTS: Filtered voices (English & Filipino only):', filteredVoices.length, filteredVoices);
@@ -129,12 +129,12 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
         const availableVoices = window.speechSynthesis.getVoices();
         console.log('📢 TTS: Available web voices:', availableVoices.length, availableVoices);
         
-        // Filter to show only English and Filipino voices
+        // Filter to show only EN-US and Filipino voices
         const filteredVoices = availableVoices.filter(v => {
           const langLower = v.lang.toLowerCase();
           
-          // Include English voices (en, en-US, en-GB, etc.)
-          const isEnglish = langLower.startsWith('en');
+          // Include ONLY English US voices (en-US specifically)
+          const isEnglishUS = langLower === 'en-us' || langLower === 'en_us';
           
           // Include Filipino/Tagalog voices (fil, fil-PH, tl, tl-PH)
           const isFilipino = langLower.startsWith('fil') || 
@@ -143,7 +143,7 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
                              langLower.includes('filipino') ||
                              langLower.includes('tagalog');
           
-          return isEnglish || isFilipino;
+          return isEnglishUS || isFilipino;
         });
         
         console.log('📢 TTS: Filtered web voices (English & Filipino only):', filteredVoices.length, filteredVoices);

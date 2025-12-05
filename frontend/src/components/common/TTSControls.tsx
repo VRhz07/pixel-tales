@@ -336,12 +336,18 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
                 ) : (
                   <>
                     <CustomDropdown
-                      options={voices.map((voice) => ({
-                        value: voice.name,
+                      options={voices.map((voice, index) => ({
+                        value: `${voice.name}|||${voice.lang}|||${index}`,
                         label: `${voice.name} (${voice.lang})`
                       }))}
-                      value={currentVoice?.name || ''}
-                      onChange={handleVoiceChange}
+                      value={currentVoice ? `${currentVoice.name}|||${currentVoice.lang}|||${voices.findIndex(v => v.name === currentVoice.name && v.lang === currentVoice.lang)}` : ''}
+                      onChange={(value) => {
+                        const [name, lang, indexStr] = value.split('|||');
+                        const index = parseInt(indexStr);
+                        if (index >= 0 && index < voices.length) {
+                          setVoice(voices[index]);
+                        }
+                      }}
                       className="tts-select"
                     />
                     {isNativePlatform && (

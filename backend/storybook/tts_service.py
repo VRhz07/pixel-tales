@@ -16,9 +16,10 @@ class TTSService:
     """
     
     # Available voices with English and Filipino accents
+    # Using WaveNet for all voices - 1 million characters FREE per month!
     VOICES = {
         'female_english': {
-            'name': 'en-US-Neural2-C',
+            'name': 'en-US-Wavenet-F',
             'language_code': 'en-US',
             'label': 'Female (English Accent)',
             'accent': 'english'
@@ -30,13 +31,13 @@ class TTSService:
             'accent': 'filipino'
         },
         'male_english': {
-            'name': 'en-US-Neural2-D',
+            'name': 'en-US-Wavenet-A',
             'language_code': 'en-US',
             'label': 'Male (English Accent)',
             'accent': 'english'
         },
         'male_filipino': {
-            'name': 'fil-PH-Wavenet-C',
+            'name': 'fil-PH-Wavenet-D',
             'language_code': 'fil-PH',
             'label': 'Male (Filipino Accent)',
             'accent': 'filipino'
