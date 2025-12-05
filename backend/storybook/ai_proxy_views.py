@@ -20,6 +20,10 @@ GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5
 GEMINI_VISION_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent'
 GEMINI_API_KEY = settings.GOOGLE_AI_API_KEY
 
+# OCR.space API Configuration
+OCR_SPACE_API_KEY = getattr(settings, 'OCR_SPACE_API_KEY', None)
+OCR_SPACE_API_URL = 'https://api.ocr.space/parse/image'
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -193,14 +197,9 @@ def analyze_image_with_gemini(request):
 def ocr_image(request):
     """
     Proxy endpoint for OCR processing
-    Uses Gemini Vision API as primary method
+    Uses OCR.space API if available (better for handwriting), 
+    falls back to Gemini Vision API
     """
-    if not GEMINI_API_KEY:
-        return Response(
-            {'error': 'OCR service not configured on server'},
-            status=status.HTTP_503_SERVICE_UNAVAILABLE
-        )
-    
     try:
         image_data = request.data.get('image', '')
         detect_handwriting = request.data.get('detectHandwriting', False)
@@ -211,22 +210,69 @@ def ocr_image(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Remove data URL prefix if present
+        # If OCR.space API key is available, use it (especially for handwriting)
+        if OCR_SPACE_API_KEY and detect_handwriting:
+            try:
+                # OCR.space expects base64 with data URL prefix
+                if ',' not in image_data:
+                    # Add data URL prefix if not present
+                    image_data = f'data:image/jpeg;base64,{image_data}'
+                
+                # Make request to OCR.space API
+                response = requests.post(
+                    OCR_SPACE_API_URL,
+                    data={
+                        'apikey': OCR_SPACE_API_KEY,
+                        'base64Image': image_data,
+                        'isTable': False,
+                        'OCREngine': 2,  # Engine 2 is better for handwriting
+                        'detectOrientation': True,
+                        'scale': True,
+                    },
+                    timeout=30
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    
+                    if result.get('IsErroredOnProcessing'):
+                        error_msg = result.get('ErrorMessage', ['Unknown error'])[0]
+                        print(f'OCR.space error: {error_msg}')
+                        # Fall back to Gemini
+                    else:
+                        # Extract text from OCR.space response
+                        extracted_text = ''
+                        if 'ParsedResults' in result and len(result['ParsedResults']) > 0:
+                            extracted_text = result['ParsedResults'][0].get('ParsedText', '')
+                        
+                        if extracted_text:
+                            return Response({
+                                'text': extracted_text.strip(),
+                                'success': True
+                            }, status=status.HTTP_200_OK)
+            except Exception as ocr_error:
+                print(f'OCR.space failed, falling back to Gemini: {ocr_error}')
+                # Fall back to Gemini
+        
+        # Fall back to Gemini Vision API
+        if not GEMINI_API_KEY:
+            return Response(
+                {'error': 'OCR service not configured on server'},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE
+            )
+        
+        # Remove data URL prefix for Gemini
         if ',' in image_data:
             image_data = image_data.split(',')[1]
         
-        # Different prompts for handwriting vs printed text
-        if detect_handwriting:
-            prompt = (
-                "Extract all handwritten and printed text from this image. "
-                "Preserve the original formatting and structure as much as possible. "
-                "If there's handwriting, transcribe it carefully."
-            )
-        else:
-            prompt = (
-                "Extract all text from this image. "
-                "Preserve the original formatting and structure as much as possible."
-            )
+        # Gemini prompt for clean text extraction
+        prompt = (
+            "Extract ALL text from this image. "
+            "Return ONLY the extracted text, nothing else. "
+            "Do not add any explanations, descriptions, or metadata. "
+            "Just return the text exactly as it appears in the image. "
+            "Preserve the original formatting and line breaks."
+        )
         
         # Make request to Gemini Vision API
         response = requests.post(
@@ -267,7 +313,7 @@ def ocr_image(request):
                         break
         
         return Response({
-            'text': extracted_text,
+            'text': extracted_text.strip(),
             'success': bool(extracted_text)
         }, status=status.HTTP_200_OK)
         

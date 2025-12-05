@@ -196,9 +196,12 @@ CORS_ALLOW_CREDENTIALS = True
 # Google AI API
 GOOGLE_AI_API_KEY = os.getenv('GOOGLE_AI_API_KEY')
 
+# OCR.space API Configuration
+OCR_SPACE_API_KEY = os.getenv('OCR_SPACE_API_KEY')
+
 # SendGrid Email Configuration
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
-FROM_EMAIL = os.getenv('FROM_EMAIL', 'noreply@imaginaryworlds.com')
+FROM_EMAIL = os.getenv('FROM_EMAIL', 'noreply@pixeltales.com')
 EMAIL_VERIFICATION_EXPIRY_MINUTES = int(os.getenv('EMAIL_VERIFICATION_EXPIRY_MINUTES', 15))
 
 # Channels Configuration

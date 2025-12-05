@@ -475,12 +475,22 @@ Create a story with the following JSON format:
         setGenerationStage(`Creating illustration ${i + 1} of ${totalPages}...`);
 
         try {
+          console.log(`🎨 Generating illustration for page ${i + 1}/${totalPages}...`);
+          console.log(`   Prompt: ${page.imagePrompt.substring(0, 100)}...`);
+          
           const imageUrls = await generateStoryIllustrationsFromPrompts(
             [{ imagePrompt: page.imagePrompt, pageNumber: i + 1 }],
             storyData.characterDescription
           );
           
           const imageUrl = imageUrls[0];
+          
+          if (!imageUrl) {
+            console.error(`❌ No image URL returned for page ${i + 1}`);
+            throw new Error('Image generation returned null');
+          }
+          
+          console.log(`✅ Generated image for page ${i + 1}: ${imageUrl.substring(0, 60)}...`);
           
           // For the first page, update the existing empty page instead of adding new one
           if (i === 0 && hasEmptyFirstPage && currentStory) {
@@ -499,16 +509,21 @@ Create a story with the following JSON format:
               order: i
             });
           }
-        } catch (error) {
-          console.error(`Error generating illustration for page ${i + 1}:`, error);
           
-          // Same logic for error case
+          console.log(`✅ Page ${i + 1} saved successfully with image`);
+        } catch (error) {
+          console.error(`❌ Error generating illustration for page ${i + 1}:`, error);
+          console.error(`   Error details:`, error);
+          
+          // Same logic for error case - add page with text only
           if (i === 0 && hasEmptyFirstPage && currentStory) {
+            console.log(`📝 Adding page ${i + 1} with text only (no image)`);
             updatePage(newStory.id, currentStory.pages[0].id, {
               text: page.text,
               order: 0
             });
           } else {
+            console.log(`➕ Adding page ${i + 1} with text only (no image)`);
             const newPage = addPage(newStory.id, page.text);
             updatePage(newStory.id, newPage.id, {
               order: i

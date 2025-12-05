@@ -20,7 +20,21 @@ export async function processImageWithOCR(
   detectHandwriting: boolean = false
 ): Promise<OCRResult> {
   try {
-    const token = localStorage.getItem('token');
+    // Get token from auth-storage (Zustand) or access_token
+    let token = localStorage.getItem('access_token');
+    
+    if (!token) {
+      // Try getting from auth-storage
+      const authStorage = localStorage.getItem('auth-storage');
+      if (authStorage) {
+        try {
+          const parsed = JSON.parse(authStorage);
+          token = parsed.state?.token;
+        } catch (e) {
+          console.error('Failed to parse auth-storage:', e);
+        }
+      }
+    }
     
     if (!token) {
       throw new Error('Authentication required. Please log in.');
@@ -89,7 +103,21 @@ export async function extractTextFromImage(
  */
 export async function isOCRAvailable(): Promise<boolean> {
   try {
-    const token = localStorage.getItem('token');
+    // Get token from auth-storage (Zustand) or access_token
+    let token = localStorage.getItem('access_token');
+    
+    if (!token) {
+      // Try getting from auth-storage
+      const authStorage = localStorage.getItem('auth-storage');
+      if (authStorage) {
+        try {
+          const parsed = JSON.parse(authStorage);
+          token = parsed.state?.token;
+        } catch (e) {
+          console.error('Failed to parse auth-storage:', e);
+        }
+      }
+    }
     
     if (!token) {
       return false;
