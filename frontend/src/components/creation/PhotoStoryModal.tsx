@@ -260,16 +260,38 @@ Analyze this photo and create an engaging ${formData.pageCount}-page story based
 
 ${formData.additionalContext ? `Additional Context: ${formData.additionalContext}` : ''}
 Art Style: ${formData.selectedArtStyle}
+Genres: ${formData.selectedGenres.join(', ')}
 Language: ${formData.storyLanguage === 'tl' ? 'Tagalog' : 'English'}
 
-Create a story with the following JSON format:
+Create a story with the following JSON format (no markdown, just pure JSON):
 {
   "title": "Story Title",
   "description": "Brief description",
-  "characterDescription": "Detailed character description based on photo",
-  "colorScheme": "Color palette",
-  "pages": [...]
+  "characterDescription": "DETAILED character description for AI image generation - describe appearance, clothing, colors, distinctive features. BE VERY SPECIFIC to ensure consistency across all images.",
+  "colorScheme": "Consistent color palette to use throughout all images",
+  "coverImagePrompt": "Wide establishing shot showing main character and setting. Include: [characterDescription], scene details, lighting, composition. Art style: ${formData.selectedArtStyle}. IMPORTANT: Correct anatomy, proper proportions.",
+  "pages": [
+    {
+      "text": "Page text content",
+      "imagePrompt": "Detailed scene description. ALWAYS include: [characterDescription] in consistent appearance, action/pose, setting details, lighting, ${formData.selectedArtStyle} art style. CRITICAL: Correct human/animal anatomy, proper proportions, realistic poses, no extra limbs, fingers count correct."
+    }
+  ]
 }
+
+CRITICAL REQUIREMENTS:
+1. characterDescription MUST be extremely detailed (hair color/style, eye color, skin tone, clothing colors/style, body type, age, species for animals, distinctive markings)
+2. Every imagePrompt MUST reference the characterDescription to maintain consistency
+3. Every imagePrompt MUST include anatomy guidelines: "correct anatomy, proper proportions, accurate [body parts], realistic pose"
+4. For humans: specify "5 fingers on each hand, 2 arms, 2 legs, correct facial proportions"
+5. For animals: specify "correct [species] anatomy, proper leg count, realistic features"
+6. Avoid prompts that could cause: extra limbs, distorted faces, wrong finger counts, impossible poses
+7. Each page's imagePrompt should describe the SAME character but in different scenes/actions
+
+EXAMPLE of good characterDescription:
+"A majestic bald eagle with white head feathers, sharp yellow curved beak, piercing golden eyes, dark brown body and wing feathers with white tail feathers, powerful yellow talons, wingspan of 6-7 feet"
+
+EXAMPLE of good imagePrompt:
+"A majestic bald eagle (white head, yellow beak, golden eyes, dark brown wings, white tail) soaring high above mountain peaks at sunrise, wings fully spread showing correct eagle anatomy with proper feather arrangement, ${formData.selectedArtStyle} art style, dramatic lighting, correct bird proportions"
       `.trim();
       
       const storyJSON = await analyzeImageWithGemini(formData.capturedImage, analysisPrompt);
@@ -427,6 +449,7 @@ Create a story with the following JSON format:
             genre: 'Photo Story',
             illustrationStyle: formData.selectedArtStyle,
             coverImage: coverImageWithText,
+            language: formData.storyLanguage, // Set the story language
             creationType: 'ai_assisted', // Mark as AI-assisted for achievement tracking
             isDraft: false,
             isPublished: false
@@ -438,6 +461,7 @@ Create a story with the following JSON format:
             genre: 'Photo Story',
             illustrationStyle: formData.selectedArtStyle,
             coverImage: baseImageUrl,
+            language: formData.storyLanguage, // Set the story language
             creationType: 'ai_assisted', // Mark as AI-assisted for achievement tracking
             isDraft: false,
             isPublished: false
@@ -450,6 +474,7 @@ Create a story with the following JSON format:
           description: storyData.description,
           genre: 'Photo Story',
           illustrationStyle: formData.selectedArtStyle,
+          language: formData.storyLanguage, // Set the story language
           creationType: 'ai_assisted', // Mark as AI-assisted for achievement tracking
           isDraft: false,
           isPublished: false
@@ -475,6 +500,12 @@ Create a story with the following JSON format:
         setGenerationStage(`Creating illustration ${i + 1} of ${totalPages}...`);
 
         try {
+          // Check if imagePrompt exists
+          if (!page.imagePrompt) {
+            console.error(`❌ No image prompt for page ${i + 1}. Page data:`, page);
+            throw new Error(`Missing imagePrompt for page ${i + 1}`);
+          }
+          
           console.log(`🎨 Generating illustration for page ${i + 1}/${totalPages}...`);
           console.log(`   Prompt: ${page.imagePrompt.substring(0, 100)}...`);
           

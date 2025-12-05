@@ -2064,7 +2064,7 @@ const ManualStoryCreationPage: React.FC = () => {
     }
   };
 
-  const handleSaveStory = async (genres: string[], description: string) => {
+  const handleSaveStory = async (genres: string[], description: string, language: string = 'en') => {
     if (!currentStory) return;
     
     // Check if story has any content
@@ -2089,7 +2089,8 @@ const ManualStoryCreationPage: React.FC = () => {
     updateStory(currentStory.id, { 
       genre: genreString,
       description: description || undefined,
-      tags: genres // Store individual genres as tags too
+      tags: genres, // Store individual genres as tags too
+      language: language // Store language
     });
     
     // If in collaboration mode, update the draft on the backend with genres and description
@@ -3013,6 +3014,7 @@ const ManualStoryCreationPage: React.FC = () => {
         }}
         onSave={handleSaveStory}
         currentGenres={currentStory?.tags || []}
+        currentLanguage={currentStory?.language || 'en'}
         currentDescription={currentStory?.description || ''}
         storyTitle={storyTitle || 'Untitled Story'}
       />
@@ -3073,7 +3075,9 @@ const ManualStoryCreationPage: React.FC = () => {
               color: '#6B7280',
               marginBottom: '0'
             }}>
-              {wasVoteInitiator ? 'Thank you for creating this story!' : 'Thanks for collaborating!'}<br/>
+              {isCollaborating 
+                ? (wasVoteInitiator ? 'Thank you for creating this story!' : 'Thanks for collaborating!') 
+                : 'Your story has been saved successfully!'}<br/>
               Redirecting you to the library...
             </p>
           </div>

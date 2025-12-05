@@ -18,6 +18,7 @@ export interface CreateStoryRequest {
     order: number;
   }>;
   coverImage?: string;
+  language?: string; // Story language (en, tl, etc.)
   isDraft: boolean;
   isPublished: boolean;
 }
@@ -34,6 +35,7 @@ export interface UpdateStoryRequest {
     order: number;
   }>;
   coverImage?: string;
+  language?: string; // Story language (en, tl, etc.)
   isDraft?: boolean;
   isPublished?: boolean;
 }
@@ -259,10 +261,14 @@ class StoryApiService {
    */
   async unpublishStory(id: string): Promise<StoryApiResponse> {
     try {
+      console.log('🔄 Unpublishing story:', id);
+      console.log('📤 Calling endpoint:', API_ENDPOINTS.STORIES.UNPUBLISH(id));
       const response = await api.post<StoryApiResponse>(API_ENDPOINTS.STORIES.UNPUBLISH(id));
+      console.log('✅ Unpublish response:', response);
+      console.log('📊 Story is_published status:', response.is_published);
       return response;
     } catch (error) {
-      console.error(`Error unpublishing story ${id}:`, error);
+      console.error(`❌ Error unpublishing story ${id}:`, error);
       throw error;
     }
   }
@@ -522,6 +528,11 @@ class StoryApiService {
       }
     }
     
+    // Convert genres array to readable tags
+    const tags = apiStory.genres && Array.isArray(apiStory.genres) 
+      ? apiStory.genres.map((g: string) => genreMap[g] || g.charAt(0).toUpperCase() + g.slice(1))
+      : [];
+    
     const convertedStory = {
       id: apiStory.id?.toString() || '',
       backendId: apiStory.id, // Store Django ID for future updates
@@ -531,7 +542,7 @@ class StoryApiService {
       is_collaborative: apiStory.is_collaborative || false, // Whether this is a collaborative story
       description: apiStory.summary || '',
       genre: genreMap[apiStory.category] || 'Other',
-      tags: [],
+      tags: tags, // Multiple genres as array
       pages: pages,
       coverImage: coverImage,
       ageGroup: undefined,
@@ -542,6 +553,7 @@ class StoryApiService {
       createdAt: new Date(apiStory.date_created),
       lastModified: new Date(apiStory.date_updated),
       wordCount: wordCount,
+      language: apiStory.language || 'en', // Preserve language
     };
     
     console.log('✅ Converted story:', convertedStory.id, 'isDraft:', convertedStory.isDraft, 'isPublished:', convertedStory.isPublished);

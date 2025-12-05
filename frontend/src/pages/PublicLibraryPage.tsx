@@ -203,20 +203,22 @@ const PublicLibraryPage: React.FC = () => {
             <div className="public-library-filter-group">
               <label className="public-library-filter-label">Language</label>
               <CustomDropdown
+                key="language-dropdown"
                 value={selectedLanguage}
                 onChange={(value) => setSelectedLanguage(value)}
                 options={languages}
-                className="public-library-filter-select"
+                className="public-library-filter-select language-filter"
               />
             </div>
 
             <div className="public-library-filter-group">
               <label className="public-library-filter-label">Genre</label>
               <CustomDropdown
+                key="genre-dropdown"
                 value={selectedGenre}
                 onChange={(value) => setSelectedGenre(value)}
                 options={genres}
-                className="public-library-filter-select"
+                className="public-library-filter-select genre-filter"
               />
             </div>
 

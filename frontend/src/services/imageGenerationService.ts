@@ -449,6 +449,9 @@ export const addTitleOverlayToCover = async (
         ctx.fillText(line, canvas.width / 2, y);
       });
       
+      // Note: No subtitle here - this is used by Photo Story which adds "A Photo Story"
+      // AI Story doesn't use this function's title overlay
+      
       // Convert canvas to base64
       const coverImageWithText = canvas.toDataURL('image/png', 0.95);
       console.log('✅ Cover with title overlay created successfully');

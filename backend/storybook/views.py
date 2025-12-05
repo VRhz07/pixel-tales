@@ -281,7 +281,11 @@ def unpublish_story(request, story_id):
     """Unpublish a story (remove from public library, move back to drafts)"""
     story = get_object_or_404(Story, id=story_id, author=request.user)
     
+    print(f"📤 Unpublish request for story {story_id}: {story.title}")
+    print(f"   Current is_published: {story.is_published}")
+    
     if not story.is_published:
+        print(f"⚠️ Story {story_id} is already unpublished")
         return Response({
             'success': False,
             'message': 'Story is already unpublished'
@@ -290,10 +294,16 @@ def unpublish_story(request, story_id):
     story.is_published = False
     story.save()
     
+    # Verify the change was saved
+    story.refresh_from_db()
+    print(f"✅ Story {story_id} unpublished successfully")
+    print(f"   New is_published: {story.is_published}")
+    
     return Response({
         'success': True,
         'message': 'Story unpublished successfully',
-        'story_id': story.id
+        'story_id': story.id,
+        'is_published': story.is_published  # Include in response for verification
     })
 
 

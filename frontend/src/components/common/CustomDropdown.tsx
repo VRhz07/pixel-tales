@@ -79,6 +79,10 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
     <div 
       ref={dropdownRef} 
       className={`custom-dropdown ${disabled ? 'disabled' : ''} ${className}`}
+      style={{
+        position: 'relative',
+        zIndex: isOpen ? 1001 : 1
+      }}
     >
       {/* Dropdown Button */}
       <button
@@ -97,7 +101,25 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="custom-dropdown-menu" role="listbox">
+        <div 
+          className="custom-dropdown-menu" 
+          role="listbox"
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            zIndex: 1002,
+            background: 'white',
+            border: '1px solid #d1d5db',
+            borderRadius: '0.5rem',
+            marginTop: '0.25rem',
+            width: '100%',
+            maxHeight: '200px',
+            overflowY: 'auto',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+          }}
+        >
           {options.map((option) => (
             <button
               key={option.value}

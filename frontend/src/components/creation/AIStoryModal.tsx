@@ -308,6 +308,8 @@ Each page should have text and an imagePrompt for illustration generation.
         
         console.log('🎨 Generating cover with description:', coverDescription);
         
+        // generateCoverIllustration already adds title overlay
+        // No need to add it again here
         coverUrl = await generateCoverIllustration(
           storyData.title || 'AI Generated Story',
           coverDescription,  // Use AI-generated description
@@ -316,12 +318,14 @@ Each page should have text and an imagePrompt for illustration generation.
           storyData.colorScheme
         );
         
-        console.log('Generated cover URL:', coverUrl);
+        console.log('✅ Cover illustration generated (includes title overlay)');
         
         // Save cover to story
-        updateStory(newStory.id, {
-          coverImage: coverUrl
-        });
+        if (coverUrl) {
+          updateStory(newStory.id, {
+            coverImage: coverUrl
+          });
+        }
       } catch (error) {
         console.error('Failed to generate cover illustration:', error);
         warnings.push('Cover image failed to generate');

@@ -915,7 +915,7 @@ export const useStoryStore = create<StoryState>()(
       },
 
       markAsDraft: (id: string) => {
-        get().updateStory(id, { isDraft: true });
+        get().updateStory(id, { isDraft: true, isPublished: false });
       },
 
       markAsSaved: (id: string) => {

@@ -186,6 +186,24 @@ const PublicLibraryPage = () => {
   // Load published stories from backend
   useEffect(() => {
     loadPublishedStories();
+    
+    // Set up interval to refresh published stories every 30 seconds
+    const refreshInterval = setInterval(() => {
+      loadPublishedStories();
+    }, 30000); // Refresh every 30 seconds
+    
+    // Listen for story unpublish events
+    const handleStoryUnpublished = () => {
+      console.log('📢 Story unpublished event received - refreshing public library');
+      loadPublishedStories();
+    };
+    
+    window.addEventListener('story-unpublished', handleStoryUnpublished);
+    
+    return () => {
+      clearInterval(refreshInterval);
+      window.removeEventListener('story-unpublished', handleStoryUnpublished);
+    };
   }, []);
 
   const loadPublishedStories = async () => {
@@ -266,10 +284,12 @@ const PublicLibraryPage = () => {
       );
     }
     
-    // Filter by language (mock data doesn't have language, so skip for now)
-    // In real implementation, would filter: stories = stories.filter(s => s.language === selectedLanguage)
+    // Filter by language
+    if (selectedLanguage) {
+      stories = stories.filter((story: any) => story.language === selectedLanguage);
+    }
     
-    // Filter by genre
+    // Filter by genre - check if any of the story's genres match the selected genre
     if (selectedGenre) {
       stories = stories.filter((story: any) => 
         story.tags && story.tags.some((tag: string) => tag.toLowerCase() === selectedGenre.toLowerCase())

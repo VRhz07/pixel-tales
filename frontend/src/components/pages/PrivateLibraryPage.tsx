@@ -205,6 +205,9 @@ const PrivateLibraryPage = () => {
           markAsDraft(storyId);
           
           console.log('Story unpublished successfully:', storyId);
+          
+          // Dispatch event to notify public library to refresh
+          window.dispatchEvent(new CustomEvent('story-unpublished', { detail: { storyId } }));
           setIsModalLoading(false);
           closeModal();
         } catch (error) {

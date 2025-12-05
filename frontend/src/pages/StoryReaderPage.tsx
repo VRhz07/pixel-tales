@@ -981,12 +981,14 @@ const StoryReaderPage: React.FC = () => {
               <span className="story-reader-detail-value">{storyAuthor}</span>
             </div>
           )}
-          {story.genre && (
+          {(story.tags && story.tags.length > 0) || story.genre ? (
             <div className="story-reader-detail-item">
               <span className="story-reader-detail-label">Genre: </span>
-              <span className="story-reader-detail-value">{story.genre}</span>
+              <span className="story-reader-detail-value">
+                {story.tags && story.tags.length > 0 ? story.tags.join(', ') : story.genre}
+              </span>
             </div>
-          )}
+          ) : null}
         </div>
         
         {/* Story Description */}

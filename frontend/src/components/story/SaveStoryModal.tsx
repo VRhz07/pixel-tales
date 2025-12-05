@@ -5,9 +5,10 @@ import { STORY_GENRES } from '../../constants/genres';
 interface SaveStoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (genres: string[], description: string) => void;
+  onSave: (genres: string[], description: string, language: string) => void;
   currentGenres?: string[];
   currentDescription?: string;
+  currentLanguage?: string;
   storyTitle: string;
 }
 
@@ -17,18 +18,21 @@ const SaveStoryModal: React.FC<SaveStoryModalProps> = ({
   onSave,
   currentGenres = [],
   currentDescription = '',
+  currentLanguage = 'en',
   storyTitle
 }) => {
   const [selectedGenres, setSelectedGenres] = useState<string[]>(currentGenres);
   const [description, setDescription] = useState(currentDescription);
+  const [language, setLanguage] = useState<string>(currentLanguage);
 
   // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
       setSelectedGenres(currentGenres);
       setDescription(currentDescription);
+      setLanguage(currentLanguage);
     }
-  }, [isOpen, currentGenres, currentDescription]);
+  }, [isOpen, currentGenres, currentDescription, currentLanguage]);
 
   if (!isOpen) return null;
 
@@ -41,7 +45,7 @@ const SaveStoryModal: React.FC<SaveStoryModalProps> = ({
   };
 
   const handleSave = () => {
-    onSave(selectedGenres, description);
+    onSave(selectedGenres, description, language);
     onClose();
   };
 
@@ -94,6 +98,33 @@ const SaveStoryModal: React.FC<SaveStoryModalProps> = ({
                   {genre}
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Language Selection */}
+          <div className="save-story-modal-section">
+            <label className="save-story-modal-label">
+              Story Language
+            </label>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button
+                onClick={() => setLanguage('en')}
+                className={`save-story-modal-genre-button ${
+                  language === 'en' ? 'selected' : ''
+                }`}
+                style={{ flex: 1 }}
+              >
+                🇺🇸 English
+              </button>
+              <button
+                onClick={() => setLanguage('tl')}
+                className={`save-story-modal-genre-button ${
+                  language === 'tl' ? 'selected' : ''
+                }`}
+                style={{ flex: 1 }}
+              >
+                🇵🇭 Tagalog
+              </button>
             </div>
           </div>
 
