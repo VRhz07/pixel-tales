@@ -18,6 +18,10 @@
     <!-- Network state -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!-- Foreground service for media playback -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <!-- Camera feature declaration -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
@@ -46,6 +50,17 @@
             </intent-filter>
 
         </activity>
+
+        <!-- Media Button Receiver for notification controls -->
+        <receiver android:name=".MediaButtonReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="com.pixeltales.app.PLAY" />
+                <action android:name="com.pixeltales.app.PAUSE" />
+                <action android:name="com.pixeltales.app.STOP" />
+                <action android:name="com.pixeltales.app.NEXT" />
+                <action android:name="com.pixeltales.app.PREVIOUS" />
+            </intent-filter>
+        </receiver>
 
         <provider
             android:name="androidx.core.content.FileProvider"

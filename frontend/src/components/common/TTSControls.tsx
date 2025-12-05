@@ -12,19 +12,22 @@ import { useI18nStore } from '../../stores/i18nStore';
 import { CustomDropdown } from './CustomDropdown';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { Capacitor } from '@capacitor/core';
+import { useMediaNotification } from '../../hooks/useMediaNotification';
 
 interface TTSControlsProps {
   text: string;
   autoPlay?: boolean;
   showProgress?: boolean;
   compact?: boolean;
+  storyTitle?: string; // For media notification
 }
 
 export const TTSControls: React.FC<TTSControlsProps> = ({ 
   text, 
   autoPlay = false,
   showProgress = true,
-  compact = false
+  compact = false,
+  storyTitle = 'Story'
 }) => {
   const { t } = useI18nStore();
   const {
@@ -44,8 +47,8 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
     volume,
     setVolume,
     progress,
-    voiceGender,
-    setVoiceGender,
+    cloudVoiceId,
+    setCloudVoiceId,
     useCloudTTS,
     setUseCloudTTS,
     isOnline
@@ -53,6 +56,60 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
 
   const [showSettings, setShowSettings] = useState(false);
   const isNativePlatform = Capacitor.isNativePlatform();
+
+  // Media notification integration
+  const {
+    showNotification,
+    hideNotification,
+    updateNotification,
+    isSupported: isNotificationSupported
+  } = useMediaNotification({
+    onPlay: () => {
+      console.log('📱 Media notification: Play pressed');
+      if (isPaused) {
+        resume();
+      } else if (!isSpeaking && text) {
+        speak(text);
+      }
+    },
+    onPause: () => {
+      console.log('📱 Media notification: Pause pressed');
+      pause();
+    },
+    onStop: () => {
+      console.log('📱 Media notification: Stop pressed');
+      stop();
+    }
+  });
+
+  // Update notification when TTS state changes
+  React.useEffect(() => {
+    if (!isNotificationSupported || !isNativePlatform) return;
+
+    if (isSpeaking || isPaused) {
+      const notificationText = `${isPaused ? 'Paused' : 'Playing'} - ${Math.round(progress)}%`;
+      
+      if (isSpeaking && !isPaused) {
+        // Currently playing
+        showNotification(storyTitle, notificationText, true);
+      } else if (isPaused) {
+        // Paused
+        updateNotification(storyTitle, notificationText, false);
+      }
+    } else {
+      // Stopped
+      hideNotification();
+    }
+  }, [isSpeaking, isPaused, progress, storyTitle, isNotificationSupported, isNativePlatform]);
+
+  // Clean up notification on unmount
+  React.useEffect(() => {
+    return () => {
+      if (isNotificationSupported && isNativePlatform) {
+        hideNotification();
+      }
+    };
+  }, [isNotificationSupported, isNativePlatform]);
   
   const handleInstallTTS = async () => {
     if (!isNativePlatform) {
@@ -239,17 +296,19 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
               </p>
             </div>
 
-            {/* Voice Gender Selection (for Cloud TTS) */}
+            {/* Voice Selection (for Cloud TTS) */}
             {useCloudTTS && (
               <div className="tts-setting-item">
-                <label htmlFor="tts-gender">Voice Gender</label>
+                <label htmlFor="tts-cloud-voice">Voice</label>
                 <CustomDropdown
                   options={[
-                    { value: 'female', label: '👩 Female Voice' },
-                    { value: 'male', label: '👨 Male Voice' }
+                    { value: 'female_english', label: '👩 Female (English Accent)' },
+                    { value: 'female_filipino', label: '👩 Female (Filipino Accent)' },
+                    { value: 'male_english', label: '👨 Male (English Accent)' },
+                    { value: 'male_filipino', label: '👨 Male (Filipino Accent)' }
                   ]}
-                  value={voiceGender}
-                  onChange={(value) => setVoiceGender(value as 'female' | 'male')}
+                  value={cloudVoiceId}
+                  onChange={(value) => setCloudVoiceId(value)}
                   className="tts-select"
                 />
               </div>

@@ -23,8 +23,8 @@ def synthesize_speech(request):
     Request body:
     {
         "text": "Text to synthesize",
-        "language": "en" or "fil",
-        "gender": "female" or "male",
+        "voice_id": "female_english" | "female_filipino" | "male_english" | "male_filipino",
+        "language": "en" or "fil" (fallback if voice_id not provided),
         "rate": 1.0,
         "pitch": 0.0,
         "volume": 0.0
@@ -36,8 +36,8 @@ def synthesize_speech(request):
     try:
         # Get parameters
         text = request.data.get('text', '').strip()
-        language = request.data.get('language', 'en')
-        gender = request.data.get('gender', 'female')
+        voice_id = request.data.get('voice_id')  # New parameter
+        language = request.data.get('language', 'en')  # Fallback
         rate = float(request.data.get('rate', 1.0))
         pitch = float(request.data.get('pitch', 0.0))
         volume = float(request.data.get('volume', 0.0))
@@ -63,13 +63,13 @@ def synthesize_speech(request):
                 'fallback': True
             }, status=503)
         
-        logger.info(f"🎤 TTS request: {len(text)} chars, lang: {language}, gender: {gender}")
+        logger.info(f"🎤 TTS request: {len(text)} chars, voice_id: {voice_id}, fallback_lang: {language}")
         
         # Synthesize speech
         audio_content = tts_service.synthesize_speech(
             text=text,
+            voice_id=voice_id,
             language=language,
-            gender=gender,
             rate=rate,
             pitch=pitch,
             volume=volume
@@ -141,19 +141,27 @@ def check_tts_status(request):
     Returns:
         {
             "available": true/false,
-            "service": "google-cloud-tts"
+            "service": "google-cloud-tts",
+            "voices": [...list of available voices...]
         }
     """
     try:
         tts_service = get_tts_service()
         
+        # Get available voices with their details
+        voices_list = [
+            {
+                'id': voice_id,
+                'label': voice_config['label'],
+                'accent': voice_config['accent']
+            }
+            for voice_id, voice_config in tts_service.VOICES.items()
+        ]
+        
         return Response({
             'available': tts_service.is_available(),
             'service': 'google-cloud-tts',
-            'voices': {
-                'en': ['female', 'male'],
-                'fil': ['female', 'male']
-            }
+            'voices': voices_list
         })
         
     except Exception as e:

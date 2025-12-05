@@ -15,15 +15,31 @@ class TTSService:
     Text-to-Speech service using Google Cloud TTS
     """
     
-    # Available voices for each language and gender
+    # Available voices with English and Filipino accents
     VOICES = {
-        'en': {
-            'female': 'en-US-Neural2-C',  # Natural, clear female voice
-            'male': 'en-US-Neural2-D',    # Natural, clear male voice
+        'female_english': {
+            'name': 'en-US-Neural2-C',
+            'language_code': 'en-US',
+            'label': 'Female (English Accent)',
+            'accent': 'english'
         },
-        'fil': {
-            'female': 'fil-PH-Wavenet-A',  # Natural Filipino female voice
-            'male': 'fil-PH-Wavenet-C',    # Natural Filipino male voice
+        'female_filipino': {
+            'name': 'fil-PH-Wavenet-A',
+            'language_code': 'fil-PH',
+            'label': 'Female (Filipino Accent)',
+            'accent': 'filipino'
+        },
+        'male_english': {
+            'name': 'en-US-Neural2-D',
+            'language_code': 'en-US',
+            'label': 'Male (English Accent)',
+            'accent': 'english'
+        },
+        'male_filipino': {
+            'name': 'fil-PH-Wavenet-C',
+            'language_code': 'fil-PH',
+            'label': 'Male (Filipino Accent)',
+            'accent': 'filipino'
         }
     }
     
@@ -40,34 +56,42 @@ class TTSService:
         """Check if TTS service is available"""
         return self.client is not None
     
-    def get_voice_name(self, language: str, gender: str) -> str:
+    def get_voice_config(self, voice_id: str = None, language: str = 'en') -> dict:
         """
-        Get the appropriate voice name based on language and gender
+        Get the voice configuration based on voice ID or fallback to language
         
         Args:
-            language: 'en' or 'fil' (Tagalog)
-            gender: 'female' or 'male'
+            voice_id: Voice identifier (e.g., 'female_english', 'male_filipino')
+            language: Fallback language if voice_id not provided ('en' or 'fil')
             
         Returns:
-            Voice name string
+            Dictionary with voice configuration
         """
-        # Normalize language code
+        # If voice_id is provided and valid, use it
+        if voice_id and voice_id in self.VOICES:
+            config = self.VOICES[voice_id]
+            logger.info(f"🎤 Selected voice: {config['name']} ({config['label']})")
+            return config
+        
+        # Fallback: Auto-select based on language
         lang = 'fil' if language in ['tl', 'fil', 'fil-PH'] else 'en'
+        fallback_voice_id = f'female_{lang}lish' if lang == 'en' else 'female_filipino'
         
-        # Normalize gender
-        gender = gender.lower() if gender else 'female'
-        if gender not in ['male', 'female']:
-            gender = 'female'
+        if fallback_voice_id in self.VOICES:
+            config = self.VOICES[fallback_voice_id]
+            logger.info(f"🎤 Fallback voice: {config['name']} ({config['label']})")
+            return config
         
-        voice = self.VOICES.get(lang, {}).get(gender)
-        logger.info(f"🎤 Selected voice: {voice} (language: {lang}, gender: {gender})")
-        return voice
+        # Ultimate fallback
+        config = self.VOICES['female_english']
+        logger.warning(f"⚠️ Using default voice: {config['name']}")
+        return config
     
     def synthesize_speech(
         self,
         text: str,
+        voice_id: str = None,
         language: str = 'en',
-        gender: str = 'female',
         rate: float = 1.0,
         pitch: float = 0.0,
         volume: float = 0.0
@@ -77,8 +101,8 @@ class TTSService:
         
         Args:
             text: Text to synthesize
-            language: 'en' or 'fil'
-            gender: 'female' or 'male'
+            voice_id: Voice identifier (e.g., 'female_english', 'male_filipino')
+            language: Fallback language 'en' or 'fil' (used if voice_id not provided)
             rate: Speaking rate (0.25 to 4.0, default 1.0)
             pitch: Voice pitch (-20.0 to 20.0, default 0.0)
             volume: Volume gain in dB (-96.0 to 16.0, default 0.0)
@@ -95,9 +119,10 @@ class TTSService:
         if not text or not text.strip():
             raise ValueError("Text cannot be empty")
         
-        # Get voice name
-        voice_name = self.get_voice_name(language, gender)
-        language_code = 'fil-PH' if language in ['tl', 'fil', 'fil-PH'] else 'en-US'
+        # Get voice configuration
+        voice_config = self.get_voice_config(voice_id, language)
+        voice_name = voice_config['name']
+        language_code = voice_config['language_code']
         
         try:
             # Set the text input to be synthesized

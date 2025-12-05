@@ -31,8 +31,8 @@ interface UseTextToSpeechReturn {
   volume: number;
   setVolume: (volume: number) => void;
   progress: number; // 0 to 100
-  voiceGender: 'female' | 'male';
-  setVoiceGender: (gender: 'female' | 'male') => void;
+  cloudVoiceId: string;
+  setCloudVoiceId: (voiceId: string) => void;
   useCloudTTS: boolean;
   setUseCloudTTS: (use: boolean) => void;
   isOnline: boolean;
@@ -48,7 +48,7 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
   const [pitch, setPitch] = useState(1);
   const [volume, setVolume] = useState(1);
   const [progress, setProgress] = useState(0);
-  const [voiceGender, setVoiceGender] = useState<'female' | 'male'>('female');
+  const [cloudVoiceId, setCloudVoiceId] = useState<string>('female_english');
   const [useCloudTTS, setUseCloudTTS] = useState(true); // Default to cloud when available
   const isOnline = useOnlineStatus();
   
@@ -57,6 +57,8 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
   const currentWordRef = useRef(0);
   const fullTextRef = useRef<string>('');
   const wordsArrayRef = useRef<string[]>([]);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
   const isNativePlatform = Capacitor.isNativePlatform();
 
@@ -76,19 +78,38 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
           console.log('📢 TTS: Native voices loaded:', result.voices.length, result.voices);
           
           if (result.voices && result.voices.length > 0) {
-            setVoices(result.voices);
+            // Filter to show only English and Filipino voices
+            const filteredVoices = result.voices.filter(v => {
+              if (!v.lang) return false;
+              const langLower = v.lang.toLowerCase();
+              
+              // Include English voices (en, en-US, en-GB, etc.)
+              const isEnglish = langLower.startsWith('en');
+              
+              // Include Filipino/Tagalog voices (fil, fil-PH, tl, tl-PH)
+              const isFilipino = langLower.startsWith('fil') || 
+                                 langLower.startsWith('tl') || 
+                                 langLower.includes('ph') ||
+                                 langLower.includes('filipino') ||
+                                 langLower.includes('tagalog');
+              
+              return isEnglish || isFilipino;
+            });
+            
+            console.log('📢 TTS: Filtered voices (English & Filipino only):', filteredVoices.length, filteredVoices);
+            setVoices(filteredVoices);
             
             // Auto-select voice based on current language
-            if (!currentVoice) {
+            if (!currentVoice && filteredVoices.length > 0) {
               // For Tagalog, look for Filipino voices
               const langCode = language === 'tl' ? 'fil' : language;
-              const preferredVoice = result.voices.find(v => 
+              const preferredVoice = filteredVoices.find(v => 
                 v.lang && (
                   v.lang.toLowerCase().includes(langCode) || 
                   v.lang.toLowerCase().startsWith('fil') ||
                   (language === 'tl' && v.lang.toLowerCase().includes('ph'))
                 )
-              ) || result.voices[0];
+              ) || filteredVoices[0];
               
               console.log('📢 TTS: Auto-selected voice:', preferredVoice);
               setCurrentVoice(preferredVoice);
@@ -107,14 +128,33 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
         
         const availableVoices = window.speechSynthesis.getVoices();
         console.log('📢 TTS: Available web voices:', availableVoices.length, availableVoices);
-        setVoices(availableVoices);
+        
+        // Filter to show only English and Filipino voices
+        const filteredVoices = availableVoices.filter(v => {
+          const langLower = v.lang.toLowerCase();
+          
+          // Include English voices (en, en-US, en-GB, etc.)
+          const isEnglish = langLower.startsWith('en');
+          
+          // Include Filipino/Tagalog voices (fil, fil-PH, tl, tl-PH)
+          const isFilipino = langLower.startsWith('fil') || 
+                             langLower.startsWith('tl') || 
+                             langLower.includes('ph') ||
+                             langLower.includes('filipino') ||
+                             langLower.includes('tagalog');
+          
+          return isEnglish || isFilipino;
+        });
+        
+        console.log('📢 TTS: Filtered web voices (English & Filipino only):', filteredVoices.length, filteredVoices);
+        setVoices(filteredVoices);
 
         // Auto-select voice based on current language
-        if (availableVoices.length > 0 && !currentVoice) {
+        if (filteredVoices.length > 0 && !currentVoice) {
           const langCode = language === 'tl' ? 'fil' : 'en'; // Filipino or English
-          const preferredVoice = availableVoices.find(v => 
+          const preferredVoice = filteredVoices.find(v => 
             v.lang.startsWith(langCode) || v.lang.startsWith(language)
-          ) || availableVoices[0];
+          ) || filteredVoices[0];
           console.log('📢 TTS: Selected web voice:', preferredVoice);
           setCurrentVoice(preferredVoice);
         }
@@ -164,8 +204,8 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
         },
         body: JSON.stringify({
           text,
+          voice_id: cloudVoiceId,
           language: lang,
-          gender: voiceGender,
           rate: rate,
           pitch: pitch,
           volume: volume
@@ -188,8 +228,15 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
       
+      // Clean up previous audio if exists
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      
       // Play audio
       const audio = new Audio(audioUrl);
+      audioRef.current = audio;
       
       audio.onloadedmetadata = () => {
         console.log('🌥️ TTS: Audio loaded, duration:', audio.duration);
@@ -207,6 +254,7 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
         setIsSpeaking(false);
         setProgress(100);
         URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
       };
       
       audio.onerror = (error) => {
@@ -214,6 +262,7 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
         setIsSpeaking(false);
         setProgress(0);
         URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
       };
       
       await audio.play();
@@ -224,7 +273,7 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
       console.error('🌥️ TTS: Cloud TTS error:', error);
       return false; // Indicate fallback needed
     }
-  }, [language, voiceGender, rate, pitch, volume]);
+  }, [language, cloudVoiceId, rate, pitch, volume]);
 
   // Speak text
   const speak = useCallback(async (text: string, options?: TextToSpeechOptions) => {
@@ -282,23 +331,66 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
         }
         
         console.log('📢 TTS: Speaking with options:', ttsOptions);
-        await TextToSpeech.speak(ttsOptions);
-        console.log('📢 TTS: Speech completed successfully');
         
-        // On mobile, we don't get word-by-word progress, so simulate it
-        const estimatedDuration = (text.length / 15) * 1000; // ~15 chars per second
-        const progressInterval = setInterval(() => {
-          setProgress(prev => {
-            const next = prev + 2;
-            if (next >= 100) {
-              clearInterval(progressInterval);
-              setIsSpeaking(false);
-              setProgress(100);
-              return 100;
+        // Clear any existing progress interval
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current);
+          progressIntervalRef.current = null;
+        }
+        
+        // Calculate estimated duration based on text length and speech rate
+        // Average speaking rate is ~150 words per minute, adjusted by rate setting
+        const wordCount = words.length;
+        const wordsPerMinute = 150 * rate; // Adjust for speech rate
+        const estimatedDurationMs = (wordCount / wordsPerMinute) * 60 * 1000;
+        
+        console.log('📢 TTS: Estimated duration:', estimatedDurationMs / 1000, 'seconds for', wordCount, 'words');
+        
+        // Start progress simulation
+        const startTime = Date.now();
+        progressIntervalRef.current = setInterval(() => {
+          const elapsed = Date.now() - startTime;
+          const progressPercent = Math.min((elapsed / estimatedDurationMs) * 100, 99);
+          
+          setProgress(progressPercent);
+          
+          // Don't reach 100% until speech actually completes
+          if (progressPercent >= 99) {
+            if (progressIntervalRef.current) {
+              clearInterval(progressIntervalRef.current);
+              progressIntervalRef.current = null;
             }
-            return next;
-          });
-        }, estimatedDuration / 50);
+          }
+        }, 100); // Update every 100ms for smooth progress
+        
+        // Start speaking (this is fire-and-forget, doesn't wait for completion)
+        TextToSpeech.speak(ttsOptions).then(() => {
+          console.log('📢 TTS: Speech completed successfully');
+          
+          // Clear interval and set final state
+          if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+            progressIntervalRef.current = null;
+          }
+          
+          setIsSpeaking(false);
+          setProgress(100);
+          
+          // Reset progress after a short delay
+          setTimeout(() => {
+            setProgress(0);
+          }, 1000);
+        }).catch((error) => {
+          console.error('📢 TTS: Speech error:', error);
+          
+          if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+            progressIntervalRef.current = null;
+          }
+          
+          setIsSpeaking(false);
+          setProgress(0);
+        });
         
       } catch (error) {
         console.error('📢 TTS Error on native platform:', error);
@@ -410,6 +502,18 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
   const stop = useCallback(async () => {
     if (!isSupported) return;
     
+    // Clear progress interval
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+    
+    // Stop audio if playing
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    
     if (isNativePlatform) {
       await TextToSpeech.stop();
     } else {
@@ -497,6 +601,18 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      // Clear progress interval
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+      
+      // Stop audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      
       if (isSupported && !isNativePlatform && typeof window !== 'undefined' && window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
@@ -522,8 +638,8 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
     volume,
     setVolume,
     progress,
-    voiceGender,
-    setVoiceGender,
+    cloudVoiceId,
+    setCloudVoiceId,
     useCloudTTS,
     setUseCloudTTS,
     isOnline

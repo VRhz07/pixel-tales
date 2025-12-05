@@ -1053,6 +1053,7 @@ const StoryReaderPage: React.FC = () => {
           <TTSControls 
             text={story.pages.map(page => page.text).filter(Boolean).join(' ')}
             showProgress={true}
+            storyTitle={story.title}
           />
         </div>
       </div>
