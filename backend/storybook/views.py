@@ -9,6 +9,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Avg
+from django.utils import timezone
 import json
 
 from .models import (
@@ -2707,7 +2708,7 @@ def add_child_relationship(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def remove_child_relationship(request, child_id):
-    """Remove a child from parent account"""
+    """Remove a child from parent account and archive the child's profile"""
     try:
         user_profile = request.user.profile
         
@@ -2735,15 +2736,38 @@ def remove_child_relationship(request, child_id):
                 'error': 'Relationship not found'
             }, status=status.HTTP_404_NOT_FOUND)
         
+        # Deactivate the relationship
         relationship.is_active = False
         relationship.save()
         
+        # Archive the child's profile
+        try:
+            child_user = User.objects.get(id=child_id)
+            child_profile = child_user.profile
+            
+            # Mark profile as archived
+            child_profile.is_archived = True
+            child_profile.archived_at = timezone.now()
+            child_profile.archive_reason = f'Removed by {user_profile.user_type}: {request.user.username}'
+            child_profile.save()
+            
+            print(f"Child profile archived: {child_user.username} by {request.user.username}")
+            
+        except User.DoesNotExist:
+            print(f"Child user not found: {child_id}")
+        except Exception as archive_error:
+            print(f"Error archiving child profile: {str(archive_error)}")
+            # Continue even if archiving fails
+        
         return Response({
             'success': True,
-            'message': 'Relationship removed successfully'
+            'message': 'Child removed and archived successfully'
         })
         
     except Exception as e:
+        import traceback
+        print(f"Error in remove_child_relationship: {str(e)}")
+        print(traceback.format_exc())
         return Response({
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2940,6 +2964,103 @@ def get_child_activities(request, child_id):
         })
         
     except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_child_stories(request, child_id):
+    """Get all stories created by a specific child"""
+    try:
+        user_profile = request.user.profile
+        
+        # Verify parent/teacher relationship
+        if user_profile.user_type == 'parent':
+            has_access = ParentChildRelationship.objects.filter(
+                parent=request.user,
+                child_id=child_id,
+                is_active=True
+            ).exists()
+        elif user_profile.user_type == 'teacher':
+            has_access = TeacherStudentRelationship.objects.filter(
+                teacher=request.user,
+                student_id=child_id,
+                is_active=True
+            ).exists()
+        else:
+            has_access = False
+        
+        if not has_access:
+            return Response({
+                'error': 'You do not have access to this child\'s data'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        child = get_object_or_404(User, id=child_id)
+        
+        # Get all stories (both published and drafts)
+        stories = child.stories.all().order_by('-date_created')
+        
+        stories_data = []
+        for story in stories:
+            # Calculate page count based on canvas_data
+            page_count = 1
+            try:
+                if story.canvas_data:
+                    import json
+                    canvas = json.loads(story.canvas_data) if isinstance(story.canvas_data, str) else story.canvas_data
+                    if isinstance(canvas, dict) and 'pages' in canvas:
+                        page_count = len(canvas['pages'])
+                    elif isinstance(canvas, list):
+                        page_count = len(canvas)
+            except Exception:
+                page_count = 1
+            
+            # Get interaction stats
+            likes_count = story.likes.count()
+            comments_count = story.comments.count()
+            views_count = story.views
+            
+            # Parse canvas_data for the response
+            canvas_data_json = None
+            try:
+                if story.canvas_data:
+                    canvas_data_json = json.loads(story.canvas_data) if isinstance(story.canvas_data, str) else story.canvas_data
+            except Exception:
+                canvas_data_json = None
+            
+            stories_data.append({
+                'id': story.id,
+                'title': story.title,
+                'category': story.category or 'Uncategorized',
+                'genres': story.genres or [],
+                'is_published': story.is_published,
+                'creation_type': story.creation_type,
+                'date_created': story.date_created.isoformat() if story.date_created else None,
+                'date_updated': story.date_updated.isoformat() if story.date_updated else None,
+                'page_count': page_count,
+                'cover_image': story.cover_image if story.cover_image else None,
+                'likes': likes_count,
+                'comments': comments_count,
+                'views': views_count,
+                'language': story.language or 'en',
+                'canvas_data': canvas_data_json,
+                'content': story.content if story.content else '',
+            })
+        
+        return Response({
+            'success': True,
+            'stories': stories_data,
+            'total_count': len(stories_data),
+            'published_count': len([s for s in stories_data if s['is_published']]),
+            'draft_count': len([s for s in stories_data if not s['is_published']]),
+        })
+        
+    except Exception as e:
+        import traceback
+        print(f"Error in get_child_stories: {str(e)}")
+        print(traceback.format_exc())
         return Response({
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

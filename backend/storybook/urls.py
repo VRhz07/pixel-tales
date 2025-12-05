@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .jwt_auth import CustomTokenObtainPairView, jwt_register, jwt_logout, jwt_user_profile, jwt_create_session, verify_email, resend_verification_code, verify_password, send_password_reset_code, verify_password_reset_code, reset_password, change_password, delete_account
-from . import views, admin_views, admin_auth, admin_features, admin_profanity, ai_proxy_views, tts_views
+from . import views, admin_views, admin_auth, admin_features, admin_profanity, ai_proxy_views
 
 # Create a router for ViewSets (we'll add these later)
 router = DefaultRouter()
@@ -186,11 +186,6 @@ urlpatterns = [
     path('ai/ocr/process/', ai_proxy_views.ocr_image, name='ocr_image'),
     path('ai/status/', ai_proxy_views.check_ai_service_status, name='check_ai_service_status'),
     
-    # Text-to-Speech endpoints (Google Cloud TTS)
-    path('tts/synthesize/', tts_views.synthesize_speech, name='synthesize_speech'),
-    path('tts/voices/', tts_views.get_available_voices, name='get_available_voices'),
-    path('tts/status/', tts_views.check_tts_status, name='check_tts_status'),
-    
     # Parent/Teacher Dashboard endpoints
     path('parent/children/', views.get_parent_children, name='get_parent_children'),
     path('parent/children/create/', views.create_child_account, name='create_child_account'),
@@ -200,6 +195,7 @@ urlpatterns = [
     path('parent/children/<int:child_id>/activities/', views.get_child_activities, name='get_child_activities'),
     path('parent/children/<int:child_id>/goals/', views.get_child_goals, name='get_child_goals'),
     path('parent/children/<int:child_id>/analytics/', views.get_child_analytics, name='get_child_analytics'),
+    path('parent/children/<int:child_id>/stories/', views.get_child_stories, name='get_child_stories'),
     path('parent/children/<int:child_id>/switch-view/', views.switch_to_child_view, name='switch_to_child_view'),
     path('teacher/students/', views.get_teacher_students, name='get_teacher_students'),
     path('teacher/students/<int:student_id>/stats/', views.get_child_statistics, name='get_student_statistics'),

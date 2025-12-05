@@ -297,6 +297,33 @@ const parentDashboardService = {
     }
   },
 
+  // Get child stories (all stories created by the child)
+  async getChildStories(childId: number): Promise<any[]> {
+    try {
+      const data = await api.get(`/parent/children/${childId}/stories/`);
+      console.log('Child stories API response:', data);
+      
+      // Handle response structure
+      if (data && data.stories && Array.isArray(data.stories)) {
+        return data.stories;
+      }
+      
+      // If response is direct array
+      if (Array.isArray(data)) {
+        return data;
+      }
+      
+      console.warn('No stories found in response');
+      return [];
+    } catch (error: any) {
+      console.error('Error fetching child stories:', error);
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+      }
+      return [];
+    }
+  },
+
   // Switch to child view (allows parent/teacher to view app as child)
   async switchToChildView(childId: number): Promise<any> {
     try {

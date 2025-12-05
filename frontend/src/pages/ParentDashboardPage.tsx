@@ -25,6 +25,7 @@ import { useNotificationStore } from '../stores/notificationStore';
 import parentDashboardService, { Child, ChildStatistics, Activity, Goal, ChildFormData, ChildAnalytics } from '../services/parentDashboard.service';
 import AddChildModal from '../components/parent/AddChildModal';
 import UnifiedProfileSwitcher from '../components/parent/UnifiedProfileSwitcher';
+import StoryViewModal from '../components/parent/StoryViewModal';
 import { useAccountSwitchStore } from '../stores/accountSwitchStore';
 import { storage } from '../utils/storage';
 import './ParentDashboardPage.css';
@@ -182,6 +183,13 @@ const ParentDashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [loadingAnalytics, setLoadingAnalytics] = useState(false);
   const [showAddChildModal, setShowAddChildModal] = useState(false);
+  const [childStories, setChildStories] = useState<any[]>([]);
+  const [loadingStories, setLoadingStories] = useState(false);
+  const [selectedStory, setSelectedStory] = useState<any | null>(null);
+  const [showStoryModal, setShowStoryModal] = useState(false);
+  const [storyFilter, setStoryFilter] = useState<'all' | 'published' | 'draft'>('all');
+  const [storySortBy, setStorySortBy] = useState<'newest' | 'oldest' | 'mostLiked' | 'mostViewed'>('newest');
+  const [storySearchQuery, setStorySearchQuery] = useState('');
 
   // Set active account as parent when viewing dashboard
   useEffect(() => {
@@ -278,6 +286,21 @@ const ParentDashboardPage: React.FC = () => {
     }
   }, [selectedChild]);
 
+  // Real-time polling for activity updates when on activity notifications tab
+  useEffect(() => {
+    if (activeTab === 'activity' && activitySubTab === 'notifications' && selectedChild) {
+      // Load immediately
+      loadChildData(selectedChild.id);
+      
+      // Then poll every 10 seconds for real-time updates
+      const pollInterval = setInterval(() => {
+        loadChildData(selectedChild.id);
+      }, 10000); // 10 seconds
+      
+      return () => clearInterval(pollInterval);
+    }
+  }, [activeTab, activitySubTab, selectedChild]);
+
   const loadChildData = async (childId: number) => {
     try {
       const [stats, acts, gls] = await Promise.all([
@@ -306,12 +329,77 @@ const ParentDashboardPage: React.FC = () => {
     }
   };
 
+  const loadChildStories = async (childId: number) => {
+    try {
+      setLoadingStories(true);
+      const stories = await parentDashboardService.getChildStories(childId);
+      setChildStories(stories);
+    } catch (error) {
+      console.error('Error loading child stories:', error);
+    } finally {
+      setLoadingStories(false);
+    }
+  };
+
+  const handleStoryClick = (story: any) => {
+    setSelectedStory(story);
+    setShowStoryModal(true);
+  };
+
+  // Filter and sort stories
+  const getFilteredAndSortedStories = () => {
+    let filtered = [...childStories];
+
+    // Apply filter
+    if (storyFilter === 'published') {
+      filtered = filtered.filter(s => s.is_published);
+    } else if (storyFilter === 'draft') {
+      filtered = filtered.filter(s => !s.is_published);
+    }
+
+    // Apply search
+    if (storySearchQuery.trim()) {
+      const query = storySearchQuery.toLowerCase();
+      filtered = filtered.filter(s => 
+        s.title.toLowerCase().includes(query) ||
+        s.category.toLowerCase().includes(query) ||
+        (s.genres && s.genres.some((g: string) => g.toLowerCase().includes(query)))
+      );
+    }
+
+    // Apply sort
+    filtered.sort((a, b) => {
+      switch (storySortBy) {
+        case 'newest':
+          return new Date(b.date_created).getTime() - new Date(a.date_created).getTime();
+        case 'oldest':
+          return new Date(a.date_created).getTime() - new Date(b.date_created).getTime();
+        case 'mostLiked':
+          return (b.likes || 0) - (a.likes || 0);
+        case 'mostViewed':
+          return (b.views || 0) - (a.views || 0);
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  };
+
   // Load analytics when switching to analytics tab or overview tab (for engagement insights)
   useEffect(() => {
     if ((activeTab === 'analytics' || activeTab === 'overview') && selectedChild && !analytics) {
       loadAnalytics(selectedChild.id);
     }
   }, [activeTab, selectedChild]);
+
+
+  // Load child stories when switching to activity tab with library sub-tab
+  useEffect(() => {
+    if (activeTab === 'activity' && activitySubTab === 'library' && selectedChild) {
+      loadChildStories(selectedChild.id);
+    }
+  }, [activeTab, activitySubTab, selectedChild]);
 
   const handleAddChild = async (childData: ChildFormData) => {
     await parentDashboardService.addChild(childData);
@@ -520,41 +608,6 @@ const ParentDashboardPage: React.FC = () => {
     gradient: getActivityGradient(activity.type)
   }));
 
-  const recommendedStories = [
-    {
-      title: 'Ocean Explorer',
-      category: 'Adventure',
-      difficulty: 'easy' as const,
-      pages: 12,
-      timeRead: '15 min',
-      rating: 4,
-      completed: false,
-      gradient: 'linear-gradient(135deg, #5DADE2 0%, #3498DB 100%)',
-      icon: <BookOpenIcon />
-    },
-    {
-      title: 'The Magic Garden',
-      category: 'Fantasy',
-      difficulty: 'easy' as const,
-      pages: 10,
-      timeRead: '12 min',
-      rating: 5,
-      completed: true,
-      gradient: 'linear-gradient(135deg, #5FD99E 0%, #4BC788 100%)',
-      icon: <BookOpenIcon />
-    },
-    {
-      title: 'Dinosaur Discovery',
-      category: 'Educational',
-      difficulty: 'medium' as const,
-      pages: 18,
-      timeRead: '20 min',
-      rating: 4,
-      completed: false,
-      gradient: 'linear-gradient(135deg, #FFB347 0%, #FF9A5C 100%)',
-      icon: <BookOpenIcon />
-    }
-  ];
 
   // Dynamic learning goals based on real data
   const learningGoals = goals;
@@ -778,20 +831,6 @@ const ParentDashboardPage: React.FC = () => {
                     </div>
                   </section>
 
-          {/* Recommended Stories */}
-          <section className="parent-section" style={{ marginTop: '24px' }}>
-            <div className="parent-section-header">
-              <h2 className="parent-section-title">Recommended Stories</h2>
-              <button className="parent-text-button">
-                See More <ArrowRightIcon />
-              </button>
-            </div>
-            <div className="parent-story-grid">
-              {recommendedStories.map((story, index) => (
-                <StoryCard key={index} {...story} />
-              ))}
-            </div>
-          </section>
                 </>
               )}
 
@@ -1014,44 +1053,346 @@ const ParentDashboardPage: React.FC = () => {
                     <section className="parent-section">
                       <div className="parent-section-header">
                         <h2 className="parent-section-title">📚 Child's Library</h2>
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                          {statistics && (
+                            <div style={{ display: 'flex', gap: '16px', fontSize: '14px', color: '#6B7280' }}>
+                              <span><strong>{statistics.stories_created}</strong> Created</span>
+                              <span><strong>{statistics.stories_read}</strong> Read</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
+
+                      {/* Filters and Search */}
+                      <div style={{
+                        padding: '16px 0',
+                        display: 'flex',
+                        gap: '12px',
+                        flexWrap: 'wrap',
+                        alignItems: 'center',
+                        borderBottom: `1px solid ${theme === 'dark' ? '#3A3A3A' : '#E8ECEF'}`
+                      }}>
+                        {/* Search Bar */}
+                        <div style={{ flex: '1', minWidth: '250px' }}>
+                          <input
+                            type="text"
+                            placeholder="Search by title, category, or genre..."
+                            value={storySearchQuery}
+                            onChange={(e) => setStorySearchQuery(e.target.value)}
+                            style={{
+                              width: '100%',
+                              padding: '10px 16px',
+                              borderRadius: '8px',
+                              border: `1px solid ${theme === 'dark' ? '#3A3A3A' : '#E8ECEF'}`,
+                              background: theme === 'dark' ? '#2A2A2A' : '#FFFFFF',
+                              color: theme === 'dark' ? '#FFFFFF' : '#1A1A1A',
+                              fontSize: '14px',
+                              outline: 'none',
+                              transition: 'border-color 0.2s'
+                            }}
+                            onFocus={(e) => {
+                              e.target.style.borderColor = '#6366F1';
+                            }}
+                            onBlur={(e) => {
+                              e.target.style.borderColor = theme === 'dark' ? '#3A3A3A' : '#E8ECEF';
+                            }}
+                          />
+                        </div>
+
+                        {/* Filter Buttons */}
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            onClick={() => setStoryFilter('all')}
+                            style={{
+                              padding: '8px 16px',
+                              borderRadius: '8px',
+                              border: `1px solid ${theme === 'dark' ? '#3A3A3A' : '#E8ECEF'}`,
+                              background: storyFilter === 'all' 
+                                ? '#6366F1' 
+                                : (theme === 'dark' ? '#2A2A2A' : '#FFFFFF'),
+                              color: storyFilter === 'all' 
+                                ? '#FFFFFF' 
+                                : (theme === 'dark' ? '#D1D5DB' : '#6B7280'),
+                              fontSize: '14px',
+                              fontWeight: storyFilter === 'all' ? '600' : '500',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                          >
+                            All
+                          </button>
+                          <button
+                            onClick={() => setStoryFilter('published')}
+                            style={{
+                              padding: '8px 16px',
+                              borderRadius: '8px',
+                              border: `1px solid ${theme === 'dark' ? '#3A3A3A' : '#E8ECEF'}`,
+                              background: storyFilter === 'published' 
+                                ? '#10B981' 
+                                : (theme === 'dark' ? '#2A2A2A' : '#FFFFFF'),
+                              color: storyFilter === 'published' 
+                                ? '#FFFFFF' 
+                                : (theme === 'dark' ? '#D1D5DB' : '#6B7280'),
+                              fontSize: '14px',
+                              fontWeight: storyFilter === 'published' ? '600' : '500',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                          >
+                            Published
+                          </button>
+                          <button
+                            onClick={() => setStoryFilter('draft')}
+                            style={{
+                              padding: '8px 16px',
+                              borderRadius: '8px',
+                              border: `1px solid ${theme === 'dark' ? '#3A3A3A' : '#E8ECEF'}`,
+                              background: storyFilter === 'draft' 
+                                ? '#F59E0B' 
+                                : (theme === 'dark' ? '#2A2A2A' : '#FFFFFF'),
+                              color: storyFilter === 'draft' 
+                                ? '#FFFFFF' 
+                                : (theme === 'dark' ? '#D1D5DB' : '#6B7280'),
+                              fontSize: '14px',
+                              fontWeight: storyFilter === 'draft' ? '600' : '500',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                          >
+                            Drafts
+                          </button>
+                        </div>
+
+                        {/* Sort Dropdown */}
+                        <select
+                          value={storySortBy}
+                          onChange={(e) => setStorySortBy(e.target.value as any)}
+                          style={{
+                            padding: '8px 16px',
+                            borderRadius: '8px',
+                            border: `1px solid ${theme === 'dark' ? '#3A3A3A' : '#E8ECEF'}`,
+                            background: theme === 'dark' ? '#2A2A2A' : '#FFFFFF',
+                            color: theme === 'dark' ? '#D1D5DB' : '#6B7280',
+                            fontSize: '14px',
+                            fontWeight: '500',
+                            cursor: 'pointer',
+                            outline: 'none'
+                          }}
+                        >
+                          <option value="newest">Newest First</option>
+                          <option value="oldest">Oldest First</option>
+                          <option value="mostLiked">Most Liked</option>
+                          <option value="mostViewed">Most Viewed</option>
+                        </select>
+                      </div>
+
                       <div className="parent-activity-list">
-                        {statistics && statistics.stories_read > 0 ? (
-                          <div className="library-content">
-                            <div className="library-stats">
-                              <div className="library-stat-card">
-                                <BookOpenIcon className="library-stat-icon" />
-                                <div>
-                                  <p className="library-stat-value">{statistics.stories_read}</p>
-                                  <p className="library-stat-label">Stories Read</p>
-                                </div>
-                              </div>
-                              <div className="library-stat-card">
-                                <StarIcon className="library-stat-icon" />
-                                <div>
-                                  <p className="library-stat-value">{statistics.stories_created}</p>
-                                  <p className="library-stat-label">Stories Created</p>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="library-info">
-                              <p className="library-info-text">
-                                View detailed reading history and created stories in the Analytics tab
-                              </p>
-                            </div>
+                        {loadingStories ? (
+                          <div style={{ 
+                            textAlign: 'center', 
+                            padding: '40px 20px',
+                            color: '#6B7280',
+                            fontSize: '14px'
+                          }}>
+                            Loading stories...
                           </div>
+                        ) : childStories.length > 0 ? (
+                          <>
+                            {/* Results count */}
+                            <div style={{
+                              padding: '12px 0',
+                              fontSize: '14px',
+                              color: theme === 'dark' ? '#9CA3AF' : '#6B7280'
+                            }}>
+                              Showing {getFilteredAndSortedStories().length} of {childStories.length} stories
+                            </div>
+                            
+                            {getFilteredAndSortedStories().length > 0 ? (
+                              <div className="story-cards-grid-two-column">
+                                {getFilteredAndSortedStories().map((story, index) => (
+                              <div 
+                                key={story.id || index} 
+                                onClick={() => handleStoryClick(story)}
+                                style={{
+                                  background: theme === 'dark' ? '#2A2A2A' : '#FFFFFF',
+                                  borderRadius: '16px',
+                                  overflow: 'hidden',
+                                  border: `1px solid ${theme === 'dark' ? '#3A3A3A' : '#E8ECEF'}`,
+                                  transition: 'transform 0.2s, box-shadow 0.2s',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  height: '100%'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.transform = 'translateY(-4px)';
+                                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.transform = 'translateY(0)';
+                                  e.currentTarget.style.boxShadow = 'none';
+                                }}
+                              >
+                                {/* Cover Image or Placeholder */}
+                                <div style={{
+                                  width: '100%',
+                                  height: '220px',
+                                  background: story.cover_image 
+                                    ? `url(${story.cover_image}) center/cover` 
+                                    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  color: 'white',
+                                  fontSize: '64px',
+                                  position: 'relative',
+                                  flexShrink: 0
+                                }}>
+                                  {!story.cover_image && '📖'}
+                                  {/* Status Badge */}
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '12px',
+                                    right: '12px',
+                                    background: story.is_published ? '#10B981' : '#F59E0B',
+                                    color: 'white',
+                                    padding: '6px 12px',
+                                    borderRadius: '8px',
+                                    fontSize: '12px',
+                                    fontWeight: '700',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                                  }}>
+                                    {story.is_published ? 'Published' : 'Draft'}
+                                  </div>
+                                </div>
+                                
+                                {/* Card Content */}
+                                <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+
+                                  {/* Story Info */}
+                                  <h4 style={{
+                                    fontSize: '18px',
+                                    fontWeight: '700',
+                                    marginBottom: '10px',
+                                    color: theme === 'dark' ? '#FFFFFF' : '#1A1A1A',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: 'vertical',
+                                    lineHeight: '1.4'
+                                  }}>
+                                    {story.title || 'Untitled Story'}
+                                  </h4>
+
+                                  {/* Category & Type */}
+                                  <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                                    <span style={{
+                                      background: theme === 'dark' ? '#3A3A3A' : '#F3F4F6',
+                                      color: theme === 'dark' ? '#D1D5DB' : '#6B7280',
+                                      padding: '5px 10px',
+                                      borderRadius: '6px',
+                                      fontSize: '12px',
+                                      fontWeight: '600'
+                                    }}>
+                                      {story.category}
+                                    </span>
+                                    {story.creation_type && (
+                                      <span style={{
+                                        background: story.creation_type === 'ai_assisted' ? '#EEF2FF' : '#FEF3C7',
+                                        color: story.creation_type === 'ai_assisted' ? '#4F46E5' : '#92400E',
+                                        padding: '5px 10px',
+                                        borderRadius: '6px',
+                                        fontSize: '12px',
+                                        fontWeight: '600'
+                                      }}>
+                                        {story.creation_type === 'ai_assisted' ? '✨ AI' : '✏️ Manual'}
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {/* Metadata */}
+                                  <div style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '8px',
+                                    fontSize: '14px',
+                                    color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                                    marginBottom: '12px'
+                                  }}>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                      <BookOpenIcon style={{ width: '16px', height: '16px' }} />
+                                      {story.page_count} pages
+                                    </span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                      <ClockIcon style={{ width: '16px', height: '16px' }} />
+                                      {new Date(story.date_created).toLocaleDateString()}
+                                    </span>
+                                  </div>
+
+                                  {/* Stats */}
+                                  {story.is_published && (
+                                    <div style={{
+                                      display: 'flex',
+                                      gap: '16px',
+                                      paddingTop: '12px',
+                                      marginTop: 'auto',
+                                      borderTop: `1px solid ${theme === 'dark' ? '#3A3A3A' : '#E8ECEF'}`,
+                                      fontSize: '14px',
+                                      color: theme === 'dark' ? '#9CA3AF' : '#6B7280',
+                                      fontWeight: '500'
+                                    }}>
+                                      <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                        <HeartIcon style={{ width: '16px', height: '16px' }} />
+                                        {story.likes || 0}
+                                      </span>
+                                      <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                        <ChatBubbleLeftIcon style={{ width: '16px', height: '16px' }} />
+                                        {story.comments || 0}
+                                      </span>
+                                      <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                        👁️ {story.views || 0}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="empty-state">
+                                <BookOpenIcon className="empty-state-icon" />
+                                <p className="empty-state-text">No matching stories</p>
+                                <p className="empty-state-subtext">
+                                  Try adjusting your search or filters
+                                </p>
+                              </div>
+                            )}
+                          </>
                         ) : (
                           <div className="empty-state">
                             <BookOpenIcon className="empty-state-icon" />
-                            <p className="empty-state-text">Library is empty</p>
+                            <p className="empty-state-text">No stories yet</p>
                             <p className="empty-state-subtext">
-                              Stories read and created by your child will appear here
+                              Stories created by your child will appear here
                             </p>
                           </div>
                         )}
                       </div>
                     </section>
                   )}
+                  
+                  {/* Story View Modal */}
+                  <StoryViewModal
+                    story={selectedStory}
+                    isOpen={showStoryModal}
+                    onClose={() => {
+                      setShowStoryModal(false);
+                      setSelectedStory(null);
+                    }}
+                  />
                 </>
               )}
             </>
