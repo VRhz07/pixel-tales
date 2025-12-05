@@ -144,51 +144,33 @@ class SocialService {
   async getFriends(): Promise<Friend[]> {
     try {
       const data: any = await api.get('/friends/');
-      console.log('Friends response:', data); // Debug log
-      const friendships = data?.friends || data || [];
+      console.log('🔍 Friends API response:', data); // Debug log
+      const friends = data?.friends || data || [];
       
-      if (!Array.isArray(friendships)) {
-        console.warn('Friends response is not an array:', friendships);
+      if (!Array.isArray(friends)) {
+        console.warn('⚠️ Friends response is not an array:', friends);
         return [];
       }
       
-      // Transform friendship data to friend list
-      const currentUserId = this.getCurrentUserId();
-      console.log('Current user ID:', currentUserId, 'Type:', typeof currentUserId);
-      console.log('Friendships data:', friendships);
+      console.log(`✅ Found ${friends.length} friends`);
       
-      return friendships.map((friendship: any) => {
-        console.log('Processing friendship:', friendship);
-        console.log('Sender ID:', friendship.sender?.id, 'Type:', typeof friendship.sender?.id);
-        console.log('Receiver ID:', friendship.receiver?.id, 'Type:', typeof friendship.receiver?.id);
-        
-        // Determine which user is the friend (not the current user)
-        // Convert both to numbers for comparison
-        const senderId = Number(friendship.sender?.id);
-        const receiverId = Number(friendship.receiver?.id);
-        const currentUserIdNum = Number(currentUserId);
-        
-        console.log('Comparison:', senderId, '===', currentUserIdNum, '?', senderId === currentUserIdNum);
-        
-        const friend = senderId === currentUserIdNum 
-          ? friendship.receiver 
-          : friendship.sender;
-        
-        console.log('Selected friend:', friend);
+      // Backend now returns friend data directly (no need for sender/receiver logic)
+      return friends.map((friend: any) => {
+        console.log('👤 Friend:', friend.name, '(ID:', friend.id, ')');
         
         return {
-          id: friend?.id || 0,
-          name: friend?.profile?.display_name || friend?.username || 'Unknown',
-          avatar: friend?.profile?.avatar_emoji || '👤', // Use avatar_emoji from profile
-          username: friend?.username || '',
-          is_online: friend?.profile?.is_online || false,
-          story_count: friend?.story_count || 0,
-          last_message_time: friendship.last_message_time || undefined,
-          unread_messages: friendship.unread_messages > 0 ? friendship.unread_messages : undefined,
+          id: friend.id || 0,
+          name: friend.name || 'Unknown',
+          avatar: friend.avatar || '👤',
+          username: friend.username || '',
+          is_online: friend.is_online || false,
+          story_count: friend.story_count || 0,
+          last_message_time: friend.last_message_time || undefined,
+          unread_messages: friend.unread_messages || undefined,
         };
       });
     } catch (error) {
-      console.error('Error fetching friends:', error);
+      console.error('❌ Error fetching friends:', error);
       return []; // Return empty array instead of throwing
     }
   }

@@ -802,11 +802,12 @@ def mark_all_notifications_read(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def search_users(request):
-    """Search for users by name or username. If no query, returns non-friend users with pagination."""
+    """Search for users by name or username. Returns all users (friends and non-friends) with their relationship status."""
     query = request.GET.get('q', '').strip()
     offset = int(request.GET.get('offset', 0))
     limit = int(request.GET.get('limit', 10))
-    exclude_friends = request.GET.get('exclude_friends', 'false').lower() == 'true'
+    # Note: exclude_friends parameter is now ignored to show all users
+    # The frontend can filter by is_friend status if needed
     
     # Get current user's friends and pending requests first
     friend_ids = set()
@@ -835,9 +836,9 @@ def search_users(request):
     # Exclude parent accounts (only show child accounts)
     users_query = users_query.exclude(profile__user_type='parent')
     
-    # Exclude friends if requested
-    if exclude_friends:
-        users_query = users_query.exclude(id__in=friend_ids)
+    # NOTE: We no longer exclude friends - show all users!
+    # Users can see both friends and non-friends in search results
+    # The is_friend flag will indicate their relationship status
     
     # Apply search filter if query provided
     if query:
@@ -891,8 +892,9 @@ def friend_list(request):
     
     friends_data = []
     for friendship in friendships:
-        # Determine who the friend is
+        # Determine who the friend is (NOT the current user)
         friend = friendship.receiver if friendship.sender == request.user else friendship.sender
+        friend_profile = getattr(friend, 'profile', None)
         
         # Get last message time between these two users
         last_message = Message.objects.filter(
@@ -914,23 +916,28 @@ def friend_list(request):
             is_read=False
         ).order_by('-created_at').first()
         
-        # Serialize the friendship
-        serialized = FriendshipSerializer(friendship).data
-        
-        # Add message activity data
-        serialized['last_message_time'] = last_message.created_at.isoformat() if last_message else None
-        serialized['unread_messages'] = unread_count
+        # Build friend data directly (no need for full serializer)
+        friend_data = {
+            'id': friend.id,
+            'name': friend_profile.display_name if friend_profile else friend.username,
+            'avatar': friend_profile.avatar_emoji if friend_profile and friend_profile.avatar_emoji else '👤',
+            'username': friend.username,
+            'is_online': friend_profile.is_online if friend_profile else False,
+            'story_count': friend.stories.filter(is_published=True).count(),
+            'last_message_time': last_message.created_at.isoformat() if last_message else None,
+            'unread_messages': unread_count if unread_count > 0 else None,
+        }
         
         # Add collaboration invite if exists
         if collab_invite:
-            serialized['collaboration_invite'] = {
+            friend_data['collaboration_invite'] = {
                 'id': collab_invite.id,
                 'session_id': collab_invite.data.get('session_id') if collab_invite.data else None,
                 'story_title': collab_invite.data.get('story_title') if collab_invite.data else 'Untitled Story',
                 'created_at': collab_invite.created_at.isoformat()
             }
         
-        friends_data.append(serialized)
+        friends_data.append(friend_data)
     
     return Response({
         'success': True,

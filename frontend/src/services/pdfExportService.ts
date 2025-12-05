@@ -469,6 +469,9 @@ class PDFExportService {
       addCropMarks(pdf, this.PAGE_WIDTH, this.PAGE_HEIGHT);
     }
     
+    // Calculate available space
+    const availableHeight = this.PAGE_HEIGHT - printConfig.margins.top - printConfig.margins.bottom - 15; // 15mm for page number
+    
     // Add canvas image if available
     let imageHeight = 0;
     if (page.canvasData) {
@@ -479,9 +482,10 @@ class PDFExportService {
         const imgDimensions = await this.getImageDimensions(imgData);
         const actualAspectRatio = imgDimensions.width / imgDimensions.height;
         
-        // Calculate optimal size maintaining aspect ratio
+        // BALANCED: Use 50% of available height for images (was 40%, too small)
+        // This provides better balance between image and text
+        const maxImageHeight = availableHeight * 0.50; // 50% for image
         const maxImageWidth = this.contentWidth;
-        const maxImageHeight = (this.PAGE_HEIGHT - printConfig.margins.top - printConfig.margins.bottom) * 0.65; // Use 65% of available height (increased from 50%)
         
         let imgWidth = maxImageWidth;
         let imgHeight = imgWidth / actualAspectRatio;
@@ -504,38 +508,48 @@ class PDFExportService {
 
     // Add text content with template styling
     if (page.text) {
-      const textY = page.canvasData ? printConfig.margins.top + imageHeight + 20 : printConfig.margins.top + 20; // Increased gap from 10mm to 20mm
-      const maxTextHeight = this.PAGE_HEIGHT - textY - printConfig.margins.bottom - 15; // Leave space for page number
+      const textStartY = page.canvasData ? printConfig.margins.top + imageHeight + 12 : printConfig.margins.top + 12; // 12mm gap
+      const maxTextHeight = this.PAGE_HEIGHT - textStartY - printConfig.margins.bottom - 15; // Space for page number
       
       const [tr, tg, tb] = parseColor(templateConfig.colors.text);
       pdf.setTextColor(tr, tg, tb);
       
-      // Use 30pt font for maximum readability
-      const fontSize = 30;
+      // BALANCED: Use consistent readable font size
+      const fontSize = 22; // Readable size for most content (was 18-24pt adaptive)
+      
       pdf.setFontSize(fontSize);
       pdf.setFont(templateConfig.fonts.body.family, templateConfig.fonts.body.style);
       
       const lines = pdf.splitTextToSize(page.text, this.contentWidth);
       
-      // Line height for 30pt font - using 1.4x for comfortable reading
-      const lineHeight = fontSize * 0.5; // ~15mm for 30pt font
+      // Line height - comfortable reading with proper spacing
+      const lineHeight = fontSize * 0.353 * 1.5; // pt to mm with 1.5x spacing
       
-      // Check if text fits on page
-      const totalTextHeight = lines.length * lineHeight;
-      if (totalTextHeight > maxTextHeight) {
-        // Text is too long, truncate with ellipsis
-        const maxLines = Math.floor(maxTextHeight / lineHeight);
-        const truncatedLines = lines.slice(0, maxLines);
-        if (truncatedLines.length < lines.length) {
-          truncatedLines[truncatedLines.length - 1] += '...';
+      // Calculate how many lines fit
+      const maxLines = Math.floor(maxTextHeight / lineHeight);
+      
+      // Warn if text is truncated
+      if (lines.length > maxLines) {
+        console.warn(`⚠️ Text truncated on page ${pageNumber}: ${lines.length} lines → ${maxLines} lines`);
+        console.warn(`   Consider splitting this page's content or using shorter text.`);
+        
+        const visibleLines = lines.slice(0, maxLines);
+        // Add ellipsis only to the last line if text is cut off
+        if (visibleLines.length > 0) {
+          const lastLine = visibleLines[visibleLines.length - 1];
+          // Only add ellipsis if the last line doesn't already end with punctuation
+          if (!lastLine.match(/[.!?…]$/)) {
+            visibleLines[visibleLines.length - 1] = lastLine + '...';
+          }
         }
         
-        truncatedLines.forEach((line: string, index: number) => {
-          pdf.text(line, this.margin, textY + (index * lineHeight));
+        visibleLines.forEach((line: string, index: number) => {
+          pdf.text(line, this.margin, textStartY + (index * lineHeight));
         });
       } else {
+        // All text fits - render normally
         lines.forEach((line: string, index: number) => {
-          pdf.text(line, this.margin, textY + (index * lineHeight));
+          pdf.text(line, this.margin, textStartY + (index * lineHeight));
         });
       }
     }

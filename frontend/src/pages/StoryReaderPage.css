@@ -110,7 +110,9 @@
   width: 100%;
   height: auto;
   aspect-ratio: 1 / 1;
-  object-fit: cover;
+  object-fit: cover; /* Fill completely for professional look */
+  object-position: center; /* Center the image */
+  background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
   border-radius: 1rem;
 }
 
@@ -195,7 +197,7 @@
 .story-reader-page-card {
   border-radius: 1rem;
   padding: 1rem;
-  overflow: hidden;
+  overflow: visible; /* Changed from hidden - allow image to show fully */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s;
 }
@@ -229,18 +231,19 @@
 .story-reader-illustration-container {
   width: 100%;
   max-width: 100%;
+  height: 300px; /* Fixed height for consistent look */
   margin: 0 auto 0.75rem;
   border-radius: 0.75rem;
-  overflow: hidden;
+  overflow: hidden; /* Clip to rounded corners */
+  background: linear-gradient(135deg, #f3e8ff, #e9d5ff); /* Fallback background */
 }
 
 .story-reader-illustration {
   width: 100%;
-  height: auto;
-  max-height: 250px; /* Reduced from default to save vertical space */
-  object-fit: contain;
+  height: 100%; /* Fill container height */
+  object-fit: cover; /* Fill completely, crop edges if needed */
+  object-position: center; /* Keep most important part (center) visible */
   display: block;
-  background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
 }
 
 .story-reader-text {
@@ -299,10 +302,10 @@
 /* MOBILE OPTIMIZED: Compact horizontal illustration */
 .story-reader-horizontal-illustration {
   width: 100%;
-  height: auto;
-  max-height: 35vh; /* Use viewport height for responsive sizing */
-  object-fit: contain;
-  border-radius: 0.75rem;
+  height: 40vh; /* Fixed height */
+  object-fit: cover; /* Fill completely */
+  object-position: center; /* Center the image */
+  border-radius: 0.75rem; /* Rounded corners on all sides */
   margin-bottom: 0.5rem;
   background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
   flex-shrink: 0; /* Don't shrink illustration */
@@ -520,8 +523,8 @@
     padding: 1.5rem;
   }
   
-  .story-reader-illustration {
-    max-height: 400px;
+  .story-reader-illustration-container {
+    height: 400px; /* Larger on tablet */
   }
   
   .story-reader-horizontal-illustration {

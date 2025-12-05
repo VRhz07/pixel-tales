@@ -1,0 +1,19 @@
+// Check your current user                                                                                           
+   const auth = JSON.parse(localStorage.getItem('auth-storage'));                                                       
+   console.log('Your user:', auth?.state?.user);                                                                        
+                                                                                                                        
+   // Manually call the friends API                                                                                     
+   fetch('http://localhost:8000/api/friends/', {                                                                        
+     headers: {                                                                                                         
+       'Authorization': 'Bearer ' + auth?.state?.token                                                                  
+     }                                                                                                                  
+   }).then(r => r.json()).then(data => {                                                                                
+     console.log('Raw friends response:', data);                                                                        
+     console.log('Number of friends:', data.friends?.length);                                                           
+     data.friends?.forEach((f, i) => {                                                                                  
+       console.log(`Friend ${i+1}:`, {                                                                                  
+         sender: f.sender,                                                                                              
+         receiver: f.receiver                                                                                           
+       });                                                                                                              
+    });                                                                                                               
+  }); 
