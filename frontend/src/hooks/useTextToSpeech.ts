@@ -48,8 +48,19 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
   const [pitch, setPitch] = useState(1);
   const [volume, setVolume] = useState(1);
   const [progress, setProgress] = useState(0);
-  const [cloudVoiceId, setCloudVoiceId] = useState<string>('female_english');
-  const [useCloudTTS, setUseCloudTTS] = useState(true); // Default to cloud when available
+  
+  // Load cloudVoiceId from localStorage with proper initialization
+  const [cloudVoiceId, setCloudVoiceId] = useState<string>(() => {
+    const saved = localStorage.getItem('tts_cloudVoiceId');
+    return saved || 'female_english';
+  });
+  
+  // Load useCloudTTS preference from localStorage
+  const [useCloudTTS, setUseCloudTTS] = useState(() => {
+    const saved = localStorage.getItem('tts_useCloudTTS');
+    return saved !== null ? saved === 'true' : true; // Default to cloud when available
+  });
+  
   const isOnline = useOnlineStatus();
   
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -61,6 +72,18 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   const isNativePlatform = Capacitor.isNativePlatform();
+  
+  // Save cloudVoiceId to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('tts_cloudVoiceId', cloudVoiceId);
+    console.log('🎤 TTS: Saved cloud voice preference:', cloudVoiceId);
+  }, [cloudVoiceId]);
+  
+  // Save useCloudTTS to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('tts_useCloudTTS', String(useCloudTTS));
+    console.log('🎤 TTS: Saved cloud TTS preference:', useCloudTTS);
+  }, [useCloudTTS]);
 
   // Check if TTS is supported (always true on mobile with plugin, check Web Speech API on web)
   const isSupported = isNativePlatform || (typeof window !== 'undefined' && 'speechSynthesis' in window);

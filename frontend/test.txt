@@ -1,19 +1,40 @@
-// Check your current user                                                                                           
-   const auth = JSON.parse(localStorage.getItem('auth-storage'));                                                       
-   console.log('Your user:', auth?.state?.user);                                                                        
+ // Get auth storage                                                                                                  
+   const authStr = localStorage.getItem('auth-storage');                                                                
+   console.log('Auth string:', authStr);                                                                                
                                                                                                                         
-   // Manually call the friends API                                                                                     
-   fetch('http://localhost:8000/api/friends/', {                                                                        
-     headers: {                                                                                                         
-       'Authorization': 'Bearer ' + auth?.state?.token                                                                  
-     }                                                                                                                  
-   }).then(r => r.json()).then(data => {                                                                                
-     console.log('Raw friends response:', data);                                                                        
-     console.log('Number of friends:', data.friends?.length);                                                           
-     data.friends?.forEach((f, i) => {                                                                                  
-       console.log(`Friend ${i+1}:`, {                                                                                  
-         sender: f.sender,                                                                                              
-         receiver: f.receiver                                                                                           
+   // Parse it                                                                                                          
+   const auth = authStr ? JSON.parse(authStr) : null;                                                                   
+   console.log('Parsed auth:', auth);                                                                                   
+   console.log('Your user:', auth?.state?.user);                                                                        
+   console.log('Your user ID:', auth?.state?.user?.id);                                                                 
+                                                                                                                        
+   // Get access token                                                                                                  
+   const token = localStorage.getItem('access_token');                                                                  
+   console.log('Token exists:', !!token);                                                                               
+                                                                                                                        
+   // Now fetch friends manually                                                                                        
+   if (token) {                                                                                                         
+     fetch('http://localhost:8000/api/friends/', {                                                                      
+       headers: {                                                                                                       
+         'Authorization': 'Bearer ' + token                                                                             
+       }                                                                                                                
+     })                                                                                                                 
+     .then(r => r.json())                                                                                               
+     .then(data => {                                                                                                    
+       console.log('\n=== RAW FRIENDS DATA ===');                                                                       
+       console.log('Success:', data.success);                                                                           
+       console.log('Number of friends:', data.friends?.length);                                                         
+                                                                                                                        
+       const yourId = auth?.state?.user?.id;                                                                            
+       console.log('\nYour ID:', yourId);                                                                               
+                                                                                                                        
+       data.friends?.forEach((f, i) => {                                                                                
+         console.log(`\n--- Friend ${i+1} ---`);                                                                        
+         console.log('Sender:', f.sender);                                                                              
+         console.log('Receiver:', f.receiver);                                                                          
+         console.log('Sender ID:', f.sender?.id, 'matches yours?', f.sender?.id === yourId);                            
+         console.log('Receiver ID:', f.receiver?.id, 'matches yours?', f.receiver?.id === yourId);                      
+         console.log('Should select:', f.sender?.id === yourId ? 'receiver' : 'sender');                                
        });                                                                                                              
-    });                                                                                                               
-  }); 
+     });                                                                                                                
+   }   

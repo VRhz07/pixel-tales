@@ -15,32 +15,37 @@ class TTSService:
     Text-to-Speech service using Google Cloud TTS
     """
     
-    # Available voices with English and Filipino accents
-    # Using WaveNet for all voices - 1 million characters FREE per month!
+    # Available voices with English (US) and Filipino (Tagalog) accents
+    # Using Neural2 voices for best quality and natural sound
+    # These are premium voices but still within the 1 million character FREE tier per month!
     VOICES = {
         'female_english': {
-            'name': 'en-US-Wavenet-F',
+            'name': 'en-US-Neural2-F',  # Natural, warm female voice
             'language_code': 'en-US',
-            'label': 'Female (English Accent)',
-            'accent': 'english'
+            'label': 'Female (US English - Natural)',
+            'accent': 'english',
+            'description': 'Natural and expressive female voice'
         },
         'female_filipino': {
-            'name': 'fil-PH-Wavenet-A',
+            'name': 'fil-PH-Wavenet-A',  # Best Filipino female voice
             'language_code': 'fil-PH',
-            'label': 'Female (Filipino Accent)',
-            'accent': 'filipino'
+            'label': 'Female (Filipino Tagalog)',
+            'accent': 'filipino',
+            'description': 'Native Filipino/Tagalog female voice'
         },
         'male_english': {
-            'name': 'en-US-Wavenet-A',
+            'name': 'en-US-Neural2-D',  # Natural, clear male voice
             'language_code': 'en-US',
-            'label': 'Male (English Accent)',
-            'accent': 'english'
+            'label': 'Male (US English - Natural)',
+            'accent': 'english',
+            'description': 'Natural and clear male voice'
         },
         'male_filipino': {
-            'name': 'fil-PH-Wavenet-D',
+            'name': 'fil-PH-Wavenet-D',  # Best Filipino male voice
             'language_code': 'fil-PH',
-            'label': 'Male (Filipino Accent)',
-            'accent': 'filipino'
+            'label': 'Male (Filipino Tagalog)',
+            'accent': 'filipino',
+            'description': 'Native Filipino/Tagalog male voice'
         }
     }
     
@@ -146,10 +151,17 @@ class TTSService:
             
             logger.info(f"🎙️ Synthesizing speech:")
             logger.info(f"   - Text: {len(text)} characters")
-            logger.info(f"   - Voice: {voice_name}")
+            logger.info(f"   - Voice: {voice_name} ({voice_config['label']})")
             logger.info(f"   - Language: {language_code}")
             logger.info(f"   - Voice ID: {voice_id}")
+            logger.info(f"   - Description: {voice_config.get('description', 'N/A')}")
             logger.info(f"   - Rate: {rate}, Pitch: {pitch}, Volume: {volume}")
+            
+            # Verify we're using the right voice type
+            if voice_id and 'english' in voice_id and 'Neural2' not in voice_name:
+                logger.warning(f"⚠️ Expected Neural2 voice for English, but got: {voice_name}")
+            if voice_id and 'filipino' in voice_id and 'fil-PH' not in language_code:
+                logger.warning(f"⚠️ Expected fil-PH language code for Filipino, but got: {language_code}")
             
             # Perform the text-to-speech request
             response = self.client.synthesize_speech(

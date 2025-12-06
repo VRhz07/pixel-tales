@@ -302,15 +302,21 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
                 <label htmlFor="tts-cloud-voice">Voice</label>
                 <CustomDropdown
                   options={[
-                    { value: 'female_english', label: '👩 Female (English Accent)' },
-                    { value: 'female_filipino', label: '👩 Female (Filipino Accent)' },
-                    { value: 'male_english', label: '👨 Male (English Accent)' },
-                    { value: 'male_filipino', label: '👨 Male (Filipino Accent)' }
+                    { value: 'female_english', label: '👩 Female (US English)' },
+                    { value: 'female_filipino', label: '👩 Female (Filipino Tagalog)' },
+                    { value: 'male_english', label: '👨 Male (US English)' },
+                    { value: 'male_filipino', label: '👨 Male (Filipino Tagalog)' }
                   ]}
                   value={cloudVoiceId}
-                  onChange={(value) => setCloudVoiceId(value)}
+                  onChange={(value) => {
+                    console.log('🎤 Voice changed to:', value);
+                    setCloudVoiceId(value);
+                  }}
                   className="tts-select"
                 />
+                <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px', fontStyle: 'italic' }}>
+                  {cloudVoiceId.includes('english') ? '🇺🇸 Natural US English voice' : '🇵🇭 Native Filipino/Tagalog voice'}
+                </p>
               </div>
             )}
 

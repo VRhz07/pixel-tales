@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Google Cloud TTS Voices</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .voice-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        .voice-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        .voice-card.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .voice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .voice-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .voice-description {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .voice-card.active button {
+            background: white;
+            color: #667eea;
+        }
+        .test-text {
+            margin: 30px 0;
+        }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        .status.show {
+            display: block;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .settings {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .setting-item label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .setting-item input {
+            padding: 8px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .localStorage-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        .localStorage-info code {
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Test Google Cloud TTS Voices</h1>
+        <p class="subtitle">Select a voice and click Test to hear how it sounds</p>
+
+        <div id="status" class="status"></div>
+
+        <div class="voice-cards">
+            <div class="voice-card" data-voice="female_english">
+                <div class="voice-header">
+                    <div>
+                        <div class="voice-title">👩 Female (US English)</div>
+                        <div class="voice-description">Natural, warm, and expressive</div>
+                    </div>
+                    <button onclick="testVoice('female_english')">Test Voice</button>
+                </div>
+            </div>
+
+            <div class="voice-card" data-voice="male_english">
+                <div class="voice-header">
+                    <div>
+                        <div class="voice-title">👨 Male (US English)</div>
+                        <div class="voice-description">Natural, clear, and engaging</div>
+                    </div>
+                    <button onclick="testVoice('male_english')">Test Voice</button>
+                </div>
+            </div>
+
+            <div class="voice-card" data-voice="female_filipino">
+                <div class="voice-header">
+                    <div>
+                        <div class="voice-title">👩 Female (Filipino Tagalog)</div>
+                        <div class="voice-description">Native Filipino/Tagalog speaker</div>
+                    </div>
+                    <button onclick="testVoice('female_filipino')">Test Voice</button>
+                </div>
+            </div>
+
+            <div class="voice-card" data-voice="male_filipino">
+                <div class="voice-header">
+                    <div>
+                        <div class="voice-title">👨 Male (Filipino Tagalog)</div>
+                        <div class="voice-description">Native Filipino/Tagalog speaker</div>
+                    </div>
+                    <button onclick="testVoice('male_filipino')">Test Voice</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-text">
+            <label for="testText" style="display: block; font-weight: 600; margin-bottom: 10px;">
+                Custom Test Text:
+            </label>
+            <textarea id="testText" placeholder="Enter text to test (or use default samples)">Once upon a time, in a magical land far away, there lived a brave young hero who loved to read stories.</textarea>
+        </div>
+
+        <div class="settings">
+            <div class="setting-item">
+                <label>Speed (0.25-4.0)</label>
+                <input type="number" id="rate" value="1.0" min="0.25" max="4.0" step="0.1">
+            </div>
+            <div class="setting-item">
+                <label>Pitch (-20 to 20)</label>
+                <input type="number" id="pitch" value="0" min="-20" max="20" step="1">
+            </div>
+            <div class="setting-item">
+                <label>Volume (-96 to 16 dB)</label>
+                <input type="number" id="volume" value="0" min="-96" max="16" step="1">
+            </div>
+        </div>
+
+        <div class="localStorage-info">
+            <strong>💾 localStorage Status:</strong><br>
+            Current Voice: <code id="currentVoice">-</code><br>
+            Use Cloud TTS: <code id="useCloud">-</code>
+        </div>
+    </div>
+
+    <script>
+        // Update localStorage display
+        function updateLocalStorageDisplay() {
+            document.getElementById('currentVoice').textContent = 
+                localStorage.getItem('tts_cloudVoiceId') || 'Not set';
+            document.getElementById('useCloud').textContent = 
+                localStorage.getItem('tts_useCloudTTS') || 'Not set';
+        }
+
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status show ${type}`;
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 5000);
+        }
+
+        // Default test phrases for each voice
+        const defaultPhrases = {
+            'female_english': "Hello! This is a natural sounding female voice in US English. I hope you enjoy listening to this story.",
+            'male_english': "Hello! This is a natural sounding male voice in US English. I hope you enjoy listening to this story.",
+            'female_filipino': "Kamusta! Ako ay isang natural na tunog ng babaeng boses sa Filipino. Sana ay magsaya ka sa pakikinig ng kuwentong ito.",
+            'male_filipino': "Kamusta! Ako ay isang natural na tunog ng lalaking boses sa Filipino. Sana ay magsaya ka sa pakikinig ng kuwentong ito."
+        };
+
+        let currentAudio = null;
+
+        async function testVoice(voiceId) {
+            console.log('🎤 Testing voice:', voiceId);
+            
+            // Stop any currently playing audio
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+
+            // Update UI
+            document.querySelectorAll('.voice-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelector(`[data-voice="${voiceId}"]`).classList.add('active');
+
+            // Save to localStorage (same as the app does)
+            localStorage.setItem('tts_cloudVoiceId', voiceId);
+            localStorage.setItem('tts_useCloudTTS', 'true');
+            updateLocalStorageDisplay();
+
+            // Get test text
+            let text = document.getElementById('testText').value.trim();
+            if (!text) {
+                text = defaultPhrases[voiceId];
+            }
+
+            // Get settings
+            const rate = parseFloat(document.getElementById('rate').value) || 1.0;
+            const pitch = parseFloat(document.getElementById('pitch').value) || 0;
+            const volume = parseFloat(document.getElementById('volume').value) || 0;
+
+            try {
+                showStatus('🎙️ Generating speech...', 'info');
+
+                // Call the backend API
+                // Using your Render production URL
+                const apiUrl = 'https://pixeltales-backend.onrender.com/api/tts/synthesize/';
+                
+                // If testing locally, uncomment this instead:
+                // const apiUrl = 'http://localhost:8000/api/tts/synthesize/';
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        voice_id: voiceId,
+                        language: voiceId.includes('filipino') ? 'fil' : 'en',
+                        rate: rate,
+                        pitch: pitch,
+                        volume: volume
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP ${response.status}`);
+                }
+
+                // Get audio blob and play
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                
+                currentAudio = new Audio(audioUrl);
+                currentAudio.onended = () => {
+                    showStatus('✅ Playback complete!', 'success');
+                    URL.revokeObjectURL(audioUrl);
+                };
+                currentAudio.onerror = (error) => {
+                    showStatus('❌ Audio playback error', 'error');
+                    console.error('Audio error:', error);
+                };
+
+                await currentAudio.play();
+                showStatus('🔊 Playing voice sample...', 'success');
+
+            } catch (error) {
+                console.error('Error testing voice:', error);
+                showStatus('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // Initialize
+        updateLocalStorageDisplay();
+        
+        // Update localStorage display every second
+        setInterval(updateLocalStorageDisplay, 1000);
+
+        console.log('🎤 TTS Voice Tester Ready!');
+        console.log('💡 Tip: Open DevTools console to see detailed logs');
+    </script>
+</body>
+</html>
