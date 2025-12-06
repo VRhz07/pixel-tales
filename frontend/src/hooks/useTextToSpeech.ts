@@ -504,6 +504,14 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
   const pause = useCallback(async () => {
     if (!isSupported || !isSpeaking) return;
     
+    // If using Cloud TTS (audio element)
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPaused(true);
+      console.log('🌥️ TTS: Cloud audio paused');
+      return;
+    }
+    
     if (isNativePlatform) {
       // Capacitor TTS doesn't support pause, so we'll just stop
       await TextToSpeech.stop();
@@ -521,6 +529,14 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
   // Resume speech
   const resume = useCallback(() => {
     if (!isSupported || !isPaused) return;
+    
+    // If using Cloud TTS (audio element)
+    if (audioRef.current) {
+      audioRef.current.play();
+      setIsPaused(false);
+      console.log('🌥️ TTS: Cloud audio resumed');
+      return;
+    }
     
     if (isNativePlatform) {
       // On mobile, we can't resume, so just note that it's not paused
