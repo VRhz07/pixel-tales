@@ -230,7 +230,7 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
       });
       
       // Call backend API
-      const response = await fetch(`${API_BASE_URL}/api/tts/synthesize/`, {
+      const response = await fetch(`${API_BASE_URL}/tts/synthesize/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
