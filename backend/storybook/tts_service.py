@@ -20,11 +20,11 @@ class TTSService:
     # These are premium voices but still within the 1 million character FREE tier per month!
     VOICES = {
         'female_english': {
-            'name': 'en-US-Neural2-F',  # Natural, warm female voice
+            'name': 'en-US-Wavenet-F',  # High-quality WaveNet female voice
             'language_code': 'en-US',
-            'label': 'Female (US English - Natural)',
+            'label': 'Female (US English)',
             'accent': 'english',
-            'description': 'Natural and expressive female voice'
+            'description': 'Natural US English female voice'
         },
         'female_filipino': {
             'name': 'fil-PH-Wavenet-A',  # Best Filipino female voice
@@ -34,11 +34,11 @@ class TTSService:
             'description': 'Native Filipino/Tagalog female voice'
         },
         'male_english': {
-            'name': 'en-US-Neural2-D',  # Natural, clear male voice
+            'name': 'en-US-Wavenet-D',  # High-quality WaveNet male voice
             'language_code': 'en-US',
-            'label': 'Male (US English - Natural)',
+            'label': 'Male (US English)',
             'accent': 'english',
-            'description': 'Natural and clear male voice'
+            'description': 'Natural US English male voice'
         },
         'male_filipino': {
             'name': 'fil-PH-Wavenet-D',  # Best Filipino male voice
