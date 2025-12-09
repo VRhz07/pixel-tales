@@ -195,6 +195,7 @@ urlpatterns = [
     path('parent/children/', views.get_parent_children, name='get_parent_children'),
     path('parent/children/create/', views.create_child_account, name='create_child_account'),
     path('parent/children/add/', views.add_child_relationship, name='add_child_relationship'),
+    path('parent/children/<int:child_id>/update/', views.update_child_profile, name='update_child_profile'),
     path('parent/children/<int:child_id>/remove/', views.remove_child_relationship, name='remove_child_relationship'),
     path('parent/children/<int:child_id>/stats/', views.get_child_statistics, name='get_child_statistics'),
     path('parent/children/<int:child_id>/activities/', views.get_child_activities, name='get_child_activities'),

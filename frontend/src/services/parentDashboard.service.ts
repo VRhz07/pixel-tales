@@ -179,6 +179,21 @@ const parentDashboardService = {
     }
   },
 
+  // Update a child profile
+  async updateChild(childId: number, childData: ChildFormData): Promise<void> {
+    try {
+      await api.put(`/parent/children/${childId}/update/`, {
+        name: childData.name,
+        username: childData.username,
+        dateOfBirth: childData.dateOfBirth,
+        className: childData.className
+      });
+    } catch (error: any) {
+      console.error('Error updating child profile:', error);
+      throw error;
+    }
+  },
+
   // Remove a child
   async removeChild(childId: number): Promise<void> {
     try {

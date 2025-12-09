@@ -2705,6 +2705,92 @@ def add_child_relationship(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@api_view(['PUT', 'PATCH'])
+@permission_classes([IsAuthenticated])
+def update_child_profile(request, child_id):
+    """Update a child's profile information"""
+    try:
+        user_profile = request.user.profile
+        
+        if user_profile.user_type not in ['parent', 'teacher']:
+            return Response({
+                'error': 'Only parent/teacher accounts can update child profiles'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Verify relationship exists
+        if user_profile.user_type == 'parent':
+            relationship = ParentChildRelationship.objects.filter(
+                parent=request.user,
+                child_id=child_id,
+                is_active=True
+            ).first()
+        else:  # teacher
+            relationship = TeacherStudentRelationship.objects.filter(
+                teacher=request.user,
+                student_id=child_id,
+                is_active=True
+            ).first()
+        
+        if not relationship:
+            return Response({
+                'error': 'Child not found or not associated with your account'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Get the child user
+        child_user = get_object_or_404(User, id=child_id)
+        child_profile = child_user.profile
+        
+        # Update name if provided
+        name = request.data.get('name')
+        if name:
+            child_profile.display_name = name
+            child_user.first_name = name.split()[0] if name else ''
+            child_user.last_name = ' '.join(name.split()[1:]) if len(name.split()) > 1 else ''
+        
+        # Update username if provided and not taken
+        username = request.data.get('username')
+        if username and username != child_user.username:
+            if User.objects.filter(username=username).exists():
+                return Response({
+                    'error': 'Username already exists'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            child_user.username = username
+            child_user.email = f"{username}@child.pixeltales.local"
+        
+        # Update date of birth if provided
+        date_of_birth = request.data.get('dateOfBirth') or request.data.get('date_of_birth')
+        if date_of_birth:
+            child_profile.date_of_birth = date_of_birth
+        
+        # Update class name if provided (for teachers)
+        class_name = request.data.get('className') or request.data.get('class_name')
+        if class_name is not None:
+            # Store in relationship metadata if needed
+            pass
+        
+        # Save changes
+        child_user.save()
+        child_profile.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Child profile updated successfully',
+            'child': {
+                'id': child_user.id,
+                'name': child_profile.display_name,
+                'username': child_user.username,
+                'email': child_user.email
+            }
+        })
+        
+    except Exception as e:
+        print(f"Error updating child profile: {str(e)}")
+        return Response({
+            'error': 'Failed to update child profile',
+            'details': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def remove_child_relationship(request, child_id):

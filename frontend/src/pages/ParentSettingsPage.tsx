@@ -20,6 +20,8 @@ import { useAuthStore } from '../stores/authStore';
 import { useThemeStore } from '../stores/themeStore';
 import { useI18nStore } from '../stores/i18nStore';
 import { PasswordUpdateModal } from '../components/settings/PasswordUpdateModal';
+import { ParentProfileEditModal } from '../components/settings/ParentProfileEditModal';
+import { EmailChangeModal } from '../components/settings/EmailChangeModal';
 import { authService } from '../services/auth.service';
 import ParentBottomNav from '../components/navigation/ParentBottomNav';
 import parentDashboardService, { Child, ChildFormData } from '../services/parentDashboard.service';
@@ -35,6 +37,8 @@ const ParentSettingsPage: React.FC = () => {
   
   // Modal states
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteError, setDeleteError] = useState('');
@@ -83,6 +87,37 @@ const ParentSettingsPage: React.FC = () => {
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Failed to update password');
+    }
+  };
+
+  const handleProfileUpdate = async (name: string) => {
+    try {
+      await authService.updateProfile({ name });
+      
+      // Update the store immediately with setUser
+      const { setUser } = useAuthStore.getState();
+      if (user) {
+        setUser({
+          ...user,
+          name: name,
+        });
+      }
+      
+      setSuccessMessage('Profile updated successfully!');
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to update profile');
+    }
+  };
+
+  const handleEmailChange = async (newEmail: string, password: string) => {
+    try {
+      await authService.changeEmail(newEmail, password);
+      await useAuthStore.getState().loadUserProfile();
+      setSuccessMessage('Email updated successfully!');
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to update email');
     }
   };
 
@@ -404,7 +439,10 @@ const ParentSettingsPage: React.FC = () => {
                           </span>
                         </div>
                       </div>
-                      <button className="parent-settings-btn-secondary">
+                      <button 
+                        className="parent-settings-btn-secondary"
+                        onClick={() => setShowProfileModal(true)}
+                      >
                         Edit Profile
                       </button>
                     </div>
@@ -479,7 +517,10 @@ const ParentSettingsPage: React.FC = () => {
                         <label>Primary Email</label>
                         <div className="parent-settings-field-value">{user?.email || 'N/A'}</div>
                       </div>
-                      <button className="parent-settings-btn-secondary">
+                      <button 
+                        className="parent-settings-btn-secondary"
+                        onClick={() => setShowEmailModal(true)}
+                      >
                         <EnvelopeIcon />
                         Change Email
                       </button>
@@ -1160,6 +1201,26 @@ const ParentSettingsPage: React.FC = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Profile Edit Modal */}
+      {showProfileModal && (
+        <ParentProfileEditModal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          currentName={user?.name || ''}
+          onSave={handleProfileUpdate}
+        />
+      )}
+
+      {/* Email Change Modal */}
+      {showEmailModal && (
+        <EmailChangeModal
+          isOpen={showEmailModal}
+          onClose={() => setShowEmailModal(false)}
+          currentEmail={user?.email || ''}
+          onSave={handleEmailChange}
+        />
       )}
 
       <ParentBottomNav currentPage="settings" />
