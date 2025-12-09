@@ -12,6 +12,10 @@ interface TextToSpeechOptions {
   voice?: SpeechSynthesisVoice | null;
 }
 
+interface UseTextToSpeechOptions {
+  storyLanguage?: 'en' | 'tl'; // Override language for specific story
+}
+
 interface UseTextToSpeechReturn {
   speak: (text: string, options?: TextToSpeechOptions) => void;
   pause: () => void;
@@ -38,8 +42,10 @@ interface UseTextToSpeechReturn {
   isOnline: boolean;
 }
 
-export const useTextToSpeech = (): UseTextToSpeechReturn => {
-  const { language } = useI18nStore();
+export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpeechReturn => {
+  const { language: appLanguage } = useI18nStore();
+  // Use story language if provided, otherwise fall back to app language
+  const language = options?.storyLanguage || appLanguage;
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
@@ -105,19 +111,28 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
             const filteredVoices = result.voices.filter(v => {
               if (!v.lang) return false;
               const langLower = v.lang.toLowerCase();
+              const nameLower = v.name ? v.name.toLowerCase() : '';
               
               // Include ONLY English US voices (en-US specifically)
               const isEnglishUS = langLower === 'en-us' || langLower === 'en_us';
               
-              // Include Filipino/Tagalog voices (fil, fil-PH, tl, tl-PH)
+              // Include Filipino/Tagalog voices - BE STRICT to avoid Bengali/Arabic
               const isFilipino = langLower.startsWith('fil') || 
-                                 langLower.startsWith('tl') || 
-                                 langLower.includes('ph') ||
-                                 langLower.includes('filipino') ||
-                                 langLower.includes('tagalog');
+                                 langLower.startsWith('tl-') ||
+                                 langLower === 'tl' ||
+                                 (langLower.includes('ph') && (langLower.startsWith('fil') || langLower.startsWith('tl'))) ||
+                                 nameLower.includes('filipino') ||
+                                 nameLower.includes('tagalog');
               
-              return isEnglishUS || isFilipino;
-            });
+              // Explicitly EXCLUDE Arabic and Bengali
+              const isArabic = langLower.startsWith('ar') || nameLower.includes('arabic') || nameLower.includes('عربي');
+              const isBengali = langLower.startsWith('bn') || nameLower.includes('bengali') || nameLower.includes('বাংলা');
+              
+              return (isEnglishUS || isFilipino) && !isArabic && !isBengali;
+            }).map((v, index) => ({
+              ...v,
+              originalIndex: result.voices.indexOf(v) // Store original index for voice selection
+            }));
             
             console.log('📢 TTS: Filtered voices (English & Filipino only):', filteredVoices.length, filteredVoices);
             setVoices(filteredVoices);
@@ -155,18 +170,24 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
         // Filter to show only EN-US and Filipino voices
         const filteredVoices = availableVoices.filter(v => {
           const langLower = v.lang.toLowerCase();
+          const nameLower = v.name ? v.name.toLowerCase() : '';
           
           // Include ONLY English US voices (en-US specifically)
           const isEnglishUS = langLower === 'en-us' || langLower === 'en_us';
           
-          // Include Filipino/Tagalog voices (fil, fil-PH, tl, tl-PH)
+          // Include Filipino/Tagalog voices - BE STRICT to avoid Bengali/Arabic
           const isFilipino = langLower.startsWith('fil') || 
-                             langLower.startsWith('tl') || 
-                             langLower.includes('ph') ||
-                             langLower.includes('filipino') ||
-                             langLower.includes('tagalog');
+                             langLower.startsWith('tl-') ||
+                             langLower === 'tl' ||
+                             (langLower.includes('ph') && (langLower.startsWith('fil') || langLower.startsWith('tl'))) ||
+                             nameLower.includes('filipino') ||
+                             nameLower.includes('tagalog');
           
-          return isEnglishUS || isFilipino;
+          // Explicitly EXCLUDE Arabic and Bengali
+          const isArabic = langLower.startsWith('ar') || nameLower.includes('arabic') || nameLower.includes('عربي');
+          const isBengali = langLower.startsWith('bn') || nameLower.includes('bengali') || nameLower.includes('বাংলা');
+          
+          return (isEnglishUS || isFilipino) && !isArabic && !isBengali;
         });
         
         console.log('📢 TTS: Filtered web voices (English & Filipino only):', filteredVoices.length, filteredVoices);
@@ -206,6 +227,71 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
       };
     }
   }, [isSupported, isNativePlatform, language, currentVoice]);
+
+  // Auto-switch voice when language changes (for story language switching)
+  useEffect(() => {
+    if (!isSupported || voices.length === 0) return;
+    
+    console.log('📢 TTS: Language changed to:', language);
+    
+    // Find a voice that matches the current language
+    const langCode = language === 'tl' ? 'fil' : language;
+    const matchingVoice = voices.find(v => 
+      v.lang && (
+        v.lang.toLowerCase().includes(langCode) || 
+        v.lang.toLowerCase().startsWith('fil') ||
+        (language === 'tl' && v.lang.toLowerCase().includes('ph'))
+      )
+    );
+    
+    // If we found a matching voice and it's different from current
+    if (matchingVoice && matchingVoice !== currentVoice) {
+      console.log('📢 TTS: Auto-switching voice to match language:', matchingVoice);
+      setCurrentVoice(matchingVoice);
+    } else if (matchingVoice) {
+      console.log('📢 TTS: Voice already matches language:', matchingVoice);
+    } else {
+      console.log('📢 TTS: No matching voice found for language:', language);
+    }
+  }, [language, voices, isSupported]); // Watch language changes
+
+  // Auto-switch Cloud TTS voice ID when language changes
+  useEffect(() => {
+    console.log('🌥️ TTS: Checking Cloud voice for language:', language, 'Current voice:', cloudVoiceId);
+    
+    // Define default cloud voice IDs for each language
+    const defaultCloudVoices: { [key: string]: string } = {
+      'en': 'female_english',
+      'tl': 'female_filipino'
+    };
+    
+    const langKey = language === 'tl' ? 'tl' : 'en';
+    const recommendedVoiceId = defaultCloudVoices[langKey];
+    
+    // Only auto-switch if the current voice doesn't match the language
+    // Check if current voice ID contains language indicator
+    const currentIsEnglish = cloudVoiceId.toLowerCase().includes('english');
+    const currentIsFilipino = cloudVoiceId.toLowerCase().includes('filipino') || cloudVoiceId.toLowerCase().includes('tagalog');
+    const needsEnglish = language === 'en';
+    const needsFilipino = language === 'tl';
+    
+    console.log('🌥️ TTS: Voice check -', {
+      cloudVoiceId,
+      currentIsEnglish,
+      currentIsFilipino,
+      needsEnglish,
+      needsFilipino,
+      recommendedVoiceId
+    });
+    
+    // Auto-switch if language doesn't match current voice
+    if ((needsEnglish && !currentIsEnglish) || (needsFilipino && !currentIsFilipino)) {
+      console.log('🌥️ TTS: Auto-switching Cloud voice from', cloudVoiceId, 'to', recommendedVoiceId);
+      setCloudVoiceId(recommendedVoiceId);
+    } else {
+      console.log('🌥️ TTS: Cloud voice already matches language:', cloudVoiceId);
+    }
+  }, [language, cloudVoiceId]); // Watch language AND cloudVoiceId changes
 
   // Speak with Google Cloud TTS
   const speakWithCloudTTS = useCallback(async (text: string) => {
@@ -345,24 +431,27 @@ export const useTextToSpeech = (): UseTextToSpeechReturn => {
         setIsPaused(false);
         setProgress(0);
         
-        // Get voice index if a voice is selected
-        const voiceIndex = currentVoice ? voices.findIndex(v => 
-          v.name === currentVoice.name && v.lang === currentVoice.lang
-        ) : undefined;
+        // Get voice's ORIGINAL index from the device (not filtered array index)
+        const voiceIndex = currentVoice && (currentVoice as any).originalIndex !== undefined 
+          ? (currentVoice as any).originalIndex 
+          : undefined;
         
         const ttsOptions: any = {
           text: text,
-          lang: language === 'tl' ? 'fil-PH' : 'en-US',
           rate: options?.rate ?? rate,
           pitch: options?.pitch ?? pitch,
           volume: options?.volume ?? volume,
           category: 'ambient',
         };
         
-        // Add voice index if available
+        // Add voice index if available - this will use the voice's native language
         if (voiceIndex !== undefined && voiceIndex >= 0) {
           ttsOptions.voice = voiceIndex;
-          console.log('📢 TTS: Using voice index:', voiceIndex);
+          console.log('📢 TTS: Using voice ORIGINAL index:', voiceIndex, 'Voice:', currentVoice?.name, 'Language:', currentVoice?.lang);
+        } else {
+          // Only set lang if no specific voice is selected (fallback)
+          ttsOptions.lang = currentVoice?.lang || (language === 'tl' ? 'fil-PH' : 'en-US');
+          console.log('📢 TTS: No voice selected, using lang fallback:', ttsOptions.lang);
         }
         
         console.log('📢 TTS: Speaking with options:', ttsOptions);

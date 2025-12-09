@@ -126,80 +126,71 @@ const HomePage = () => {
 
       {/* Creation Section */}
       <div className="creation-section">
-        <div className="section-header">
-          <div className="section-icon">📖</div>
-          <h2 className="section-title">{t('home.createYourStory')}</h2>
+        <div className="section-header" style={{ marginBottom: '1rem' }}>
+          <h2 style={{ 
+            fontSize: '18px', 
+            fontWeight: '600', 
+            textAlign: 'center',
+            margin: '0',
+            color: '#374151'
+          }} className="dark:text-white">
+            {t('home.createYourStory')}
+          </h2>
         </div>
         
-        {/* AI Creation Card */}
-        <div className="magical-card">
-          <div className="card-content">
-            <div className="card-icon primary">
-              <span>🤖</span>
+        {/* Three Creation Methods Side by Side - Inside One Border */}
+        <div className="creation-methods-container">
+          <div className="creation-methods-grid">
+            {/* AI Creation Card */}
+            <div 
+              onClick={() => {
+                playButtonClick();
+                setIsAIModalOpen(true);
+              }}
+              className="feature-button ai-story"
+            >
+              <div className="feature-button-icon-wrapper">
+                <span className="feature-button-icon">🤖</span>
+              </div>
+              <div className="feature-button-content">
+                <h3 className="feature-button-title">AI Story</h3>
+                <p className="feature-button-subtitle">Create with AI magic</p>
+              </div>
             </div>
-            <div className="card-text">
-              <h3 className="card-title">{t('home.createWithAI')}</h3>
-              <p className="card-description">
-                {t('home.createWithAIDesc')}
-              </p>
-              <button 
-                className="magical-button"
-                onClick={() => {
-                  playButtonClick();
-                  setIsAIModalOpen(true);
-                }}
-              >
-                {t('home.startAIStory')}
-              </button>
-            </div>
-          </div>
-        </div>
 
-        {/* Manual Creation Card */}
-        <div className="magical-card">
-          <div className="card-content">
-            <div className="card-icon secondary">
-              <span>✍️</span>
+            {/* Manual Creation Card */}
+            <div 
+              onClick={() => {
+                playButtonClick();
+                setIsModeSelectionOpen(true);
+              }}
+              className="feature-button draw-story"
+            >
+              <div className="feature-button-icon-wrapper">
+                <span className="feature-button-icon">✍️</span>
+              </div>
+              <div className="feature-button-content">
+                <h3 className="feature-button-title">Draw Story</h3>
+                <p className="feature-button-subtitle">Make your own illustrations</p>
+              </div>
             </div>
-            <div className="card-text">
-              <h3 className="card-title">{t('home.createManually')}</h3>
-              <p className="card-description">
-                {t('home.createManuallyDesc')}
-              </p>
-              <button 
-                className="magical-button secondary"
-                onClick={() => {
-                  playButtonClick();
-                  setIsModeSelectionOpen(true);
-                }}
-              >
-                {t('home.startCreating')}
-              </button>
-            </div>
-          </div>
-        </div>
 
-        {/* Photo Story Creation Card */}
-        <div className="magical-card">
-          <div className="card-content">
-            <div className="card-icon mystical">
-              <span>📸</span>
-            </div>
-            <div className="card-text">
-              <h3 className="card-title">Create from Photo</h3>
-              <p className="card-description">
-                Take or upload a photo and let AI create a magical story from it
-              </p>
-              <button 
-                className="magical-button outline"
-                onClick={() => {
-                  playButtonClick();
-                  console.log('Photo Story button clicked!');
-                  setIsPhotoModalOpen(true);
-                }}
-              >
-                Start Photo Story
-              </button>
+            {/* Photo Story Creation Card */}
+            <div 
+              onClick={() => {
+                playButtonClick();
+                console.log('Photo Story button clicked!');
+                setIsPhotoModalOpen(true);
+              }}
+              className="feature-button photo-ai"
+            >
+              <div className="feature-button-icon-wrapper">
+                <span className="feature-button-icon">📸</span>
+              </div>
+              <div className="feature-button-content">
+                <h3 className="feature-button-title">Photo AI</h3>
+                <p className="feature-button-subtitle">Turn photos into stories</p>
+              </div>
             </div>
           </div>
         </div>
@@ -211,9 +202,14 @@ const HomePage = () => {
           {draftStories.length > 0 ? (
             <div className="drafts-list">
               {draftStories.map((story) => (
-                <div key={story.id} className="draft-item">
+                <div 
+                  key={story.id} 
+                  className="draft-item"
+                >
                   <div className="draft-content">
-                    <h4 className="draft-title">{story.title}</h4>
+                    <h4 className="draft-title">
+                      {story.title}
+                    </h4>
                     <p className="draft-meta">
                       {story.pages.length} pages • {story.wordCount} words
                     </p>
@@ -222,8 +218,7 @@ const HomePage = () => {
                     </p>
                   </div>
                   <button 
-                    className="magical-button"
-                    style={{padding: '0.5rem 1rem', fontSize: '0.8rem'}}
+                    className="magical-button draft-continue-button"
                     onClick={() => {
                       playButtonClick();
                       handleContinueStory(story);

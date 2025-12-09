@@ -1054,6 +1054,7 @@ const StoryReaderPage: React.FC = () => {
             text={story.pages.map(page => page.text).filter(Boolean).join(' ')}
             showProgress={true}
             storyTitle={story.title}
+            storyLanguage={story.language as 'en' | 'tl'}
           />
         </div>
       </div>

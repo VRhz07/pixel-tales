@@ -6,11 +6,13 @@ import {
   MagnifyingGlassIcon,
   FunnelIcon,
   EyeIcon,
-  HeartIcon
+  HeartIcon,
+  UserCircleIcon
 } from '@heroicons/react/24/outline';
 import { storyApiService } from '../../services/storyApiService';
 import { useAuthStore } from '../../stores/authStore';
 import CustomDropdown, { DropdownOption } from '../common/CustomDropdown';
+
 
 // Mock data for public stories (would come from API in real app)
 const mockPublicStories = {
@@ -182,6 +184,7 @@ const PublicLibraryPage = () => {
   const [showAllTopRated, setShowAllTopRated] = useState(false);
   const [publishedStories, setPublishedStories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [recommendedStories, setRecommendedStories] = useState<any[]>([]);
 
   // Load published stories from backend
   useEffect(() => {
@@ -206,16 +209,42 @@ const PublicLibraryPage = () => {
     };
   }, []);
 
+
   const loadPublishedStories = async () => {
     setIsLoading(true);
     try {
       const stories = await storyApiService.getPublishedStories();
       setPublishedStories(stories);
+      
+      // Set recommended stories (top liked stories) when no filters active
+      if (!searchQuery && !selectedLanguage && !selectedGenre) {
+        const recommended = [...stories]
+          .sort((a, b) => (b.likes_count || 0) - (a.likes_count || 0))
+          .slice(0, 6);
+        setRecommendedStories(recommended);
+      }
     } catch (error) {
       console.error('Error loading published stories:', error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Get available genres from published stories
+  const getAvailableGenres = () => {
+    const genreSet = new Set<string>();
+    publishedStories.forEach((story: any) => {
+      if (story.genres && Array.isArray(story.genres)) {
+        story.genres.forEach((genre: string) => genreSet.add(genre.toLowerCase()));
+      }
+    });
+    
+    // Filter genres to only show those that have stories
+    const availableGenres = genres.filter(genre => 
+      genre.value === '' || genreSet.has(genre.value.toLowerCase())
+    );
+    
+    return availableGenres;
   };
 
   // Combine all stories from different categories
@@ -429,8 +458,241 @@ const PublicLibraryPage = () => {
       {/* Show carousels only when no filters are active */}
       {!searchQuery && !selectedLanguage && !selectedGenre ? (
         <>
+          {/* Recommendations Section */}
+          {recommendedStories.length > 0 && (
+            <div style={{ marginBottom: '32px' }}>
+              <h2 className="dark:text-white" style={{ 
+                fontSize: '20px', 
+                fontWeight: '700', 
+                color: '#111827', 
+                marginBottom: '16px' 
+              }}>
+                Recommendations
+              </h2>
+              <div style={{ 
+                display: 'flex', 
+                gap: '16px', 
+                overflowX: 'auto', 
+                paddingBottom: '8px',
+                scrollbarWidth: 'thin'
+              }}>
+                {recommendedStories.map((story) => (
+                  <div
+                    key={story.id}
+                    onClick={() => handleStoryClick(story.id.toString())}
+                    style={{
+                      minWidth: '140px',
+                      cursor: 'pointer',
+                      transition: 'transform 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }}
+                  >
+                    <div style={{
+                      width: '140px',
+                      height: '200px',
+                      borderRadius: '16px',
+                      overflow: 'hidden',
+                      position: 'relative',
+                      backgroundColor: '#f3f4f6',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                    }}>
+                      {story.cover_image ? (
+                        <img 
+                          src={story.cover_image} 
+                          alt={story.title}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover'
+                          }}
+                        />
+                      ) : (
+                        <div style={{
+                          width: '100%',
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          color: 'white',
+                          fontSize: '48px',
+                          fontWeight: '700'
+                        }}>
+                          {story.title.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      {/* Title and Chapter badge overlay */}
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '0',
+                        left: '0',
+                        right: '0',
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)',
+                        padding: '40px 12px 12px 12px'
+                      }}>
+                        <h3 style={{
+                          fontSize: '14px',
+                          fontWeight: '700',
+                          color: 'white',
+                          margin: '0',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                        }}>
+                          {story.title}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Categories Section */}
+          <div style={{ marginBottom: '24px' }}>
+            <h2 className="dark:text-white" style={{ 
+              fontSize: '20px', 
+              fontWeight: '700', 
+              color: '#111827', 
+              marginBottom: '16px' 
+            }}>
+              Categories
+            </h2>
+            <div style={{ 
+              display: 'flex', 
+              gap: '12px', 
+              overflowX: 'auto',
+              paddingBottom: '12px',
+              scrollbarWidth: 'thin'
+            }}>
+              {getAvailableGenres().map((genre) => {
+                const isSelected = selectedGenre === genre.value;
+                const isDark = document.documentElement.classList.contains('dark');
+                
+                return (
+                  <button
+                    key={genre.value}
+                    onClick={() => setSelectedGenre(genre.value)}
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '24px',
+                      border: 'none',
+                      backgroundColor: isSelected ? '#9333ea' : (isDark ? '#2a2435' : '#f3f4f6'),
+                      color: isSelected ? '#ffffff' : (isDark ? '#d1d5db' : '#374151'),
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.2s ease',
+                      boxShadow: isSelected ? '0 10px 25px rgba(147, 51, 234, 0.5)' : 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.backgroundColor = isDark ? '#3a3445' : '#e5e7eb';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.backgroundColor = isDark ? '#2a2435' : '#f3f4f6';
+                      }
+                    }}
+                  >
+                    {genre.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Large Story Cards Grid - Always show below categories */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(2, 1fr)', 
+            gap: '16px',
+            marginBottom: '32px'
+          }}>
+            {allPublishedStories.slice(0, 8).map((story) => (
+              <div
+                key={story.id}
+                onClick={() => handleStoryClick(story.id)}
+                className="bg-white dark:bg-gray-800 shadow-lg"
+                style={{
+                  cursor: 'pointer',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  transition: 'transform 0.2s ease',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <div style={{
+                  width: '100%',
+                  height: '200px',
+                  overflow: 'hidden',
+                  backgroundColor: '#f3f4f6',
+                }}>
+                  {story.coverImage ? (
+                    <img 
+                      src={story.coverImage} 
+                      alt={story.title}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      color: 'white',
+                      fontSize: '48px',
+                      fontWeight: '700'
+                    }}>
+                      {story.title.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <div style={{ padding: '12px' }}>
+                  <h3 className="dark:text-white" style={{
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    color: '#111827',
+                    margin: '0 0 4px 0',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {story.title}
+                  </h3>
+                  <p className="dark:text-gray-400" style={{
+                    fontSize: '14px',
+                    color: '#6b7280',
+                    margin: '0',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    by {story.author}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
           {/* Recent Stories Carousel */}
-          <div className="library-carousel-section">
+          <div className="library-carousel-section" style={{ display: 'none' }}>
         <div className="library-carousel-header">
           <h2 className="library-carousel-title">Recent Stories</h2>
           <button 
@@ -473,8 +735,8 @@ const PublicLibraryPage = () => {
         </div>
       </div>
 
-      {/* Most Popular Stories Carousel */}
-      <div className="library-carousel-section">
+      {/* Most Popular Stories Carousel - Hidden */}
+      <div className="library-carousel-section" style={{ display: 'none' }}>
         <div className="library-carousel-header">
           <h2 className="library-carousel-title">Most Popular Stories</h2>
           <button 

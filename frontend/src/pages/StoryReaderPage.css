@@ -4,11 +4,27 @@
 .story-reader-page {
   min-height: 100vh;
   padding-bottom: 5rem; /* Space for bottom navigation */
+  position: relative;
+  z-index: 1;
 }
 
 .story-reader-page.dark {
-  background-color: #1a1625;
+  background-color: #1a1625 !important;
+  background: #1a1625 !important;
   color: #f3f4f6;
+}
+
+/* Override body background when story reader is active */
+body:has(.story-reader-page.dark) {
+  background-color: #1a1625 !important;
+}
+
+body:has(.story-reader-page.dark) #root {
+  background-color: #1a1625 !important;
+}
+
+.story-reader-page.dark * {
+  /* Ensure no gray backgrounds on any child elements */
 }
 
 .story-reader-page.light {
@@ -29,7 +45,7 @@
 }
 
 .story-reader-top-bar.dark {
-  background-color: rgba(26, 22, 37, 0.95);
+  background-color: #1a1625 !important;
   border-bottom: 1px solid #2a2435;
 }
 
@@ -93,7 +109,7 @@
 }
 
 .story-reader-header.dark {
-  background-color: #2a2435;
+  background-color: #1a1625 !important;
 }
 
 .story-reader-header.light {
@@ -192,6 +208,8 @@
   gap: 1rem;
   padding: 1rem;
   padding-bottom: 8rem; /* Extra space for TTS controls */
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 .story-reader-page-card {
@@ -203,8 +221,8 @@
 }
 
 .story-reader-page-card.dark {
-  background-color: #2a2435;
-  border: 1px solid #3a3445;
+  background-color: transparent !important;
+  border: 1px solid rgba(42, 36, 53, 0.2);
 }
 
 .story-reader-page-card.light {
@@ -250,7 +268,34 @@
   font-size: 0.95rem;
   line-height: 1.6;
   padding: 0.75rem;
-  border-radius: 0.5rem;
+  border-radius: 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fade effect at top and bottom */
+.story-reader-text::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.story-reader-text::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.1), transparent);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .story-reader-text.dark {
@@ -258,9 +303,25 @@
   background-color: rgba(139, 92, 246, 0.05);
 }
 
+.story-reader-text.dark::before {
+  background: linear-gradient(to bottom, rgba(139, 92, 246, 0.1), transparent);
+}
+
+.story-reader-text.dark::after {
+  background: linear-gradient(to top, rgba(139, 92, 246, 0.1), transparent);
+}
+
 .story-reader-text.light {
   color: #374151;
   background-color: rgba(139, 92, 246, 0.02);
+}
+
+.story-reader-text.light::before {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), transparent);
+}
+
+.story-reader-text.light::after {
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.5), transparent);
 }
 
 /* Horizontal scroll mode - MOBILE OPTIMIZED */
@@ -290,8 +351,8 @@
 }
 
 .story-reader-horizontal-page-card.dark {
-  background-color: #2a2435;
-  border: 1px solid #3a3445;
+  background-color: #1a1625 !important;
+  border: 1px solid #2a2435;
 }
 
 .story-reader-horizontal-page-card.light {
@@ -454,6 +515,9 @@
 .story-reader-end-subtitle {
   font-size: 1rem;
   margin: 0;
+  border: none;
+  padding: 0.75rem;
+  background: transparent;
 }
 
 .story-reader-end-subtitle.dark {

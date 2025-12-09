@@ -20,6 +20,7 @@ interface TTSControlsProps {
   showProgress?: boolean;
   compact?: boolean;
   storyTitle?: string; // For media notification
+  storyLanguage?: 'en' | 'tl'; // Story's language for proper voice selection
 }
 
 export const TTSControls: React.FC<TTSControlsProps> = ({ 
@@ -27,7 +28,8 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
   autoPlay = false,
   showProgress = true,
   compact = false,
-  storyTitle = 'Story'
+  storyTitle = 'Story',
+  storyLanguage // Story language for TTS
 }) => {
   const { t } = useI18nStore();
   const {
@@ -52,7 +54,7 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
     useCloudTTS,
     setUseCloudTTS,
     isOnline
-  } = useTextToSpeech();
+  } = useTextToSpeech({ storyLanguage });
 
   const [showSettings, setShowSettings] = useState(false);
   const isNativePlatform = Capacitor.isNativePlatform();
@@ -342,15 +344,75 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
                 ) : (
                   <>
                     <CustomDropdown
-                      options={voices.map((voice, index) => ({
-                        value: `${voice.name}|||${voice.lang}|||${index}`,
-                        label: `${voice.name} (${voice.lang})`
-                      }))}
-                      value={currentVoice ? `${currentVoice.name}|||${currentVoice.lang}|||${voices.findIndex(v => v.name === currentVoice.name && v.lang === currentVoice.lang)}` : ''}
+                      options={(() => {
+                        // Build voice options (will only log on re-render, not continuously)
+                        const options = voices.map((voice, index) => {
+                          // Count how many voices of the same language we have
+                          const sameLanguageVoices = voices.filter(v => v.lang === voice.lang);
+                          // Use the actual position in the filtered same-language list
+                          const voiceNumber = sameLanguageVoices.indexOf(voice) + 1;
+                          
+                          // Create user-friendly label
+                          let languageLabel = voice.lang;
+                          if (voice.lang?.toLowerCase().includes('en')) {
+                            languageLabel = 'English (US)';
+                          } else if (voice.lang?.toLowerCase().includes('fil') || voice.lang?.toLowerCase().includes('tl')) {
+                            languageLabel = 'Filipino';
+                          }
+                          
+                          // Extract a more readable identifier from the voice name
+                          // Voice names are like: "fil-ph-x-fie-local", "fil-ph-x-fid-local"
+                          let voiceIdentifier = '';
+                          if (voice.name) {
+                            // Try to get a unique part from the voice name
+                            const nameParts = voice.name.split('-');
+                            if (nameParts.length > 3) {
+                              // Get the unique identifier (usually the 4th part)
+                              voiceIdentifier = ` (${nameParts[3]?.toUpperCase() || ''})`;
+                            } else {
+                              voiceIdentifier = ` (${voice.name.substring(0, 8)}...)`;
+                            }
+                          }
+                          
+                          // Add number if there are multiple voices for same language
+                          const label = sameLanguageVoices.length > 1 
+                            ? `${languageLabel} - Voice ${voiceNumber}${voiceIdentifier}` 
+                            : languageLabel;
+                          
+                          return {
+                            value: `${voice.name}|||${voice.lang}|||${index}`,
+                            label: label,
+                            voiceData: {
+                              index,
+                              voiceNumber,
+                              name: voice.name,
+                              lang: voice.lang,
+                              label,
+                              originalIndex: (voice as any).originalIndex
+                            }
+                          };
+                        });
+                        
+                        // Log once when dropdown opens (not on every render)
+                        if (options.length > 0 && !window.__voicesLogged) {
+                          console.log('🎤 TTS: Voice dropdown options:', JSON.stringify(options.map(o => o.voiceData), null, 2));
+                          window.__voicesLogged = true;
+                          setTimeout(() => { window.__voicesLogged = false; }, 1000); // Reset after 1 second
+                        }
+                        
+                        return options;
+                      })()}
+                      value={currentVoice ? `${currentVoice.name}|||${currentVoice.lang}|||${voices.indexOf(currentVoice)}` : ''}
                       onChange={(value) => {
                         const [name, lang, indexStr] = value.split('|||');
                         const index = parseInt(indexStr);
                         if (index >= 0 && index < voices.length) {
+                          console.log('🎤 TTS: User selected voice:', JSON.stringify({
+                            index,
+                            name: voices[index].name,
+                            lang: voices[index].lang,
+                            originalIndex: (voices[index] as any).originalIndex
+                          }, null, 2));
                           setVoice(voices[index]);
                         }
                       }}

@@ -39,43 +39,58 @@ export const useMediaNotification = (options: UseMediaNotificationOptions = {}) 
   const isNative = Capacitor.isNativePlatform();
 
   useEffect(() => {
+    // Temporarily disable media notification listeners until plugin is properly implemented
+    // This prevents app crashes
     if (!isNative) return;
-
+    
+    console.log('📱 Media notification: Listeners temporarily disabled to prevent crashes');
+    
+    // TODO: Re-enable when MediaNotificationPlugin is properly implemented
+    /*
     const listeners: Array<{ remove: () => void }> = [];
 
     const setupListeners = async () => {
-      if (options.onPlay) {
-        const playListener = await MediaNotification.addListener('play', options.onPlay);
-        listeners.push(playListener);
-      }
+      try {
+        if (options.onPlay) {
+          const playListener = await MediaNotification.addListener('play', options.onPlay);
+          listeners.push(playListener);
+        }
 
-      if (options.onPause) {
-        const pauseListener = await MediaNotification.addListener('pause', options.onPause);
-        listeners.push(pauseListener);
-      }
+        if (options.onPause) {
+          const pauseListener = await MediaNotification.addListener('pause', options.onPause);
+          listeners.push(pauseListener);
+        }
 
-      if (options.onStop) {
-        const stopListener = await MediaNotification.addListener('stop', options.onStop);
-        listeners.push(stopListener);
-      }
+        if (options.onStop) {
+          const stopListener = await MediaNotification.addListener('stop', options.onStop);
+          listeners.push(stopListener);
+        }
 
-      if (options.onNext) {
-        const nextListener = await MediaNotification.addListener('next', options.onNext);
-        listeners.push(nextListener);
-      }
+        if (options.onNext) {
+          const nextListener = await MediaNotification.addListener('next', options.onNext);
+          listeners.push(nextListener);
+        }
 
-      if (options.onPrevious) {
-        const previousListener = await MediaNotification.addListener('previous', options.onPrevious);
-        listeners.push(previousListener);
+        if (options.onPrevious) {
+          const previousListener = await MediaNotification.addListener('previous', options.onPrevious);
+          listeners.push(previousListener);
+        }
+      } catch (error) {
+        console.error('📱 Media notification: Failed to setup listeners (plugin not implemented):', error);
       }
     };
 
     setupListeners();
 
     return () => {
-      listeners.forEach(listener => listener.remove());
-      MediaNotification.removeAllListeners();
+      try {
+        listeners.forEach(listener => listener.remove());
+        MediaNotification.removeAllListeners();
+      } catch (error) {
+        console.error('📱 Media notification: Failed to cleanup listeners:', error);
+      }
     };
+    */
   }, [isNative, options.onPlay, options.onPause, options.onStop, options.onNext, options.onPrevious]);
 
   const showNotification = useCallback(async (title: string, text: string, isPlaying: boolean) => {
@@ -120,6 +135,6 @@ export const useMediaNotification = (options: UseMediaNotificationOptions = {}) 
     showNotification,
     hideNotification,
     updateNotification,
-    isSupported: isNative
+    isSupported: false // Temporarily disabled until plugin is properly implemented
   };
 };
