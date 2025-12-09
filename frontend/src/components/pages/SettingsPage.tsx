@@ -491,45 +491,6 @@ const SettingsPage = () => {
         )}
       </div>
 
-      {/* Support Section */}
-      <div className="settings-support-section">
-        <h2 className="settings-support-title">Support</h2>
-      </div>
-
-      <div className="settings-card">
-        <div className="settings-support-item">
-          <div className="settings-support-content">
-            <div className="settings-support-icon-purple">
-              <QuestionMarkCircleIcon className="h-5 w-5" />
-            </div>
-            <div className="settings-support-text">
-              <div className="settings-support-text-title">Help Center</div>
-              <div className="settings-support-text-subtitle">Get answers to common questions</div>
-            </div>
-          </div>
-          <div className="settings-support-action">
-            <span>Open</span>
-            <ChevronRightIcon className="h-4 w-4" />
-          </div>
-        </div>
-
-        <div className="settings-support-item">
-          <div className="settings-support-content">
-            <div className="settings-support-icon-orange">
-              <SpeakerWaveIcon className="h-5 w-5" />
-            </div>
-            <div className="settings-support-text">
-              <div className="settings-support-text-title">Contact Us</div>
-              <div className="settings-support-text-subtitle">Report issues or send feedback</div>
-            </div>
-          </div>
-          <div className="settings-support-action">
-            <span>Contact</span>
-            <ChevronRightIcon className="h-4 w-4" />
-          </div>
-        </div>
-      </div>
-
       {/* Action Buttons - Only show for authenticated non-child users */}
       {!isAnonymous && currentUser?.user_type !== 'child' && (
         <div className="settings-action-buttons">

@@ -26158,12 +26158,12 @@ body.dark .magical-home p {
 }
 
 .dark .tts-settings-panel {
-  background: #1F2937;
-  border-color: #374151;
+  background: #1a1625;
+  border-color: rgba(139, 92, 246, 0.3);
 }
 
 .dark .tts-settings-header {
-  border-bottom-color: #374151;
+  border-bottom-color: rgba(139, 92, 246, 0.2);
 }
 
 .dark .tts-settings-header h3 {

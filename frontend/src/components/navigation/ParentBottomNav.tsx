@@ -18,17 +18,33 @@ const ParentBottomNav: React.FC = () => {
 
   // Hide bottom nav when keyboard is visible
   useEffect(() => {
-    const showListener = Keyboard.addListener('keyboardWillShow', () => {
-      setIsKeyboardVisible(true);
-    });
+    let showListener: any;
+    let hideListener: any;
 
-    const hideListener = Keyboard.addListener('keyboardWillHide', () => {
-      setIsKeyboardVisible(false);
-    });
+    const setupListeners = async () => {
+      try {
+        showListener = await Keyboard.addListener('keyboardWillShow', () => {
+          setIsKeyboardVisible(true);
+        });
+
+        hideListener = await Keyboard.addListener('keyboardWillHide', () => {
+          setIsKeyboardVisible(false);
+        });
+      } catch (error) {
+        // Keyboard API not available (web browser)
+        console.log('Keyboard API not available');
+      }
+    };
+
+    setupListeners();
 
     return () => {
-      showListener.remove();
-      hideListener.remove();
+      if (showListener?.remove) {
+        showListener.remove();
+      }
+      if (hideListener?.remove) {
+        hideListener.remove();
+      }
     };
   }, []);
 
