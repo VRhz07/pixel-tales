@@ -10896,9 +10896,9 @@ body.dark .magical-home p {
   }
 
   .profile-avatar-container {
-    width: 5rem !important;
-    height: 5rem !important;
-    background-color: #DDD6FE !important;
+    width: fit-content !important;
+    height: fit-content !important;
+    background-color: transparent !important;
     border-radius: 50% !important;
     display: flex !important;
     align-items: center !important;

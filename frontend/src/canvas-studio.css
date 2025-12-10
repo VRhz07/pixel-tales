@@ -1208,18 +1208,42 @@ body.capacitor .canvas-studio-mobile-sliders {
    ============================================ */
 
 @media (max-width: 1024px) and (orientation: landscape) and (max-height: 600px) {
+  /* Override body padding in landscape for canvas page */
+  body.capacitor {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  
+  /* Override root padding in landscape for canvas page */
+  .capacitor #root {
+    padding-top: 0 !important;
+  }
+  
   /* Change to horizontal layout: left bar | canvas | right bar */
   .canvas-studio-mobile {
     display: grid;
     grid-template-columns: 48px 1fr 80px;
     grid-template-rows: 1fr;
     height: 100vh;
+    overflow: hidden; /* Prevent scrolling */
   }
   
-  /* Capacitor safe area for landscape mode */
+  /* Capacitor safe area for landscape mode - account for notch/camera */
   body.capacitor .canvas-studio-mobile {
-    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    margin-top: env(safe-area-inset-top);
+    height: 100vh;
+    margin-top: 0;
+    /* Add safe areas on left and right for notches/cameras */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    /* Adjust grid to account for padding */
+    grid-template-columns: calc(48px) 1fr calc(80px);
+  }
+  
+  /* Override the default canvas-studio padding in landscape */
+  body.capacitor .canvas-studio {
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden; /* Prevent scrolling */
   }
 
   /* Top bar becomes left vertical bar */
@@ -1290,6 +1314,13 @@ body.capacitor .canvas-studio-mobile-sliders {
     height: 100%;
     padding: 1rem;
   }
+  
+  /* Override Capacitor safe area for canvas in landscape */
+  body.capacitor .canvas-studio-canvas-area-mobile {
+    position: static;
+    top: auto;
+    bottom: auto;
+  }
 
   /* Bottom toolbar becomes right vertical bar */
   .canvas-studio-mobile-toolbar {
@@ -1307,6 +1338,11 @@ body.capacitor .canvas-studio-mobile-sliders {
     right: auto;
     overflow-y: auto;
     overflow-x: hidden;
+  }
+  
+  /* Override Capacitor safe area for toolbar in landscape */
+  body.capacitor .canvas-studio-mobile-toolbar {
+    padding-bottom: 0.5rem;
   }
 
   .canvas-studio-mobile-tool {

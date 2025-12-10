@@ -34,6 +34,7 @@ urlpatterns = [
     # User endpoints
     path('users/profile/', views.get_user_profile, name='get_user_profile'),
     path('users/profile/update/', views.update_user_profile, name='update_user_profile'),
+    path('users/rewards/', views.get_user_rewards, name='get_user_rewards'),
     
     # Story endpoints
     path('stories/', views.story_list, name='story_list'),

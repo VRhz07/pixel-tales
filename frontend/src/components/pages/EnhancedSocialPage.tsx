@@ -29,6 +29,7 @@ import {
 import { useAuthStore } from '../../stores/authStore';
 import { useNotificationStore } from '../../stores/notificationStore';
 import AnonymousPrompt from '../ui/AnonymousPrompt';
+import { AvatarWithBorder } from '../common/AvatarWithBorder';
 
 const EnhancedSocialPage = () => {
   const navigate = useNavigate();
@@ -584,8 +585,12 @@ const EnhancedSocialPage = () => {
                     >
                       <div className="friend-card-left min-w-0 flex-1" onClick={() => !collabInvite && handleViewProfile(friend.id)} style={{ cursor: collabInvite ? 'default' : 'pointer' }}>
                         <div className="friend-avatar-container flex-shrink-0">
-                          <div className="friend-avatar-medium" style={{ position: 'relative' }}>
-                            {friend.avatar}
+                          <div style={{ position: 'relative' }}>
+                            <AvatarWithBorder 
+                              avatar={friend.avatar}
+                              borderId={friend.selected_avatar_border || 'basic'}
+                              size={56}
+                            />
                             {collabInvite && (
                               <div style={{
                                 position: 'absolute',
@@ -599,7 +604,8 @@ const EnhancedSocialPage = () => {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 fontSize: '12px',
-                                animation: 'pulse 2s infinite'
+                                animation: 'pulse 2s infinite',
+                                zIndex: 10
                               }}>
                                 🎨
                               </div>
@@ -724,8 +730,13 @@ const EnhancedSocialPage = () => {
                       </div>
                       <div className="activity-content">
                         <div className="activity-user">
-                          <span className="activity-avatar">{activity.user_avatar}</span>
-                          <span className="activity-name">{activity.user_name}</span>
+                          <AvatarWithBorder 
+                            avatar={activity.user_avatar}
+                            borderId={activity.user_avatar_border || 'basic'}
+                            size={32}
+                            style={{ display: 'inline-flex' }}
+                          />
+                          <span className="activity-name" style={{ marginLeft: '8px' }}>{activity.user_name}</span>
                         </div>
                         <div className="activity-text">
                           {getActivityText(activity)}
@@ -797,9 +808,11 @@ const EnhancedSocialPage = () => {
                       {user.rank === 3 && <div className="rank-medal bronze">🥉</div>}
                       {user.rank > 3 && <div className="rank-number">#{user.rank}</div>}
                     </div>
-                    <div className="leaderboard-avatar-large">
-                      {user.avatar}
-                    </div>
+                    <AvatarWithBorder 
+                      avatar={user.avatar}
+                      borderId={user.selected_avatar_border || 'basic'}
+                      size={64}
+                    />
                     <div className="leaderboard-info">
                       <div className="leaderboard-name">{user.name}</div>
                       <div className="leaderboard-badges">
@@ -879,8 +892,12 @@ const EnhancedSocialPage = () => {
                     <div key={friend.id} className="manage-friend-card">
                       <div className="manage-friend-info">
                         <div className="friend-avatar-container">
-                          <div className="friend-avatar-medium">
-                            {friend.avatar}
+                          <div style={{ position: 'relative' }}>
+                            <AvatarWithBorder 
+                              avatar={friend.avatar}
+                              borderId={friend.selected_avatar_border || 'basic'}
+                              size={56}
+                            />
                           </div>
                           <div className={`online-dot-small ${friend.is_online ? 'online-dot-active' : ''}`}></div>
                         </div>
@@ -937,9 +954,11 @@ const EnhancedSocialPage = () => {
                   {/* Friend Requests Only - Collaboration invites now appear in Profile > Social > Friends tab */}
                   {friendRequests.map((request) => (
                     <div key={`friend-${request.id}`} className="friend-request-card">
-                      <div className="friend-request-avatar-large">
-                        {request.sender_avatar}
-                      </div>
+                      <AvatarWithBorder 
+                        avatar={request.sender_avatar}
+                        borderId={request.sender_avatar_border || 'basic'}
+                        size={72}
+                      />
                       <div className="friend-request-info">
                         <div className="friend-request-name">{request.sender_name}</div>
                         <div className="friend-request-time">{getTimeAgo(request.created_at)}</div>
@@ -998,10 +1017,14 @@ const EnhancedSocialPage = () => {
             <div className="profile-header">
               <div className="profile-cover"></div>
               <div className="profile-avatar-container">
-                <div className="profile-avatar-huge">
-                  {selectedProfile.avatar}
+                <div style={{ position: 'relative' }}>
+                  <AvatarWithBorder 
+                    avatar={selectedProfile.avatar}
+                    borderId={selectedProfile.selected_avatar_border || 'basic'}
+                    size={120}
+                  />
+                  <div className={`profile-online-indicator ${selectedProfile.is_online ? 'online' : 'offline'}`} style={{ position: 'absolute', bottom: '8px', right: '8px' }}></div>
                 </div>
-                <div className={`profile-online-indicator ${selectedProfile.is_online ? 'online' : 'offline'}`}></div>
               </div>
             </div>
             
@@ -1152,9 +1175,11 @@ const EnhancedSocialPage = () => {
                 <div className="search-results-grid">
                   {searchResults.map((user) => (
                     <div key={user.id} className="search-result-card">
-                      <div className="search-result-avatar">
-                        {user.avatar}
-                      </div>
+                      <AvatarWithBorder 
+                        avatar={user.avatar}
+                        borderId={user.selected_avatar_border || 'basic'}
+                        size={48}
+                      />
                       <div className="search-result-info">
                         <div className="search-result-name">{user.name}</div>
                         <div className="search-result-stats">

@@ -9,6 +9,7 @@ import {
   CalendarIcon,
   TrophyIcon
 } from '@heroicons/react/24/outline';
+import { AvatarWithBorder } from '../common/AvatarWithBorder';
 import { api } from '@/services/api';
 
 interface Achievement {
@@ -140,7 +141,11 @@ const ProfilePage = () => {
       {/* User Profile Card */}
       <div className="profile-user-card">
         <div className="profile-avatar-container">
-          <span className="profile-avatar-emoji">{user?.avatar || profile.avatar}</span>
+          <AvatarWithBorder
+            avatar={user?.avatar || profile.avatar}
+            borderId={user?.selected_avatar_border || 'basic'}
+            size={100}
+          />
         </div>
         <h2 className="profile-user-title">{user?.name || profile.name}</h2>
         <p className="profile-level-info">Level {userLevel.level} • {userLevel.currentXP.toLocaleString()} XP</p>

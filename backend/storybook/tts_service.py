@@ -4,8 +4,15 @@ Provides high-quality voice synthesis for storytelling
 """
 import os
 import logging
-from google.cloud import texttospeech
 from django.core.cache import cache
+
+# Try to import Google Cloud TTS, but make it optional
+try:
+    from google.cloud import texttospeech
+    GOOGLE_TTS_AVAILABLE = True
+except ImportError:
+    GOOGLE_TTS_AVAILABLE = False
+    texttospeech = None
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +58,11 @@ class TTSService:
     
     def __init__(self):
         """Initialize the TTS client"""
+        if not GOOGLE_TTS_AVAILABLE:
+            logger.warning("⚠️ Google Cloud TTS library not installed")
+            self.client = None
+            return
+            
         try:
             self.client = texttospeech.TextToSpeechClient()
             logger.info("✅ Google Cloud TTS client initialized successfully")
@@ -193,6 +205,9 @@ _tts_service = None
 def get_tts_service() -> TTSService:
     """Get the singleton TTS service instance"""
     global _tts_service
+    if not GOOGLE_TTS_AVAILABLE:
+        logger.warning("⚠️ Google Cloud TTS not available")
+        return None
     if _tts_service is None:
         _tts_service = TTSService()
     return _tts_service

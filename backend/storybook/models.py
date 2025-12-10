@@ -25,6 +25,9 @@ class UserProfile(models.Model):
     # Gamification fields
     experience_points = models.PositiveIntegerField(default=0)  # Total XP earned (never decreases)
     level = models.PositiveIntegerField(default=1)  # Current level based on XP
+    
+    # Reward system fields
+    selected_avatar_border = models.CharField(max_length=50, blank=True, default='basic')  # Selected border ID
 
     # Moderation fields
     violation_count = models.PositiveIntegerField(default=0)

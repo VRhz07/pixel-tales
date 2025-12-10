@@ -13,6 +13,8 @@ import { collaborationService } from '../services/collaborationService';
 import { CollaborationEnhancer } from '../components/canvas/CollaborationEnhancer';
 import ReconnectingModal from '../components/collaboration/ReconnectingModal';
 import { VotingModal } from '../components/collaboration/VotingModal';
+import { Capacitor } from '@capacitor/core';
+import { StatusBar } from '@capacitor/status-bar';
 import '../canvas-studio.css';
 import '../components/canvas/AdvancedColorPicker.css';
 import '../components/canvas/GradientEditor.css';
@@ -168,6 +170,51 @@ const CanvasDrawingPage: React.FC = () => {
       }
     }
   }, []);
+  
+  // Handle status bar visibility and orientation changes
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    
+    const handleOrientationChange = async () => {
+      const isLandscape = window.matchMedia('(orientation: landscape)').matches;
+      const isSmallHeight = window.innerHeight <= 600;
+      
+      try {
+        if (isLandscape && isSmallHeight) {
+          // Hide status bar in landscape mode for immersive drawing
+          await StatusBar.hide();
+          console.log('📱 Status bar hidden (landscape mode)');
+        } else {
+          // Show status bar in portrait mode
+          await StatusBar.show();
+          console.log('📱 Status bar shown (portrait mode)');
+        }
+      } catch (error) {
+        console.error('Failed to toggle status bar:', error);
+      }
+    };
+    
+    // Initial check
+    handleOrientationChange();
+    
+    // Listen for orientation changes
+    const mediaQuery = window.matchMedia('(orientation: landscape)');
+    mediaQuery.addEventListener('change', handleOrientationChange);
+    
+    // Also listen for resize events (more reliable on some devices)
+    window.addEventListener('resize', handleOrientationChange);
+    
+    return () => {
+      mediaQuery.removeEventListener('change', handleOrientationChange);
+      window.removeEventListener('resize', handleOrientationChange);
+      
+      // Restore status bar when leaving canvas
+      if (Capacitor.isNativePlatform()) {
+        StatusBar.show().catch(console.error);
+      }
+    };
+  }, []);
+  
   useEffect(() => {
     if (isCollaborating && collaborationService.isConnected() && drawingEngineRef.current && !hasRequestedInitialSync.current) {
       hasRequestedInitialSync.current = true;

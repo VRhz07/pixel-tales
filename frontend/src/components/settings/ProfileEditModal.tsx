@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { XMarkIcon, UserIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, UserIcon, GiftIcon } from '@heroicons/react/24/outline';
 import { FilteredInput } from '../common/FilteredInput';
+import { RewardsModal } from './RewardsModal';
+import api from '../../services/api';
 
 interface ProfileEditModalProps {
   isOpen: boolean;
@@ -27,9 +29,11 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
 }) => {
   const [name, setName] = useState(currentName);
   const [avatar, setAvatar] = useState(currentAvatar);
+  const [selectedBorder, setSelectedBorder] = useState('basic');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showRewardsModal, setShowRewardsModal] = useState(false);
 
   // Check for dark mode
   useEffect(() => {
@@ -50,6 +54,24 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
     return () => observer.disconnect();
   }, []);
 
+  // Load current border when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      loadCurrentBorder();
+    }
+  }, [isOpen]);
+
+  const loadCurrentBorder = async () => {
+    try {
+      const response = await api.get('/users/profile/');
+      if (response.data.success && response.data.profile.selected_avatar_border) {
+        setSelectedBorder(response.data.profile.selected_avatar_border);
+      }
+    } catch (err) {
+      console.error('Error loading border:', err);
+    }
+  };
+
   const handleSave = async () => {
     if (!name.trim()) {
       setError('Name cannot be empty');
@@ -66,6 +88,21 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
       setError(err.message || 'Failed to update profile');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleRewardsSave = async (newAvatar: string, newBorder: string) => {
+    // Update avatar and border
+    const response = await api.put('/users/profile/update/', {
+      avatar_emoji: newAvatar,
+      selected_avatar_border: newBorder,
+    });
+
+    if (response.data.success) {
+      setAvatar(newAvatar);
+      setSelectedBorder(newBorder);
+    } else {
+      throw new Error('Failed to update rewards');
     }
   };
 
@@ -149,14 +186,39 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
 
           {/* Avatar Selection */}
           <div className="account-modal-section">
-            <label 
-              className="account-modal-label"
-              style={{
-                color: isDarkMode ? '#d1d5db' : '#374151'
-              }}
-            >
-              Choose Avatar
-            </label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <label 
+                className="account-modal-label"
+                style={{
+                  color: isDarkMode ? '#d1d5db' : '#374151',
+                  margin: 0,
+                }}
+              >
+                Choose Avatar
+              </label>
+              <button
+                onClick={() => setShowRewardsModal(true)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.5rem 1rem',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '0.5rem',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <GiftIcon style={{ width: '18px', height: '18px' }} />
+                View All Rewards
+              </button>
+            </div>
             <div 
               className="account-modal-avatar-grid"
               style={{
@@ -288,6 +350,15 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Rewards Modal */}
+      <RewardsModal
+        isOpen={showRewardsModal}
+        onClose={() => setShowRewardsModal(false)}
+        currentAvatar={avatar}
+        currentBorder={selectedBorder}
+        onSave={handleRewardsSave}
+      />
     </div>
   );
 

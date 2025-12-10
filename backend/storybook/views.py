@@ -57,12 +57,63 @@ def get_user_profile(request):
         }, status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_rewards(request):
+    """Get user's unlocked rewards (avatars and borders)"""
+    from .reward_service import RewardService
+    
+    try:
+        # Ensure user has a profile
+        if not hasattr(request.user, 'profile'):
+            return Response({
+                'error': 'User profile not found. Please contact support.'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        profile = request.user.profile
+        
+        # Get rewards info based on user level
+        rewards_info = RewardService.get_all_rewards_info(profile.level)
+        
+        return Response({
+            'success': True,
+            'rewards': rewards_info,
+            'selected_border': profile.selected_avatar_border
+        })
+    except UserProfile.DoesNotExist:
+        return Response({
+            'error': 'User profile not found'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        import traceback
+        print(f"Error in get_user_rewards: {str(e)}")
+        print(traceback.format_exc())
+        return Response({
+            'error': f'Failed to load rewards: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(['PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def update_user_profile(request):
     """Update current user's profile"""
+    from .reward_service import RewardService
+    
     try:
         profile = request.user.profile
+        
+        # If updating avatar border, verify it's unlocked
+        if 'selected_avatar_border' in request.data:
+            border_id = request.data['selected_avatar_border']
+            unlocked_borders = RewardService.get_unlocked_borders(profile.level)
+            unlocked_border_ids = [b['id'] for b in unlocked_borders]
+            
+            if border_id not in unlocked_border_ids:
+                return Response({
+                    'error': 'This border is not unlocked yet',
+                    'required_level': 'Level up to unlock more borders'
+                }, status=status.HTTP_403_FORBIDDEN)
+        
         serializer = UserProfileSerializer(profile, data=request.data, partial=True)
         
         if serializer.is_valid():

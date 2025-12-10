@@ -26,7 +26,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name',
-            'user_type', 'display_name', 'avatar', 'avatar_emoji', 'bio', 
+            'user_type', 'display_name', 'avatar', 'avatar_emoji', 'selected_avatar_border', 'bio', 
             'date_of_birth', 'is_online', 'last_seen', 'created_at', 'updated_at',
             'experience_points', 'level', 'xp_for_next_level', 
             'xp_progress_in_current_level', 'xp_progress_percentage'

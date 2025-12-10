@@ -37,6 +37,7 @@ export interface User {
   xp_for_next_level?: number;
   xp_progress?: number;
   xp_progress_percentage?: number;
+  selected_avatar_border?: string;
   profile?: {
     user_type: 'child' | 'parent' | 'teacher';
     display_name?: string;

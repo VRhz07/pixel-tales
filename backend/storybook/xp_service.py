@@ -4,6 +4,7 @@ XP is awarded for various actions and never decreases
 """
 from django.contrib.auth.models import User
 from .models import UserProfile, Notification
+from .reward_service import RewardService
 
 
 class XPService:
@@ -44,6 +45,9 @@ class XPService:
             # Get user profile
             profile = user.profile
             
+            # Store old level for reward checking
+            old_level = profile.level
+            
             # Determine XP amount
             xp_amount = amount if amount is not None else cls.XP_REWARDS.get(action, 0)
             
@@ -55,7 +59,12 @@ class XPService:
             
             # Create notification if requested and user leveled up
             if create_notification and result and result.get('leveled_up'):
-                cls._create_level_up_notification(user, result['level'])
+                new_level = result['level']
+                
+                # Check for newly unlocked rewards
+                new_unlocks = RewardService.check_new_unlocks(old_level, new_level)
+                
+                cls._create_level_up_notification(user, new_level, new_unlocks)
             
             return result
             
@@ -64,17 +73,31 @@ class XPService:
             return None
     
     @classmethod
-    def _create_level_up_notification(cls, user, new_level):
+    def _create_level_up_notification(cls, user, new_level, new_unlocks=None):
         """Create a notification when user levels up"""
         try:
+            # Build message with unlock info
+            message = f'Congratulations! You reached Level {new_level}!'
+            
+            if new_unlocks:
+                unlock_parts = []
+                if new_unlocks.get('avatars'):
+                    unlock_parts.append(f"{len(new_unlocks['avatars'])} new avatar(s)")
+                if new_unlocks.get('borders'):
+                    unlock_parts.append(f"{len(new_unlocks['borders'])} new border(s)")
+                
+                if unlock_parts:
+                    message += f"\n\n🎁 You unlocked: {' and '.join(unlock_parts)}!"
+            
             Notification.objects.create(
                 recipient=user,
                 notification_type='achievement_earned',
                 title=f'Level Up! 🎉',
-                message=f'Congratulations! You reached Level {new_level}!',
+                message=message,
                 data={
                     'level': new_level,
-                    'type': 'level_up'
+                    'type': 'level_up',
+                    'new_unlocks': new_unlocks or {}
                 }
             )
         except Exception as e:
