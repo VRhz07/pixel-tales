@@ -26,6 +26,7 @@ import parentDashboardService, { Child, ChildStatistics, Activity, Goal, ChildFo
 import AddChildModal from '../components/parent/AddChildModal';
 import UnifiedProfileSwitcher from '../components/parent/UnifiedProfileSwitcher';
 import StoryViewModal from '../components/parent/StoryViewModal';
+import ParentBottomNav from '../components/navigation/ParentBottomNav';
 import { useAccountSwitchStore } from '../stores/accountSwitchStore';
 import { storage } from '../utils/storage';
 import './ParentDashboardPage.css';
@@ -1400,39 +1401,8 @@ const ParentDashboardPage: React.FC = () => {
         </div>
       </main>
 
-      {/* Bottom Navigation - Tab Buttons Only */}
-      <nav className="parent-nav">
-        <div className="parent-nav-items">
-          <button 
-            className={`parent-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
-            onClick={() => setActiveTab('overview')}
-          >
-            <UserGroupIcon />
-            <span>Overview</span>
-          </button>
-          <button 
-            className={`parent-nav-item ${activeTab === 'analytics' ? 'active' : ''}`}
-            onClick={() => setActiveTab('analytics')}
-          >
-            <ChartBarIcon />
-            <span>Analytics</span>
-          </button>
-          <button 
-            className={`parent-nav-item ${activeTab === 'activity' ? 'active' : ''}`}
-            onClick={() => setActiveTab('activity')}
-          >
-            <BellIcon />
-            <span>Activity</span>
-          </button>
-          <button 
-            className="parent-nav-item"
-            onClick={() => navigate('/parent-settings')}
-          >
-            <Cog6ToothIcon />
-            <span>Settings</span>
-          </button>
-        </div>
-      </nav>
+      {/* Bottom Navigation */}
+      <ParentBottomNav />
     </div>
   );
 };

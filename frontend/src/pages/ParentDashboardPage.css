@@ -46,25 +46,7 @@
 }
 
 /* ========== Bottom Navigation Bar (Tabs Only) ========== */
-.parent-nav {
-  background: #FFFFFF;
-  border-top: 1px solid #E8ECEF;
-  height: 72px;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.dark .parent-nav {
-  background: #151020;
-  border-top: 1px solid #2a1f3d;
-}
+/* Navigation now handled by ParentBottomNav component */
 
 .parent-nav-logo {
   display: flex;
@@ -100,58 +82,7 @@
   color: #f1f5f9;
 }
 
-.parent-nav-items {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  width: 100%;
-  max-width: 600px;
-}
-
-.parent-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  color: #6B7280;
-  font-weight: 500;
-  font-size: 15px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.dark .parent-nav-item {
-  color: #94a3b8;
-}
-
-.parent-nav-item svg {
-  width: 20px;
-  height: 20px;
-  color: #9CA3AF;
-  transition: color 0.3s ease;
-}
-
-.parent-nav-item:hover {
-  color: #1A1A1A;
-  background: #F9FAFB;
-}
-
-.dark .parent-nav-item:hover {
-  color: #f1f5f9;
-  background: #2a1f3d;
-}
-
-.parent-nav-item.active {
-  color: #8B5CF6;
-  background: #F3E8FF;
-}
-
-.parent-nav-item.active svg {
-  color: #8B5CF6;
-}
+/* Navigation items now handled by ParentBottomNav component */
 
 .parent-nav-actions {
   display: flex;
@@ -1062,23 +993,7 @@
     padding: 0 16px;
   }
 
-  .parent-nav {
-    height: 60px;
-  }
-
-  .parent-nav-items {
-    justify-content: space-around;
-    padding: 0 16px;
-  }
-
-  .parent-nav-item span {
-    display: none;
-  }
-
-  .parent-nav-item svg {
-    width: 24px;
-    height: 24px;
-  }
+  /* Navigation responsive styles now handled by ParentBottomNav component */
 
   .parent-container {
     padding: 0 16px;

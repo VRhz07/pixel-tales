@@ -430,8 +430,9 @@ export const useAuthStore = create<AuthState>()(
               const controller = new AbortController();
               const timeoutId = setTimeout(() => controller.abort(), 3000);
               
+              // Use GET instead of HEAD since the endpoint doesn't support HEAD
               await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/auth/profile/`, {
-                method: 'HEAD', // HEAD request is lighter than GET
+                method: 'GET',
                 headers: {
                   'Authorization': `Bearer ${storage.getItemSync('access_token')}`
                 },
@@ -443,6 +444,7 @@ export const useAuthStore = create<AuthState>()(
               clearTimeout(timeoutId);
             } catch (err) {
               // Ignore errors - this is just a wake-up call
+              console.log('🔐 Backend wake-up call completed');
             }
           };
           

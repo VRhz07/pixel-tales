@@ -2578,6 +2578,13 @@ const ManualStoryCreationPage: React.FC = () => {
   // but the React state (currentStory) updates asynchronously
   const storeStory = useStoryStore.getState().currentStory;
   
+  // FIX: If we have a story in the store but not in the hook, sync it
+  // This can happen when returning from canvas or on initial load
+  if (storeStory && !currentStory) {
+    console.log('📖 Syncing story from store to component state');
+    setCurrentStory(storeStory);
+  }
+  
   // If collaborating but no story in the store yet, create one immediately
   // This handles the race condition where isCollaborating is set before currentStory
   if (!storeStory && isCollaborating && !hasCreatedStory.current) {

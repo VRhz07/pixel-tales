@@ -448,45 +448,6 @@ const ParentSettingsPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Appearance Settings */}
-                  <div className="parent-settings-card">
-                    <div className="parent-settings-card-header">
-                      <h3>Appearance</h3>
-                    </div>
-                    <div className="parent-settings-card-body">
-                      <div className="parent-settings-toggle-item">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '10px',
-                            background: theme === 'dark' 
-                              ? 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
-                              : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white'
-                          }}>
-                            {theme === 'dark' ? <MoonIcon style={{ width: '24px', height: '24px' }} /> : <SunIcon style={{ width: '24px', height: '24px' }} />}
-                          </div>
-                          <div>
-                            <h4>Dark Mode</h4>
-                            <p>Switch between light and dark theme</p>
-                          </div>
-                        </div>
-                        <label className="parent-settings-toggle">
-                          <input 
-                            type="checkbox" 
-                            checked={theme === 'dark'}
-                            onChange={(e) => setTheme(e.target.checked ? 'dark' : 'light')}
-                          />
-                          <span className="parent-settings-toggle-slider"></span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
                   {/* Password Settings */}
                   <div className="parent-settings-card">
                     <div className="parent-settings-card-header">
@@ -827,9 +788,6 @@ const ParentSettingsPage: React.FC = () => {
           </div>
         </div>
       </main>
-      
-      {/* Bottom Navigation */}
-      <ParentBottomNav />
 
       {/* Password Update Modal */}
       <PasswordUpdateModal

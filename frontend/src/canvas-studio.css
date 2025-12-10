@@ -1215,6 +1215,12 @@ body.capacitor .canvas-studio-mobile-sliders {
     grid-template-rows: 1fr;
     height: 100vh;
   }
+  
+  /* Capacitor safe area for landscape mode */
+  body.capacitor .canvas-studio-mobile {
+    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    margin-top: env(safe-area-inset-top);
+  }
 
   /* Top bar becomes left vertical bar */
   .canvas-studio-topbar {
@@ -1226,6 +1232,11 @@ body.capacitor .canvas-studio-mobile-sliders {
     padding: 0.5rem 0;
     border-right: 1px solid var(--cs-border);
     border-bottom: none;
+  }
+  
+  /* Remove extra padding in landscape for Capacitor */
+  body.capacitor .canvas-studio-topbar {
+    padding-top: 0.5rem;
   }
 
   .canvas-studio-topbar-left,
