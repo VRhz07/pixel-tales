@@ -997,7 +997,7 @@ const EnhancedSocialPage = () => {
                     <div key={`friend-${request.id}`} className="friend-request-card">
                       <AvatarWithBorder 
                         avatar={request.sender_avatar}
-                        borderId={request.sender_avatar_border || 'basic'}
+                        borderId={request.selected_avatar_border || 'basic'}
                         size={72}
                       />
                       <div className="friend-request-info">

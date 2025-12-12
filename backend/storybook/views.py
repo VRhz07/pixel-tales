@@ -2222,26 +2222,32 @@ def get_collaboration_participants(request, session_id):
             notification_type='collaboration_invite',
             is_read=False,
             data__session_id=session_id
-        ).select_related('recipient')
+        ).select_related('recipient', 'recipient__profile')
         
         # Get accepted participants
-        accepted_participants = session.participants.filter(is_active=True).select_related('user')
+        accepted_participants = session.participants.filter(is_active=True).select_related('user', 'user__profile')
         
         participants_list = []
         
         # Add host
+        host_profile = session.host.profile if hasattr(session.host, 'profile') else None
         participants_list.append({
             'user_id': session.host.id,
             'username': session.host.username,
+            'avatar': host_profile.avatar_emoji if host_profile and host_profile.avatar_emoji else '👤',
+            'selected_avatar_border': host_profile.selected_avatar_border if host_profile else 'basic',
             'status': 'joined',
             'is_host': True
         })
         
         # Add accepted participants
         for participant in accepted_participants:
+            participant_profile = participant.user.profile if hasattr(participant.user, 'profile') else None
             participants_list.append({
                 'user_id': participant.user.id,
                 'username': participant.user.username,
+                'avatar': participant_profile.avatar_emoji if participant_profile and participant_profile.avatar_emoji else '👤',
+                'selected_avatar_border': participant_profile.selected_avatar_border if participant_profile else 'basic',
                 'status': 'joined',
                 'is_host': False
             })
@@ -2250,9 +2256,12 @@ def get_collaboration_participants(request, session_id):
         for invite in pending_invites:
             # Check if user hasn't already joined
             if not any(p['user_id'] == invite.recipient.id for p in participants_list):
+                invite_profile = invite.recipient.profile if hasattr(invite.recipient, 'profile') else None
                 participants_list.append({
                     'user_id': invite.recipient.id,
                     'username': invite.recipient.username,
+                    'avatar': invite_profile.avatar_emoji if invite_profile and invite_profile.avatar_emoji else '👤',
+                    'selected_avatar_border': invite_profile.selected_avatar_border if invite_profile else 'basic',
                     'status': 'pending',
                     'is_host': False
                 })

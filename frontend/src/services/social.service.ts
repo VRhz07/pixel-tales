@@ -5,6 +5,7 @@ export interface SearchedUser {
   username: string;
   name: string;
   avatar: string;
+  selected_avatar_border?: string;
   bio: string;
   is_friend: boolean;
   request_sent: boolean;
@@ -16,6 +17,7 @@ export interface Friend {
   id: number;
   name: string;
   avatar: string;
+  selected_avatar_border?: string;
   username: string;
   is_online: boolean;
   latest_story?: string;
@@ -29,6 +31,7 @@ export interface FriendRequest {
   sender_id: number;
   sender_name: string;
   sender_avatar: string;
+  selected_avatar_border?: string;
   sender_username: string;
   mutual_friends: number;
   created_at: string;
@@ -52,6 +55,7 @@ export interface ActivityItem {
   user_id: number;
   user_name: string;
   user_avatar: string;
+  selected_avatar_border?: string;
   activity_type: 'published' | 'liked' | 'commented' | 'followed' | 'achievement' | 'commented_on_your_story' | 'liked_your_story' | 'saved_your_story';
   story_title?: string;
   story_id?: number;
@@ -66,6 +70,7 @@ export interface FriendProfile {
   username: string;
   name: string;
   avatar: string;
+  selected_avatar_border?: string;
   bio: string;
   story_count: number;
   follower_count: number;
@@ -88,6 +93,7 @@ export interface LeaderboardUser {
   id: number;
   name: string;
   avatar: string;
+  selected_avatar_border?: string;
   rank: number;
   story_count: number;
   total_reads: number;
@@ -162,6 +168,7 @@ class SocialService {
           id: friend.id || 0,
           name: friend.name || 'Unknown',
           avatar: friend.avatar || '👤',
+          selected_avatar_border: friend.selected_avatar_border || 'basic',
           username: friend.username || '',
           is_online: friend.is_online || false,
           story_count: friend.story_count || 0,
@@ -194,6 +201,7 @@ class SocialService {
         sender_id: request.sender?.id || 0,
         sender_name: request.sender?.profile?.display_name || request.sender?.username || 'Unknown',
         sender_avatar: request.sender?.profile?.avatar_emoji || '👤',
+        selected_avatar_border: request.sender?.profile?.selected_avatar_border || 'basic',
         sender_username: request.sender?.username || '',
         mutual_friends: 0, // TODO: Calculate mutual friends
         created_at: request.date_created || new Date().toISOString(),

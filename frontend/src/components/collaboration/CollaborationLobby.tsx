@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserGroupIcon, XMarkIcon, CheckCircleIcon, ClockIcon, PlayIcon, UserPlusIcon } from '@heroicons/react/24/outline';
 import { collaborationService } from '../../services/collaborationService';
+import { AvatarWithBorder } from '../common/AvatarWithBorder';
 
 interface Participant {
   user_id: number;
   username: string;
   avatar?: string;
+  selected_avatar_border?: string;
   status: 'pending' | 'joined';
   joinedAt?: string;
   is_active?: boolean;
@@ -115,6 +117,7 @@ const CollaborationLobby: React.FC<CollaborationLobbyProps> = ({
         user_id: p.user_id || p.id,
         username: p.username || p.name || 'Unknown',
         avatar: p.avatar,
+        selected_avatar_border: p.selected_avatar_border || 'basic',
         status: p.is_active ? 'joined' : 'pending',
         joinedAt: p.last_seen || p.joined_at || undefined,
         is_active: p.is_active,
@@ -276,20 +279,12 @@ const CollaborationLobby: React.FC<CollaborationLobbyProps> = ({
                     }}
                   >
                     {/* Avatar */}
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                      fontSize: '18px',
-                      fontWeight: 'bold',
-                      flexShrink: 0
-                    }}>
-                      {participant.username.charAt(0).toUpperCase()}
+                    <div style={{ flexShrink: 0 }}>
+                      <AvatarWithBorder
+                        avatar={participant.avatar || participant.username.charAt(0).toUpperCase()}
+                        borderId={participant.selected_avatar_border || 'basic'}
+                        size={56}
+                      />
                     </div>
 
                     {/* Info */}

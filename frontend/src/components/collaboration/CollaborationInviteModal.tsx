@@ -7,12 +7,14 @@ import { X, UserPlus, Users, Link as LinkIcon, Check, Copy } from 'lucide-react'
 import { socialService } from '../../services/social.service';
 import { createCollaborationSession } from '../../services/collaborationApi';
 import { collaborationService } from '../../services/collaborationService';
+import { AvatarWithBorder } from '../common/AvatarWithBorder';
 import './CollaborationModal.css';
 
 interface Friend {
   id: number;
   username: string;
   avatar?: string;
+  selected_avatar_border?: string;
   isOnline?: boolean;
 }
 
@@ -278,9 +280,11 @@ export const CollaborationInviteModal: React.FC<CollaborationInviteModalProps> =
                 return (
                   <div key={friend.id} className="friend-card-enhanced">
                     <div className="friend-avatar-container">
-                      <div className="friend-avatar">
-                        {friend.username?.charAt(0).toUpperCase() || 'U'}
-                      </div>
+                      <AvatarWithBorder
+                        avatar={friend.avatar || friend.username?.charAt(0).toUpperCase() || 'U'}
+                        borderId={friend.selected_avatar_border || 'basic'}
+                        size={48}
+                      />
                       <div className={`friend-online-indicator ${isOnline ? 'online' : 'offline'}`}></div>
                     </div>
 
