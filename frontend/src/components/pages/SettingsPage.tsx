@@ -25,6 +25,7 @@ import { ParentPasswordVerificationModal } from '../settings/ParentPasswordVerif
 import { CustomDropdown } from '../common/CustomDropdown';
 import { storage } from '../../utils/storage';
 import { authService } from '../../services/auth.service';
+import { api } from '../../services/api';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
 import soundService from '../../services/soundService';
 
@@ -185,18 +186,29 @@ const SettingsPage = () => {
   // Rewards save handler
   const handleRewardsSave = async (newAvatar: string, newBorder: string) => {
     try {
-      await authService.updateProfile({ 
-        avatar: newAvatar,
+      // Use the correct endpoint for border updates
+      const response = await api.put('/users/profile/update/', { 
+        avatar_emoji: newAvatar,
         selected_avatar_border: newBorder 
       });
+      
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to update rewards');
+      }
       
       // Update the store immediately with setUser
       const { setUser } = useAuthStore.getState();
       if (currentUser) {
-        setUser({
+        const updatedUser = {
           ...currentUser,
           avatar: newAvatar,
           selected_avatar_border: newBorder,
+        };
+        setUser(updatedUser);
+        
+        // Also update cache immediately
+        import('../../stores/cacheStore').then(({ useCacheStore }) => {
+          useCacheStore.getState().setCache('userProfile', updatedUser, 10 * 60 * 1000);
         });
       }
       

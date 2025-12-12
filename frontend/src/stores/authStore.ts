@@ -172,6 +172,11 @@ export const useAuthStore = create<AuthState>()(
             accountSwitchStore.clearActiveAccount();
           });
           
+          // Clear all cache
+          import('../stores/cacheStore').then(({ useCacheStore }) => {
+            useCacheStore.getState().clearAllCache();
+          });
+          
           // Clear parent session if exists
           storage.removeItemSync('parent_session');
           
@@ -229,6 +234,11 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             isLoading: false,
             error: null,
+          });
+
+          // Cache user profile including avatar border
+          import('../stores/cacheStore').then(({ useCacheStore }) => {
+            useCacheStore.getState().setCache('userProfile', profile, 10 * 60 * 1000); // Cache for 10 minutes
           });
 
           // Update feature access with fresh data
@@ -495,6 +505,11 @@ export const useAuthStore = create<AuthState>()(
         set({ user });
         // Also update storage
         storage.setItemSync('user_data', JSON.stringify(user));
+        
+        // Update cache
+        import('../stores/cacheStore').then(({ useCacheStore }) => {
+          useCacheStore.getState().setCache('userProfile', user, 10 * 60 * 1000);
+        });
       },
     }),
     {

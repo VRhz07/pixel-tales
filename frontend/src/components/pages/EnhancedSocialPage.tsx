@@ -145,8 +145,43 @@ const EnhancedSocialPage = () => {
   };
 
   const loadAllData = async () => {
-    setIsLoading(true);
+    // Try to load from cache first
+    const { useCacheStore } = await import('../../stores/cacheStore');
+    const cacheStore = useCacheStore.getState();
+    
+    const cachedFriends = cacheStore.getCache<any[]>('friendsList');
+    const cachedRequests = cacheStore.getCache<any[]>('friendRequests');
+    const cachedActivity = cacheStore.getCache<any[]>('activityFeed');
+    const cachedLeaderboard = cacheStore.getCache<any[]>('leaderboard');
+    
+    // If we have cached data, use it immediately
+    if (cachedFriends) {
+      console.log('📦 Using cached friends list');
+      const sortedFriends = sortFriendsByActivity(cachedFriends);
+      setFriends(sortedFriends);
+    }
+    if (cachedRequests) {
+      console.log('📦 Using cached friend requests');
+      setFriendRequests(cachedRequests);
+    }
+    if (cachedActivity) {
+      console.log('📦 Using cached activity feed');
+      setActivityFeed(cachedActivity);
+    }
+    if (cachedLeaderboard) {
+      console.log('📦 Using cached leaderboard');
+      setLeaderboard(cachedLeaderboard);
+    }
+    
+    // If all cache is valid, set loading to false immediately
+    if (cachedFriends && cachedRequests && cachedActivity && cachedLeaderboard) {
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+    }
+    
     try {
+      // Fetch fresh data in background
       const [friendsData, requestsData, collabInvitesData, activityData, suggestionsData, leaderboardData] = await Promise.all([
         socialService.getFriends(),
         socialService.getFriendRequests(),
@@ -178,6 +213,12 @@ const EnhancedSocialPage = () => {
       setActivityFeed(activityDataWithReadStatus);
       setFriendSuggestions(suggestionsData);
       setLeaderboard(leaderboardData);
+      
+      // Cache the fresh data
+      cacheStore.setCache('friendsList', friendsData, 3 * 60 * 1000); // 3 minutes
+      cacheStore.setCache('friendRequests', requestsData, 3 * 60 * 1000);
+      cacheStore.setCache('activityFeed', activityData, 5 * 60 * 1000); // 5 minutes
+      cacheStore.setCache('leaderboard', leaderboardData, 10 * 60 * 1000); // 10 minutes
     } catch (error) {
       console.error('Error loading social data:', error);
     } finally {

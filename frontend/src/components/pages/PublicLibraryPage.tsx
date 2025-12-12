@@ -211,22 +211,58 @@ const PublicLibraryPage = () => {
 
 
   const loadPublishedStories = async () => {
-    setIsLoading(true);
-    try {
-      const stories = await storyApiService.getPublishedStories();
-      setPublishedStories(stories);
+    // Try to load from cache first
+    const { useCacheStore } = await import('../../stores/cacheStore');
+    const cacheStore = useCacheStore.getState();
+    
+    const cachedStories = cacheStore.getCache<any[]>('publishedStories');
+    
+    if (cachedStories) {
+      console.log('📦 Using cached published stories');
+      setPublishedStories(cachedStories);
+      setIsLoading(false);
       
-      // Set recommended stories (top liked stories) when no filters active
+      // Set recommended stories from cache
       if (!searchQuery && !selectedLanguage && !selectedGenre) {
-        const recommended = [...stories]
+        const recommended = [...cachedStories]
           .sort((a, b) => (b.likes_count || 0) - (a.likes_count || 0))
           .slice(0, 6);
         setRecommendedStories(recommended);
       }
-    } catch (error) {
-      console.error('Error loading published stories:', error);
-    } finally {
-      setIsLoading(false);
+      
+      // Fetch fresh data in background
+      storyApiService.getPublishedStories().then(stories => {
+        setPublishedStories(stories);
+        cacheStore.setCache('publishedStories', stories, 3 * 60 * 1000); // Cache for 3 minutes
+        
+        // Update recommended stories
+        if (!searchQuery && !selectedLanguage && !selectedGenre) {
+          const recommended = [...stories]
+            .sort((a, b) => (b.likes_count || 0) - (a.likes_count || 0))
+            .slice(0, 6);
+          setRecommendedStories(recommended);
+        }
+      }).catch(err => console.warn('Background refresh failed:', err));
+    } else {
+      // No cache, fetch fresh data
+      setIsLoading(true);
+      try {
+        const stories = await storyApiService.getPublishedStories();
+        setPublishedStories(stories);
+        cacheStore.setCache('publishedStories', stories, 3 * 60 * 1000);
+        
+        // Set recommended stories (top liked stories) when no filters active
+        if (!searchQuery && !selectedLanguage && !selectedGenre) {
+          const recommended = [...stories]
+            .sort((a, b) => (b.likes_count || 0) - (a.likes_count || 0))
+            .slice(0, 6);
+          setRecommendedStories(recommended);
+        }
+      } catch (error) {
+        console.error('Error loading published stories:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 

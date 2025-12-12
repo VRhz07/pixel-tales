@@ -63,15 +63,42 @@ const ProfilePage = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showAllTrophies, setShowAllTrophies] = useState(false);
 
-  // Fetch achievements from API
+  // Fetch achievements from API with caching
   useEffect(() => {
     const fetchAchievements = async () => {
       try {
-        const response = await api.get('/achievements/progress/');
+        // Try to get cached achievements first
+        const { useCacheStore } = await import('../../stores/cacheStore');
+        const cacheStore = useCacheStore.getState();
         
-        if (response.success) {
-          setAchievements(response.achievements);
-          setUserStats(response.user_stats);
+        const cachedAchievements = cacheStore.getCache<any>('achievements');
+        const cachedStats = cacheStore.getCache<any>('userStats');
+        
+        if (cachedAchievements && cachedStats) {
+          console.log('📦 Using cached achievements and stats');
+          setAchievements(cachedAchievements);
+          setUserStats(cachedStats);
+          setLoading(false);
+          
+          // Still fetch fresh data in background
+          api.get('/achievements/progress/').then(response => {
+            if (response.success) {
+              setAchievements(response.achievements);
+              setUserStats(response.user_stats);
+              cacheStore.setCache('achievements', response.achievements, 5 * 60 * 1000);
+              cacheStore.setCache('userStats', response.user_stats, 5 * 60 * 1000);
+            }
+          }).catch(err => console.warn('Background refresh failed:', err));
+        } else {
+          // No cache, fetch fresh data
+          const response = await api.get('/achievements/progress/');
+          
+          if (response.success) {
+            setAchievements(response.achievements);
+            setUserStats(response.user_stats);
+            cacheStore.setCache('achievements', response.achievements, 5 * 60 * 1000);
+            cacheStore.setCache('userStats', response.user_stats, 5 * 60 * 1000);
+          }
         }
       } catch (error) {
         console.error('Error fetching achievements:', error);

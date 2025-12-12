@@ -66,6 +66,12 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
       const response = await api.get('/users/profile/');
       if (response.data.success && response.data.profile.selected_avatar_border) {
         setSelectedBorder(response.data.profile.selected_avatar_border);
+        
+        // Update authStore to persist border selection
+        const { setUser } = await import('../../stores/authStore').then(m => m.useAuthStore.getState());
+        if (response.data.profile) {
+          setUser(response.data.profile);
+        }
       }
     } catch (err) {
       console.error('Error loading border:', err);
@@ -98,9 +104,25 @@ export const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
       selected_avatar_border: newBorder,
     });
 
-    if (response.data.success) {
+    if (response.success) {
       setAvatar(newAvatar);
       setSelectedBorder(newBorder);
+      
+      // Update authStore to persist border selection immediately
+      const { setUser } = await import('../../stores/authStore').then(m => m.useAuthStore.getState());
+      const currentUser = await import('../../stores/authStore').then(m => m.useAuthStore.getState().user);
+      if (currentUser) {
+        const updatedUser = {
+          ...currentUser,
+          avatar: newAvatar,
+          selected_avatar_border: newBorder,
+        };
+        setUser(updatedUser);
+        
+        // Also update cache immediately
+        const { useCacheStore } = await import('../../stores/cacheStore');
+        useCacheStore.getState().setCache('userProfile', updatedUser, 10 * 60 * 1000);
+      }
     } else {
       throw new Error('Failed to update rewards');
     }

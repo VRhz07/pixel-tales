@@ -84,6 +84,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 'user_type': profile.user_type,
                 'display_name': profile.display_name,
                 'avatar': profile.avatar_emoji or (profile.avatar.url if profile.avatar else '📚'),
+                'selected_avatar_border': profile.selected_avatar_border,  # Include border
                 'experience_points': profile.experience_points,
                 'level': profile.level,
             }
@@ -305,6 +306,7 @@ def jwt_user_profile(request):
                 'user_type': profile.user_type,
                 'display_name': profile.display_name,
                 'avatar': profile.avatar_emoji or (profile.avatar.url if profile.avatar else '📚'),
+                'selected_avatar_border': profile.selected_avatar_border,  # Include border
                 'bio': profile.bio,
                 'date_of_birth': profile.date_of_birth,
                 'created_at': profile.created_at,
@@ -353,6 +355,7 @@ def jwt_user_profile(request):
                 'user_type': profile.user_type,
                 'display_name': profile.display_name,
                 'avatar': profile.avatar_emoji or data.get('avatar', '📚'),  # Return the emoji avatar
+                'selected_avatar_border': profile.selected_avatar_border,  # Include border
                 'bio': profile.bio,
                 'date_of_birth': profile.date_of_birth,
                 'created_at': profile.created_at,
