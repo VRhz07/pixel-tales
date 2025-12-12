@@ -248,7 +248,6 @@ const ParentDashboardPage: React.FC = () => {
 
   const loadChildren = async () => {
     try {
-      setLoading(true);
       const userType = user?.profile?.user_type || user?.user_type;
       
       if (!userType) {
@@ -257,19 +256,57 @@ const ParentDashboardPage: React.FC = () => {
         return;
       }
       
-      let childrenData: Child[];
-      if (userType === 'parent') {
-        childrenData = await parentDashboardService.getChildren();
+      // Try to get cached children first
+      const { useCacheStore } = await import('../stores/cacheStore');
+      const cacheStore = useCacheStore.getState();
+      
+      const cachedChildren = cacheStore.getCache<Child[]>('parentChildren');
+      
+      if (cachedChildren) {
+        console.log('📦 Using cached children list');
+        setChildren(cachedChildren);
+        setLoading(false);
+        
+        // Auto-select first child if available
+        if (cachedChildren.length > 0 && !selectedChild) {
+          setSelectedChild(cachedChildren[0]);
+        }
+        
+        // Fetch fresh data in background
+        (async () => {
+          try {
+            let childrenData: Child[];
+            if (userType === 'parent') {
+              childrenData = await parentDashboardService.getChildren();
+            } else {
+              childrenData = await parentDashboardService.getStudents();
+            }
+            
+            console.log('Loaded fresh children/students:', childrenData);
+            setChildren(childrenData);
+            cacheStore.setCache('parentChildren', childrenData, 5 * 60 * 1000); // Cache for 5 minutes
+          } catch (error) {
+            console.warn('Background refresh failed:', error);
+          }
+        })();
       } else {
-        childrenData = await parentDashboardService.getStudents();
-      }
-      
-      console.log('Loaded children/students:', childrenData);
-      setChildren(childrenData);
-      
-      // Auto-select first child if available
-      if (childrenData.length > 0 && !selectedChild) {
-        setSelectedChild(childrenData[0]);
+        // No cache, fetch fresh data
+        setLoading(true);
+        let childrenData: Child[];
+        if (userType === 'parent') {
+          childrenData = await parentDashboardService.getChildren();
+        } else {
+          childrenData = await parentDashboardService.getStudents();
+        }
+        
+        console.log('Loaded children/students:', childrenData);
+        setChildren(childrenData);
+        cacheStore.setCache('parentChildren', childrenData, 5 * 60 * 1000);
+        
+        // Auto-select first child if available
+        if (childrenData.length > 0 && !selectedChild) {
+          setSelectedChild(childrenData[0]);
+        }
       }
     } catch (error: any) {
       console.error('Error loading children:', error);
@@ -304,6 +341,19 @@ const ParentDashboardPage: React.FC = () => {
 
   const loadChildData = async (childId: number) => {
     try {
+      // Try to get cached data first
+      const { useCacheStore } = await import('../stores/cacheStore');
+      const cacheStore = useCacheStore.getState();
+      
+      const cachedStats = cacheStore.getChildCache<any>('childStatistics', childId);
+      
+      // Use cached statistics if available
+      if (cachedStats) {
+        console.log(`📦 Using cached statistics for child ${childId}`);
+        setStatistics(cachedStats);
+      }
+      
+      // Load all child data in parallel
       const [stats, acts, gls] = await Promise.all([
         parentDashboardService.getChildStatistics(childId),
         parentDashboardService.getChildActivities(childId),
@@ -313,6 +363,9 @@ const ParentDashboardPage: React.FC = () => {
       setStatistics(stats);
       setActivities(acts);
       setGoals(gls);
+      
+      // Cache the statistics
+      cacheStore.setChildCache('childStatistics', childId, stats, 5 * 60 * 1000); // Cache for 5 minutes
     } catch (error) {
       console.error('Error loading child data:', error);
     }
@@ -320,9 +373,29 @@ const ParentDashboardPage: React.FC = () => {
 
   const loadAnalytics = async (childId: number) => {
     try {
-      setLoadingAnalytics(true);
-      const analyticsData = await parentDashboardService.getChildAnalytics(childId);
-      setAnalytics(analyticsData);
+      // Try to get cached analytics first
+      const { useCacheStore } = await import('../stores/cacheStore');
+      const cacheStore = useCacheStore.getState();
+      
+      const cachedAnalytics = cacheStore.getChildCache<any>('childAnalytics', childId);
+      
+      if (cachedAnalytics) {
+        console.log(`📦 Using cached analytics for child ${childId}`);
+        setAnalytics(cachedAnalytics);
+        setLoadingAnalytics(false);
+        
+        // Fetch fresh data in background
+        parentDashboardService.getChildAnalytics(childId).then(analyticsData => {
+          setAnalytics(analyticsData);
+          cacheStore.setChildCache('childAnalytics', childId, analyticsData, 10 * 60 * 1000); // Cache for 10 minutes
+        }).catch(err => console.warn('Background refresh failed:', err));
+      } else {
+        // No cache, fetch fresh data
+        setLoadingAnalytics(true);
+        const analyticsData = await parentDashboardService.getChildAnalytics(childId);
+        setAnalytics(analyticsData);
+        cacheStore.setChildCache('childAnalytics', childId, analyticsData, 10 * 60 * 1000);
+      }
     } catch (error) {
       console.error('Error loading analytics:', error);
     } finally {
@@ -332,9 +405,29 @@ const ParentDashboardPage: React.FC = () => {
 
   const loadChildStories = async (childId: number) => {
     try {
-      setLoadingStories(true);
-      const stories = await parentDashboardService.getChildStories(childId);
-      setChildStories(stories);
+      // Try to get cached stories first
+      const { useCacheStore } = await import('../stores/cacheStore');
+      const cacheStore = useCacheStore.getState();
+      
+      const cachedStories = cacheStore.getChildCache<any[]>('childStories', childId);
+      
+      if (cachedStories) {
+        console.log(`📦 Using cached stories for child ${childId}`);
+        setChildStories(cachedStories);
+        setLoadingStories(false);
+        
+        // Fetch fresh data in background
+        parentDashboardService.getChildStories(childId).then(stories => {
+          setChildStories(stories);
+          cacheStore.setChildCache('childStories', childId, stories, 3 * 60 * 1000); // Cache for 3 minutes
+        }).catch(err => console.warn('Background refresh failed:', err));
+      } else {
+        // No cache, fetch fresh data
+        setLoadingStories(true);
+        const stories = await parentDashboardService.getChildStories(childId);
+        setChildStories(stories);
+        cacheStore.setChildCache('childStories', childId, stories, 3 * 60 * 1000);
+      }
     } catch (error) {
       console.error('Error loading child stories:', error);
     } finally {

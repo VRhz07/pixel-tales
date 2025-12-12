@@ -983,6 +983,7 @@ def friend_list(request):
             'id': friend.id,
             'name': friend_profile.display_name if friend_profile else friend.username,
             'avatar': friend_profile.avatar_emoji if friend_profile and friend_profile.avatar_emoji else '👤',
+            'selected_avatar_border': friend_profile.selected_avatar_border if friend_profile else 'basic',
             'username': friend.username,
             'is_online': friend_profile.is_online if friend_profile else False,
             'story_count': friend.stories.filter(is_published=True).count(),
@@ -1432,11 +1433,13 @@ def get_activity_feed(request):
         ).select_related('author', 'author__profile').order_by('-date_created')[:limit]
         
         for story in recent_stories:
+            profile = story.author.profile if hasattr(story.author, 'profile') else None
             activities.append({
                 'id': f'story_{story.id}',
                 'user_id': story.author.id,
-                'user_name': story.author.profile.display_name if hasattr(story.author, 'profile') else story.author.username,
-                'user_avatar': '👤',
+                'user_name': profile.display_name if profile else story.author.username,
+                'user_avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '👤',
+                'selected_avatar_border': profile.selected_avatar_border if profile else 'basic',
                 'activity_type': 'published',
                 'story_title': story.title,
                 'story_id': story.id,
@@ -1450,11 +1453,13 @@ def get_activity_feed(request):
         ).select_related('user', 'user__profile', 'story').order_by('-date_created')[:limit]
         
         for like in recent_likes_on_my_stories:
+            profile = like.user.profile if hasattr(like.user, 'profile') else None
             activities.append({
                 'id': f'like_{like.id}',
                 'user_id': like.user.id,
-                'user_name': like.user.profile.display_name if hasattr(like.user, 'profile') else like.user.username,
-                'user_avatar': '👤',
+                'user_name': profile.display_name if profile else like.user.username,
+                'user_avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '👤',
+                'selected_avatar_border': profile.selected_avatar_border if profile else 'basic',
                 'activity_type': 'liked_your_story',
                 'story_title': like.story.title,
                 'story_id': like.story.id,
@@ -1467,11 +1472,13 @@ def get_activity_feed(request):
         ).select_related('author', 'author__profile', 'story').order_by('-date_created')[:limit]
         
         for comment in recent_comments_on_my_stories:
+            profile = comment.author.profile if hasattr(comment.author, 'profile') else None
             activities.append({
                 'id': f'comment_{comment.id}',
                 'user_id': comment.author.id,
-                'user_name': comment.author.profile.display_name if hasattr(comment.author, 'profile') else comment.author.username,
-                'user_avatar': '👤',
+                'user_name': profile.display_name if profile else comment.author.username,
+                'user_avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '👤',
+                'selected_avatar_border': profile.selected_avatar_border if profile else 'basic',
                 'activity_type': 'commented_on_your_story',
                 'story_title': comment.story.title,
                 'story_id': comment.story.id,
@@ -1485,11 +1492,13 @@ def get_activity_feed(request):
             ).select_related('user', 'user__profile', 'story').order_by('-date_saved')[:limit]
             
             for save in recent_saves_on_my_stories:
+                profile = save.user.profile if hasattr(save.user, 'profile') else None
                 activities.append({
                     'id': f'save_{save.id}',
                     'user_id': save.user.id,
-                    'user_name': save.user.profile.display_name if hasattr(save.user, 'profile') else save.user.username,
-                    'user_avatar': '👤',
+                    'user_name': profile.display_name if profile else save.user.username,
+                    'user_avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '👤',
+                    'selected_avatar_border': profile.selected_avatar_border if profile else 'basic',
                     'activity_type': 'saved_your_story',
                     'story_title': save.story.title,
                     'story_id': save.story.id,
@@ -1550,10 +1559,12 @@ def get_leaderboard(request):
         achievement_count = user_achievements.count()
         badge_icons = [ua.achievement.icon or '🏆' for ua in user_achievements[:10]]  # Show up to 10 badges
         
+        profile = user.profile if hasattr(user, 'profile') else None
         leaderboard.append({
             'id': user.id,
-            'name': user.profile.display_name if hasattr(user, 'profile') else user.username,
-            'avatar': '👤',
+            'name': profile.display_name if profile else user.username,
+            'avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '👤',
+            'selected_avatar_border': profile.selected_avatar_border if profile else 'basic',
             'rank': 0,  # Rank will be assigned by frontend based on filter
             'story_count': user.story_count or 0,
             'total_reads': user.total_reads or 0,

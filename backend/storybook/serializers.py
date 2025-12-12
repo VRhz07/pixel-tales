@@ -175,6 +175,7 @@ class FriendshipSerializer(serializers.ModelSerializer):
             'profile': {
                 'display_name': profile.display_name if profile else user.username,
                 'avatar_emoji': profile.avatar_emoji if profile and profile.avatar_emoji else '👤',
+                'selected_avatar_border': profile.selected_avatar_border if profile else 'basic',
                 'is_online': profile.is_online if profile else False,
             } if profile else None,
             'story_count': user.stories.filter(is_published=True).count()
@@ -191,6 +192,7 @@ class FriendshipSerializer(serializers.ModelSerializer):
             'profile': {
                 'display_name': profile.display_name if profile else user.username,
                 'avatar_emoji': profile.avatar_emoji if profile and profile.avatar_emoji else '👤',
+                'selected_avatar_border': profile.selected_avatar_border if profile else 'basic',
                 'is_online': profile.is_online if profile else False,
             } if profile else None,
             'story_count': user.stories.filter(is_published=True).count()

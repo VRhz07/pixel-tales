@@ -76,6 +76,8 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
   const wordsArrayRef = useRef<string[]>([]);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const isMountedRef = useRef(true);
   
   const isNativePlatform = Capacitor.isNativePlatform();
   
@@ -315,7 +317,10 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
         volume
       });
       
-      // Call backend API
+      // Create abort controller for this request
+      abortControllerRef.current = new AbortController();
+      
+      // Call backend API with abort signal
       const response = await fetch(`${API_BASE_URL}/tts/synthesize/`, {
         method: 'POST',
         headers: {
@@ -328,7 +333,8 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
           rate: rate,
           pitch: pitch,
           volume: volume
-        })
+        }),
+        signal: abortControllerRef.current.signal
       });
       
       console.log('🌥️ TTS: Response status:', response.status);
@@ -347,6 +353,13 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
       
       // Get audio blob
       const audioBlob = await response.blob();
+      
+      // Check if component is still mounted before proceeding
+      if (!isMountedRef.current) {
+        console.log('🌥️ TTS: Component unmounted, aborting playback');
+        return true;
+      }
+      
       const audioUrl = URL.createObjectURL(audioBlob);
       
       // Clean up previous audio if exists
@@ -386,12 +399,30 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
         audioRef.current = null;
       };
       
+      // Check again before playing
+      if (!isMountedRef.current) {
+        console.log('🌥️ TTS: Component unmounted, not playing audio');
+        URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
+        return true;
+      }
+      
       await audio.play();
       console.log('🌥️ TTS: Cloud TTS playback started');
       return true; // Success
       
     } catch (error) {
+      // Check if error is due to abort
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('🌥️ TTS: Fetch aborted (user left page)');
+        setIsSpeaking(false);
+        setProgress(0);
+        return true; // Not a real error, just aborted
+      }
+      
       console.error('🌥️ TTS: Cloud TTS error:', error);
+      setIsSpeaking(false);
+      setProgress(0);
       return false; // Indicate fallback needed
     }
   }, [language, cloudVoiceId, rate, pitch, volume]);
@@ -642,6 +673,14 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
   const stop = useCallback(async () => {
     if (!isSupported) return;
     
+    console.log('🛑 TTS: Stopping playback and cleanup');
+    
+    // Abort any pending fetch requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    
     // Clear progress interval
     if (progressIntervalRef.current) {
       clearInterval(progressIntervalRef.current);
@@ -651,6 +690,7 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
     // Stop audio if playing
     if (audioRef.current) {
       audioRef.current.pause();
+      audioRef.current.src = ''; // Clear source to prevent further loading
       audioRef.current = null;
     }
     
@@ -740,16 +780,28 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
 
   // Cleanup on unmount
   useEffect(() => {
+    isMountedRef.current = true;
+    
     return () => {
+      console.log('🧹 TTS: Component unmounting, cleaning up');
+      isMountedRef.current = false;
+      
+      // Abort any pending fetch requests
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
+      
       // Clear progress interval
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
         progressIntervalRef.current = null;
       }
       
-      // Stop audio
+      // Stop audio if playing
       if (audioRef.current) {
         audioRef.current.pause();
+        audioRef.current.src = ''; // Clear source to prevent further loading
         audioRef.current = null;
       }
       
