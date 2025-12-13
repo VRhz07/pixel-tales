@@ -12,7 +12,7 @@ interface Border {
 
 // Border configurations - should match backend
 const BORDER_CONFIGS: Record<string, Border> = {
-  basic: { id: 'basic', name: 'Basic', level: 1, style: 'solid', color: '#9CA3AF', glowIntensity: 'none' },
+  basic: { id: 'basic', name: 'Basic', level: 1, style: 'solid', color: '#D1D5DB', glowIntensity: 'none' },
   bronze: { id: 'bronze', name: 'Bronze', level: 3, style: 'solid', color: '#CD7F32', glowIntensity: 'none' },
   silver: { id: 'silver', name: 'Silver', level: 5, style: 'solid', color: '#C0C0C0', glowIntensity: 'low' },
   gold: { id: 'gold', name: 'Gold', level: 7, style: 'solid', color: '#FFD700', glowIntensity: 'low' },
@@ -42,6 +42,7 @@ export const AvatarWithBorder: React.FC<AvatarWithBorderProps> = ({
   style = {},
 }) => {
   const border = BORDER_CONFIGS[borderId] || BORDER_CONFIGS.basic;
+  
 
   const getGlowEffect = (intensity: string, color?: string): string => {
     if (intensity === 'none' || !color) return '';
@@ -74,18 +75,18 @@ export const AvatarWithBorder: React.FC<AvatarWithBorderProps> = ({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      fontSize: `${size * 0.5}px`,
       position: 'relative',
-      overflow: 'hidden',
+      boxSizing: 'border-box',
       ...style,
     };
 
     if (border.style === 'solid') {
       const glowEffect = getGlowEffect(border.glowIntensity || 'none', border.color);
+      const borderWidth = Math.max(3, size / 20);
       
       return {
         ...baseStyle,
-        border: `${Math.max(3, size / 20)}px solid ${border.color}`,
+        border: `${borderWidth}px solid ${border.color}`,
         boxShadow: glowEffect || undefined,
         filter: border.glowIntensity && border.glowIntensity !== 'none' ? 'brightness(1.1)' : undefined,
       };
@@ -121,7 +122,7 @@ export const AvatarWithBorder: React.FC<AvatarWithBorderProps> = ({
       return {};
     }
 
-    // For gradient and animated borders, we need an inner circle
+    // For gradient and animated borders, we need an inner circle with avatar styling
     return {
       width: '100%',
       height: '100%',
@@ -130,7 +131,30 @@ export const AvatarWithBorder: React.FC<AvatarWithBorderProps> = ({
       alignItems: 'center',
       justifyContent: 'center',
       fontSize: `${size * 0.5}px`,
-      background: 'var(--bg-primary, white)',
+      fontWeight: 700,
+      color: '#1F2937',
+      background: '#F3F4F6',
+      overflow: 'hidden',
+    };
+  };
+
+  const getAvatarContentStyle = (): React.CSSProperties => {
+    if (border.style !== 'solid') {
+      return {};
+    }
+    
+    // For solid borders, we need a styled inner div for the avatar content
+    return {
+      width: '100%',
+      height: '100%',
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: `${size * 0.5}px`,
+      fontWeight: 700,
+      color: '#1F2937',
+      background: '#F3F4F6',
       overflow: 'hidden',
     };
   };
@@ -163,7 +187,9 @@ export const AvatarWithBorder: React.FC<AvatarWithBorderProps> = ({
       </style>
       <div className={className} style={getBorderStyle()}>
         {border.style === 'solid' ? (
-          avatar
+          <div style={getAvatarContentStyle()}>
+            {avatar}
+          </div>
         ) : (
           <div style={getInnerStyle()}>
             {avatar}

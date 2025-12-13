@@ -249,57 +249,42 @@ const HomePage = () => {
           )}
         </div>
 
-
-        {/* Quick Actions Section */}
+        {/* Quick Actions Section - Child-Friendly Colorful Design */}
         <div className="section-header" style={{marginTop: '3rem'}}>
           <div className="section-icon">🌟</div>
           <h2 className="section-title">Quick Actions</h2>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="magical-card">
-            <div className="card-content">
-              <div className="card-icon primary" style={{width: '50px', height: '50px', fontSize: '1.25rem'}}>
-                <span>📚</span>
-              </div>
-              <div className="card-text">
-                <h4 className="card-title" style={{fontSize: '1rem', marginBottom: '0.25rem'}}>Browse Library</h4>
-                <p className="card-description" style={{fontSize: '0.875rem', marginBottom: '0.75rem'}}>
-                  Explore stories from other creators
-                </p>
-                <button 
-                  className="magical-button" 
-                  style={{padding: '0.5rem 1rem', fontSize: '0.8rem'}}
-                  onClick={() => navigate('/library')}
-                >
-                  Explore
-                </button>
-              </div>
+        <div className="quick-actions-grid">
+          <div className="quick-action-card quick-action-library">
+            <div className="quick-action-icon">📚</div>
+            <div className="quick-action-content">
+              <h4 className="quick-action-title">Browse Library</h4>
+              <p className="quick-action-description">Explore stories from other creators</p>
             </div>
+            <button 
+              className="quick-action-button"
+              onClick={() => navigate('/library')}
+            >
+              Explore
+            </button>
           </div>
 
-          <div className="magical-card">
-            <div className="card-content">
-              <div className="card-icon secondary" style={{width: '50px', height: '50px', fontSize: '1.25rem'}}>
-                <span>👥</span>
-              </div>
-              <div className="card-text">
-                <h4 className="card-title" style={{fontSize: '1rem', marginBottom: '0.25rem'}}>Find Friends</h4>
-                <p className="card-description" style={{fontSize: '0.875rem', marginBottom: '0.75rem'}}>
-                  Connect with other storytellers
-                </p>
-                <button 
-                  className="magical-button secondary" 
-                  style={{padding: '0.5rem 1rem', fontSize: '0.8rem'}}
-                  onClick={() => {
-                    playButtonClick();
-                    navigate('/social');
-                  }}
-                >
-                  Connect
-                </button>
-              </div>
+          <div className="quick-action-card quick-action-friends">
+            <div className="quick-action-icon">👥</div>
+            <div className="quick-action-content">
+              <h4 className="quick-action-title">Find Friends</h4>
+              <p className="quick-action-description">Connect with other storytellers</p>
             </div>
+            <button 
+              className="quick-action-button"
+              onClick={() => {
+                playButtonClick();
+                navigate('/social');
+              }}
+            >
+              Connect
+            </button>
           </div>
         </div>
       </div>

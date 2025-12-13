@@ -8316,7 +8316,7 @@ body {
   height: auto;
 }
 
-/* Draft List Styles */
+/* Draft List Styles - Colorful Child-Friendly Design */
 .drafts-list {
   display: flex;
   flex-direction: column;
@@ -8328,18 +8328,19 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  background-color: rgba(139, 92, 246, 0.1);
-  border-radius: 12px;
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  border-radius: 16px;
+  border: 3px solid #F59E0B;
   gap: 16px;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
 }
 
 .draft-item:hover {
-  background-color: rgba(139, 92, 246, 0.15);
-  border-color: rgba(139, 92, 246, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+  background: linear-gradient(135deg, #FDE68A 0%, #FCD34D 100%);
+  border-color: #D97706;
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
 }
 
 .draft-content {
@@ -8392,36 +8393,43 @@ body {
   min-width: fit-content;
 }
 
-/* Dark mode for draft items */
+/* Dark mode for draft items - Same amber/orange as status card with white text */
 .dark .draft-item {
-  background-color: rgba(139, 92, 246, 0.15);
-  border-color: rgba(139, 92, 246, 0.3);
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+  border-color: #FBBF24 !important;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.5) !important;
 }
 
 .dark .draft-item:hover {
-  background-color: rgba(139, 92, 246, 0.2);
-  border-color: rgba(139, 92, 246, 0.4);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%) !important;
+  border-color: #FCD34D !important;
+  box-shadow: 0 8px 28px rgba(251, 191, 36, 0.6) !important;
+  transform: translateY(-4px) scale(1.01) !important;
 }
 
 .dark .draft-title {
-  color: #F9FAFB;
+  color: #FFFFFF !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  font-weight: 700;
 }
 
 .dark .draft-meta {
-  color: #9CA3AF;
+  color: rgba(255, 255, 255, 0.95) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
 }
 
 .dark .draft-date {
-  color: #6B7280;
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* Feature Creation Buttons - Child-Friendly Vertical Design */
+/* Feature Creation Buttons - Child-Friendly Colorful Design */
 .creation-methods-container {
-  margin: 0 auto 2rem;
-  max-width: 500px;
-  padding: 0 16px;
+  margin: 0 0 2rem 0;
+  max-width: 100%;
+  padding: 0;
   background: transparent !important;
+  width: 100%;
 }
 
 .creation-methods-grid {
@@ -8429,6 +8437,7 @@ body {
   flex-direction: column;
   gap: 16px;
   background: transparent !important;
+  width: 100% !important;
 }
 
 /* Ensure creation-section parent is also transparent */
@@ -8453,65 +8462,70 @@ body {
   align-items: center;
   gap: 20px;
   padding: 24px;
-  background: rgba(255, 255, 255, 0.7);
   border-radius: 20px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border: 2px solid transparent;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border: 3px solid;
   position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  overflow: visible;
+  width: 100% !important;
 }
 
 .feature-button::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 100%);
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border-radius: 20px;
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
+  z-index: -1;
 }
 
 .feature-button:hover::before {
-  opacity: 1;
+  opacity: 0.3;
 }
 
 .feature-button:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
 }
 
 .feature-button:active {
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.01);
   transition: all 0.1s ease;
 }
 
 .feature-button-icon-wrapper {
   width: 64px;
   height: 64px;
-  border-radius: 16px;
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .feature-button:hover .feature-button-icon-wrapper {
-  transform: scale(1.1) rotate(-5deg);
+  transform: scale(1.15) rotate(-8deg);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
 }
 
 .feature-button-icon {
-  font-size: 36px;
+  font-size: 38px;
   display: block;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15));
+  transition: transform 0.3s ease;
+}
+
+.feature-button:hover .feature-button-icon {
+  transform: scale(1.1);
 }
 
 .feature-button-content {
@@ -8539,145 +8553,167 @@ body {
   line-height: 1.4;
 }
 
-/* AI Story Button - Pastel Purple Theme */
+/* AI Story Button - Vibrant Purple Theme */
 .feature-button.ai-story {
-  border-color: rgba(139, 127, 219, 0.6);
-  background: rgba(224, 215, 255, 0.15);
-  border-width: 3px;
+  background: linear-gradient(135deg, #E9D5FF 0%, #DDD6FE 100%);
+  border-color: #A78BFA;
 }
 
 .feature-button.ai-story:hover {
-  border-color: rgba(139, 127, 219, 0.8);
-  background: rgba(224, 215, 255, 0.25);
-  box-shadow: 0 12px 32px rgba(139, 127, 219, 0.25);
+  background: linear-gradient(135deg, #DDD6FE 0%, #C4B5FD 100%);
+  box-shadow: 0 16px 40px rgba(167, 139, 250, 0.4);
+}
+
+.feature-button.ai-story::before {
+  background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%);
 }
 
 .feature-button.ai-story .feature-button-icon-wrapper {
-  background: linear-gradient(135deg, #e0d7ff 0%, #c7b9f4 100%);
-  border: 3px solid rgba(139, 127, 219, 0.6);
+  background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%);
+  border: 3px solid #7C3AED;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
-/* Draw Story Button - Pastel Pink Theme */
+/* Draw Story Button - Vibrant Pink Theme */
 .feature-button.draw-story {
-  border-color: rgba(255, 141, 199, 0.6);
-  background: rgba(255, 214, 232, 0.15);
-  border-width: 3px;
+  background: linear-gradient(135deg, #FCE7F3 0%, #FBCFE8 100%);
+  border-color: #F472B6;
 }
 
 .feature-button.draw-story:hover {
-  border-color: rgba(255, 141, 199, 0.8);
-  background: rgba(255, 214, 232, 0.25);
-  box-shadow: 0 12px 32px rgba(255, 141, 199, 0.25);
+  background: linear-gradient(135deg, #FBCFE8 0%, #F9A8D4 100%);
+  box-shadow: 0 16px 40px rgba(244, 114, 182, 0.4);
+}
+
+.feature-button.draw-story::before {
+  background: linear-gradient(135deg, #F472B6 0%, #EC4899 100%);
 }
 
 .feature-button.draw-story .feature-button-icon-wrapper {
-  background: linear-gradient(135deg, #ffd6e8 0%, #ffc0dd 100%);
-  border: 3px solid rgba(255, 141, 199, 0.6);
+  background: linear-gradient(135deg, #F472B6 0%, #EC4899 100%);
+  border: 3px solid #DB2777;
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
 }
 
-/* Photo AI Button - Pastel Blue Theme */
+/* Photo AI Button - Vibrant Blue Theme */
 .feature-button.photo-ai {
-  border-color: rgba(95, 200, 255, 0.6);
-  background: rgba(212, 241, 255, 0.15);
-  border-width: 3px;
+  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+  border-color: #60A5FA;
 }
 
 .feature-button.photo-ai:hover {
-  border-color: rgba(95, 200, 255, 0.8);
-  background: rgba(212, 241, 255, 0.25);
-  box-shadow: 0 12px 32px rgba(95, 200, 255, 0.25);
+  background: linear-gradient(135deg, #BFDBFE 0%, #93C5FD 100%);
+  box-shadow: 0 16px 40px rgba(96, 165, 250, 0.4);
+}
+
+.feature-button.photo-ai::before {
+  background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
 }
 
 .feature-button.photo-ai .feature-button-icon-wrapper {
-  background: linear-gradient(135deg, #d4f1ff 0%, #b3e5fc 100%);
-  border: 3px solid rgba(95, 200, 255, 0.6);
+  background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+  border: 3px solid #2563EB;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 /* Dark Mode Styles */
 .dark .feature-button {
-  background: transparent;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .dark .feature-button:hover {
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
 }
 
 .dark .feature-button-title {
-  color: #f9fafb;
+  color: #FFFFFF;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .dark .feature-button-subtitle {
-  color: #9ca3af;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-/* Dark mode - Enhanced icon backgrounds */
+/* Dark mode - AI Story Button - Deep Purple */
 .dark .feature-button.ai-story {
-  border-color: rgba(155, 135, 245, 0.6);
-  background: rgba(139, 127, 219, 0.15);
+  background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+  border-color: #A78BFA;
 }
 
 .dark .feature-button.ai-story:hover {
-  border-color: rgba(155, 135, 245, 0.8);
-  background: rgba(139, 127, 219, 0.25);
-  box-shadow: 0 12px 36px rgba(139, 127, 219, 0.35);
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  box-shadow: 0 16px 48px rgba(139, 92, 246, 0.6);
+}
+
+.dark .feature-button.ai-story::before {
+  background: linear-gradient(135deg, #C4B5FD 0%, #A78BFA 100%);
 }
 
 .dark .feature-button.ai-story .feature-button-icon-wrapper {
-  background: linear-gradient(135deg, #9b87f5 0%, #8b7fdb 100%);
-  box-shadow: 0 4px 16px rgba(139, 127, 219, 0.5);
-  border: 2px solid rgba(155, 135, 245, 0.6);
+  background: linear-gradient(135deg, #DDD6FE 0%, #C4B5FD 100%);
+  border: 3px solid #E9D5FF;
+  box-shadow: 0 4px 16px rgba(167, 139, 250, 0.6);
 }
 
+/* Dark mode - Draw Story Button - Deep Pink */
 .dark .feature-button.draw-story {
-  border-color: rgba(255, 141, 199, 0.6);
-  background: rgba(255, 107, 181, 0.15);
+  background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
+  border-color: #F472B6;
 }
 
 .dark .feature-button.draw-story:hover {
-  border-color: rgba(255, 141, 199, 0.8);
-  background: rgba(255, 107, 181, 0.25);
-  box-shadow: 0 12px 36px rgba(255, 141, 199, 0.35);
+  background: linear-gradient(135deg, #F472B6 0%, #EC4899 100%);
+  box-shadow: 0 16px 48px rgba(236, 72, 153, 0.6);
+}
+
+.dark .feature-button.draw-story::before {
+  background: linear-gradient(135deg, #F9A8D4 0%, #F472B6 100%);
 }
 
 .dark .feature-button.draw-story .feature-button-icon-wrapper {
-  background: linear-gradient(135deg, #ff8dc7 0%, #ff6bb5 100%);
-  box-shadow: 0 4px 16px rgba(255, 141, 199, 0.5);
-  border: 2px solid rgba(255, 141, 199, 0.6);
+  background: linear-gradient(135deg, #FBCFE8 0%, #F9A8D4 100%);
+  border: 3px solid #FCE7F3;
+  box-shadow: 0 4px 16px rgba(244, 114, 182, 0.6);
 }
 
+/* Dark mode - Photo AI Button - Deep Blue */
 .dark .feature-button.photo-ai {
-  border-color: rgba(95, 200, 255, 0.6);
-  background: rgba(62, 184, 240, 0.15);
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  border-color: #60A5FA;
 }
 
 .dark .feature-button.photo-ai:hover {
-  border-color: rgba(95, 200, 255, 0.8);
-  background: rgba(62, 184, 240, 0.25);
-  box-shadow: 0 12px 36px rgba(95, 200, 255, 0.35);
+  background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+  box-shadow: 0 16px 48px rgba(59, 130, 246, 0.6);
+}
+
+.dark .feature-button.photo-ai::before {
+  background: linear-gradient(135deg, #93C5FD 0%, #60A5FA 100%);
 }
 
 .dark .feature-button.photo-ai .feature-button-icon-wrapper {
-  background: linear-gradient(135deg, #5fc8ff 0%, #3eb8f0 100%);
-  box-shadow: 0 4px 16px rgba(95, 200, 255, 0.5);
-  border: 2px solid rgba(95, 200, 255, 0.6);
+  background: linear-gradient(135deg, #BFDBFE 0%, #93C5FD 100%);
+  border: 3px solid #DBEAFE;
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.6);
 }
 
 /* Responsive design for feature buttons */
 @media (max-width: 640px) {
   .creation-methods-container {
-    padding: 0 12px;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   .creation-methods-grid {
     gap: 14px;
+    width: 100% !important;
   }
 
   .feature-button {
     padding: 20px;
     gap: 16px;
+    width: 100% !important;
   }
 
   .feature-button-icon-wrapper {
@@ -8700,11 +8736,18 @@ body {
 
 @media (min-width: 641px) and (max-width: 1024px) {
   .creation-methods-container {
-    max-width: 480px;
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .creation-methods-grid {
+    width: 100% !important;
   }
 
   .feature-button {
     padding: 22px;
+    width: 100% !important;
   }
 }
 
@@ -8933,8 +8976,9 @@ body {
   position: relative;
   z-index: 10;
   padding: 0 2rem 6rem;
-  max-width: var(--container-max-width);
+  max-width: 100%;
   margin: 0 auto;
+  width: 100%;
 }
 
 .section-header {
@@ -8967,62 +9011,97 @@ h3.section-title,
 }
 
 .magical-card {
-  background: linear-gradient(135deg, 
-    hsl(0, 0%, 100% / 0.95) 0%, 
-    hsl(263, 20%, 98% / 0.95) 50%, 
-    hsl(0, 0%, 100% / 0.95) 100%);
-  backdrop-filter: blur(25px);
-  border: 2px solid hsl(263, 40%, 75%);
-  border-radius: var(--radius-lg);
-  box-shadow: 
-    0 12px 40px -8px hsl(263, 50%, 20% / 0.25), 
-    0 8px 24px -4px hsl(0, 0%, 0% / 0.15),
-    inset 0 1px 0 hsl(0, 0%, 100% / 0.2);
-  transition: var(--transition-magical);
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%) !important;
+  border: 3px solid #10B981;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
   margin-bottom: 1.5rem;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
+  z-index: 100 !important;
+  backdrop-filter: none !important;
+}
+
+/* Status Card - Yellow/Amber for Continue Working */
+.magical-card.status-card {
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%) !important;
+  border: 3px solid #F59E0B;
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
+  backdrop-filter: none !important;
+}
+
+/* Quick Actions Cards - Individual Colors */
+/* First card (Browse Library) - Keep Green */
+.grid .magical-card:first-child {
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%) !important;
+  border: 3px solid #10B981 !important;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25) !important;
+  backdrop-filter: none !important;
+}
+
+.grid .magical-card:first-child::before {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+.grid .magical-card:first-child:hover {
+  background: linear-gradient(135deg, #A7F3D0 0%, #6EE7B7 100%);
+  box-shadow: 0 16px 32px rgba(16, 185, 129, 0.35);
+  border-color: #059669;
+}
+
+/* Second card (Find Friends) - Make it Cyan/Teal */
+.grid .magical-card:last-child {
+  background: linear-gradient(135deg, #CFFAFE 0%, #A5F3FC 100%) !important;
+  border: 3px solid #06B6D4 !important;
+  box-shadow: 0 8px 20px rgba(6, 182, 212, 0.25) !important;
+  backdrop-filter: none !important;
+}
+
+.grid .magical-card:last-child::before {
+  background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+}
+
+.grid .magical-card:last-child:hover {
+  background: linear-gradient(135deg, #A5F3FC 0%, #67E8F9 100%);
+  box-shadow: 0 16px 32px rgba(6, 182, 212, 0.35);
+  border-color: #0891B2;
 }
 
 .magical-card::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    hsl(0, 0%, 100% / 0.1),
-    transparent
-  );
-  transition: left 0.6s ease;
-}
-
-.magical-card {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .magical-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 
-    0 20px 40px -8px hsl(263, 85%, 60% / 0.4),
-    0 12px 24px -4px hsl(0, 0%, 0% / 0.3),
-    inset 0 1px 0 hsl(0, 0%, 100% / 0.2),
-    0 0 0 1px hsl(263, 85%, 60% / 0.5);
-  border-color: hsl(263, 85%, 60% / 0.6);
-  backdrop-filter: blur(30px);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 32px rgba(16, 185, 129, 0.35);
+  border-color: #059669;
+}
+
+/* Status Card hover */
+.magical-card.status-card::before {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+}
+
+.magical-card.status-card:hover {
+  background: linear-gradient(135deg, #FDE68A 0%, #FCD34D 100%);
+  box-shadow: 0 16px 32px rgba(245, 158, 11, 0.35);
+  border-color: #D97706;
 }
 
 .magical-card:hover::before {
-  left: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    hsl(263, 85%, 60% / 0.2),
-    transparent
-  );
+  opacity: 0.3;
 }
 
 .card-content {
@@ -9030,35 +9109,40 @@ h3.section-title,
   align-items: center;
   padding: 1.5rem;
   position: relative;
-  z-index: 1;
+  z-index: 101 !important;
+  background: transparent !important;
 }
 
 .card-icon {
   width: 60px;
   height: 60px;
-  border-radius: 0.75rem;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 1.25rem;
-  font-size: 1.5rem;
-  color: white;
+  font-size: 1.75rem;
   flex-shrink: 0;
-  box-shadow: var(--shadow-warm);
-  transition: var(--transition-magical);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   position: relative;
+  border: 3px solid;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .card-icon span {
   position: relative;
   z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.magical-card:hover .card-icon {
+  transform: scale(1.1) rotate(-5deg);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
 }
 
 .card-icon.primary {
-  background-image: url('./assets/ai-assistant-icon.jpg');
-  background-size: cover;
-  background-position: center;
-  position: relative;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  border-color: #60A5FA;
 }
 
 .card-icon.primary::before {
@@ -9068,17 +9152,14 @@ h3.section-title,
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--gradient-primary);
-  opacity: 0.7;
+  background: transparent;
+  opacity: 0;
   border-radius: inherit;
-  mix-blend-mode: multiply;
 }
 
 .card-icon.secondary {
-  background-image: url('./assets/manual-creation-icon.jpg');
-  background-size: cover;
-  background-position: center;
-  position: relative;
+  background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);
+  border-color: #F472B6;
 }
 
 .card-icon.secondary::before {
@@ -9088,10 +9169,9 @@ h3.section-title,
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--gradient-secondary);
-  opacity: 0.7;
+  background: transparent;
+  opacity: 0;
   border-radius: inherit;
-  mix-blend-mode: multiply;
 }
 
 .card-icon.mystical {
@@ -9151,7 +9231,8 @@ h3.section-title,
   font-weight: 600 !important;
   color: #1a0d2e !important;
   margin-bottom: 0.5rem;
-  text-shadow: 0 2px 4px hsl(0, 0%, 100% / 0.5), 0 1px 2px hsl(0, 0%, 100% / 0.3) !important;
+  text-shadow: none !important;
+  background: transparent !important;
 }
 
 .magical-card .card-description,
@@ -9161,23 +9242,25 @@ h3.section-title,
   color: #2d1f3d !important;
   margin-bottom: 1rem;
   line-height: 1.5;
-  text-shadow: 0 2px 4px hsl(0, 0%, 100% / 0.4), 0 1px 2px hsl(0, 0%, 100% / 0.3) !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+  background: transparent !important;
 }
 
 .magical-button {
-  background: var(--gradient-primary);
-  color: var(--primary-foreground);
-  border: 2px solid var(--primary);
+  background: rgba(255, 255, 255, 0.4);
+  color: #1a0d2e;
+  border: 2px solid rgba(255, 255, 255, 0.6);
   border-radius: var(--radius-md);
   padding: 0.75rem 1.5rem;
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
   transition: var(--transition-magical);
-  box-shadow: var(--shadow-magical);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(10px);
 }
 
 .magical-button::before {
@@ -9233,9 +9316,11 @@ h3.section-title,
 }
 
 .magical-button.secondary {
-  background: var(--gradient-secondary);
-  border: 2px solid var(--secondary);
-  box-shadow: var(--shadow-warm);
+  background: rgba(255, 255, 255, 0.4);
+  color: #1a0d2e;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .magical-button.outline {
@@ -9258,32 +9343,48 @@ h3.section-title,
 }
 
 .status-card {
-  background: linear-gradient(135deg, 
-    hsl(0, 0%, 100% / 0.95) 0%, 
-    hsl(263, 15%, 97% / 0.95) 100%);
-  border: 3px solid hsl(263, 50%, 70%);
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%) !important;
+  border: 3px solid #F59E0B;
   text-align: center;
   padding: 2rem 1.5rem;
-  backdrop-filter: blur(25px);
-  box-shadow: 
-    0 12px 40px -8px hsl(263, 50%, 20% / 0.3), 
-    0 8px 24px -4px hsl(0, 0%, 0% / 0.2),
-    inset 0 1px 0 hsl(0, 0%, 100% / 0.2);
+  backdrop-filter: none !important;
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
+}
+
+/* Dark mode status card keeps the vibrant orange background for empty state */
+.dark .status-card {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+  border: 3px solid #FBBF24;
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.5);
 }
 
 .status-icon {
   font-size: 3rem;
-  opacity: 0.6;
+  opacity: 1;
   margin-bottom: 1rem;
   display: block;
 }
 
+/* Light mode - dark text on bright background */
 .status-card .status-text,
-.magical-card .status-text {
-  color: #3d2f4d !important;
+.magical-card.status-card .status-text,
+.status-card .card-title,
+.magical-card.status-card .card-title,
+.status-card h3 {
+  color: #1a0d2e !important;
   font-size: 0.9rem;
   font-weight: 500;
-  text-shadow: 0 2px 4px hsl(0, 0%, 100% / 0.5), 0 1px 2px hsl(0, 0%, 100% / 0.3) !important;
+  text-shadow: none !important;
+}
+
+/* Dark mode - keep white text */
+.dark .status-card .status-text,
+.dark .magical-card.status-card .status-text,
+.dark .status-card .card-title,
+.dark .magical-card.status-card .card-title,
+.dark .status-card h3 {
+  color: #FFFFFF !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
 }
 
 .magical-card.challenge-card {
@@ -9554,11 +9655,11 @@ h3.section-title,
 
 .dark .magical-home::after {
   background: linear-gradient(135deg, 
-    rgba(26, 22, 37, 0.6) 0%, 
-    rgba(42, 36, 53, 0.65) 25%, 
-    rgba(58, 52, 69, 0.6) 50%, 
-    rgba(42, 36, 53, 0.65) 75%, 
-    rgba(26, 22, 37, 0.6) 100%
+    rgba(26, 22, 37, 0.3) 0%, 
+    rgba(42, 36, 53, 0.35) 25%, 
+    rgba(58, 52, 69, 0.3) 50%, 
+    rgba(42, 36, 53, 0.35) 75%, 
+    rgba(26, 22, 37, 0.3) 100%
   );
 }
 
@@ -9592,18 +9693,305 @@ body.dark .magical-home .section-title {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important;
 }
 
-.dark .magical-card {
-  background: linear-gradient(135deg, 
-    hsl(245, 30%, 15% / 0.95) 0%, 
-    hsl(263, 35%, 20% / 0.95) 50%, 
-    hsl(290, 30%, 18% / 0.95) 100%);
-  border: 1px solid #3a3445;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+/* This red style is for any magical-card that's NOT status-card and NOT inside .grid */
+.dark .magical-card:not(.status-card) {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  border: 3px solid #EF4444;
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
 }
 
-.dark .magical-card:hover {
-  border-color: #8b5cf6;
-  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);
+.dark .magical-card:not(.status-card):hover {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  border-color: #F87171;
+  box-shadow: 0 16px 32px rgba(239, 68, 68, 0.5);
+}
+
+.dark .magical-card:not(.status-card)::before {
+  background: linear-gradient(135deg, #FCA5A5 0%, #F87171 100%);
+}
+
+/* Override the above for grid cards - these rules must come AFTER */
+
+/* Dark mode - Status Card (Continue Working) - Rich Vibrant Amber/Orange */
+.dark .magical-card.status-card {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+  border: 3px solid #FBBF24 !important;
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.5) !important;
+  backdrop-filter: none !important;
+}
+
+.dark .magical-card.status-card:hover {
+  background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%) !important;
+  border-color: #FCD34D;
+  box-shadow: 0 12px 32px rgba(251, 191, 36, 0.6);
+}
+
+.dark .magical-card.status-card::before {
+  background: linear-gradient(135deg, #FCD34D 0%, #FBBF24 100%);
+}
+
+/* ============================================
+   QUICK ACTIONS SECTION - CHILD-FRIENDLY DESIGN
+   ============================================ */
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.quick-action-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 16px;
+  border: 3px solid;
+  text-align: left;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 100;
+  backdrop-filter: none !important;
+}
+
+.quick-action-card:hover {
+  transform: translateY(-4px) scale(1.01);
+}
+
+.quick-action-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.quick-action-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.quick-action-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.quick-action-description {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.quick-action-button {
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.quick-action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Light Mode - Browse Library (Green/Emerald) */
+.quick-action-library {
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+  border-color: #10B981;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.quick-action-library:hover {
+  background: linear-gradient(135deg, #A7F3D0 0%, #6EE7B7 100%);
+  border-color: #059669;
+  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.4);
+}
+
+.quick-action-library .quick-action-title {
+  color: #065F46;
+}
+
+.quick-action-library .quick-action-description {
+  color: #047857;
+}
+
+.quick-action-library .quick-action-button {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: white;
+}
+
+.quick-action-library .quick-action-button:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+/* Light Mode - Find Friends (Cyan/Teal) */
+.quick-action-friends {
+  background: linear-gradient(135deg, #CFFAFE 0%, #A5F3FC 100%);
+  border-color: #06B6D4;
+  box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3);
+}
+
+.quick-action-friends:hover {
+  background: linear-gradient(135deg, #A5F3FC 0%, #67E8F9 100%);
+  border-color: #0891B2;
+  box-shadow: 0 12px 28px rgba(6, 182, 212, 0.4);
+}
+
+.quick-action-friends .quick-action-title {
+  color: #155E75;
+}
+
+.quick-action-friends .quick-action-description {
+  color: #0E7490;
+}
+
+.quick-action-friends .quick-action-button {
+  background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+  color: white;
+}
+
+.quick-action-friends .quick-action-button:hover {
+  background: linear-gradient(135deg, #0891B2 0%, #0E7490 100%);
+}
+
+/* Dark Mode - Browse Library (Darker Green) */
+.dark .quick-action-library {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  border-color: #059669 !important;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4) !important;
+}
+
+.dark .quick-action-library:hover {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  border-color: #10B981 !important;
+  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.5) !important;
+}
+
+.dark .quick-action-library .quick-action-title,
+.dark .quick-action-library .quick-action-description {
+  color: #FFFFFF;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dark .quick-action-library .quick-action-button {
+  background: linear-gradient(135deg, #6EE7B7 0%, #34D399 100%);
+  color: #065F46;
+}
+
+.dark .quick-action-library .quick-action-button:hover {
+  background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+}
+
+/* Dark Mode - Find Friends (Darker Cyan) */
+.dark .quick-action-friends {
+  background: linear-gradient(135deg, #0891B2 0%, #0E7490 100%) !important;
+  border-color: #0891B2 !important;
+  box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4) !important;
+}
+
+.dark .quick-action-friends:hover {
+  background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%) !important;
+  border-color: #06B6D4 !important;
+  box-shadow: 0 12px 28px rgba(6, 182, 212, 0.5) !important;
+}
+
+.dark .quick-action-friends .quick-action-title,
+.dark .quick-action-friends .quick-action-description {
+  color: #FFFFFF;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dark .quick-action-friends .quick-action-button {
+  background: linear-gradient(135deg, #22D3EE 0%, #06B6D4 100%);
+  color: #155E75;
+}
+
+.dark .quick-action-friends .quick-action-button:hover {
+  background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .quick-action-card {
+    padding: 0.875rem 1rem;
+  }
+  
+  .quick-action-icon {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .quick-action-title {
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .quick-action-description {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .quick-action-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Dark mode - Quick Actions Cards - Using !important to override */
+/* First card (Browse Library) - Deep Green */
+.dark .grid .magical-card:first-child {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  border: 3px solid #10B981 !important;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4) !important;
+}
+
+.dark .grid .magical-card:first-child::before {
+  background: linear-gradient(135deg, #6EE7B7 0%, #34D399 100%) !important;
+}
+
+.dark .grid .magical-card:first-child:hover {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  border-color: #34D399 !important;
+  box-shadow: 0 16px 32px rgba(16, 185, 129, 0.5) !important;
+}
+
+/* Second card (Find Friends) - Deep Cyan/Teal */
+.dark .grid .magical-card:last-child {
+  background: linear-gradient(135deg, #0891B2 0%, #0E7490 100%) !important;
+  border: 3px solid #06B6D4 !important;
+  box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4) !important;
+}
+
+.dark .grid .magical-card:last-child::before {
+  background: linear-gradient(135deg, #22D3EE 0%, #06B6D4 100%) !important;
+}
+
+.dark .grid .magical-card:last-child:hover {
+  background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%) !important;
+  border-color: #22D3EE !important;
+  box-shadow: 0 16px 32px rgba(6, 182, 212, 0.5) !important;
+}
+
+/* Dark mode - Card Icons */
+.dark .card-icon.primary {
+  background: linear-gradient(135deg, #93C5FD 0%, #60A5FA 100%);
+  border-color: #BFDBFE;
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.5);
+}
+
+.dark .card-icon.secondary {
+  background: linear-gradient(135deg, #FBCFE8 0%, #F9A8D4 100%);
+  border-color: #FCE7F3;
+  box-shadow: 0 4px 16px rgba(244, 114, 182, 0.5);
 }
 
 .dark .magical-card.challenge-card {
@@ -9612,13 +10000,6 @@ body.dark .magical-home .section-title {
     rgba(168, 85, 247, 0.3) 100%
   );
   border-color: #8b5cf6;
-}
-
-.dark .magical-card.status-card {
-  background: linear-gradient(135deg, 
-    hsl(245, 30%, 15% / 0.98) 0%, 
-    hsl(263, 35%, 18% / 0.98) 100%);
-  border: 2px solid #3a3445;
 }
 
 .dark .card-title,

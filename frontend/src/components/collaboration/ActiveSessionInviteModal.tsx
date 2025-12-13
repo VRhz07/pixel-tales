@@ -3,10 +3,13 @@ import ReactDOM from 'react-dom';
 import { X, UserPlus, Copy, Check } from 'lucide-react';
 import { socialService } from '../../services/social.service';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
+import { AvatarWithBorder } from '../common/AvatarWithBorder';
 
 interface Friend {
   id: number;
   username: string;
+  avatar?: string;
+  selected_avatar_border?: string;
   profile_picture?: string;
 }
 
@@ -264,19 +267,11 @@ export const ActiveSessionInviteModal: React.FC<ActiveSessionInviteModalProps> =
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <div style={{ position: 'relative' }}>
-                          <div style={{
-                            width: '2rem',
-                            height: '2rem',
-                            borderRadius: '50%',
-                            backgroundColor: '#9333ea',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white',
-                            fontWeight: 600
-                          }}>
-                            {friend.username[0].toUpperCase()}
-                          </div>
+                          <AvatarWithBorder
+                            avatar={friend.avatar || friend.username[0].toUpperCase()}
+                            borderId={friend.selected_avatar_border || 'basic'}
+                            size={48}
+                          />
                           {/* Always show status indicator */}
                           <div style={{
                             position: 'absolute',
