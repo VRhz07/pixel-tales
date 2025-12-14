@@ -99,5 +99,9 @@ export const useBackgroundMusic = () => {
     setEnabled: (enabled: boolean) => soundService.setBackgroundMusicEnabled(enabled),
     start: () => soundService.startBackgroundMusic(),
     stop: () => soundService.stopBackgroundMusic(),
+    selectedTrack: soundService.getSelectedMusicTrack(),
+    setTrack: (track: any) => soundService.setBackgroundMusicTrack(track),
+    availableTracks: soundService.getAvailableTracks(),
+    currentTrackName: soundService.getCurrentTrackName(),
   };
 };

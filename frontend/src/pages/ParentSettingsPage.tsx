@@ -90,9 +90,9 @@ const ParentSettingsPage: React.FC = () => {
     }
   };
 
-  const handleProfileUpdate = async (name: string) => {
+  const handleProfileUpdate = async (name: string, username: string) => {
     try {
-      await authService.updateProfile({ name });
+      await authService.updateProfile({ name, username });
       
       // Update the store immediately with setUser
       const { setUser } = useAuthStore.getState();
@@ -100,6 +100,7 @@ const ParentSettingsPage: React.FC = () => {
         setUser({
           ...user,
           name: name,
+          username: username,
         });
       }
       
@@ -1167,6 +1168,7 @@ const ParentSettingsPage: React.FC = () => {
           isOpen={showProfileModal}
           onClose={() => setShowProfileModal(false)}
           currentName={user?.name || ''}
+          currentUsername={user?.username || ''}
           onSave={handleProfileUpdate}
         />
       )}

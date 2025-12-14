@@ -27,7 +27,7 @@ import { storage } from '../../utils/storage';
 import { authService } from '../../services/auth.service';
 import { api } from '../../services/api';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
-import soundService from '../../services/soundService';
+import soundService, { BackgroundMusicTrack } from '../../services/soundService';
 
 const SettingsPage = () => {
   const navigate = useNavigate();
@@ -43,6 +43,8 @@ const SettingsPage = () => {
   const [soundVolume, setSoundVolume] = useState(soundService.getGlobalVolume());
   const [backgroundMusicEnabled, setBackgroundMusicEnabled] = useState(soundService.isBackgroundMusicEnabled());
   const [backgroundMusicVolume, setBackgroundMusicVolume] = useState(soundService.getBackgroundMusicVolume());
+  const [selectedTrack, setSelectedTrack] = useState<BackgroundMusicTrack>(soundService.getSelectedMusicTrack());
+  const [currentTrackName, setCurrentTrackName] = useState<string | null>(soundService.getCurrentTrackName());
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -550,35 +552,115 @@ const SettingsPage = () => {
 
             {/* Background Music Volume - Only show when music is enabled */}
             {backgroundMusicEnabled && (
-              <div className="settings-item" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-                <div className="settings-item-content" style={{ marginBottom: '1rem' }}>
-                  <div className="settings-item-title">Music Volume</div>
-                  <div className="settings-item-subtitle">
-                    Adjust background music volume ({Math.round(backgroundMusicVolume * 100)}%)
+              <>
+                <div className="settings-item" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <div className="settings-item-content" style={{ marginBottom: '1rem' }}>
+                    <div className="settings-item-title">Music Volume</div>
+                    <div className="settings-item-subtitle">
+                      Adjust background music volume ({Math.round(backgroundMusicVolume * 100)}%)
+                    </div>
+                  </div>
+                  <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
+                    <span style={{ fontSize: '1.25rem' }}>🎵</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={backgroundMusicVolume}
+                      onChange={(e) => {
+                        const newVolume = parseFloat(e.target.value);
+                        setBackgroundMusicVolume(newVolume);
+                        soundService.setBackgroundMusicVolume(newVolume);
+                      }}
+                      style={{
+                        flex: 1,
+                        accentColor: '#10b981',
+                        cursor: 'pointer',
+                      }}
+                    />
+                    <span style={{ fontSize: '1.25rem' }}>🎶</span>
                   </div>
                 </div>
-                <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
-                  <span style={{ fontSize: '1.25rem' }}>🎵</span>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.05"
-                    value={backgroundMusicVolume}
-                    onChange={(e) => {
-                      const newVolume = parseFloat(e.target.value);
-                      setBackgroundMusicVolume(newVolume);
-                      soundService.setBackgroundMusicVolume(newVolume);
-                    }}
-                    style={{
-                      flex: 1,
-                      accentColor: '#10b981',
-                      cursor: 'pointer',
-                    }}
-                  />
-                  <span style={{ fontSize: '1.25rem' }}>🎶</span>
+
+                {/* Track Selection */}
+                <div className="settings-item" style={{ flexDirection: 'column', alignItems: 'flex-start', paddingTop: '1.5rem', borderTop: theme === 'dark' ? '1px solid #3d3349' : '1px solid #e5e7eb' }}>
+                  <div className="settings-item-content" style={{ marginBottom: '0.75rem' }}>
+                    <div className="settings-item-title">Choose Music Track</div>
+                    {currentTrackName && (
+                      <div className="settings-item-subtitle" style={{ color: theme === 'dark' ? '#a78bfa' : '#8b5cf6', fontStyle: 'italic' }}>
+                        ♪ Now playing: {currentTrackName}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div style={{ 
+                    width: '100%', 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(2, 1fr)', 
+                    gap: '0.5rem',
+                    padding: '0 1rem'
+                  }}>
+                    {soundService.getAvailableTracks().map((track) => (
+                      <button
+                        key={track}
+                        onClick={() => {
+                          playButtonClick();
+                          setSelectedTrack(track);
+                          soundService.setBackgroundMusicTrack(track);
+                          // Update current track name after a short delay
+                          setTimeout(() => {
+                            setCurrentTrackName(soundService.getCurrentTrackName());
+                          }, 1000);
+                        }}
+                        style={{
+                          padding: '0.75rem',
+                          backgroundColor: selectedTrack === track
+                            ? (theme === 'dark' ? '#6d28d9' : '#a78bfa')
+                            : (theme === 'dark' ? '#3d3349' : '#f3f4f6'),
+                          border: `2px solid ${
+                            selectedTrack === track
+                              ? (theme === 'dark' ? '#7c3aed' : '#8b5cf6')
+                              : (theme === 'dark' ? '#4b4560' : '#d1d5db')
+                          }`,
+                          borderRadius: '0.5rem',
+                          color: selectedTrack === track
+                            ? '#ffffff'
+                            : (theme === 'dark' ? '#e5e7eb' : '#374151'),
+                          fontSize: '0.75rem',
+                          fontWeight: selectedTrack === track ? '600' : '500',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          textAlign: 'center',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (selectedTrack !== track) {
+                            e.currentTarget.style.backgroundColor = theme === 'dark' ? '#4b4560' : '#e5e7eb';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (selectedTrack !== track) {
+                            e.currentTarget.style.backgroundColor = theme === 'dark' ? '#3d3349' : '#f3f4f6';
+                          }
+                        }}
+                      >
+                        {soundService.getTrackDisplayName(track)}
+                      </button>
+                    ))}
+                  </div>
+
+                  <p style={{
+                    fontSize: '0.75rem',
+                    color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                    marginTop: '0.75rem',
+                    lineHeight: '1.5',
+                    padding: '0 1rem',
+                    textAlign: 'center',
+                  }}>
+                    💡 Select "Random" to hear a different song each time, or choose your favorite track!
+                  </p>
                 </div>
-              </div>
+              </>
             )}
           </>
         )}

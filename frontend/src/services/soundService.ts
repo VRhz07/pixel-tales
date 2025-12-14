@@ -38,6 +38,14 @@ export type SoundType =
   | 'friend-request'
   | 'collaboration-invite';
 
+export type BackgroundMusicTrack =
+  | 'track-1'
+  | 'track-2'
+  | 'track-3'
+  | 'track-4'
+  | 'track-5'
+  | 'random'; // Special value for random selection
+
 interface SoundConfig {
   volume: number;
   loop?: boolean;
@@ -54,6 +62,19 @@ class SoundService {
   private backgroundMusicEnabled: boolean = true;
   private backgroundMusicVolume: number = 0.2; // Lower volume for background
   private isMusicPlaying: boolean = false;
+  private currentTrack: BackgroundMusicTrack | null = null;
+  private selectedTrack: BackgroundMusicTrack = 'random'; // Default to random
+  private loopCount: number = 0; // Count how many times current track has looped
+  private readonly loopsBeforeChange: number = 2; // Change track after 2 loops in random mode
+  
+  // Available background music tracks
+  private readonly availableTracks: Exclude<BackgroundMusicTrack, 'random'>[] = [
+    'track-1',
+    'track-2',
+    'track-3',
+    'track-4',
+    'track-5',
+  ];
   
   // Default volume levels for different sound types
   private readonly defaultVolumes: Partial<Record<SoundType, number>> = {
@@ -101,8 +122,13 @@ class SoundService {
       this.backgroundMusicVolume = parseFloat(savedMusicVolume);
     }
     
+    const savedMusicTrack = localStorage.getItem('backgroundMusicTrack') as BackgroundMusicTrack;
+    if (savedMusicTrack && (savedMusicTrack === 'random' || this.availableTracks.includes(savedMusicTrack as any))) {
+      this.selectedTrack = savedMusicTrack;
+    }
+    
     this.preloadCommonSounds();
-    this.initBackgroundMusic();
+    // Don't initialize background music here - it will be initialized when first played
   }
 
   /**
@@ -298,40 +324,153 @@ class SoundService {
   }
 
   /**
-   * Initialize background music
+   * Initialize background music with a specific track
    */
-  private initBackgroundMusic() {
+  private initBackgroundMusic(track: Exclude<BackgroundMusicTrack, 'random'>) {
     try {
-      this.backgroundMusic = new Audio('/sounds/background-music.mp3');
-      this.backgroundMusic.loop = true; // Native loop - let browser handle it
+      // Clean up previous instance
+      if (this.backgroundMusic) {
+        this.backgroundMusic.pause();
+        this.backgroundMusic.removeEventListener('ended', this.handleTrackEnded);
+        this.backgroundMusic.src = '';
+        this.backgroundMusic = null;
+      }
+
+      // Map track names to actual file names
+      const trackFiles: Record<Exclude<BackgroundMusicTrack, 'random'>, string> = {
+        'track-1': 'background-music.mp3',
+        'track-2': 'background-music-2.mp3',
+        'track-3': 'background-music-3.mp3',
+        'track-4': 'background-music-4.mp3',
+        'track-5': 'background-music-5.mp3',
+      };
+      
+      this.backgroundMusic = new Audio(`/sounds/${trackFiles[track]}`);
+      this.backgroundMusic.loop = false; // Don't use native loop - we'll handle it manually
       this.backgroundMusic.volume = this.backgroundMusicVolume;
       this.backgroundMusic.preload = 'auto';
+      this.currentTrack = track;
+      this.loopCount = 0; // Reset loop count for new track
       
-      // Don't add 'ended' event listener - it interferes with native loop
-      // The browser's native loop is more reliable than manual restart
+      // Listen for track end to handle loop counting and random track changes
+      this.backgroundMusic.addEventListener('ended', this.handleTrackEnded);
       
-      // Handle page visibility changes
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-          this.pauseBackgroundMusic();
-        } else if (this.isMusicPlaying && this.backgroundMusicEnabled) {
-          this.resumeBackgroundMusic();
-        }
-      });
+      // Handle page visibility changes (only set up once)
+      if (!this.hasSetupVisibilityHandler) {
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            this.pauseBackgroundMusic();
+          } else if (this.isMusicPlaying && this.backgroundMusicEnabled) {
+            this.resumeBackgroundMusic();
+          }
+        });
+        this.hasSetupVisibilityHandler = true;
+      }
     } catch (error) {
-      console.error('Failed to initialize background music', error);
+      console.error(`Failed to initialize background music track: ${track}`, error);
     }
+  }
+
+  /**
+   * Handle track ended event - loop or switch to new track in random mode
+   */
+  private handleTrackEnded = () => {
+    if (!this.isMusicPlaying || !this.backgroundMusic) return;
+
+    this.loopCount++;
+
+    // If in random mode and we've reached the loop limit, switch to a new track
+    if (this.selectedTrack === 'random' && this.loopCount >= this.loopsBeforeChange) {
+      console.log(`🎵 Switching to new random track after ${this.loopCount} loops`);
+      this.switchToRandomTrack();
+    } else {
+      // Otherwise, just restart the same track
+      this.backgroundMusic.currentTime = 0;
+      this.backgroundMusic.play().catch(err => {
+        console.error('Failed to loop track:', err);
+      });
+    }
+  };
+
+  /**
+   * Switch to a new random track with smooth transition
+   */
+  private async switchToRandomTrack() {
+    if (!this.backgroundMusic) return;
+
+    try {
+      // Get a new random track (different from current)
+      const newTrack = this.getRandomTrack();
+      
+      // Fade out current track
+      await this.fadeOutMusic(1000);
+      
+      // Initialize new track
+      this.initBackgroundMusic(newTrack);
+      
+      if (!this.backgroundMusic) return;
+      
+      // Start new track with fade in
+      this.backgroundMusic.volume = 0;
+      await this.backgroundMusic.play();
+      this.fadeInMusic(1500);
+      
+      console.log(`🎵 Now playing: ${this.getCurrentTrackName()}`);
+    } catch (error) {
+      console.error('Failed to switch to random track:', error);
+    }
+  }
+
+  private hasSetupVisibilityHandler = false;
+
+  /**
+   * Get a random track from available tracks (excluding current track)
+   */
+  private getRandomTrack(): Exclude<BackgroundMusicTrack, 'random'> {
+    // If there's a current track and we have more than one track, avoid repeating it
+    if (this.currentTrack && this.availableTracks.length > 1) {
+      const availableTracksExcludingCurrent = this.availableTracks.filter(
+        track => track !== this.currentTrack
+      );
+      const randomIndex = Math.floor(Math.random() * availableTracksExcludingCurrent.length);
+      return availableTracksExcludingCurrent[randomIndex];
+    }
+    
+    const randomIndex = Math.floor(Math.random() * this.availableTracks.length);
+    return this.availableTracks[randomIndex];
+  }
+
+  /**
+   * Get the track to play based on settings
+   */
+  private getTrackToPlay(): Exclude<BackgroundMusicTrack, 'random'> {
+    if (this.selectedTrack === 'random') {
+      return this.getRandomTrack();
+    }
+    return this.selectedTrack as Exclude<BackgroundMusicTrack, 'random'>;
   }
 
   /**
    * Start playing background music with fade in
    */
   async startBackgroundMusic(fadeInDuration: number = 2000): Promise<void> {
-    if (!this.backgroundMusic || !this.backgroundMusicEnabled) {
+    if (!this.backgroundMusicEnabled) {
       return;
     }
 
     try {
+      // Determine which track to play
+      const trackToPlay = this.getTrackToPlay();
+      
+      // Initialize or switch track if needed
+      if (!this.backgroundMusic || this.currentTrack !== trackToPlay) {
+        this.initBackgroundMusic(trackToPlay);
+      }
+
+      if (!this.backgroundMusic) {
+        throw new Error('Failed to initialize background music');
+      }
+
       // Reset to start if already playing
       if (this.isMusicPlaying) {
         this.backgroundMusic.currentTime = 0;
@@ -485,6 +624,71 @@ class SoundService {
    */
   isBackgroundMusicPlaying(): boolean {
     return this.isMusicPlaying;
+  }
+
+  /**
+   * Set the background music track selection
+   */
+  setBackgroundMusicTrack(track: BackgroundMusicTrack) {
+    this.selectedTrack = track;
+    this.loopCount = 0; // Reset loop count when manually changing track
+    localStorage.setItem('backgroundMusicTrack', track);
+    
+    // If music is currently playing, restart with new track
+    if (this.isMusicPlaying) {
+      this.stopBackgroundMusic(500).then(() => {
+        this.startBackgroundMusic(1000);
+      });
+    }
+  }
+
+  /**
+   * Get the currently selected track
+   */
+  getSelectedMusicTrack(): BackgroundMusicTrack {
+    return this.selectedTrack;
+  }
+
+  /**
+   * Get all available music tracks
+   */
+  getAvailableTracks(): BackgroundMusicTrack[] {
+    return ['random', ...this.availableTracks];
+  }
+
+  /**
+   * Get the currently playing track name
+   */
+  getCurrentTrackName(): string | null {
+    if (!this.currentTrack) return null;
+    
+    // Convert track ID to display name
+    const trackNames: Record<Exclude<BackgroundMusicTrack, 'random'>, string> = {
+      'track-1': 'Melody One',
+      'track-2': 'Melody Two',
+      'track-3': 'Melody Three',
+      'track-4': 'Melody Four',
+      'track-5': 'Melody Five',
+    };
+    
+    return trackNames[this.currentTrack];
+  }
+
+  /**
+   * Get display name for a track
+   */
+  getTrackDisplayName(track: BackgroundMusicTrack): string {
+    if (track === 'random') return '🎲 Random (Surprise Me!)';
+    
+    const trackNames: Record<Exclude<BackgroundMusicTrack, 'random'>, string> = {
+      'track-1': '🎵 Melody One',
+      'track-2': '🎶 Melody Two',
+      'track-3': '🎼 Melody Three',
+      'track-4': '🎹 Melody Four',
+      'track-5': '🎸 Melody Five',
+    };
+    
+    return trackNames[track as Exclude<BackgroundMusicTrack, 'random'>] || track;
   }
 }
 
