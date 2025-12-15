@@ -16,7 +16,8 @@ import {
   EyeIcon,
   TrashIcon,
   CloudArrowDownIcon,
-  DocumentArrowDownIcon
+  DocumentArrowDownIcon,
+  PuzzlePieceIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon, BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
 import { useThemeStore } from '../stores/themeStore';
@@ -28,6 +29,7 @@ import { TTSControls } from '../components/common/TTSControls';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import pdfExportService from '../services/pdfExportService';
 import { useSoundEffects } from '../hooks/useSoundEffects';
+import api from '../services/api';
 import './StoryReaderPage.css';
 
 type ReadingMode = 'verticalScroll' | 'leftToRight';
@@ -71,6 +73,12 @@ const StoryReaderPage: React.FC = () => {
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const horizontalCardRef = React.useRef<HTMLDivElement>(null);
   
+  // Games state
+  const [hasGames, setHasGames] = useState(false);
+  const [gamesCount, setGamesCount] = useState(0);
+  const [isGeneratingGames, setIsGeneratingGames] = useState(false);
+  const [canGenerateGames, setCanGenerateGames] = useState(false);
+  
   // Load story from local store or backend API
   useEffect(() => {
     const loadStory = async () => {
@@ -81,17 +89,61 @@ const StoryReaderPage: React.FC = () => {
       
       setIsLoading(true);
       
-      // First, try to get from local store
-      const localStory = getStory(storyId);
-      if (localStory) {
-        console.log('📖 Loaded story from local store:', localStory.title);
-        setStory(localStory);
-        setStoryAuthor(user?.username || 'You');
-        setIsOwnStory(true); // Local stories are always owned by current user
-        // Local stories don't have interaction counts - keep defaults at 0
-        setIsSavedOffline(isStorySavedOffline(storyId));
-        setIsLoading(false);
-        return;
+      // First, try to fetch from backend if user is authenticated
+      // This ensures we get the backend ID for published stories
+      let backendFetchSucceeded = false;
+      if (user) {
+        try {
+          console.log('🔍 Attempting to fetch story from backend:', storyId);
+          const apiStory = await storyApiService.getStory(storyId);
+          
+          const convertedStory = storyApiService.convertFromApiFormat(apiStory);
+          console.log('✅ Loaded story from backend:', convertedStory.title);
+          
+          setStory(convertedStory);
+          const authorDisplay = apiStory.is_collaborative && apiStory.authors_names && apiStory.authors_names.length > 0
+            ? apiStory.authors_names.join(', ')
+            : (apiStory.author_name || 'Anonymous');
+          setStoryAuthor(authorDisplay);
+          
+          const storyIdToUse = apiStory.id?.toString() || storyId;
+          setBackendStoryId(storyIdToUse);
+          console.log('📝 Backend story ID set:', storyIdToUse);
+          
+          // Check if current user is the author
+          const authorId = apiStory.author?.id;
+          const currentUserId = user?.id?.toString();
+          setIsOwnStory(authorId === currentUserId);
+          
+          // Set interaction counts from API response
+          setLikeCount(apiStory.likes_count || 0);
+          setCommentCount(apiStory.comments_count || 0);
+          setSaveCount(apiStory.saved_count || 0);
+          setViewCount(apiStory.views || 0);
+          setIsLiked(apiStory.is_liked_by_user || false);
+          setIsSaved(apiStory.is_saved_by_user || false);
+          setIsSavedOffline(isStorySavedOffline(storyId));
+          
+          backendFetchSucceeded = true;
+          setIsLoading(false);
+          return;
+        } catch (error) {
+          console.log('⚠️ Backend fetch failed, trying local store:', error);
+        }
+      }
+      
+      // Fallback: try to get from local store if backend fetch failed or user not logged in
+      if (!backendFetchSucceeded) {
+        const localStory = getStory(storyId);
+        if (localStory) {
+          console.log('📖 Loaded story from local store:', localStory.title);
+          setStory(localStory);
+          setStoryAuthor(user?.username || 'You');
+          setIsOwnStory(true); // Local stories are always owned by current user
+          setIsSavedOffline(isStorySavedOffline(storyId));
+          setIsLoading(false);
+          return;
+        }
       }
       
       // If not in local store, fetch from backend API
@@ -202,6 +254,14 @@ const StoryReaderPage: React.FC = () => {
     return () => clearInterval(interval);
   }, [backendStoryId]);
 
+  // Check games status when story loads
+  useEffect(() => {
+    console.log('🎮 Checking games - backendStoryId:', backendStoryId, 'user:', user?.username);
+    if (backendStoryId && user) {
+      checkGamesStatus();
+    }
+  }, [backendStoryId, user]);
+
   // Keyboard navigation - must be before conditional returns
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -285,6 +345,52 @@ const StoryReaderPage: React.FC = () => {
     if (storyId) {
       navigate('/create-story-manual', { state: { storyId } });
     }
+  };
+
+  const checkGamesStatus = async () => {
+    if (!backendStoryId) return;
+    
+    try {
+      const response = await api.get(`/games/check/${backendStoryId}/`);
+      console.log('🎮 Games status:', response);
+      setHasGames(response.has_games);
+      setGamesCount(response.games_count);
+      setCanGenerateGames(response.can_generate);
+    } catch (err) {
+      console.error('Error checking games status:', err);
+    }
+  };
+
+  const handleGenerateGames = async () => {
+    if (!backendStoryId || isGeneratingGames) return;
+    
+    setIsGeneratingGames(true);
+    playButtonClick();
+    
+    try {
+      const response = await api.post('/games/generate/', {
+        story_id: backendStoryId
+      });
+      
+      setHasGames(true);
+      setGamesCount(Object.keys(response.games).length);
+      playSuccess();
+      alert(`✅ Games generated successfully! ${Object.keys(response.games).length} games created.`);
+      setShowViewControls(false);
+    } catch (err: any) {
+      console.error('Error generating games:', err);
+      alert(err.response?.data?.error || 'Failed to generate games');
+    } finally {
+      setIsGeneratingGames(false);
+    }
+  };
+
+  const handleViewGames = () => {
+    playButtonClick();
+    if (backendStoryId) {
+      navigate(`/games/story/${backendStoryId}`);
+    }
+    setShowViewControls(false);
   };
 
   const handleShare = async () => {
@@ -1056,6 +1162,61 @@ const StoryReaderPage: React.FC = () => {
             storyTitle={story.title}
             storyLanguage={story.language as 'en' | 'tl'}
           />
+
+          {/* Games Button - Always visible below TTS controls */}
+          {backendStoryId && (
+            <div style={{ marginTop: '12px', width: '100%' }}>
+              {hasGames ? (
+                <button
+                  onClick={handleViewGames}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    backgroundColor: '#10b981',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
+                  }}
+                >
+                  <PuzzlePieceIcon style={{ width: '20px', height: '20px' }} />
+                  <span>Play Games ({gamesCount})</span>
+                </button>
+              ) : canGenerateGames ? (
+                <button
+                  onClick={handleGenerateGames}
+                  disabled={isGeneratingGames}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    backgroundColor: isGeneratingGames ? '#9ca3af' : '#3b82f6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    cursor: isGeneratingGames ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)',
+                    opacity: isGeneratingGames ? 0.6 : 1
+                  }}
+                >
+                  <PuzzlePieceIcon style={{ width: '20px', height: '20px' }} />
+                  <span>{isGeneratingGames ? 'Generating Games...' : 'Generate Games'}</span>
+                </button>
+              ) : null}
+            </div>
+          )}
         </div>
       </div>
 

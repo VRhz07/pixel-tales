@@ -8,7 +8,8 @@ from django.utils.html import format_html
 from .models import (
     UserProfile, Story, Character, Comment, Rating, Friendship,
     Achievement, UserAchievement, Notification, ParentChildRelationship,
-    TeacherStudentRelationship, Message, EmailVerification
+    TeacherStudentRelationship, Message, EmailVerification,
+    StoryGame, GameQuestion, GameAttempt, GameAnswer
 )
 
 
@@ -205,6 +206,57 @@ class EmailVerificationAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.select_related('user')
+
+
+@admin.register(StoryGame)
+class StoryGameAdmin(admin.ModelAdmin):
+    list_display = ('story', 'game_type', 'difficulty', 'is_active', 'created_at', 'questions_count')
+    list_filter = ('game_type', 'difficulty', 'is_active', 'created_at')
+    search_fields = ('story__title',)
+    readonly_fields = ('created_at', 'updated_at')
+    
+    def questions_count(self, obj):
+        return obj.get_questions_count()
+    questions_count.short_description = 'Questions'
+
+
+@admin.register(GameQuestion)
+class GameQuestionAdmin(admin.ModelAdmin):
+    list_display = ('game', 'question_type', 'order', 'points', 'is_active', 'question_preview')
+    list_filter = ('question_type', 'is_active', 'game__game_type')
+    search_fields = ('question_text', 'game__story__title')
+    ordering = ('game', 'order')
+    readonly_fields = ('created_at',)
+    
+    def question_preview(self, obj):
+        return obj.question_text[:50] + '...' if len(obj.question_text) > 50 else obj.question_text
+    question_preview.short_description = 'Question'
+
+
+@admin.register(GameAttempt)
+class GameAttemptAdmin(admin.ModelAdmin):
+    list_display = ('user', 'game', 'score_percentage', 'passed_status', 'xp_earned', 'is_completed', 'completed_at')
+    list_filter = ('is_completed', 'game__game_type', 'completed_at')
+    search_fields = ('user__username', 'game__story__title')
+    readonly_fields = ('score_percentage', 'passed', 'started_at', 'completed_at')
+    
+    def score_percentage(self, obj):
+        return f"{obj.score_percentage}%"
+    score_percentage.short_description = 'Score'
+    
+    def passed_status(self, obj):
+        if obj.is_completed:
+            return '✅ Passed' if obj.passed else '❌ Failed'
+        return '⏳ In Progress'
+    passed_status.short_description = 'Status'
+
+
+@admin.register(GameAnswer)
+class GameAnswerAdmin(admin.ModelAdmin):
+    list_display = ('attempt', 'question', 'is_correct', 'points_earned', 'answered_at')
+    list_filter = ('is_correct', 'answered_at')
+    search_fields = ('attempt__user__username', 'question__question_text')
+    readonly_fields = ('answered_at',)
 
 
 # Customize admin site

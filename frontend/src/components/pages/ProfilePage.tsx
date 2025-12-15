@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../../stores/userStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useStoryStore } from '../../stores/storyStore';
@@ -7,7 +8,8 @@ import {
   UserGroupIcon,
   HeartIcon,
   CalendarIcon,
-  TrophyIcon
+  TrophyIcon,
+  CogIcon
 } from '@heroicons/react/24/outline';
 import { AvatarWithBorder } from '../common/AvatarWithBorder';
 import { api } from '@/services/api';
@@ -44,6 +46,7 @@ interface UserStats {
 }
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const { profile } = useUserStore();
   const { user } = useAuthStore();
   const { stories, characters, getStats } = useStoryStore();
@@ -163,7 +166,26 @@ const ProfilePage = () => {
   return (
     <div className="profile-page-container">
       {/* Page Header */}
-      <h1 className="profile-page-header">Profile</h1>
+      <div className="flex items-center justify-between mb-6 px-4">
+        <h1 className="profile-page-header mb-0">Profile</h1>
+        <button
+          onClick={() => navigate('/settings')}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
+          style={{
+            background: 'linear-gradient(to right, #9333ea, #ec4899)',
+            color: 'white',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(to right, #7e22ce, #db2777)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(to right, #9333ea, #ec4899)';
+          }}
+        >
+          <CogIcon className="w-5 h-5" style={{ color: 'white' }} />
+          <span className="text-sm" style={{ color: 'white' }}>Settings</span>
+        </button>
+      </div>
       
       {/* User Profile Card */}
       <div className="profile-user-card">

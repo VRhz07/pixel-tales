@@ -6,12 +6,21 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .jwt_auth import CustomTokenObtainPairView, jwt_register, jwt_logout, jwt_user_profile, jwt_create_session, verify_email, resend_verification_code, verify_password, send_password_reset_code, verify_password_reset_code, reset_password, change_password, delete_account
-from . import views, admin_views, admin_auth, admin_features, admin_profanity, ai_proxy_views, tts_views
+from . import views, admin_views, admin_auth, admin_features, admin_profanity, ai_proxy_views, tts_views, game_views
 
 # Create a router for ViewSets (we'll add these later)
 router = DefaultRouter()
+router.register(r'games', game_views.StoryGameViewSet, basename='game')
 
 urlpatterns = [
+    # Educational Games endpoints (MUST come before router to avoid conflicts)
+    path('games/submit_answer/', game_views.submit_answer, name='submit_answer'),
+    path('games/complete/', game_views.complete_game, name='complete_game'),
+    path('games/my_stats/', game_views.my_game_stats, name='my_game_stats'),
+    path('games/generate/', game_views.generate_games_for_story, name='generate_games'),
+    path('games/check/<int:story_id>/', game_views.check_story_games, name='check_story_games'),
+    path('games/attempt/<int:attempt_id>/', game_views.game_attempt_detail, name='game_attempt_detail'),
+    
     # Include router URLs
     path('', include(router.urls)),
     

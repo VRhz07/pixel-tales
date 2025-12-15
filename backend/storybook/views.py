@@ -302,8 +302,9 @@ def delete_story(request, story_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def publish_story(request, story_id):
-    """Publish a story (make it visible in public library)"""
+    """Publish a story (make it visible in public library) and auto-generate games"""
     from .xp_service import award_xp
+    from .game_service import GameGenerationService
     
     story = get_object_or_404(Story, id=story_id, author=request.user)
     
@@ -319,12 +320,36 @@ def publish_story(request, story_id):
     # Award XP for publishing a story
     xp_result = award_xp(request.user, 'story_published')
     
-    return Response({
+    # Auto-generate games if story has enough content
+    games_generated = False
+    games_error = None
+    
+    is_valid, error_message = GameGenerationService.validate_story_for_games(story)
+    if is_valid:
+        try:
+            # Generate games automatically
+            result = GameGenerationService.generate_games_for_story(story)
+            games_generated = result.get('success', False)
+            if not games_generated:
+                games_error = result.get('message', 'Failed to generate games')
+        except Exception as e:
+            games_error = str(e)
+            print(f"Error auto-generating games: {e}")
+    else:
+        games_error = error_message
+    
+    response_data = {
         'success': True,
         'message': 'Story published successfully',
         'story_id': story.id,
-        'xp_earned': xp_result if xp_result else None
-    })
+        'xp_earned': xp_result if xp_result else None,
+        'games_generated': games_generated
+    }
+    
+    if games_error:
+        response_data['games_info'] = games_error
+    
+    return Response(response_data)
 
 
 @api_view(['POST'])

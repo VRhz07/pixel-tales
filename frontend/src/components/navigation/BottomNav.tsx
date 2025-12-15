@@ -23,17 +23,35 @@ const BottomNav = () => {
 
   // Hide bottom nav when keyboard is visible
   useEffect(() => {
-    const showListener = Keyboard.addListener('keyboardWillShow', () => {
-      setIsKeyboardVisible(true);
-    });
+    let showListener: any;
+    let hideListener: any;
 
-    const hideListener = Keyboard.addListener('keyboardWillHide', () => {
-      setIsKeyboardVisible(false);
-    });
+    // Only set up keyboard listeners on mobile (Capacitor)
+    const setupKeyboardListeners = async () => {
+      try {
+        showListener = await Keyboard.addListener('keyboardWillShow', () => {
+          setIsKeyboardVisible(true);
+        });
+
+        hideListener = await Keyboard.addListener('keyboardWillHide', () => {
+          setIsKeyboardVisible(false);
+        });
+      } catch (error) {
+        // Keyboard plugin not available on web, ignore
+        console.log('Keyboard plugin not available (web environment)');
+      }
+    };
+
+    setupKeyboardListeners();
 
     return () => {
-      showListener.remove();
-      hideListener.remove();
+      // Safely remove listeners if they exist
+      if (showListener?.remove) {
+        showListener.remove();
+      }
+      if (hideListener?.remove) {
+        hideListener.remove();
+      }
     };
   }, []);
 
@@ -67,6 +85,7 @@ const BottomNav = () => {
   const getLabelColor = (iconName: string) => {
     switch (iconName) {
       case 'home': return 'text-purple-500';
+      case 'games': return 'text-pink-500';
       case 'library': return 'text-blue-500';
       case 'profile': return 'text-green-500';
       case 'social': return 'text-orange-500';
@@ -82,6 +101,7 @@ const BottomNav = () => {
       
       switch (iconName) {
         case 'home': return 'text-purple-500';
+        case 'games': return 'text-pink-500';
         case 'library': return 'text-blue-500';
         case 'profile': return 'text-green-500';
         case 'social': return 'text-orange-500';
@@ -97,6 +117,12 @@ const BottomNav = () => {
         return (
           <svg className={className} fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+          </svg>
+        );
+      case 'games':
+        return (
+          <svg className={className} fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
+            <path d="M21.58,16.09l-1.09-7.66C20.21,6.46,18.52,5,16.53,5H7.47C5.48,5,3.79,6.46,3.51,8.43l-1.09,7.66 C2.2,17.63,3.39,19,4.94,19c0.68,0,1.32-0.27,1.8-0.75L9,16h6l2.25,2.25c0.48,0.48,1.13,0.75,1.8,0.75 C20.61,19,21.8,17.63,21.58,16.09z M11,11H9v2H8v-2H6v-1h2V8h1v2h2V11z M15,10c-0.55,0-1-0.45-1-1c0-0.55,0.45-1,1-1s1,0.45,1,1 C16,9.55,15.55,10,15,10z M17,13c-0.55,0-1-0.45-1-1c0-0.55,0.45-1,1-1s1,0.45,1,1C18,12.55,17.55,13,17,13z"/>
           </svg>
         );
       case 'social':
@@ -130,17 +156,35 @@ const BottomNav = () => {
   
   const navItems = [
     { path: '/home', icon: 'home', label: t('nav.home') },
+    { path: '/games', icon: 'games', label: 'Games' },
     { path: '/library', icon: 'library', label: t('nav.library') },
-    { path: '/profile', icon: 'profile', label: t('nav.profile') },
     { path: '/social', icon: 'social', label: t('nav.social') },
-    { path: '/settings', icon: 'settings', label: 'Settings' }, // Keep Settings in English for now
+    { path: '/profile', icon: 'profile', label: t('nav.profile') },
   ];
 
   return (
-    <nav className={`fixed bottom-0 left-0 right-0 nav-glass z-50 safe-area-inset-bottom transition-transform duration-300 ${isKeyboardVisible ? 'translate-y-full' : 'translate-y-0'}`}>
+    <nav 
+      className={`nav-glass safe-area-inset-bottom ${isKeyboardVisible ? 'translate-y-full' : ''}`}
+      style={{ 
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 9999,
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderTop: '1px solid rgba(0, 0, 0, 0.1)',
+        display: 'block',
+        visibility: 'visible',
+        transform: isKeyboardVisible ? 'translateY(100%)' : 'translateY(0)',
+        transition: 'transform 300ms',
+        minHeight: '60px',
+        height: 'auto',
+        padding: '12px 16px'
+      }}
+    >
       {/* Navigation Items */}
-      <div className="px-4 py-3">
-        <div className="flex justify-around items-center max-w-md mx-auto">
+      <div style={{ padding: 0 }}>
+        <div className="flex justify-around items-center max-w-md mx-auto" style={{ minHeight: '48px' }}>
           {navItems.map((item) => {
             const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
             // Show notification badge on Social icon for friend requests, unread messages, AND collaboration invites

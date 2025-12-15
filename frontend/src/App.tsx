@@ -28,6 +28,9 @@ import ParentDashboardPage from './pages/ParentDashboardPage';
 import ParentSettingsPage from './pages/ParentSettingsPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import GamesPage from './pages/GamesPage';
+import StoryGamesPage from './pages/StoryGamesPage';
+import GamePlayPage from './pages/GamePlayPage';
 import { useAuthStore } from './stores/authStore';
 import { useThemeStore } from './stores/themeStore';
 import { storage } from './utils/storage';
@@ -460,8 +463,10 @@ function AppContent() {
   
   // Show bottom nav only for authenticated users or anonymous users (but not on auth page or canvas drawing)
   // Don't show if user is null (not loaded yet) or on auth/canvas/admin/story-creation/parent/story-reader pages
-  const showBottomNav = user && 
-    (isAuthenticated || user.id === 'anonymous') && 
+  // Show bottom nav on pages that should have navigation
+  // Special handling: Always show on /games and /games/story/* pages (games are accessible to all)
+  const isGamesPage = location.pathname === '/games' || location.pathname.startsWith('/games/story/');
+  const showBottomNav = (isGamesPage || (user && (isAuthenticated || user.id === 'anonymous'))) && 
     location.pathname !== '/auth' && 
     location.pathname !== '/canvas-drawing' &&
     location.pathname !== '/cover-canvas' &&
@@ -470,6 +475,7 @@ function AppContent() {
     location.pathname !== '/parent-dashboard' &&
     location.pathname !== '/parent-settings' &&
     !location.pathname.startsWith('/story/') &&
+    !location.pathname.startsWith('/games/play/') &&   // Hide on gameplay page (but keep on /games and /games/story/*)
     location.pathname !== '/';
   
   // Check if current page is home page for wrapper class
@@ -601,6 +607,21 @@ function AppContent() {
         } />
         <Route path="/terms" element={<TermsOfServicePage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/games" element={
+          <AnonymousRoute>
+            <GamesPage />
+          </AnonymousRoute>
+        } />
+        <Route path="/games/story/:storyId" element={
+          <AnonymousRoute>
+            <StoryGamesPage />
+          </AnonymousRoute>
+        } />
+        <Route path="/games/play/:gameId" element={
+          <AnonymousRoute>
+            <GamePlayPage />
+          </AnonymousRoute>
+        } />
         <Route path="/" element={<AuthPage />} />
       </Routes>
       {showBottomNav && <BottomNav />}

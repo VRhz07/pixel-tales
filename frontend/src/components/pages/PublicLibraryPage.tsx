@@ -417,6 +417,14 @@ const PublicLibraryPage = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="library-search-input"
+              style={{ 
+                height: '38px', 
+                minHeight: '38px',
+                maxHeight: '38px',
+                padding: '0.5rem 0.75rem 0.5rem 2.5rem', 
+                lineHeight: '1.5',
+                boxSizing: 'border-box'
+              }}
             />
           </div>
           <button

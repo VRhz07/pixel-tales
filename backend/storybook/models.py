@@ -703,3 +703,220 @@ class ProfanityWord(models.Model):
     
     def __str__(self):
         return f"{self.word} ({self.language})"
+
+
+# ============================================================================
+# EDUCATIONAL GAMES MODELS
+# ============================================================================
+
+class StoryGame(models.Model):
+    """
+    Game data associated with a published story
+    Games are generated from story content to test comprehension
+    """
+    GAME_TYPES = [
+        ('quiz', 'Multiple Choice Quiz'),
+        ('fill_blanks', 'Fill in the Blanks'),
+        ('word_search', 'Word Search'),
+    ]
+    
+    story = models.ForeignKey('Story', on_delete=models.CASCADE, related_name='games')
+    game_type = models.CharField(max_length=20, choices=GAME_TYPES)
+    difficulty = models.CharField(
+        max_length=10, 
+        choices=[('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard')],
+        default='medium'
+    )
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ('story', 'game_type')
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.get_game_type_display()} - {self.story.title}"
+    
+    def get_questions_count(self):
+        """Get total number of questions for this game"""
+        return self.questions.filter(is_active=True).count()
+
+
+class GameQuestion(models.Model):
+    """
+    Individual questions for story games
+    """
+    QUESTION_TYPES = [
+        ('multiple_choice', 'Multiple Choice'),
+        ('fill_blank', 'Fill in the Blank'),
+        ('word_search', 'Word Search'),
+    ]
+    
+    game = models.ForeignKey(StoryGame, on_delete=models.CASCADE, related_name='questions')
+    question_type = models.CharField(max_length=20, choices=QUESTION_TYPES)
+    question_text = models.TextField()
+    correct_answer = models.CharField(max_length=500)
+    
+    # For multiple choice questions (JSON array of options)
+    options = models.JSONField(null=True, blank=True)
+    
+    # Additional context (e.g., sentence for fill in the blank)
+    context = models.TextField(blank=True, null=True)
+    
+    # Question ordering
+    order = models.PositiveIntegerField(default=0)
+    
+    # Hints and explanations
+    hint = models.TextField(blank=True, null=True)
+    explanation = models.TextField(blank=True, null=True)
+    
+    # Points for correct answer
+    points = models.PositiveIntegerField(default=10)
+    
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['game', 'order']
+    
+    def __str__(self):
+        return f"Q{self.order}: {self.question_text[:50]}"
+    
+    def check_answer(self, user_answer):
+        """
+        Check if the user's answer is correct
+        Returns tuple: (is_correct, feedback)
+        """
+        if not user_answer:
+            return False, "No answer provided"
+        
+        user_answer = str(user_answer).strip().lower()
+        correct_answer = str(self.correct_answer).strip().lower()
+        
+        # For spelling and fill-in-the-blank, allow for minor variations
+        if self.question_type in ['spelling', 'fill_blank']:
+            import re
+            user_answer = re.sub(r'[^\w\s]', '', user_answer)
+            correct_answer = re.sub(r'[^\w\s]', '', correct_answer)
+        
+        is_correct = user_answer == correct_answer
+        
+        if is_correct:
+            feedback = "Correct! " + (self.explanation or "Great job!")
+        else:
+            feedback = f"Not quite. The correct answer is: {self.correct_answer}"
+            if self.explanation:
+                feedback += f"\n{self.explanation}"
+        
+        return is_correct, feedback
+
+
+class GameAttempt(models.Model):
+    """
+    Track user attempts at games
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='game_attempts')
+    game = models.ForeignKey(StoryGame, on_delete=models.CASCADE, related_name='attempts')
+    
+    # Score tracking
+    total_questions = models.PositiveIntegerField()
+    correct_answers = models.PositiveIntegerField(default=0)
+    total_points = models.PositiveIntegerField(default=0)
+    max_points = models.PositiveIntegerField()
+    
+    # Timing
+    started_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    time_taken_seconds = models.PositiveIntegerField(null=True, blank=True)
+    
+    # Rewards
+    xp_earned = models.PositiveIntegerField(default=0)
+    
+    # Status
+    is_completed = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['-started_at']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.game} - {self.score_percentage}%"
+    
+    @property
+    def score_percentage(self):
+        """Calculate percentage score"""
+        if self.total_questions == 0:
+            return 0
+        return round((self.correct_answers / self.total_questions) * 100, 1)
+    
+    @property
+    def passed(self):
+        """Check if user passed (70% or higher)"""
+        return self.score_percentage >= 70
+    
+    def complete(self):
+        """Mark attempt as completed and award XP"""
+        if self.is_completed:
+            return
+        
+        self.is_completed = True
+        self.completed_at = timezone.now()
+        
+        # Calculate time taken
+        if self.started_at:
+            duration = self.completed_at - self.started_at
+            self.time_taken_seconds = int(duration.total_seconds())
+        
+        # Award XP based on performance
+        self.xp_earned = self.calculate_xp_reward()
+        self.save()
+        
+        # Award XP to user
+        if self.xp_earned > 0:
+            from .xp_service import XPService
+            XPService.award_xp(
+                self.user,
+                'game_completed',
+                amount=self.xp_earned,
+                create_notification=True
+            )
+    
+    def calculate_xp_reward(self):
+        """Calculate XP reward based on performance"""
+        base_xp = 30  # Base XP for completing a game
+        
+        # Bonus XP for correct answers
+        performance_xp = self.correct_answers * 5
+        
+        # Bonus for perfect score
+        if self.score_percentage == 100:
+            performance_xp += 20
+        
+        # Bonus for passing
+        elif self.passed:
+            performance_xp += 10
+        
+        # Time bonus (if completed quickly - under 2 minutes)
+        if self.time_taken_seconds and self.time_taken_seconds < 120:
+            performance_xp += 15
+        
+        return base_xp + performance_xp
+
+
+class GameAnswer(models.Model):
+    """
+    Individual answers given by user during a game attempt
+    """
+    attempt = models.ForeignKey(GameAttempt, on_delete=models.CASCADE, related_name='answers')
+    question = models.ForeignKey(GameQuestion, on_delete=models.CASCADE)
+    user_answer = models.CharField(max_length=500)
+    is_correct = models.BooleanField()
+    points_earned = models.PositiveIntegerField(default=0)
+    answered_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['answered_at']
+        unique_together = ('attempt', 'question')
+    
+    def __str__(self):
+        return f"{self.attempt.user.username} - Q{self.question.order} - {'✓' if self.is_correct else '✗'}"

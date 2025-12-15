@@ -1,0 +1,1098 @@
+/* Child-Friendly Game Cards Styling */
+
+/* Force proper spacing above cards */
+.space-y-8 > * + * {
+  margin-top: 2rem !important;
+}
+
+/* Quiz Card - Blue Theme - Force Override */
+div.game-card-quiz,
+div.game-card.game-card-quiz,
+.game-card-quiz {
+  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 50%, #93C5FD 100%) !important;
+  background-color: #BFDBFE !important;
+  border: 4px solid #60A5FA !important;
+  border-color: #60A5FA !important;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+.game-card-quiz:hover {
+  border-color: #3B82F6 !important;
+  box-shadow: 0 20px 50px rgba(59, 130, 246, 0.6) !important;
+}
+
+.dark .game-card-quiz {
+  background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 50%, #2563EB 100%) !important;
+  border: 4px solid #3B82F6 !important;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.5), inset 0 1px 0 rgba(59, 130, 246, 0.3) !important;
+}
+
+.dark .game-card-quiz:hover {
+  border-color: #60A5FA !important;
+  box-shadow: 0 20px 50px rgba(59, 130, 246, 0.6) !important;
+}
+
+/* Fill in the Blanks Card - Green Theme */
+.game-card-fill_blanks,
+.game-card.game-card-fill_blanks {
+  background: linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 50%, #86EFAC 100%) !important;
+  border: 4px solid #4ADE80 !important;
+  box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+.game-card-fill_blanks:hover {
+  border-color: #22C55E !important;
+  box-shadow: 0 20px 50px rgba(34, 197, 94, 0.6) !important;
+}
+
+.dark .game-card-fill_blanks {
+  background: linear-gradient(135deg, #14532D 0%, #166534 50%, #15803D 100%) !important;
+  border: 4px solid #22C55E !important;
+  box-shadow: 0 10px 30px rgba(34, 197, 94, 0.5), inset 0 1px 0 rgba(34, 197, 94, 0.3) !important;
+}
+
+.dark .game-card-fill_blanks:hover {
+  border-color: #4ADE80 !important;
+  box-shadow: 0 20px 50px rgba(34, 197, 94, 0.6) !important;
+}
+
+/* Spelling Card - Purple Theme */
+.game-card-spelling,
+.game-card.game-card-spelling {
+  background: linear-gradient(135deg, #F3E8FF 0%, #E9D5FF 50%, #D8B4FE 100%) !important;
+  border: 4px solid #C084FC !important;
+  box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+.game-card-spelling:hover {
+  border-color: #A855F7 !important;
+  box-shadow: 0 20px 50px rgba(168, 85, 247, 0.6) !important;
+}
+
+.dark .game-card-spelling {
+  background: linear-gradient(135deg, #581C87 0%, #6B21A8 50%, #7C3AED 100%) !important;
+  border: 4px solid #A855F7 !important;
+  box-shadow: 0 10px 30px rgba(168, 85, 247, 0.5), inset 0 1px 0 rgba(168, 85, 247, 0.3) !important;
+}
+
+.dark .game-card-spelling:hover {
+  border-color: #C084FC !important;
+  box-shadow: 0 20px 50px rgba(168, 85, 247, 0.6) !important;
+}
+
+/* Remove generic hover - specific ones are in each card type above */
+
+/* Game card header gradient enhancements */
+.group .from-blue-500.to-blue-600 {
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+  box-shadow: inset 0 2px 20px rgba(255, 255, 255, 0.2);
+}
+
+.group .from-green-500.to-green-600 {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  box-shadow: inset 0 2px 20px rgba(255, 255, 255, 0.2);
+}
+
+.group .from-purple-500.to-purple-600 {
+  background: linear-gradient(135deg, #A855F7 0%, #9333EA 100%) !important;
+  box-shadow: inset 0 2px 20px rgba(255, 255, 255, 0.2);
+}
+
+/* Play button enhancements */
+.group button {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FEF3C7 100%) !important;
+  color: #7C3AED !important;
+  font-weight: 900 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  border: 3px solid #FCD34D !important;
+  box-shadow: 0 4px 15px rgba(252, 211, 77, 0.5), inset 0 1px 3px rgba(255, 255, 255, 0.8) !important;
+}
+
+.group button:hover {
+  background: linear-gradient(135deg, #FDE047 0%, #FCD34D 100%) !important;
+  color: #6B21A8 !important;
+  transform: scale(1.12) rotate(3deg) !important;
+  box-shadow: 0 8px 25px rgba(252, 211, 77, 0.8), inset 0 1px 3px rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Badge styling */
+.group span.bg-white\/30 {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  font-weight: 800 !important;
+}
+
+/* Description section enhancement */
+.group > div:last-child {
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.95), rgba(243, 232, 255, 0.8)) !important;
+  border-top: 3px solid rgba(168, 85, 247, 0.2) !important;
+}
+
+.dark .group > div:last-child {
+  background: linear-gradient(to bottom right, rgba(55, 65, 81, 0.95), rgba(88, 28, 135, 0.3)) !important;
+  border-top: 3px solid rgba(168, 85, 247, 0.3) !important;
+}
+
+/* Icon animations */
+.group .text-7xl {
+  animation: iconBounce 2s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes iconBounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.05);
+  }
+}
+
+/* Card entrance animation enhancement */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Sparkle effect on hover */
+.group:hover::before {
+  content: '✨';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 2rem;
+  animation: sparkle 1s ease-in-out infinite;
+  z-index: 100;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
+  }
+}
+
+/* Playful border animation */
+.group {
+  position: relative;
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.1);
+  }
+}
+
+/* Title text enhancement */
+.group h3 {
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(255, 255, 255, 0.5) !important;
+  letter-spacing: 0.5px;
+}
+
+/* Description text readability */
+.group p {
+  line-height: 1.6 !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.dark .group p {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Make sure all game cards get proper styling */
+.group {
+  overflow: hidden;
+  position: relative;
+}
+
+/* Add a fun border pulse animation */
+@keyframes borderPulse {
+  0%, 100% {
+    border-width: 4px;
+  }
+  50% {
+    border-width: 5px;
+  }
+}
+
+.group {
+  animation: borderPulse 3s ease-in-out infinite;
+}
+
+/* Description sections for each game type */
+.game-card-quiz > div:last-child {
+  background: linear-gradient(to bottom right, #EFF6FF, #DBEAFE, #BFDBFE) !important;
+  border-top: 3px solid #93C5FD !important;
+}
+
+.dark .game-card-quiz > div:last-child {
+  background: linear-gradient(to bottom right, #1E3A8A, #1E40AF) !important;
+  border-top: 3px solid #3B82F6 !important;
+}
+
+.game-card-fill_blanks > div:last-child {
+  background: linear-gradient(to bottom right, #F0FDF4, #DCFCE7, #BBF7D0) !important;
+  border-top: 3px solid #86EFAC !important;
+}
+
+.dark .game-card-fill_blanks > div:last-child {
+  background: linear-gradient(to bottom right, #14532D, #166534) !important;
+  border-top: 3px solid #22C55E !important;
+}
+
+.game-card-spelling > div:last-child {
+  background: linear-gradient(to bottom right, #FAF5FF, #F3E8FF, #E9D5FF) !important;
+  border-top: 3px solid #C084FC !important;
+}
+
+.dark .game-card-spelling > div:last-child {
+  background: linear-gradient(to bottom right, #581C87, #6B21A8) !important;
+  border-top: 3px solid #A855F7 !important;
+}
+
+/* Emoji animations in description */
+.group p span.text-2xl {
+  display: inline-block;
+  animation: emojiFloat 2s ease-in-out infinite;
+}
+
+@keyframes emojiFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Extra polish for readability */
+.group h3 {
+  font-size: 2rem !important;
+  font-weight: 900 !important;
+}
+
+.group .text-7xl {
+  font-size: 4.5rem !important;
+}
+
+/* ====================================
+   Tips for Success Section Styling
+   ==================================== */
+
+/* Main Tips Container */
+.mt-10.bg-gradient-to-br {
+  background: linear-gradient(135deg, #FEF3C7 0%, #FED7AA 30%, #FBCFE8 70%, #FCE7F3 100%) !important;
+  border: 5px solid #FCD34D !important;
+  box-shadow: 0 15px 40px rgba(251, 146, 60, 0.4), inset 0 2px 10px rgba(255, 255, 255, 0.6) !important;
+  position: relative;
+  overflow: hidden;
+  animation: tipsGlow 3s ease-in-out infinite;
+  margin-top: 3rem !important; /* 48px gap from game cards above */
+}
+
+.dark .mt-10.bg-gradient-to-br {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.3) 0%, rgba(194, 65, 12, 0.3) 50%, rgba(190, 24, 93, 0.3) 100%) !important;
+  border: 5px solid #D97706 !important;
+  box-shadow: 0 15px 40px rgba(217, 119, 6, 0.5), inset 0 2px 10px rgba(217, 119, 6, 0.2) !important;
+}
+
+@keyframes tipsGlow {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.05);
+  }
+}
+
+/* Decorative background pattern */
+.mt-10.bg-gradient-to-br::before {
+  content: '⭐✨💡🎯';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 3rem;
+  opacity: 0.15;
+  animation: decorFloat 4s ease-in-out infinite;
+}
+
+@keyframes decorFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(5deg);
+  }
+}
+
+/* Tips Title Enhancement */
+.mt-10 h3 {
+  font-size: 2.5rem !important;
+  font-weight: 900 !important;
+  background: linear-gradient(135deg, #EA580C 0%, #DC2626 50%, #E11D48 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  text-shadow: 0 2px 8px rgba(234, 88, 12, 0.3);
+  letter-spacing: 0.5px;
+}
+
+/* Lightbulb Icon Animation */
+.mt-10 .text-5xl {
+  display: inline-block;
+  filter: drop-shadow(0 4px 8px rgba(234, 88, 12, 0.4));
+  animation: lightbulbGlow 2s ease-in-out infinite !important;
+}
+
+@keyframes lightbulbGlow {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 4px 8px rgba(234, 88, 12, 0.4));
+  }
+  25% {
+    transform: scale(1.1) rotate(-5deg);
+    filter: drop-shadow(0 6px 12px rgba(234, 88, 12, 0.6));
+  }
+  50% {
+    transform: scale(1.15) rotate(0deg);
+    filter: drop-shadow(0 8px 16px rgba(234, 88, 12, 0.8));
+  }
+  75% {
+    transform: scale(1.1) rotate(5deg);
+    filter: drop-shadow(0 6px 12px rgba(234, 88, 12, 0.6));
+  }
+}
+
+/* Individual Tip Cards */
+.mt-10 .grid > div {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FEF3C7 100%) !important;
+  border: 3px solid #FCD34D !important;
+  box-shadow: 0 8px 20px rgba(251, 146, 60, 0.25), inset 0 1px 3px rgba(255, 255, 255, 0.8) !important;
+  transition: all 0.3s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.dark .mt-10 .grid > div {
+  background: linear-gradient(135deg, #374151 0%, #1F2937 100%) !important;
+  border: 3px solid #D97706 !important;
+  box-shadow: 0 8px 20px rgba(217, 119, 6, 0.3), inset 0 1px 3px rgba(217, 119, 6, 0.2) !important;
+}
+
+/* Tip Card Hover Effects */
+.mt-10 .grid > div:hover {
+  transform: translateY(-5px) scale(1.03) !important;
+  box-shadow: 0 15px 35px rgba(251, 146, 60, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.9) !important;
+  border-color: #F59E0B !important;
+}
+
+.dark .mt-10 .grid > div:hover {
+  box-shadow: 0 15px 35px rgba(217, 119, 6, 0.5), inset 0 1px 3px rgba(217, 119, 6, 0.3) !important;
+  border-color: #F59E0B !important;
+}
+
+/* Tip Card Icons */
+.mt-10 .grid > div > span {
+  display: inline-block;
+  font-size: 2.5rem !important;
+  filter: drop-shadow(0 2px 4px rgba(251, 146, 60, 0.3));
+  transition: transform 0.3s ease;
+}
+
+.mt-10 .grid > div:hover > span {
+  transform: scale(1.2) rotate(10deg);
+}
+
+/* Tip Card Text */
+.mt-10 .grid > div > p {
+  font-size: 1.1rem !important;
+  font-weight: 800 !important;
+  color: #78350F !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.dark .mt-10 .grid > div > p {
+  color: #FCD34D !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Add sparkle effect on hover */
+.mt-10 .grid > div:hover::after {
+  content: '✨';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.5rem;
+  animation: sparkleRotate 1s ease-in-out infinite;
+}
+
+@keyframes sparkleRotate {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+/* Stagger animation for tip cards */
+.mt-10 .grid > div:nth-child(1) {
+  animation: tipCardSlide 0.5s ease-out 0.1s both;
+}
+
+.mt-10 .grid > div:nth-child(2) {
+  animation: tipCardSlide 0.5s ease-out 0.2s both;
+}
+
+.mt-10 .grid > div:nth-child(3) {
+  animation: tipCardSlide 0.5s ease-out 0.3s both;
+}
+
+.mt-10 .grid > div:nth-child(4) {
+  animation: tipCardSlide 0.5s ease-out 0.4s both;
+}
+
+@keyframes tipCardSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .mt-10 h3 {
+    font-size: 2rem !important;
+  }
+  
+  .mt-10 .text-5xl {
+    font-size: 3rem !important;
+  }
+  
+  .mt-10 .grid > div > p {
+    font-size: 1rem !important;
+  }
+}
+
+/* ====================================
+   Hero/Header Banner Section
+   ==================================== */
+
+/* Main hero banner */
+.relative.bg-gradient-to-r.from-blue-500 {
+  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 25%, #EC4899 50%, #F472B6 75%, #FBCFE8 100%) !important;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 3rem 3rem !important;
+  box-shadow: 0 15px 50px rgba(139, 92, 246, 0.4), inset 0 2px 10px rgba(255, 255, 255, 0.3) !important;
+  animation: heroGradientShift 8s ease-in-out infinite;
+}
+
+@keyframes heroGradientShift {
+  0%, 100% {
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  50% {
+    filter: hue-rotate(10deg) brightness(1.05);
+  }
+}
+
+/* Animated background pattern */
+.relative.bg-gradient-to-r.from-blue-500::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  animation: patternMove 15s ease-in-out infinite;
+}
+
+@keyframes patternMove {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+  }
+}
+
+/* Hide background decorative emojis - keeping only game controller */
+.relative.bg-gradient-to-r.from-blue-500 .absolute.top-4,
+.relative.bg-gradient-to-r.from-blue-500 .absolute.top-8,
+.relative.bg-gradient-to-r.from-blue-500 .absolute.bottom-6,
+.relative.bg-gradient-to-r.from-blue-500 .absolute.bottom-8 {
+  display: none !important;
+}
+
+/* Main game controller icon */
+.relative.bg-gradient-to-r.from-blue-500 .text-6xl.animate-pulse {
+  font-size: 5rem !important;
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.3));
+  animation: iconBounceGlow 2s ease-in-out infinite !important;
+}
+
+@keyframes iconBounceGlow {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.3));
+  }
+  50% {
+    transform: translateY(-15px) scale(1.1);
+    filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
+  }
+}
+
+/* Hero title */
+.relative.bg-gradient-to-r.from-blue-500 h1 {
+  font-size: 3.5rem !important;
+  font-weight: 900 !important;
+  text-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 0 30px rgba(255, 255, 255, 0.3) !important;
+  letter-spacing: 1px;
+  animation: titlePop 0.8s ease-out both;
+  color: #FFFFFF !important;
+}
+
+/* Removed duplicate title text outline */
+
+@keyframes titlePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-20px);
+  }
+  60% {
+    transform: scale(1.05) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Hero subtitle */
+.relative.bg-gradient-to-r.from-blue-500 p {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  letter-spacing: 0.5px;
+  animation: subtitleSlide 1s ease-out 0.3s both;
+}
+
+@keyframes subtitleSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Add sparkle effect to hero */
+.relative.bg-gradient-to-r.from-blue-500::after {
+  content: '✨';
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  font-size: 2rem;
+  animation: heroSparkle 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes heroSparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1) rotate(90deg);
+  }
+  50% {
+    opacity: 0;
+    transform: scale(1.5) rotate(180deg);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1) rotate(270deg);
+  }
+}
+
+/* Mobile responsiveness for hero */
+@media (max-width: 768px) {
+  .relative.bg-gradient-to-r.from-blue-500 h1 {
+    font-size: 2.5rem !important;
+  }
+  
+  .relative.bg-gradient-to-r.from-blue-500 p {
+    font-size: 1.2rem !important;
+  }
+  
+  .relative.bg-gradient-to-r.from-blue-500 .text-6xl.animate-pulse {
+    font-size: 4rem !important;
+  }
+}
+
+/* ====================================
+   Back Button Styling
+   ==================================== */
+
+/* Back button container */
+.relative.bg-gradient-to-r.from-blue-500 button.mb-4,
+button.mb-4.flex.items-center.text-white {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%) !important;
+  border: 3px solid rgba(255, 255, 255, 0.4) !important;
+  border-radius: 2rem !important;
+  padding: 0.75rem 1.5rem !important;
+  font-size: 1.1rem !important;
+  font-weight: 900 !important;
+  color: #FFFFFF !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px) !important;
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shine effect on button */
+.relative.bg-gradient-to-r.from-blue-500 button.mb-4::before,
+button.mb-4.flex.items-center.text-white::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.relative.bg-gradient-to-r.from-blue-500 button.mb-4:hover::before,
+button.mb-4.flex.items-center.text-white:hover::before {
+  left: 100%;
+}
+
+/* Hover state */
+.relative.bg-gradient-to-r.from-blue-500 button.mb-4:hover,
+button.mb-4.flex.items-center.text-white:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.25) 100%) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  color: #FEF3C7 !important;
+  transform: translateX(-5px) scale(1.05) !important;
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Arrow icon styling */
+.relative.bg-gradient-to-r.from-blue-500 button.mb-4 svg,
+button.mb-4.flex.items-center.text-white svg {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  margin-right: 0.5rem !important;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+  transition: transform 0.3s ease;
+}
+
+.relative.bg-gradient-to-r.from-blue-500 button.mb-4:hover svg,
+button.mb-4.flex.items-center.text-white:hover svg {
+  transform: translateX(-5px);
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.4));
+}
+
+/* Active/pressed state */
+.relative.bg-gradient-to-r.from-blue-500 button.mb-4:active,
+button.mb-4.flex.items-center.text-white:active {
+  transform: translateX(-3px) scale(1.02) !important;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Mobile responsiveness for back button */
+@media (max-width: 768px) {
+  .relative.bg-gradient-to-r.from-blue-500 button.mb-4,
+  button.mb-4.flex.items-center.text-white {
+    font-size: 1rem !important;
+    padding: 0.625rem 1.25rem !important;
+  }
+  
+  .relative.bg-gradient-to-r.from-blue-500 button.mb-4 svg,
+  button.mb-4.flex.items-center.text-white svg {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+  }
+}
+
+/* ====================================
+   Stories Header Section
+   ==================================== */
+
+/* Main header container */
+.mb-6.bg-white.dark\\:bg-gray-800.rounded-2xl {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FAF5FF 50%, #F3E8FF 100%) !important;
+  border: 4px solid #E9D5FF !important;
+  box-shadow: 0 8px 25px rgba(168, 85, 247, 0.25), inset 0 2px 5px rgba(255, 255, 255, 0.6) !important;
+  padding: 1.5rem !important;
+  animation: headerSlide 0.6s ease-out both;
+}
+
+.dark .mb-6.bg-white.dark\\:bg-gray-800.rounded-2xl {
+  background: linear-gradient(135deg, #1F2937 0%, #581C87 30%, #1F2937 100%) !important;
+  border: 4px solid #7C3AED !important;
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4), inset 0 2px 5px rgba(124, 58, 237, 0.2) !important;
+}
+
+@keyframes headerSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header text styling */
+.mb-6 .text-xl.font-bold {
+  font-size: 1.75rem !important;
+  font-weight: 900 !important;
+  background: linear-gradient(135deg, #7C3AED 0%, #EC4899 50%, #F97316 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  text-shadow: none !important;
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+/* Fallback for browsers that don't support background-clip */
+@supports not (-webkit-background-clip: text) {
+  .mb-6 .text-xl.font-bold {
+    color: #7C3AED !important;
+    -webkit-text-fill-color: #7C3AED !important;
+  }
+}
+
+/* Add glow effect behind text */
+.mb-6 .text-xl.font-bold::before {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  background: linear-gradient(135deg, #7C3AED 0%, #EC4899 50%, #F97316 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: blur(10px);
+  opacity: 0.3;
+}
+
+/* Header emojis */
+.mb-6 .text-3xl {
+  font-size: 2.5rem !important;
+  filter: drop-shadow(0 3px 6px rgba(124, 58, 237, 0.3));
+  animation: emojiPulse 2s ease-in-out infinite;
+}
+
+@keyframes emojiPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* ====================================
+   Story List Cards Styling
+   ==================================== */
+
+/* Story Grid Spacing */
+.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3 {
+  gap: 2.5rem !important; /* 40px spacing between cards */
+  row-gap: 2.5rem !important; /* Ensure vertical spacing is also 40px */
+}
+
+/* Individual Story Cards */
+.group.bg-white.dark\\:bg-gray-800.rounded-3xl {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 50%, #F3F4F6 100%) !important;
+  border: 4px solid transparent !important;
+  background-clip: padding-box;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Removed animated gradient border effect for cleaner look */
+
+/* Dark mode story cards */
+.dark .group.bg-white.dark\\:bg-gray-800.rounded-3xl {
+  background: linear-gradient(135deg, #1F2937 0%, #111827 50%, #0F172A 100%) !important;
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3), inset 0 1px 2px rgba(139, 92, 246, 0.2) !important;
+}
+
+/* Story Card Hover Effect - Removed for better UX */
+.group.bg-white.dark\\:bg-gray-800.rounded-3xl:hover {
+  transform: none !important;
+  box-shadow: 0 12px 35px rgba(139, 92, 246, 0.25) !important;
+}
+
+.dark .group.bg-white.dark\\:bg-gray-800.rounded-3xl:hover {
+  box-shadow: 0 12px 35px rgba(139, 92, 246, 0.35) !important;
+}
+
+/* Story Cover Image Container */
+.group .relative.h-52 {
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 50%, #F97316 100%) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Removed cover image emoji effect */
+
+@keyframes iconFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Cover Image Enhancement - No zoom effect */
+.group .relative.h-52 img {
+  transition: filter 0.3s ease !important;
+  filter: brightness(0.95);
+}
+
+.group:hover .relative.h-52 img {
+  filter: brightness(1);
+}
+
+/* Games Count Badge */
+.group .absolute.top-3.right-3 {
+  background: linear-gradient(135deg, #FBBF24 0%, #F97316 100%) !important;
+  border: 3px solid #FFFFFF !important;
+  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.5), inset 0 1px 3px rgba(255, 255, 255, 0.6) !important;
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.group:hover .absolute.top-3.right-3 {
+  transform: scale(1.15) rotate(5deg) !important;
+  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.7), inset 0 1px 3px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Story Card Content Area */
+.group .p-5.bg-gradient-to-br {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FAF5FF 50%, #F3E8FF 100%) !important;
+  border-top: 3px solid #E9D5FF !important;
+  padding: 1.5rem !important;
+}
+
+.dark .group .p-5.bg-gradient-to-br {
+  background: linear-gradient(135deg, #1F2937 0%, #581C87 20%, #1F2937 100%) !important;
+  border-top: 3px solid #7C3AED !important;
+}
+
+/* Story Title */
+.group h3 {
+  font-size: 1.5rem !important;
+  font-weight: 900 !important;
+  transition: all 0.3s ease !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.group:hover h3 {
+  color: #7C3AED !important;
+  text-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+
+.dark .group:hover h3 {
+  color: #C084FC !important;
+}
+
+/* Author Section */
+.group .flex.items-center.gap-2 p {
+  font-weight: 700 !important;
+  color: #6B7280 !important;
+}
+
+.dark .group .flex.items-center.gap-2 p {
+  color: #9CA3AF !important;
+}
+
+/* Author emoji */
+.group .flex.items-center.gap-2 span.text-2xl {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Genre Badge */
+.group .text-xs.font-bold.bg-gradient-to-r {
+  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%) !important;
+  font-size: 0.875rem !important;
+  font-weight: 900 !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 9999px !important;
+  box-shadow: 
+    0 3px 10px rgba(168, 85, 247, 0.5),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+  border: 2px solid rgba(255, 255, 255, 0.4) !important;
+  text-transform: capitalize !important;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shine effect on genre badge */
+.group .text-xs.font-bold.bg-gradient-to-r::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s ease;
+}
+
+.group:hover .text-xs.font-bold.bg-gradient-to-r::before {
+  left: 100%;
+}
+
+.group:hover .text-xs.font-bold.bg-gradient-to-r {
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 
+    0 5px 15px rgba(168, 85, 247, 0.7),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Click to Play Section - Enhanced Visibility */
+.group .mt-4.pt-4.border-t-2 {
+  border-top: none !important;
+  background: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%) !important;
+  margin-top: 1.25rem !important;
+  padding: 1rem 1.5rem !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer;
+}
+
+.dark .group .mt-4.pt-4.border-t-2 {
+  background: linear-gradient(135deg, #6B21A8 0%, #7C3AED 100%) !important;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.5), inset 0 1px 2px rgba(168, 85, 247, 0.3) !important;
+}
+
+.group .mt-4.pt-4.border-t-2 p {
+  font-size: 1.2rem !important;
+  font-weight: 900 !important;
+  color: #FFFFFF !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  position: relative;
+  letter-spacing: 0.5px;
+}
+
+.dark .group .mt-4.pt-4.border-t-2 p {
+  color: #FFFFFF !important;
+}
+
+.group:hover .mt-4.pt-4.border-t-2 {
+  background: linear-gradient(135deg, #6B21A8 0%, #8B5CF6 100%) !important;
+  transform: scale(1.03) !important;
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+}
+
+.dark .group:hover .mt-4.pt-4.border-t-2 {
+  background: linear-gradient(135deg, #581C87 0%, #6B21A8 100%) !important;
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.7), inset 0 1px 2px rgba(168, 85, 247, 0.4) !important;
+}
+
+.group:hover .mt-4.pt-4.border-t-2 p {
+  transform: scale(1.05) !important;
+}
+
+/* Removed sparkle effect */
+
+/* Stagger animation for story cards */
+.group.bg-white.dark\\:bg-gray-800.rounded-3xl:nth-child(1) {
+  animation: slideInUp 0.5s ease-out 0s both !important;
+}
+
+.group.bg-white.dark\\:bg-gray-800.rounded-3xl:nth-child(2) {
+  animation: slideInUp 0.5s ease-out 0.1s both !important;
+}
+
+.group.bg-white.dark\\:bg-gray-800.rounded-3xl:nth-child(3) {
+  animation: slideInUp 0.5s ease-out 0.2s both !important;
+}
+
+.group.bg-white.dark\\:bg-gray-800.rounded-3xl:nth-child(4) {
+  animation: slideInUp 0.5s ease-out 0.3s both !important;
+}
+
+.group.bg-white.dark\\:bg-gray-800.rounded-3xl:nth-child(5) {
+  animation: slideInUp 0.5s ease-out 0.4s both !important;
+}
+
+.group.bg-white.dark\\:bg-gray-800.rounded-3xl:nth-child(6) {
+  animation: slideInUp 0.5s ease-out 0.5s both !important;
+}
+
+/* Mobile Responsiveness for Story Cards */
+@media (max-width: 768px) {
+  .grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3 {
+    gap: 2rem !important; /* 32px on mobile */
+    row-gap: 2rem !important;
+  }
+  
+  .group h3 {
+    font-size: 1.25rem !important;
+  }
+  
+  .group .mt-4.pt-4.border-t-2 p {
+    font-size: 1rem !important;
+  }
+}

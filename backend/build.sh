@@ -40,4 +40,8 @@ else
     python manage.py populate_achievements
 fi
 
+# Generate educational games for all published stories
+echo "Generating educational games for published stories..."
+python manage.py generate_all_games || echo "Warning: Game generation had some issues, but deployment continues"
+
 echo "Build completed successfully!"

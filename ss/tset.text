@@ -1,0 +1,11 @@
+const nav = document.querySelector('nav.nav-glass');                 
+  const rect = nav.getBoundingClientRect();                            
+   console.log('Nav position:', {                                       
+     top: rect.top,                                                     
+        bottom: rect.bottom,                                               
+     left: rect.left,                                                   
+     right: rect.right,                                                 
+     height: rect.height,                                               
+     windowHeight: window.innerHeight,                                  
+     isVisible: rect.bottom > 0 && rect.top < window.innerHeight        
+   });     
