@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import './GamesPage.css';
 
 interface StoryWithGames {
   id: number;
@@ -43,116 +44,72 @@ const GamesPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center' }}>
+      <div className="games-loading">
         <p>Loading games...</p>
       </div>
     );
   }
 
   return (
-    <div style={{ 
-      padding: '20px', 
-      paddingBottom: '100px',
-      minHeight: '100vh',
-      backgroundColor: '#ffffff'
-    }}>
+    <div className="games-page">
       {/* Header */}
-      <div style={{ marginBottom: '30px' }}>
-        <h1>Story Games</h1>
-        <p>Play games based on your favorite stories</p>
+      <div className="games-page-header">
+        <h1 className="games-page-title">Story Games</h1>
+        <p className="games-page-subtitle">Play games based on your favorite stories</p>
       </div>
 
       {/* Search */}
-      <div style={{ marginBottom: '30px' }}>
+      <div className="games-search-container">
         <input
           type="text"
           placeholder="Search stories or authors..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ padding: '10px', width: '100%', maxWidth: '500px' }}
+          className="games-search-input"
         />
       </div>
 
       {/* Error */}
       {error && (
-        <div style={{ padding: '20px', marginBottom: '20px', backgroundColor: '#fee', border: '1px solid #fcc' }}>
+        <div className="games-error">
           {error}
         </div>
       )}
 
       {/* Stories Grid */}
       {filteredStories.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px' }}>
+        <div className="games-empty">
           <p>No games available yet</p>
         </div>
       ) : (
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(2, 1fr)', 
-          gap: '16px'
-        }}>
+        <div className="games-stories-grid">
           {filteredStories.map((story) => (
             <div 
               key={story.id}
-              style={{ 
-                border: '1px solid #ddd',
-                borderRadius: '16px',
-                overflow: 'hidden',
-                cursor: 'pointer'
-              }}
+              className="games-story-card"
               onClick={() => navigate(`/games/story/${story.id}`)}
             >
               {/* Cover Image */}
-              <div style={{
-                width: '100%',
-                height: '200px',
-                backgroundColor: '#f3f4f6',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
+              <div className="games-story-cover">
                 {story.cover_image ? (
                   <img 
                     src={story.cover_image} 
                     alt={story.title}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover'
-                    }}
                   />
                 ) : (
-                  <div style={{ fontSize: '48px' }}>🎮</div>
+                  <div className="games-story-icon">🎮</div>
                 )}
               </div>
               
               {/* Story Info */}
-              <div style={{ padding: '12px' }}>
-                <h3 style={{
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  margin: '0 0 4px 0',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
-                }}>
+              <div className="games-story-info">
+                <h3 className="games-story-title">
                   {story.title}
                 </h3>
-                <p style={{
-                  fontSize: '14px',
-                  color: '#6b7280',
-                  margin: '0 0 8px 0',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
-                }}>
+                <p className="games-story-author">
                   by {story.author__username}
                 </p>
-                <p style={{
-                  fontSize: '12px',
-                  color: '#9ca3af',
-                  margin: 0
-                }}>
+                <p className="games-story-count">
                   🎮 {story.games_count} game{story.games_count !== 1 ? 's' : ''}
                 </p>
               </div>

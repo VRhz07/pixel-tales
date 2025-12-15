@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import gamesCacheService from '../services/gamesCache.service';
 
 interface Game {
   id: number;
@@ -67,17 +68,45 @@ const StoryGamesPage: React.FC = () => {
   const fetchGames = async () => {
     try {
       setLoading(true);
+      
+      // Try to load from cache first for instant display
+      const cachedGames = gamesCacheService.getCachedStoryGames(storyId!);
+      if (cachedGames && cachedGames.length > 0) {
+        console.log('⚡ Loading games from cache');
+        setGames(cachedGames);
+        setLoading(false);
+        
+        // Still fetch fresh data in background if online
+        if (gamesCacheService.isOnline()) {
+          console.log('🔄 Refreshing games in background');
+          fetchFreshGames();
+        }
+        return;
+      }
+      
+      // No cache, fetch from API
+      await fetchFreshGames();
+    } catch (err) {
+      console.error('Error in fetchGames:', err);
+    }
+  };
+
+  const fetchFreshGames = async () => {
+    try {
       const response = await api.get(`/games/story/${storyId}/`);
       setStoryTitle(response.story_title);
       
-      // The backend now includes last_attempt data directly in the response
       console.log('📊 Games data received:', response.games);
       setGames(response.games);
+      
+      // Cache the games for offline use
+      gamesCacheService.cacheStoryGames(storyId!, response.games);
+      
       setError(null);
+      setLoading(false);
     } catch (err) {
       console.error('Error fetching games:', err);
       setError('Failed to load games');
-    } finally {
       setLoading(false);
     }
   };

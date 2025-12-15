@@ -1096,3 +1096,260 @@ button.mb-4.flex.items-center.text-white:active {
     font-size: 1rem !important;
   }
 }
+
+/* ====================================
+   Dark Mode Support for Story Games
+   ==================================== */
+
+/* Main container */
+.dark .min-h-screen {
+  background-color: #111827 !important;
+}
+
+/* Page title and header */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4 {
+  color: #f9fafb !important;
+}
+
+.dark p:not([class*="bg-"]):not([class*="text-white"]) {
+  color: #d1d5db !important;
+}
+
+/* Game cards */
+.dark .bg-white:not([class*="text-white"]) {
+  background-color: #1f2937 !important;
+}
+
+.dark .border-gray-200 {
+  border-color: #374151 !important;
+}
+
+.dark .border-gray-300 {
+  border-color: #4b5563 !important;
+}
+
+/* Card hover states */
+.dark .hover\\:shadow-xl:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7) !important;
+}
+
+.dark .hover\\:border-purple-300:hover {
+  border-color: #818cf8 !important;
+}
+
+/* Text colors */
+.dark .text-gray-500 {
+  color: #9ca3af !important;
+}
+
+.dark .text-gray-600 {
+  color: #9ca3af !important;
+}
+
+.dark .text-gray-700 {
+  color: #d1d5db !important;
+}
+
+.dark .text-gray-800 {
+  color: #e5e7eb !important;
+}
+
+.dark .text-gray-900 {
+  color: #f9fafb !important;
+}
+
+/* Background colors */
+.dark .bg-gray-50 {
+  background-color: #374151 !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: #1f2937 !important;
+}
+
+.dark .bg-gray-200:not(button) {
+  background-color: #374151 !important;
+}
+
+/* Badge colors - keep vibrant in dark mode */
+.dark .bg-purple-100 {
+  background-color: #581c87 !important;
+}
+
+.dark .text-purple-800 {
+  color: #e9d5ff !important;
+}
+
+.dark .bg-yellow-100 {
+  background-color: #78350f !important;
+}
+
+.dark .text-yellow-800 {
+  color: #fef3c7 !important;
+}
+
+.dark .bg-red-100 {
+  background-color: #7f1d1d !important;
+}
+
+.dark .text-red-800 {
+  color: #fecaca !important;
+}
+
+.dark .bg-green-100 {
+  background-color: #064e3b !important;
+}
+
+.dark .text-green-800 {
+  color: #d1fae5 !important;
+}
+
+.dark .bg-blue-100 {
+  background-color: #1e3a8a !important;
+}
+
+.dark .text-blue-800 {
+  color: #bfdbfe !important;
+}
+
+/* Progress indicators */
+.dark .bg-green-200 {
+  background-color: #065f46 !important;
+}
+
+.dark .bg-yellow-200 {
+  background-color: #92400e !important;
+}
+
+/* Buttons - keep vibrant */
+.dark button.bg-blue-500 {
+  background-color: #3b82f6 !important;
+}
+
+.dark button.bg-blue-500:hover {
+  background-color: #2563eb !important;
+}
+
+.dark button.bg-green-500,
+.dark button.bg-green-600 {
+  background-color: #10b981 !important;
+}
+
+.dark button.bg-green-500:hover,
+.dark button.bg-green-600:hover {
+  background-color: #059669 !important;
+}
+
+.dark button.bg-orange-500 {
+  background-color: #f97316 !important;
+}
+
+.dark button.bg-orange-500:hover {
+  background-color: #ea580c !important;
+}
+
+.dark button.bg-red-500 {
+  background-color: #ef4444 !important;
+}
+
+.dark button.bg-red-500:hover {
+  background-color: #dc2626 !important;
+}
+
+/* Loading states */
+.dark .animate-spin {
+  border-color: #4b5563 !important;
+  border-top-color: #818cf8 !important;
+}
+
+/* Empty state */
+.dark .text-center p {
+  color: #9ca3af !important;
+}
+
+/* Card shadows in dark mode */
+.dark .shadow-lg {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .shadow-xl {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Stats display */
+.dark .flex.items-center.justify-between {
+  color: #d1d5db !important;
+}
+
+/* Game type badges */
+.dark .inline-block.px-3.py-1 {
+  background-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+/* Difficulty indicators */
+.dark .font-semibold {
+  color: #f9fafb !important;
+}
+
+/* Score percentages */
+.dark .text-2xl {
+  color: #f9fafb !important;
+}
+
+.dark .text-3xl {
+  color: #f9fafb !important;
+}
+
+.dark .text-4xl {
+  color: #f9fafb !important;
+}
+
+/* Back button */
+.dark button.bg-gray-200 {
+  background-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+.dark button.bg-gray-200:hover {
+  background-color: #4b5563 !important;
+}
+
+/* Incomplete attempt banner */
+.dark .bg-orange-50 {
+  background-color: #7c2d12 !important;
+  border-color: #f97316 !important;
+}
+
+.dark .bg-orange-50 * {
+  color: #fed7aa !important;
+}
+
+/* Tip cards */
+.dark .bg-blue-50 {
+  background-color: #1e3a8a !important;
+  border-color: #3b82f6 !important;
+}
+
+.dark .bg-blue-50 * {
+  color: #bfdbfe !important;
+}
+
+/* Game completion indicators */
+.dark .opacity-75 {
+  opacity: 0.6 !important;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .dark .bg-white {
+    background-color: #1f2937 !important;
+  }
+  
+  .dark .shadow-lg {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+  }
+}

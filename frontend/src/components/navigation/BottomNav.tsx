@@ -6,6 +6,7 @@ import { useI18nStore } from '../../stores/i18nStore';
 import { HomeIcon, BookOpenIcon, UserIcon, UsersIcon, CogIcon } from '@heroicons/react/24/outline';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
 import { Keyboard } from '@capacitor/keyboard';
+import { useAndroidNavBarHeight } from '../../hooks/useAndroidNavBarHeight';
 
 const BottomNav = () => {
   const location = useLocation();
@@ -15,6 +16,7 @@ const BottomNav = () => {
   const { t } = useI18nStore();
   const { playSound } = useSoundEffects();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const androidNavBarHeight = useAndroidNavBarHeight();
   
   const handleLogout = () => {
     signOut();
@@ -164,7 +166,7 @@ const BottomNav = () => {
 
   return (
     <nav 
-      className={`nav-glass safe-area-inset-bottom ${isKeyboardVisible ? 'translate-y-full' : ''}`}
+      className={`nav-glass ${isKeyboardVisible ? 'translate-y-full' : ''}`}
       style={{ 
         position: 'fixed',
         bottom: 0,
@@ -179,7 +181,7 @@ const BottomNav = () => {
         transition: 'transform 300ms',
         minHeight: '60px',
         height: 'auto',
-        padding: '12px 16px'
+        padding: `12px 16px ${12 + androidNavBarHeight}px 16px`
       }}
     >
       {/* Navigation Items */}

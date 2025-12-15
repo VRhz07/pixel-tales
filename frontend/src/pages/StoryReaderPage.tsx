@@ -78,6 +78,8 @@ const StoryReaderPage: React.FC = () => {
   const [gamesCount, setGamesCount] = useState(0);
   const [isGeneratingGames, setIsGeneratingGames] = useState(false);
   const [canGenerateGames, setCanGenerateGames] = useState(false);
+  const [isStoryAuthor, setIsStoryAuthor] = useState(false);
+  const [isStoryPublished, setIsStoryPublished] = useState(false);
   
   // Load story from local store or backend API
   useEffect(() => {
@@ -355,7 +357,10 @@ const StoryReaderPage: React.FC = () => {
       console.log('🎮 Games status:', response);
       setHasGames(response.has_games);
       setGamesCount(response.games_count);
-      setCanGenerateGames(response.can_generate);
+      setIsStoryAuthor(response.is_author);
+      setIsStoryPublished(response.is_published);
+      setCanGenerateGames(response.can_generate && response.is_published);
+      console.log('🎮 Setting states - hasGames:', response.has_games, 'canGenerate:', response.can_generate && response.is_published, 'isAuthor:', response.is_author, 'isPublished:', response.is_published);
     } catch (err) {
       console.error('Error checking games status:', err);
     }
@@ -379,7 +384,13 @@ const StoryReaderPage: React.FC = () => {
       setShowViewControls(false);
     } catch (err: any) {
       console.error('Error generating games:', err);
-      alert(err.response?.data?.error || 'Failed to generate games');
+      const errorMessage = err.response?.data?.error;
+      
+      if (errorMessage === 'Story must be published to generate games') {
+        alert('📚 Please publish your story first before generating games!\n\nGames can only be created for published stories.');
+      } else {
+        alert(errorMessage || 'Failed to generate games');
+      }
     } finally {
       setIsGeneratingGames(false);
     }
@@ -1164,7 +1175,7 @@ const StoryReaderPage: React.FC = () => {
           />
 
           {/* Games Button - Always visible below TTS controls */}
-          {backendStoryId && (
+          {backendStoryId && (hasGames || canGenerateGames || isStoryAuthor) && (
             <div style={{ marginTop: '12px', width: '100%' }}>
               {hasGames ? (
                 <button
@@ -1214,6 +1225,19 @@ const StoryReaderPage: React.FC = () => {
                   <PuzzlePieceIcon style={{ width: '20px', height: '20px' }} />
                   <span>{isGeneratingGames ? 'Generating Games...' : 'Generate Games'}</span>
                 </button>
+              ) : isStoryAuthor ? (
+                <div style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  backgroundColor: '#fef3c7',
+                  border: '2px solid #f59e0b',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  color: '#92400e',
+                  textAlign: 'center'
+                }}>
+                  📚 Publish your story to generate games!
+                </div>
               ) : null}
             </div>
           )}

@@ -1163,3 +1163,154 @@ button.bg-gradient-to-r.from-gray-400.to-gray-500:hover {
     font-size: 2rem !important;
   }
 }
+
+/* ====================================
+   Additional Dark Mode Enhancements
+   ==================================== */
+
+/* Input fields - Enhanced dark mode */
+.dark input[type="text"]:not([class*="jumbled"]),
+.dark textarea {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+.dark input[type="text"]:focus:not([class*="jumbled"]),
+.dark textarea:focus {
+  border-color: #818cf8 !important;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #6b7280 !important;
+}
+
+/* Text colors for dark mode */
+.dark .text-gray-600 {
+  color: #9ca3af !important;
+}
+
+.dark .text-gray-700 {
+  color: #d1d5db !important;
+}
+
+.dark .text-gray-800 {
+  color: #e5e7eb !important;
+}
+
+.dark .text-gray-900 {
+  color: #f9fafb !important;
+}
+
+/* Feedback messages - Enhanced */
+.dark .bg-green-50 {
+  background-color: #064e3b !important;
+  border-color: #10b981 !important;
+}
+
+.dark .bg-green-50 * {
+  color: #d1fae5 !important;
+}
+
+.dark .bg-red-50 {
+  background-color: #7f1d1d !important;
+  border-color: #ef4444 !important;
+}
+
+.dark .bg-red-50 * {
+  color: #fecaca !important;
+}
+
+/* Option buttons in dark mode */
+.dark button[class*="border-gray"] {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+.dark button[class*="border-gray"]:hover:not(:disabled) {
+  border-color: #818cf8 !important;
+  background-color: #374151 !important;
+}
+
+/* Loading states */
+.dark .animate-spin {
+  border-color: #4b5563 !important;
+  border-top-color: #818cf8 !important;
+}
+
+/* Context/hint boxes */
+.dark .bg-blue-50 {
+  background-color: #1e3a8a !important;
+  border-color: #3b82f6 !important;
+}
+
+.dark .bg-blue-50 * {
+  color: #bfdbfe !important;
+}
+
+/* Score display */
+.dark .text-8xl,
+.dark .text-7xl,
+.dark .text-6xl,
+.dark .text-5xl {
+  color: #f9fafb !important;
+}
+
+/* Card backgrounds */
+.dark .bg-white {
+  background-color: #1f2937 !important;
+}
+
+.dark .border-gray-200 {
+  border-color: #374151 !important;
+}
+
+.dark .border-gray-300 {
+  border-color: #4b5563 !important;
+}
+
+/* Progress bars */
+.dark .bg-gray-200 {
+  background-color: #374151 !important;
+}
+
+/* Disabled states */
+.dark button:disabled {
+  background-color: #4b5563 !important;
+  color: #6b7280 !important;
+  opacity: 0.6;
+}
+
+/* Results screen enhancements */
+.dark .results-container {
+  background-color: #111827 !important;
+}
+
+/* Typography improvements */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4 {
+  color: #f9fafb !important;
+}
+
+.dark p:not([class*="bg-"]) {
+  color: #d1d5db !important;
+}
+
+/* Shadow enhancements for dark mode */
+.dark .shadow-lg {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .shadow-xl {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Hover states for cards */
+.dark .hover\\:shadow-xl:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7) !important;
+}

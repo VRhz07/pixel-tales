@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { App as CapacitorApp } from '@capacitor/app';
 import api from '../services/api';
+import gamesCacheService from '../services/gamesCache.service';
 
 interface Question {
   id: number;
@@ -53,51 +55,105 @@ const GamePlayPage: React.FC = () => {
     if (gameId) {
       fetchGame();
     }
+    
+    // Sync pending progress when coming online
+    const handleOnline = async () => {
+      console.log('🌐 Back online! Syncing pending progress...');
+      const pending = gamesCacheService.getPendingProgress();
+      
+      for (const progress of pending) {
+        try {
+          // Submit each pending answer
+          for (const answer of progress.answers) {
+            await api.post('/games/submit_answer/', {
+              attempt_id: progress.attemptId,
+              question_id: answer.question_id,
+              answer: answer.answer
+            });
+          }
+          
+          // Remove from pending after successful sync
+          gamesCacheService.removePendingProgress(progress.attemptId);
+          console.log('✅ Synced progress for attempt:', progress.attemptId);
+        } catch (err) {
+          console.error('❌ Failed to sync progress:', err);
+        }
+      }
+    };
+    
+    // Handle Android back button
+    let backButtonListener: any;
+    const setupBackButton = async () => {
+      backButtonListener = await CapacitorApp.addListener('backButton', () => {
+        console.log('📱 Android back button pressed in GamePlayPage');
+        handleBackToStory();
+      });
+    };
+    
+    setupBackButton();
+    window.addEventListener('online', handleOnline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      if (backButtonListener) {
+        backButtonListener.remove();
+      }
+    };
   }, [gameId]);
 
   const fetchGame = async () => {
     try {
       setLoading(true);
       
+      // Try loading from cache first for offline play
+      const cachedGame = gamesCacheService.getCachedGameData(gameId!);
+      if (cachedGame && !gamesCacheService.isOnline()) {
+        console.log('🎮 Loading game from cache (offline mode)');
+        setGameData(cachedGame.gameData);
+        setAttemptId(cachedGame.attemptId || 0);
+        setLoading(false);
+        return;
+      }
+      
       // Check if we should force a new game
       const forceNew = location.state?.forceNew || false;
       console.log('🎮 Starting game with forceNew:', forceNew);
-      console.log('🎮 Location state:', location.state);
       
       const response = await api.post(`/games/${gameId}/start_game/`, {
         force_new: forceNew
       });
       
       console.log('🎮 Game response:', response);
-      console.log('🎮 Is resume:', response.is_resume);
-      console.log('🎮 Current score:', response.current_score);
-      console.log('🎮 Answered count:', response.answered_count);
       
       // Transform the response to match our GameData interface
       const transformedData: GameData = {
         id: parseInt(gameId!),
         game_type: response.game_type,
         game_type_display: response.game_type,
-        story_id: 0, // Will be populated if needed
-        story_title: '', // Will be populated if needed
+        story_id: 0,
+        story_title: '',
         questions: response.questions.map((q: any) => ({
           id: q.id,
           question_text: q.question_text,
           options: q.options,
-          correct_answer: '', // Don't reveal answer yet
-          context: q.context, // Include context for word search
-          hint: q.hint // Include hint
+          correct_answer: '',
+          context: q.context,
+          hint: q.hint
         }))
       };
       
       setGameData(transformedData);
       setAttemptId(response.attempt_id);
       
+      // Cache the game data for offline play
+      gamesCacheService.cacheGameData(gameId!, {
+        gameData: transformedData,
+        attemptId: response.attempt_id
+      });
+      
       // If resuming, set the current score and find first unanswered question
       if (response.is_resume) {
         setScore(response.current_score);
-        
-        // Find first unanswered question
         const firstUnanswered = response.questions.findIndex((q: any) => !q.is_answered);
         if (firstUnanswered !== -1) {
           setCurrentQuestionIndex(firstUnanswered);
@@ -107,7 +163,17 @@ const GamePlayPage: React.FC = () => {
       setError(null);
     } catch (err) {
       console.error('Error starting game:', err);
-      setError('Failed to start game');
+      
+      // Try loading from cache as fallback
+      const cachedGame = gamesCacheService.getCachedGameData(gameId!);
+      if (cachedGame) {
+        console.log('⚠️ API failed, loading from cache');
+        setGameData(cachedGame.gameData);
+        setAttemptId(cachedGame.attemptId || 0);
+        setError('Playing in offline mode - progress will sync when online');
+      } else {
+        setError('Failed to start game');
+      }
     } finally {
       setLoading(false);
     }
@@ -120,22 +186,45 @@ const GamePlayPage: React.FC = () => {
     
     setIsSubmitting(true);
     try {
-      const response = await api.post('/games/submit_answer/', {
-        attempt_id: attemptId,
-        question_id: currentQuestion.id,
-        answer: userAnswer.trim()
-      });
-      
-      setIsCorrect(response.is_correct);
-      setCorrectAnswer(response.correct_answer);
-      setShowFeedback(true);
-      
-      if (response.is_correct) {
-        setScore(score + 1);
+      if (!gamesCacheService.isOnline()) {
+        // Offline mode - store answer locally
+        console.log('📴 Offline: Storing answer locally');
+        gamesCacheService.storePendingProgress(gameData.id, attemptId, [{
+          question_id: currentQuestion.id,
+          answer: userAnswer.trim(),
+          timestamp: Date.now()
+        }]);
+        
+        // Show generic feedback (can't validate offline)
+        setIsCorrect(false);
+        setCorrectAnswer('Answer saved offline - will be checked when online');
+        setShowFeedback(true);
+        setError('Playing offline - progress will sync when online');
+      } else {
+        const response = await api.post('/games/submit_answer/', {
+          attempt_id: attemptId,
+          question_id: currentQuestion.id,
+          answer: userAnswer.trim()
+        });
+        
+        setIsCorrect(response.is_correct);
+        setCorrectAnswer(response.correct_answer);
+        setShowFeedback(true);
+        
+        if (response.is_correct) {
+          setScore(score + 1);
+        }
       }
     } catch (err) {
       console.error('Error submitting answer:', err);
-      setError('Failed to submit answer');
+      setError('Failed to submit answer - saved offline');
+      
+      // Store offline as fallback
+      gamesCacheService.storePendingProgress(gameData.id, attemptId, [{
+        question_id: currentQuestion.id,
+        answer: userAnswer.trim(),
+        timestamp: Date.now()
+      }]);
     } finally {
       setIsSubmitting(false);
     }
@@ -327,13 +416,14 @@ const GamePlayPage: React.FC = () => {
 
   const handleBackToStory = () => {
     // Navigate back to the story games page
-    const storyId = location.state?.storyId;
+    const storyId = location.state?.storyId || gameData?.story_id;
     if (storyId) {
-      // Force a full page reload to refresh the data
-      window.location.href = `/games/story/${storyId}`;
+      // Use React Router navigate instead of window.location.href
+      // This prevents asset loading issues in Capacitor
+      navigate(`/games/story/${storyId}`);
     } else {
-      // Fallback: just go back
-      navigate(-1);
+      // Fallback: go to games list
+      navigate('/games');
     }
   };
 

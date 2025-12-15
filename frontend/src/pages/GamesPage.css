@@ -1,0 +1,252 @@
+/* ====================================
+   Games Page - Dark Mode Support
+   ==================================== */
+
+.games-page {
+  padding: 20px;
+  padding-bottom: 100px;
+  min-height: 100vh;
+  background-color: #ffffff;
+  transition: background-color 0.3s ease;
+}
+
+.dark .games-page {
+  background-color: #111827;
+}
+
+/* Header */
+.games-page-header {
+  margin-bottom: 30px;
+}
+
+.games-page-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: #1f2937;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dark .games-page-title {
+  background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.games-page-subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.dark .games-page-subtitle {
+  color: #9ca3af;
+}
+
+/* Search */
+.games-search-container {
+  margin-bottom: 30px;
+}
+
+.games-search-input {
+  padding: 12px 16px;
+  width: 100%;
+  max-width: 500px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+  color: #1f2937;
+}
+
+.games-search-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.dark .games-search-input {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+.dark .games-search-input:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+}
+
+.dark .games-search-input::placeholder {
+  color: #6b7280;
+}
+
+/* Loading & Error States */
+.games-loading,
+.games-empty {
+  padding: 40px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.dark .games-loading,
+.dark .games-empty {
+  color: #9ca3af;
+}
+
+.games-error {
+  padding: 20px;
+  margin-bottom: 20px;
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  color: #991b1b;
+}
+
+.dark .games-error {
+  background-color: #7f1d1d;
+  border-color: #991b1b;
+  color: #fecaca;
+}
+
+/* Stories Grid */
+.games-stories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 640px) {
+  .games-stories-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+/* Story Card */
+.games-story-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+}
+
+.games-story-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  border-color: #667eea;
+}
+
+.dark .games-story-card {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+.dark .games-story-card:hover {
+  border-color: #818cf8;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Cover Image */
+.games-story-cover {
+  width: 100%;
+  height: 200px;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.dark .games-story-cover {
+  background-color: #374151;
+}
+
+.games-story-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.games-story-icon {
+  font-size: 48px;
+}
+
+/* Story Info */
+.games-story-info {
+  padding: 12px;
+}
+
+.games-story-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #1f2937;
+}
+
+.dark .games-story-title {
+  color: #f9fafb;
+}
+
+.games-story-author {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 8px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dark .games-story-author {
+  color: #9ca3af;
+}
+
+.games-story-count {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dark .games-story-count {
+  color: #6b7280;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .games-page {
+    padding: 16px;
+    padding-bottom: 90px;
+  }
+
+  .games-page-title {
+    font-size: 24px;
+  }
+
+  .games-page-subtitle {
+    font-size: 14px;
+  }
+
+  .games-story-cover {
+    height: 140px;
+  }
+
+  .games-story-title {
+    font-size: 14px;
+  }
+
+  .games-story-author {
+    font-size: 12px;
+  }
+}
