@@ -240,7 +240,7 @@ class GameGenerationService:
                 options=word_search_data['grid'],  # Store grid as list in options
                 context=f"Words to find: {', '.join(word_search_data['words'])}",
                 order=1,
-                hint='Words can be horizontal, vertical, or diagonal',
+                hint='Words can be horizontal or vertical',
                 points=50
             )
             
@@ -352,25 +352,25 @@ class GameGenerationService:
     
     @classmethod
     def _generate_word_search_grid(cls, story, story_text):
-        """Generate word search grid with story words"""
+        """Generate child-friendly word search grid with story words"""
         import random
         
-        # Extract interesting words from story (4-8 letters)
-        words = re.findall(r'\b[a-zA-Z]{4,8}\b', story_text)
+        # Extract interesting words from story (3-6 letters - shorter for children)
+        words = re.findall(r'\b[a-zA-Z]{3,6}\b', story_text)
         unique_words = list(set([w.upper() for w in words]))
         
         # Filter out common words
-        common_words = {'THERE', 'THEIR', 'WHERE', 'WHICH', 'THESE', 'THOSE', 'WOULD', 'COULD', 'SHOULD', 'ABOUT', 'OTHER', 'WHAT', 'WHEN', 'WITH', 'HAVE', 'FROM', 'THEY', 'BEEN', 'WERE', 'THAT', 'THIS'}
+        common_words = {'THERE', 'THEIR', 'WHERE', 'WHICH', 'THESE', 'THOSE', 'WOULD', 'COULD', 'SHOULD', 'ABOUT', 'OTHER', 'WHAT', 'WHEN', 'WITH', 'HAVE', 'FROM', 'THEY', 'BEEN', 'WERE', 'THAT', 'THIS', 'WILL', 'JUST', 'LIKE', 'THEN', 'MORE', 'VERY', 'SAID', 'SOME'}
         interesting_words = [w for w in unique_words if w not in common_words]
         
-        # Select 6-8 words for the puzzle
-        if len(interesting_words) < 6:
+        # Select 4-5 words for the puzzle (child-friendly amount)
+        if len(interesting_words) < 4:
             return None
         
-        selected_words = random.sample(interesting_words, min(8, len(interesting_words)))
+        selected_words = random.sample(interesting_words, min(5, len(interesting_words)))
         
-        # Create a 12x12 grid
-        grid_size = 12
+        # Create an 8x8 grid (child-friendly size, better for mobile)
+        grid_size = 8
         grid = [['_' for _ in range(grid_size)] for _ in range(grid_size)]
         
         placed_words = []
@@ -384,8 +384,9 @@ class GameGenerationService:
             while not placed and attempts < max_attempts:
                 attempts += 1
                 
-                # Random direction: 0=horizontal, 1=vertical, 2=diagonal
-                direction = random.randint(0, 2)
+                # Random direction: 0=horizontal, 1=vertical (removed diagonal for children)
+                # Diagonals are harder for children to spot
+                direction = random.randint(0, 1)
                 
                 if direction == 0:  # Horizontal
                     if len(word) <= grid_size:
@@ -417,20 +418,6 @@ class GameGenerationService:
                             placed = True
                             placed_words.append(word)
                 
-                elif direction == 2:  # Diagonal
-                    if len(word) <= grid_size:
-                        row = random.randint(0, grid_size - len(word))
-                        col = random.randint(0, grid_size - len(word))
-                        
-                        # Check if space is available
-                        can_place = all(grid[row + i][col + i] == '_' or grid[row + i][col + i] == word[i] 
-                                      for i in range(len(word)))
-                        
-                        if can_place:
-                            for i, letter in enumerate(word):
-                                grid[row + i][col + i] = letter
-                            placed = True
-                            placed_words.append(word)
         
         # Fill empty spaces with random letters
         letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -442,12 +429,13 @@ class GameGenerationService:
         # Convert grid to list of strings for storage
         grid_strings = [''.join(row) for row in grid]
         
-        if len(placed_words) < 5:
+        # Require at least 3 words for children (lowered from 5)
+        if len(placed_words) < 3:
             return None
         
         return {
             'grid': grid_strings,
-            'words': placed_words[:8]  # Return up to 8 words
+            'words': placed_words[:5]  # Return up to 5 words (child-friendly)
         }
     
     @classmethod

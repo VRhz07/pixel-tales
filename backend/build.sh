@@ -40,6 +40,10 @@ else
     python manage.py populate_achievements
 fi
 
+# Update word searches to new 8x8 format (delete old 12x12 ones)
+echo "Updating word search games to child-friendly 8x8 format..."
+python manage.py update_word_searches --force || echo "No word searches to update"
+
 # Generate educational games for all published stories
 echo "Generating educational games for published stories..."
 python manage.py generate_all_games || echo "Warning: Game generation had some issues, but deployment continues"

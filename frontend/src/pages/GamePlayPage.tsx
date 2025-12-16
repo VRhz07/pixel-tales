@@ -396,21 +396,37 @@ const GamePlayPage: React.FC = () => {
   };
   
   const handleCellTouchStart = (e: React.TouchEvent, row: number, col: number) => {
+    e.preventDefault(); // Prevent scrolling during selection
+    e.stopPropagation();
     handleCellMouseDown(row, col);
   };
   
   const handleCellTouchMove = (e: React.TouchEvent, grid: string[]) => {
-    const touch = e.touches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    e.preventDefault(); // Prevent scrolling during selection
+    e.stopPropagation();
     
-    if (element && element.classList.contains('word-search-cell')) {
-      const row = parseInt(element.getAttribute('data-row') || '0');
-      const col = parseInt(element.getAttribute('data-col') || '0');
-      handleCellMouseEnter(row, col);
+    const touch = e.touches[0];
+    if (!touch) return;
+    
+    // Use a more reliable method to get the element under touch
+    const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
+    const cellElement = elements.find(el => el.classList.contains('word-search-cell'));
+    
+    if (cellElement) {
+      const row = parseInt(cellElement.getAttribute('data-row') || '0');
+      const col = parseInt(cellElement.getAttribute('data-col') || '0');
+      
+      // Only update if we're moving to a different cell
+      const lastCell = selectedCells[selectedCells.length - 1];
+      if (!lastCell || lastCell.row !== row || lastCell.col !== col) {
+        handleCellMouseEnter(row, col);
+      }
     }
   };
   
-  const handleCellTouchEnd = (grid: string[], wordsToFind: string[]) => {
+  const handleCellTouchEnd = (e: React.TouchEvent, grid: string[], wordsToFind: string[]) => {
+    e.preventDefault();
+    e.stopPropagation();
     handleCellMouseUp(grid, wordsToFind);
   };
 
@@ -727,30 +743,32 @@ const GamePlayPage: React.FC = () => {
             borderRadius: '12px',
             padding: '15px',
             backgroundColor: '#f9f9f9',
-            overflow: 'hidden',
-            touchAction: 'none',
+            overflow: isSelecting ? 'hidden' : 'auto',
+            maxHeight: '70vh',
+            touchAction: isSelecting ? 'none' : 'pan-y pan-x',
             WebkitTouchCallout: 'none',
             WebkitUserSelect: 'none',
             userSelect: 'none',
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'flex-start'
           }}>
             <div 
               style={{ 
                 display: 'grid',
                 gridTemplateColumns: `repeat(${wordSearchGrid[0]?.length || 12}, 1fr)`,
-                gap: '4px',
+                gap: '6px',
                 width: '100%',
                 maxWidth: '600px',
                 aspectRatio: '1 / 1',
-                fontSize: '14px'
+                fontSize: '14px',
+                touchAction: 'none'
               }}
               onMouseUp={() => handleCellMouseUp(wordSearchGrid, wordsToFind)}
               onMouseLeave={() => {
                 setIsSelecting(false);
               }}
-              onTouchEnd={() => handleCellTouchEnd(wordSearchGrid, wordsToFind)}
+              onTouchEnd={(e) => handleCellTouchEnd(e, wordSearchGrid, wordsToFind)}
             >
               {wordSearchGrid.map((row: string, rowIndex: number) => (
                 row.split('').map((letter: string, colIndex: number) => {
@@ -790,6 +808,8 @@ const GamePlayPage: React.FC = () => {
                       style={{
                         width: '100%',
                         height: '100%',
+                        minHeight: '32px',
+                        minWidth: '32px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -797,16 +817,17 @@ const GamePlayPage: React.FC = () => {
                         border: `${borderWidth} solid ${borderColor}`,
                         borderRadius: '8px',
                         fontWeight: '700',
-                        fontSize: 'clamp(14px, 2vw, 20px)',
+                        fontSize: 'clamp(16px, 2.5vw, 22px)',
                         cursor: 'pointer',
                         userSelect: 'none',
+                        touchAction: 'none',
                         transition: 'all 0.15s ease',
                         transform: isSelected ? 'scale(1.05)' : 'scale(1)',
                         boxShadow: isSelected ? '0 2px 8px rgba(245, 158, 11, 0.3)' : 
                                    isInFoundWord ? '0 1px 3px rgba(16, 185, 129, 0.2)' : 'none',
                         color: textColor,
                         lineHeight: '1',
-                        padding: '0',
+                        padding: '4px',
                         aspectRatio: '1 / 1',
                         fontFamily: 'system-ui, -apple-system, sans-serif'
                       }}
