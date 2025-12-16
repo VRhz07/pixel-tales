@@ -655,3 +655,57 @@ def admin_regenerate_word_searches(request):
         return Response({
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@admin_required
+def admin_regenerate_all_games(request):
+    """Regenerate ALL games for all published stories (admin only)"""
+    from .models import StoryGame, GameQuestion, GameAnswer, GameAttempt, Story
+    from .game_service import GameGenerationService
+    
+    try:
+        # Get all games
+        all_games = StoryGame.objects.all()
+        total_deleted = all_games.count()
+        
+        # Delete all games and related data
+        GameAnswer.objects.filter(attempt__game__in=all_games).delete()
+        GameAttempt.objects.filter(game__in=all_games).delete()
+        GameQuestion.objects.filter(game__in=all_games).delete()
+        all_games.delete()
+        
+        # Get all published stories
+        stories = Story.objects.filter(is_published=True)
+        success_count = 0
+        error_count = 0
+        game_types_created = {'quiz': 0, 'fill_blanks': 0, 'word_search': 0}
+        
+        for story in stories:
+            try:
+                result = GameGenerationService.generate_games_for_story(story)
+                if 'error' not in result:
+                    success_count += 1
+                    for game_type in result.keys():
+                        if game_type in game_types_created:
+                            game_types_created[game_type] += 1
+                else:
+                    error_count += 1
+            except Exception as e:
+                error_count += 1
+        
+        return Response({
+            'success': True,
+            'message': f'All games regenerated successfully',
+            'deleted': total_deleted,
+            'stories_processed': success_count,
+            'failed': error_count,
+            'games_created': game_types_created,
+            'details': 'All games regenerated with new 8x8 word search format'
+        })
+        
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

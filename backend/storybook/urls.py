@@ -161,6 +161,7 @@ urlpatterns = [
     
     # Admin endpoints - Games Management
     path('admin/games/regenerate-word-searches/', admin_views.admin_regenerate_word_searches, name='admin_regenerate_word_searches'),
+    path('admin/games/regenerate-all/', admin_views.admin_regenerate_all_games, name='admin_regenerate_all_games'),
     
     # Admin endpoints - Content Moderation
     path('admin/moderation/flagged/', admin_features.get_flagged_content, name='get_flagged_content'),
