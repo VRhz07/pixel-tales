@@ -602,3 +602,56 @@ def admin_remove_parent_child(request, parent_id, child_id):
         })
     except ParentChildRelationship.DoesNotExist:
         return Response({'error': 'Relationship not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@admin_required
+def admin_regenerate_word_searches(request):
+    """Regenerate all word search games with new 8x8 format (admin only)"""
+    from .models import StoryGame, GameQuestion, GameAnswer, GameAttempt, Story
+    from .game_service import GameGenerationService
+    
+    try:
+        # Get all word search games
+        word_search_games = StoryGame.objects.filter(game_type='word_search')
+        total_deleted = word_search_games.count()
+        
+        # Get unique stories with word searches
+        story_ids = word_search_games.values_list('story_id', flat=True).distinct()
+        
+        # Delete old word searches
+        GameAnswer.objects.filter(attempt__game__in=word_search_games).delete()
+        GameAttempt.objects.filter(game__in=word_search_games).delete()
+        GameQuestion.objects.filter(game__in=word_search_games).delete()
+        word_search_games.delete()
+        
+        # Regenerate word searches for each story
+        stories = Story.objects.filter(id__in=story_ids, is_published=True)
+        success_count = 0
+        error_count = 0
+        
+        for story in stories:
+            try:
+                story_text = GameGenerationService._extract_story_text(story)
+                new_game = GameGenerationService._generate_word_search_game(story, story_text)
+                if new_game:
+                    success_count += 1
+                else:
+                    error_count += 1
+            except Exception as e:
+                error_count += 1
+        
+        return Response({
+            'success': True,
+            'message': f'Word search games regenerated successfully',
+            'deleted': total_deleted,
+            'regenerated': success_count,
+            'failed': error_count,
+            'details': 'All word searches now use 8x8 grid with 4-5 words'
+        })
+        
+    except Exception as e:
+        return Response({
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -159,6 +159,9 @@ urlpatterns = [
     path('admin/relationships/add/', admin_views.admin_add_parent_child, name='admin_add_parent_child'),
     path('admin/relationships/<int:parent_id>/<int:child_id>/remove/', admin_views.admin_remove_parent_child, name='admin_remove_parent_child'),
     
+    # Admin endpoints - Games Management
+    path('admin/games/regenerate-word-searches/', admin_views.admin_regenerate_word_searches, name='admin_regenerate_word_searches'),
+    
     # Admin endpoints - Content Moderation
     path('admin/moderation/flagged/', admin_features.get_flagged_content, name='get_flagged_content'),
     path('admin/moderation/story/<int:story_id>/', admin_features.moderate_story, name='moderate_story'),
