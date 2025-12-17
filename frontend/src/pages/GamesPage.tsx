@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { useSoundEffects } from '../hooks/useSoundEffects';
 import './GamesPage.css';
 
 interface StoryWithGames {
@@ -14,6 +15,7 @@ interface StoryWithGames {
 
 const GamesPage: React.FC = () => {
   const navigate = useNavigate();
+  const { playButtonClick } = useSoundEffects();
   const [stories, setStories] = useState<StoryWithGames[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +89,10 @@ const GamesPage: React.FC = () => {
             <div 
               key={story.id}
               className="games-story-card"
-              onClick={() => navigate(`/games/story/${story.id}`)}
+              onClick={() => {
+                playButtonClick();
+                navigate(`/games/story/${story.id}`);
+              }}
             >
               {/* Cover Image */}
               <div className="games-story-cover">

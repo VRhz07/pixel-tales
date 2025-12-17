@@ -1,1355 +1,424 @@
-/* Child-Friendly Game Cards Styling */
+/* ====================================
+   Story Games Page - Clean & Child-Friendly Design
+   ==================================== */
 
-/* Force proper spacing above cards */
-.space-y-8 > * + * {
-  margin-top: 2rem !important;
+/* Loading State */
+.story-games-loading {
+  padding: 40px;
+  text-align: center;
+  min-height: 100vh;
+  background-color: #fafafa;
 }
 
-/* Quiz Card - Blue Theme - Force Override */
-div.game-card-quiz,
-div.game-card.game-card-quiz,
+.dark .story-games-loading {
+  background-color: #1a1a1a;
+}
+
+/* Main Page Container */
+.story-games-page {
+  padding: 20px;
+  padding-bottom: 100px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 50%, #ffffff 100%);
+}
+
+.dark .story-games-page {
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%);
+}
+
+/* Header Section */
+.story-games-header {
+  margin-bottom: 30px;
+}
+
+.back-button {
+  padding: 10px 20px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #4a5568;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #f7fafc;
+  border-color: #cbd5e0;
+  transform: translateX(-3px);
+}
+
+.dark .back-button {
+  background-color: #2d3748;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+.dark .back-button:hover {
+  background-color: #3d4a5a;
+  border-color: #5a6a7a;
+}
+
+.story-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: #2d3748;
+}
+
+.dark .story-title {
+  color: #e2e8f0;
+}
+
+.story-subtitle {
+  font-size: 16px;
+  color: #718096;
+  margin: 0;
+}
+
+.dark .story-subtitle {
+  color: #a0aec0;
+}
+
+/* Error Message */
+.error-message {
+  padding: 20px;
+  margin-bottom: 20px;
+  background-color: #fee6e6;
+  border: 2px solid #f5b8b8;
+  border-radius: 10px;
+  color: #742a2a;
+}
+
+.dark .error-message {
+  background-color: #4a2d2d;
+  border-color: #7c4a4a;
+  color: #fed7d7;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #718096;
+}
+
+.dark .empty-state {
+  color: #a0aec0;
+}
+
+/* Games List */
+.games-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Game Card - Base Styles */
+.game-card {
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.dark .game-card {
+  background-color: #2d3748;
+  border-color: #4a5568;
+}
+
+.dark .game-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Game Card - Type Specific Colors (Vibrant with Gradients) */
 .game-card-quiz {
-  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 50%, #93C5FD 100%) !important;
-  background-color: #BFDBFE !important;
-  border: 4px solid #60A5FA !important;
-  border-color: #60A5FA !important;
-  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
-}
-
-.game-card-quiz:hover {
-  border-color: #3B82F6 !important;
-  box-shadow: 0 20px 50px rgba(59, 130, 246, 0.6) !important;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 50%, #93c5fd 100%) !important;
+  border: 3px solid #3b82f6 !important;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25), inset 0 2px 0 rgba(255,255,255,0.5) !important;
 }
 
 .dark .game-card-quiz {
-  background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 50%, #2563EB 100%) !important;
-  border: 4px solid #3B82F6 !important;
-  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.5), inset 0 1px 0 rgba(59, 130, 246, 0.3) !important;
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%) !important;
+  border: 3px solid #3b82f6 !important;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4) !important;
 }
 
-.dark .game-card-quiz:hover {
-  border-color: #60A5FA !important;
-  box-shadow: 0 20px 50px rgba(59, 130, 246, 0.6) !important;
-}
-
-/* Fill in the Blanks Card - Green Theme */
-.game-card-fill_blanks,
-.game-card.game-card-fill_blanks {
-  background: linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 50%, #86EFAC 100%) !important;
-  border: 4px solid #4ADE80 !important;
-  box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
-}
-
-.game-card-fill_blanks:hover {
-  border-color: #22C55E !important;
-  box-shadow: 0 20px 50px rgba(34, 197, 94, 0.6) !important;
+.game-card-fill_blanks {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 50%, #86efac 100%) !important;
+  border: 3px solid #10b981 !important;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25), inset 0 2px 0 rgba(255,255,255,0.5) !important;
 }
 
 .dark .game-card-fill_blanks {
-  background: linear-gradient(135deg, #14532D 0%, #166534 50%, #15803D 100%) !important;
-  border: 4px solid #22C55E !important;
-  box-shadow: 0 10px 30px rgba(34, 197, 94, 0.5), inset 0 1px 0 rgba(34, 197, 94, 0.3) !important;
+  background: linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%) !important;
+  border: 3px solid #22c55e !important;
+  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4) !important;
 }
 
-.dark .game-card-fill_blanks:hover {
-  border-color: #4ADE80 !important;
-  box-shadow: 0 20px 50px rgba(34, 197, 94, 0.6) !important;
-}
-
-/* Spelling Card - Purple Theme */
-.game-card-spelling,
-.game-card.game-card-spelling {
-  background: linear-gradient(135deg, #F3E8FF 0%, #E9D5FF 50%, #D8B4FE 100%) !important;
-  border: 4px solid #C084FC !important;
-  box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
-}
-
-.game-card-spelling:hover {
-  border-color: #A855F7 !important;
-  box-shadow: 0 20px 50px rgba(168, 85, 247, 0.6) !important;
+.game-card-spelling {
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 50%, #d8b4fe 100%) !important;
+  border: 3px solid #a855f7 !important;
+  box-shadow: 0 8px 20px rgba(168, 85, 247, 0.25), inset 0 2px 0 rgba(255,255,255,0.5) !important;
 }
 
 .dark .game-card-spelling {
-  background: linear-gradient(135deg, #581C87 0%, #6B21A8 50%, #7C3AED 100%) !important;
-  border: 4px solid #A855F7 !important;
-  box-shadow: 0 10px 30px rgba(168, 85, 247, 0.5), inset 0 1px 0 rgba(168, 85, 247, 0.3) !important;
+  background: linear-gradient(135deg, #581c87 0%, #6b21a8 50%, #7c3aed 100%) !important;
+  border: 3px solid #a855f7 !important;
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4) !important;
 }
 
-.dark .game-card-spelling:hover {
-  border-color: #C084FC !important;
-  box-shadow: 0 20px 50px rgba(168, 85, 247, 0.6) !important;
+.game-card-word_search {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%) !important;
+  border: 3px solid #f59e0b !important;
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25), inset 0 2px 0 rgba(255,255,255,0.5) !important;
 }
 
-/* Remove generic hover - specific ones are in each card type above */
-
-/* Game card header gradient enhancements */
-.group .from-blue-500.to-blue-600 {
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
-  box-shadow: inset 0 2px 20px rgba(255, 255, 255, 0.2);
-}
-
-.group .from-green-500.to-green-600 {
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
-  box-shadow: inset 0 2px 20px rgba(255, 255, 255, 0.2);
-}
-
-.group .from-purple-500.to-purple-600 {
-  background: linear-gradient(135deg, #A855F7 0%, #9333EA 100%) !important;
-  box-shadow: inset 0 2px 20px rgba(255, 255, 255, 0.2);
-}
-
-/* Play button enhancements */
-.group button {
-  background: linear-gradient(135deg, #FFFFFF 0%, #FEF3C7 100%) !important;
-  color: #7C3AED !important;
-  font-weight: 900 !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  border: 3px solid #FCD34D !important;
-  box-shadow: 0 4px 15px rgba(252, 211, 77, 0.5), inset 0 1px 3px rgba(255, 255, 255, 0.8) !important;
-}
-
-.group button:hover {
-  background: linear-gradient(135deg, #FDE047 0%, #FCD34D 100%) !important;
-  color: #6B21A8 !important;
-  transform: scale(1.12) rotate(3deg) !important;
-  box-shadow: 0 8px 25px rgba(252, 211, 77, 0.8), inset 0 1px 3px rgba(255, 255, 255, 0.9) !important;
-}
-
-/* Badge styling */
-.group span.bg-white\/30 {
-  background: rgba(255, 255, 255, 0.5) !important;
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.3) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-  font-weight: 800 !important;
-}
-
-/* Description section enhancement */
-.group > div:last-child {
-  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.95), rgba(243, 232, 255, 0.8)) !important;
-  border-top: 3px solid rgba(168, 85, 247, 0.2) !important;
-}
-
-.dark .group > div:last-child {
-  background: linear-gradient(to bottom right, rgba(55, 65, 81, 0.95), rgba(88, 28, 135, 0.3)) !important;
-  border-top: 3px solid rgba(168, 85, 247, 0.3) !important;
-}
-
-/* Icon animations */
-.group .text-7xl {
-  animation: iconBounce 2s ease-in-out infinite;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-}
-
-@keyframes iconBounce {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-5px) scale(1.05);
-  }
-}
-
-/* Card entrance animation enhancement */
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(40px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Sparkle effect on hover */
-.group:hover::before {
-  content: '✨';
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 2rem;
-  animation: sparkle 1s ease-in-out infinite;
-  z-index: 100;
-}
-
-@keyframes sparkle {
-  0%, 100% {
-    opacity: 0;
-    transform: scale(0.5) rotate(0deg);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.2) rotate(180deg);
-  }
-}
-
-/* Playful border animation */
-.group {
-  position: relative;
-  animation: borderGlow 3s ease-in-out infinite;
-}
-
-@keyframes borderGlow {
-  0%, 100% {
-    filter: brightness(1);
-  }
-  50% {
-    filter: brightness(1.1);
-  }
-}
-
-/* Title text enhancement */
-.group h3 {
-  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(255, 255, 255, 0.5) !important;
-  letter-spacing: 0.5px;
-}
-
-/* Description text readability */
-.group p {
-  line-height: 1.6 !important;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
-}
-
-.dark .group p {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-/* Make sure all game cards get proper styling */
-.group {
-  overflow: hidden;
-  position: relative;
-}
-
-/* Add a fun border pulse animation */
-@keyframes borderPulse {
-  0%, 100% {
-    border-width: 4px;
-  }
-  50% {
-    border-width: 5px;
-  }
-}
-
-.group {
-  animation: borderPulse 3s ease-in-out infinite;
-}
-
-/* Description sections for each game type */
-.game-card-quiz > div:last-child {
-  background: linear-gradient(to bottom right, #EFF6FF, #DBEAFE, #BFDBFE) !important;
-  border-top: 3px solid #93C5FD !important;
-}
-
-.dark .game-card-quiz > div:last-child {
-  background: linear-gradient(to bottom right, #1E3A8A, #1E40AF) !important;
-  border-top: 3px solid #3B82F6 !important;
-}
-
-.game-card-fill_blanks > div:last-child {
-  background: linear-gradient(to bottom right, #F0FDF4, #DCFCE7, #BBF7D0) !important;
-  border-top: 3px solid #86EFAC !important;
-}
-
-.dark .game-card-fill_blanks > div:last-child {
-  background: linear-gradient(to bottom right, #14532D, #166534) !important;
-  border-top: 3px solid #22C55E !important;
-}
-
-.game-card-spelling > div:last-child {
-  background: linear-gradient(to bottom right, #FAF5FF, #F3E8FF, #E9D5FF) !important;
-  border-top: 3px solid #C084FC !important;
-}
-
-.dark .game-card-spelling > div:last-child {
-  background: linear-gradient(to bottom right, #581C87, #6B21A8) !important;
-  border-top: 3px solid #A855F7 !important;
-}
-
-/* Emoji animations in description */
-.group p span.text-2xl {
-  display: inline-block;
-  animation: emojiFloat 2s ease-in-out infinite;
-}
-
-@keyframes emojiFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-3px);
-  }
-}
-
-/* Extra polish for readability */
-.group h3 {
-  font-size: 2rem !important;
-  font-weight: 900 !important;
-}
-
-.group .text-7xl {
-  font-size: 4.5rem !important;
-}
-
-/* ====================================
-   Tips for Success Section Styling
-   ==================================== */
-
-/* Main Tips Container */
-.mt-10.bg-gradient-to-br {
-  background: linear-gradient(135deg, #FEF3C7 0%, #FED7AA 30%, #FBCFE8 70%, #FCE7F3 100%) !important;
-  border: 5px solid #FCD34D !important;
-  box-shadow: 0 15px 40px rgba(251, 146, 60, 0.4), inset 0 2px 10px rgba(255, 255, 255, 0.6) !important;
-  position: relative;
-  overflow: hidden;
-  animation: tipsGlow 3s ease-in-out infinite;
-  margin-top: 3rem !important; /* 48px gap from game cards above */
-}
-
-.dark .mt-10.bg-gradient-to-br {
-  background: linear-gradient(135deg, rgba(217, 119, 6, 0.3) 0%, rgba(194, 65, 12, 0.3) 50%, rgba(190, 24, 93, 0.3) 100%) !important;
-  border: 5px solid #D97706 !important;
-  box-shadow: 0 15px 40px rgba(217, 119, 6, 0.5), inset 0 2px 10px rgba(217, 119, 6, 0.2) !important;
-}
-
-@keyframes tipsGlow {
-  0%, 100% {
-    filter: brightness(1);
-  }
-  50% {
-    filter: brightness(1.05);
-  }
-}
-
-/* Decorative background pattern */
-.mt-10.bg-gradient-to-br::before {
-  content: '⭐✨💡🎯';
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  font-size: 3rem;
-  opacity: 0.15;
-  animation: decorFloat 4s ease-in-out infinite;
-}
-
-@keyframes decorFloat {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-10px) rotate(5deg);
-  }
-}
-
-/* Tips Title Enhancement */
-.mt-10 h3 {
-  font-size: 2.5rem !important;
-  font-weight: 900 !important;
-  background: linear-gradient(135deg, #EA580C 0%, #DC2626 50%, #E11D48 100%) !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  text-shadow: 0 2px 8px rgba(234, 88, 12, 0.3);
-  letter-spacing: 0.5px;
-}
-
-/* Lightbulb Icon Animation */
-.mt-10 .text-5xl {
-  display: inline-block;
-  filter: drop-shadow(0 4px 8px rgba(234, 88, 12, 0.4));
-  animation: lightbulbGlow 2s ease-in-out infinite !important;
-}
-
-@keyframes lightbulbGlow {
-  0%, 100% {
-    transform: scale(1) rotate(0deg);
-    filter: drop-shadow(0 4px 8px rgba(234, 88, 12, 0.4));
-  }
-  25% {
-    transform: scale(1.1) rotate(-5deg);
-    filter: drop-shadow(0 6px 12px rgba(234, 88, 12, 0.6));
-  }
-  50% {
-    transform: scale(1.15) rotate(0deg);
-    filter: drop-shadow(0 8px 16px rgba(234, 88, 12, 0.8));
-  }
-  75% {
-    transform: scale(1.1) rotate(5deg);
-    filter: drop-shadow(0 6px 12px rgba(234, 88, 12, 0.6));
-  }
-}
-
-/* Individual Tip Cards */
-.mt-10 .grid > div {
-  background: linear-gradient(135deg, #FFFFFF 0%, #FEF3C7 100%) !important;
-  border: 3px solid #FCD34D !important;
-  box-shadow: 0 8px 20px rgba(251, 146, 60, 0.25), inset 0 1px 3px rgba(255, 255, 255, 0.8) !important;
-  transition: all 0.3s ease !important;
-  position: relative;
-  overflow: hidden;
-}
-
-.dark .mt-10 .grid > div {
-  background: linear-gradient(135deg, #374151 0%, #1F2937 100%) !important;
-  border: 3px solid #D97706 !important;
-  box-shadow: 0 8px 20px rgba(217, 119, 6, 0.3), inset 0 1px 3px rgba(217, 119, 6, 0.2) !important;
-}
-
-/* Tip Card Hover Effects */
-.mt-10 .grid > div:hover {
-  transform: translateY(-5px) scale(1.03) !important;
-  box-shadow: 0 15px 35px rgba(251, 146, 60, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.9) !important;
-  border-color: #F59E0B !important;
-}
-
-.dark .mt-10 .grid > div:hover {
-  box-shadow: 0 15px 35px rgba(217, 119, 6, 0.5), inset 0 1px 3px rgba(217, 119, 6, 0.3) !important;
-  border-color: #F59E0B !important;
-}
-
-/* Tip Card Icons */
-.mt-10 .grid > div > span {
-  display: inline-block;
-  font-size: 2.5rem !important;
-  filter: drop-shadow(0 2px 4px rgba(251, 146, 60, 0.3));
-  transition: transform 0.3s ease;
+.dark .game-card-word_search {
+  background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%) !important;
+  border: 3px solid #f59e0b !important;
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4) !important;
 }
 
-.mt-10 .grid > div:hover > span {
-  transform: scale(1.2) rotate(10deg);
+/* Game Icon */
+.game-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
 }
 
-/* Tip Card Text */
-.mt-10 .grid > div > p {
-  font-size: 1.1rem !important;
-  font-weight: 800 !important;
-  color: #78350F !important;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+/* Game Title */
+.game-title {
+  margin: 0 0 8px 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #1e293b;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-.dark .mt-10 .grid > div > p {
-  color: #FCD34D !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+.dark .game-title {
+  color: #f1f5f9;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-/* Add sparkle effect on hover */
-.mt-10 .grid > div:hover::after {
-  content: '✨';
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 1.5rem;
-  animation: sparkleRotate 1s ease-in-out infinite;
+/* Game Questions Count */
+.game-questions {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  color: #718096;
 }
 
-@keyframes sparkleRotate {
-  0%, 100% {
-    opacity: 0;
-    transform: scale(0.5) rotate(0deg);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1) rotate(180deg);
-  }
+.dark .game-questions {
+  color: #a0aec0;
 }
 
-/* Stagger animation for tip cards */
-.mt-10 .grid > div:nth-child(1) {
-  animation: tipCardSlide 0.5s ease-out 0.1s both;
+/* Incomplete Attempt Badge */
+.incomplete-attempt-badge {
+  padding: 14px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  border: 2px solid #f59e0b;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
 }
 
-.mt-10 .grid > div:nth-child(2) {
-  animation: tipCardSlide 0.5s ease-out 0.2s both;
+.dark .incomplete-attempt-badge {
+  background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+  border-color: #f59e0b;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
-.mt-10 .grid > div:nth-child(3) {
-  animation: tipCardSlide 0.5s ease-out 0.3s both;
+.incomplete-attempt-badge .badge-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #5a4a30;
 }
 
-.mt-10 .grid > div:nth-child(4) {
-  animation: tipCardSlide 0.5s ease-out 0.4s both;
+.dark .incomplete-attempt-badge .badge-title {
+  color: #f5e6c3;
 }
 
-@keyframes tipCardSlide {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.incomplete-attempt-badge .badge-info,
+.incomplete-attempt-badge .badge-score {
+  color: #718096;
+  margin-top: 4px;
 }
 
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .mt-10 h3 {
-    font-size: 2rem !important;
-  }
-  
-  .mt-10 .text-5xl {
-    font-size: 3rem !important;
-  }
-  
-  .mt-10 .grid > div > p {
-    font-size: 1rem !important;
-  }
+.dark .incomplete-attempt-badge .badge-info,
+.dark .incomplete-attempt-badge .badge-score {
+  color: #a0aec0;
 }
 
-/* ====================================
-   Hero/Header Banner Section
-   ==================================== */
-
-/* Main hero banner */
-.relative.bg-gradient-to-r.from-blue-500 {
-  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 25%, #EC4899 50%, #F472B6 75%, #FBCFE8 100%) !important;
-  position: relative;
-  overflow: hidden;
-  border-radius: 0 0 3rem 3rem !important;
-  box-shadow: 0 15px 50px rgba(139, 92, 246, 0.4), inset 0 2px 10px rgba(255, 255, 255, 0.3) !important;
-  animation: heroGradientShift 8s ease-in-out infinite;
-}
-
-@keyframes heroGradientShift {
-  0%, 100% {
-    filter: hue-rotate(0deg) brightness(1);
-  }
-  50% {
-    filter: hue-rotate(10deg) brightness(1.05);
-  }
-}
-
-/* Animated background pattern */
-.relative.bg-gradient-to-r.from-blue-500::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-  animation: patternMove 15s ease-in-out infinite;
-}
-
-@keyframes patternMove {
-  0%, 100% {
-    transform: scale(1) rotate(0deg);
-  }
-  50% {
-    transform: scale(1.1) rotate(5deg);
-  }
-}
-
-/* Hide background decorative emojis - keeping only game controller */
-.relative.bg-gradient-to-r.from-blue-500 .absolute.top-4,
-.relative.bg-gradient-to-r.from-blue-500 .absolute.top-8,
-.relative.bg-gradient-to-r.from-blue-500 .absolute.bottom-6,
-.relative.bg-gradient-to-r.from-blue-500 .absolute.bottom-8 {
-  display: none !important;
+/* Last Attempt Badge */
+.last-attempt-badge {
+  padding: 14px;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  border: 2px solid #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
 
-/* Main game controller icon */
-.relative.bg-gradient-to-r.from-blue-500 .text-6xl.animate-pulse {
-  font-size: 5rem !important;
-  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.3));
-  animation: iconBounceGlow 2s ease-in-out infinite !important;
+.dark .last-attempt-badge {
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+  border-color: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
-@keyframes iconBounceGlow {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-    filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.3));
-  }
-  50% {
-    transform: translateY(-15px) scale(1.1);
-    filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
-  }
+.last-attempt-badge .badge-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #2d3748;
 }
 
-/* Hero title */
-.relative.bg-gradient-to-r.from-blue-500 h1 {
-  font-size: 3.5rem !important;
-  font-weight: 900 !important;
-  text-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.3),
-    0 2px 4px rgba(0, 0, 0, 0.2),
-    0 0 30px rgba(255, 255, 255, 0.3) !important;
-  letter-spacing: 1px;
-  animation: titlePop 0.8s ease-out both;
-  color: #FFFFFF !important;
+.dark .last-attempt-badge .badge-title {
+  color: #e2e8f0;
 }
 
-/* Removed duplicate title text outline */
-
-@keyframes titlePop {
-  0% {
-    opacity: 0;
-    transform: scale(0.8) translateY(-20px);
-  }
-  60% {
-    transform: scale(1.05) translateY(0);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-/* Hero subtitle */
-.relative.bg-gradient-to-r.from-blue-500 p {
-  font-size: 1.5rem !important;
-  font-weight: 700 !important;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-  color: rgba(255, 255, 255, 0.95) !important;
-  letter-spacing: 0.5px;
-  animation: subtitleSlide 1s ease-out 0.3s both;
+.last-attempt-badge .badge-score-value {
+  color: #2d6a3e;
+  font-weight: 600;
 }
 
-@keyframes subtitleSlide {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.dark .last-attempt-badge .badge-score-value {
+  color: #86d4a8;
 }
 
-/* Add sparkle effect to hero */
-.relative.bg-gradient-to-r.from-blue-500::after {
-  content: '✨';
-  position: absolute;
-  top: 50%;
-  left: 10%;
-  font-size: 2rem;
-  animation: heroSparkle 4s ease-in-out infinite;
-  pointer-events: none;
+.last-attempt-badge .badge-time {
+  color: #718096;
+  font-size: 12px;
+  margin-top: 4px;
 }
 
-@keyframes heroSparkle {
-  0%, 100% {
-    opacity: 0;
-    transform: scale(0) rotate(0deg);
-  }
-  25% {
-    opacity: 1;
-    transform: scale(1) rotate(90deg);
-  }
-  50% {
-    opacity: 0;
-    transform: scale(1.5) rotate(180deg);
-  }
-  75% {
-    opacity: 1;
-    transform: scale(1) rotate(270deg);
-  }
+.dark .last-attempt-badge .badge-time {
+  color: #a0aec0;
 }
 
-/* Mobile responsiveness for hero */
-@media (max-width: 768px) {
-  .relative.bg-gradient-to-r.from-blue-500 h1 {
-    font-size: 2.5rem !important;
-  }
-  
-  .relative.bg-gradient-to-r.from-blue-500 p {
-    font-size: 1.2rem !important;
-  }
-  
-  .relative.bg-gradient-to-r.from-blue-500 .text-6xl.animate-pulse {
-    font-size: 4rem !important;
-  }
+/* Game Buttons Container */
+.game-buttons {
+  display: flex;
+  gap: 8px;
 }
-
-/* ====================================
-   Back Button Styling
-   ==================================== */
 
-/* Back button container */
-.relative.bg-gradient-to-r.from-blue-500 button.mb-4,
-button.mb-4.flex.items-center.text-white {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%) !important;
-  border: 3px solid rgba(255, 255, 255, 0.4) !important;
-  border-radius: 2rem !important;
-  padding: 0.75rem 1.5rem !important;
-  font-size: 1.1rem !important;
-  font-weight: 900 !important;
-  color: #FFFFFF !important;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px) !important;
-  box-shadow: 
-    0 4px 15px rgba(0, 0, 0, 0.2),
-    inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
-  transition: all 0.3s ease !important;
+/* Button Base Styles */
+.btn-play,
+.btn-resume,
+.btn-clear {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Shine effect on button */
-.relative.bg-gradient-to-r.from-blue-500 button.mb-4::before,
-button.mb-4.flex.items-center.text-white::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s ease;
-}
-
-.relative.bg-gradient-to-r.from-blue-500 button.mb-4:hover::before,
-button.mb-4.flex.items-center.text-white:hover::before {
-  left: 100%;
-}
-
-/* Hover state */
-.relative.bg-gradient-to-r.from-blue-500 button.mb-4:hover,
-button.mb-4.flex.items-center.text-white:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.25) 100%) !important;
-  border-color: rgba(255, 255, 255, 0.6) !important;
-  color: #FEF3C7 !important;
-  transform: translateX(-5px) scale(1.05) !important;
-  box-shadow: 
-    0 6px 20px rgba(0, 0, 0, 0.3),
-    inset 0 1px 2px rgba(255, 255, 255, 0.6) !important;
-}
-
-/* Arrow icon styling */
-.relative.bg-gradient-to-r.from-blue-500 button.mb-4 svg,
-button.mb-4.flex.items-center.text-white svg {
-  width: 1.5rem !important;
-  height: 1.5rem !important;
-  margin-right: 0.5rem !important;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
-  transition: transform 0.3s ease;
-}
-
-.relative.bg-gradient-to-r.from-blue-500 button.mb-4:hover svg,
-button.mb-4.flex.items-center.text-white:hover svg {
-  transform: translateX(-5px);
-  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.4));
-}
-
-/* Active/pressed state */
-.relative.bg-gradient-to-r.from-blue-500 button.mb-4:active,
-button.mb-4.flex.items-center.text-white:active {
-  transform: translateX(-3px) scale(1.02) !important;
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.3),
-    inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
-}
-
-/* Mobile responsiveness for back button */
-@media (max-width: 768px) {
-  .relative.bg-gradient-to-r.from-blue-500 button.mb-4,
-  button.mb-4.flex.items-center.text-white {
-    font-size: 1rem !important;
-    padding: 0.625rem 1.25rem !important;
-  }
-  
-  .relative.bg-gradient-to-r.from-blue-500 button.mb-4 svg,
-  button.mb-4.flex.items-center.text-white svg {
-    width: 1.25rem !important;
-    height: 1.25rem !important;
-  }
-}
-
-/* ====================================
-   Stories Header Section
-   ==================================== */
-
-/* Main header container */
-.mb-6.bg-white.dark\\:bg-gray-800.rounded-2xl {
-  background: linear-gradient(135deg, #FFFFFF 0%, #FAF5FF 50%, #F3E8FF 100%) !important;
-  border: 4px solid #E9D5FF !important;
-  box-shadow: 0 8px 25px rgba(168, 85, 247, 0.25), inset 0 2px 5px rgba(255, 255, 255, 0.6) !important;
-  padding: 1.5rem !important;
-  animation: headerSlide 0.6s ease-out both;
-}
-
-.dark .mb-6.bg-white.dark\\:bg-gray-800.rounded-2xl {
-  background: linear-gradient(135deg, #1F2937 0%, #581C87 30%, #1F2937 100%) !important;
-  border: 4px solid #7C3AED !important;
-  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4), inset 0 2px 5px rgba(124, 58, 237, 0.2) !important;
-}
-
-@keyframes headerSlide {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Header text styling */
-.mb-6 .text-xl.font-bold {
-  font-size: 1.75rem !important;
-  font-weight: 900 !important;
-  background: linear-gradient(135deg, #7C3AED 0%, #EC4899 50%, #F97316 100%) !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  text-shadow: none !important;
-  letter-spacing: 0.5px;
-  position: relative;
-}
-
-/* Fallback for browsers that don't support background-clip */
-@supports not (-webkit-background-clip: text) {
-  .mb-6 .text-xl.font-bold {
-    color: #7C3AED !important;
-    -webkit-text-fill-color: #7C3AED !important;
-  }
-}
-
-/* Add glow effect behind text */
-.mb-6 .text-xl.font-bold::before {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: -1;
-  background: linear-gradient(135deg, #7C3AED 0%, #EC4899 50%, #F97316 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  filter: blur(10px);
-  opacity: 0.3;
-}
-
-/* Header emojis */
-.mb-6 .text-3xl {
-  font-size: 2.5rem !important;
-  filter: drop-shadow(0 3px 6px rgba(124, 58, 237, 0.3));
-  animation: emojiPulse 2s ease-in-out infinite;
-}
-
-@keyframes emojiPulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-/* ====================================
-   Story List Cards Styling
-   ==================================== */
-
-/* Story Grid Spacing */
-.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3 {
-  gap: 2.5rem !important; /* 40px spacing between cards */
-  row-gap: 2.5rem !important; /* Ensure vertical spacing is also 40px */
-}
-
-/* Individual Story Cards */
-.group.bg-white.dark\\:bg-gray-800.rounded-3xl {
-  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 50%, #F3F4F6 100%) !important;
-  border: 4px solid transparent !important;
-  background-clip: padding-box;
-  position: relative;
-  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.8) !important;
-}
-
-/* Removed animated gradient border effect for cleaner look */
-
-/* Dark mode story cards */
-.dark .group.bg-white.dark\\:bg-gray-800.rounded-3xl {
-  background: linear-gradient(135deg, #1F2937 0%, #111827 50%, #0F172A 100%) !important;
-  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3), inset 0 1px 2px rgba(139, 92, 246, 0.2) !important;
-}
-
-/* Story Card Hover Effect - Removed for better UX */
-.group.bg-white.dark\\:bg-gray-800.rounded-3xl:hover {
-  transform: none !important;
-  box-shadow: 0 12px 35px rgba(139, 92, 246, 0.25) !important;
-}
-
-.dark .group.bg-white.dark\\:bg-gray-800.rounded-3xl:hover {
-  box-shadow: 0 12px 35px rgba(139, 92, 246, 0.35) !important;
-}
-
-/* Story Cover Image Container */
-.group .relative.h-52 {
-  background: linear-gradient(135deg, #A855F7 0%, #EC4899 50%, #F97316 100%) !important;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Removed cover image emoji effect */
-
-@keyframes iconFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-/* Cover Image Enhancement - No zoom effect */
-.group .relative.h-52 img {
-  transition: filter 0.3s ease !important;
-  filter: brightness(0.95);
-}
-
-.group:hover .relative.h-52 img {
-  filter: brightness(1);
-}
-
-/* Games Count Badge */
-.group .absolute.top-3.right-3 {
-  background: linear-gradient(135deg, #FBBF24 0%, #F97316 100%) !important;
-  border: 3px solid #FFFFFF !important;
-  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.5), inset 0 1px 3px rgba(255, 255, 255, 0.6) !important;
-  animation: badgePulse 2s ease-in-out infinite;
-}
-
-@keyframes badgePulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.08);
-  }
-}
-
-.group:hover .absolute.top-3.right-3 {
-  transform: scale(1.15) rotate(5deg) !important;
-  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.7), inset 0 1px 3px rgba(255, 255, 255, 0.8) !important;
-}
-
-/* Story Card Content Area */
-.group .p-5.bg-gradient-to-br {
-  background: linear-gradient(135deg, #FFFFFF 0%, #FAF5FF 50%, #F3E8FF 100%) !important;
-  border-top: 3px solid #E9D5FF !important;
-  padding: 1.5rem !important;
-}
-
-.dark .group .p-5.bg-gradient-to-br {
-  background: linear-gradient(135deg, #1F2937 0%, #581C87 20%, #1F2937 100%) !important;
-  border-top: 3px solid #7C3AED !important;
-}
-
-/* Story Title */
-.group h3 {
-  font-size: 1.5rem !important;
-  font-weight: 900 !important;
-  transition: all 0.3s ease !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.group:hover h3 {
-  color: #7C3AED !important;
-  text-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
-}
-
-.dark .group:hover h3 {
-  color: #C084FC !important;
-}
-
-/* Author Section */
-.group .flex.items-center.gap-2 p {
-  font-weight: 700 !important;
-  color: #6B7280 !important;
-}
-
-.dark .group .flex.items-center.gap-2 p {
-  color: #9CA3AF !important;
-}
-
-/* Author emoji */
-.group .flex.items-center.gap-2 span.text-2xl {
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-/* Genre Badge */
-.group .text-xs.font-bold.bg-gradient-to-r {
-  background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%) !important;
-  font-size: 0.875rem !important;
-  font-weight: 900 !important;
-  padding: 0.5rem 1rem !important;
-  border-radius: 9999px !important;
-  box-shadow: 
-    0 3px 10px rgba(168, 85, 247, 0.5),
-    inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
-  border: 2px solid rgba(255, 255, 255, 0.4) !important;
-  text-transform: capitalize !important;
-  letter-spacing: 0.5px;
   transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
+  color: white;
 }
 
-/* Shine effect on genre badge */
-.group .text-xs.font-bold.bg-gradient-to-r::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
+/* Play Button (Green with Gradient) */
+.btn-play {
   width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: left 0.5s ease;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
-.group:hover .text-xs.font-bold.bg-gradient-to-r::before {
-  left: 100%;
+.btn-play:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.5);
+  transform: translateY(-2px);
 }
 
-.group:hover .text-xs.font-bold.bg-gradient-to-r {
-  transform: scale(1.08) translateY(-2px);
-  box-shadow: 
-    0 5px 15px rgba(168, 85, 247, 0.7),
-    inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
-  border-color: rgba(255, 255, 255, 0.6) !important;
+.dark .btn-play {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }
 
-/* Click to Play Section - Enhanced Visibility */
-.group .mt-4.pt-4.border-t-2 {
-  border-top: none !important;
-  background: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%) !important;
-  margin-top: 1.25rem !important;
-  padding: 1rem 1.5rem !important;
-  border-radius: 1rem !important;
-  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
-  transition: all 0.3s ease !important;
-  cursor: pointer;
+.dark .btn-play:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.6);
 }
 
-.dark .group .mt-4.pt-4.border-t-2 {
-  background: linear-gradient(135deg, #6B21A8 0%, #7C3AED 100%) !important;
-  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.5), inset 0 1px 2px rgba(168, 85, 247, 0.3) !important;
+/* Resume Button (Orange with Gradient) */
+.btn-resume {
+  flex: 1;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
-.group .mt-4.pt-4.border-t-2 p {
-  font-size: 1.2rem !important;
-  font-weight: 900 !important;
-  color: #FFFFFF !important;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  position: relative;
-  letter-spacing: 0.5px;
+.btn-resume:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.5);
+  transform: translateY(-2px);
 }
 
-.dark .group .mt-4.pt-4.border-t-2 p {
-  color: #FFFFFF !important;
+.dark .btn-resume {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 }
 
-.group:hover .mt-4.pt-4.border-t-2 {
-  background: linear-gradient(135deg, #6B21A8 0%, #8B5CF6 100%) !important;
-  transform: scale(1.03) !important;
-  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+.dark .btn-resume:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.6);
 }
 
-.dark .group:hover .mt-4.pt-4.border-t-2 {
-  background: linear-gradient(135deg, #581C87 0%, #6B21A8 100%) !important;
-  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.7), inset 0 1px 2px rgba(168, 85, 247, 0.4) !important;
+/* Clear Button (Red with Gradient) */
+.btn-clear {
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
-.group:hover .mt-4.pt-4.border-t-2 p {
-  transform: scale(1.05) !important;
+.btn-clear:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.5);
+  transform: translateY(-2px);
 }
 
-/* Removed sparkle effect */
-
-/* Stagger animation for story cards */
-.group.bg-white.dark\\:bg-gray-800.rounded-3xl:nth-child(1) {
-  animation: slideInUp 0.5s ease-out 0s both !important;
+.dark .btn-clear {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 }
 
-.group.bg-white.dark\\:bg-gray-800.rounded-3xl:nth-child(2) {
-  animation: slideInUp 0.5s ease-out 0.1s both !important;
+.dark .btn-clear:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.6);
 }
 
-.group.bg-white.dark\\:bg-gray-800.rounded-3xl:nth-child(3) {
-  animation: slideInUp 0.5s ease-out 0.2s both !important;
-}
-
-.group.bg-white.dark\\:bg-gray-800.rounded-3xl:nth-child(4) {
-  animation: slideInUp 0.5s ease-out 0.3s both !important;
-}
-
-.group.bg-white.dark\\:bg-gray-800.rounded-3xl:nth-child(5) {
-  animation: slideInUp 0.5s ease-out 0.4s both !important;
-}
-
-.group.bg-white.dark\\:bg-gray-800.rounded-3xl:nth-child(6) {
-  animation: slideInUp 0.5s ease-out 0.5s both !important;
-}
-
-/* Mobile Responsiveness for Story Cards */
+/* Responsive Design */
 @media (max-width: 768px) {
-  .grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3 {
-    gap: 2rem !important; /* 32px on mobile */
-    row-gap: 2rem !important;
+  .story-games-page {
+    padding: 15px;
+    padding-bottom: 80px;
   }
-  
-  .group h3 {
-    font-size: 1.25rem !important;
+
+  .game-card {
+    padding: 16px;
   }
-  
-  .group .mt-4.pt-4.border-t-2 p {
-    font-size: 1rem !important;
+
+  .game-icon {
+    font-size: 40px;
   }
-}
 
-/* ====================================
-   Dark Mode Support for Story Games
-   ==================================== */
-
-/* Main container */
-.dark .min-h-screen {
-  background-color: #111827 !important;
-}
-
-/* Page title and header */
-.dark h1,
-.dark h2,
-.dark h3,
-.dark h4 {
-  color: #f9fafb !important;
-}
-
-.dark p:not([class*="bg-"]):not([class*="text-white"]) {
-  color: #d1d5db !important;
-}
-
-/* Game cards */
-.dark .bg-white:not([class*="text-white"]) {
-  background-color: #1f2937 !important;
-}
-
-.dark .border-gray-200 {
-  border-color: #374151 !important;
-}
-
-.dark .border-gray-300 {
-  border-color: #4b5563 !important;
-}
-
-/* Card hover states */
-.dark .hover\\:shadow-xl:hover {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7) !important;
-}
-
-.dark .hover\\:border-purple-300:hover {
-  border-color: #818cf8 !important;
-}
-
-/* Text colors */
-.dark .text-gray-500 {
-  color: #9ca3af !important;
-}
-
-.dark .text-gray-600 {
-  color: #9ca3af !important;
-}
-
-.dark .text-gray-700 {
-  color: #d1d5db !important;
-}
-
-.dark .text-gray-800 {
-  color: #e5e7eb !important;
-}
-
-.dark .text-gray-900 {
-  color: #f9fafb !important;
-}
-
-/* Background colors */
-.dark .bg-gray-50 {
-  background-color: #374151 !important;
-}
-
-.dark .bg-gray-100 {
-  background-color: #1f2937 !important;
-}
-
-.dark .bg-gray-200:not(button) {
-  background-color: #374151 !important;
-}
-
-/* Badge colors - keep vibrant in dark mode */
-.dark .bg-purple-100 {
-  background-color: #581c87 !important;
-}
-
-.dark .text-purple-800 {
-  color: #e9d5ff !important;
-}
-
-.dark .bg-yellow-100 {
-  background-color: #78350f !important;
-}
-
-.dark .text-yellow-800 {
-  color: #fef3c7 !important;
-}
-
-.dark .bg-red-100 {
-  background-color: #7f1d1d !important;
-}
-
-.dark .text-red-800 {
-  color: #fecaca !important;
-}
-
-.dark .bg-green-100 {
-  background-color: #064e3b !important;
-}
-
-.dark .text-green-800 {
-  color: #d1fae5 !important;
-}
-
-.dark .bg-blue-100 {
-  background-color: #1e3a8a !important;
-}
-
-.dark .text-blue-800 {
-  color: #bfdbfe !important;
-}
-
-/* Progress indicators */
-.dark .bg-green-200 {
-  background-color: #065f46 !important;
-}
-
-.dark .bg-yellow-200 {
-  background-color: #92400e !important;
-}
-
-/* Buttons - keep vibrant */
-.dark button.bg-blue-500 {
-  background-color: #3b82f6 !important;
-}
-
-.dark button.bg-blue-500:hover {
-  background-color: #2563eb !important;
-}
-
-.dark button.bg-green-500,
-.dark button.bg-green-600 {
-  background-color: #10b981 !important;
-}
-
-.dark button.bg-green-500:hover,
-.dark button.bg-green-600:hover {
-  background-color: #059669 !important;
-}
-
-.dark button.bg-orange-500 {
-  background-color: #f97316 !important;
-}
-
-.dark button.bg-orange-500:hover {
-  background-color: #ea580c !important;
-}
-
-.dark button.bg-red-500 {
-  background-color: #ef4444 !important;
-}
-
-.dark button.bg-red-500:hover {
-  background-color: #dc2626 !important;
-}
-
-/* Loading states */
-.dark .animate-spin {
-  border-color: #4b5563 !important;
-  border-top-color: #818cf8 !important;
-}
-
-/* Empty state */
-.dark .text-center p {
-  color: #9ca3af !important;
-}
-
-/* Card shadows in dark mode */
-.dark .shadow-lg {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
-}
-
-.dark .shadow-xl {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
-}
-
-/* Stats display */
-.dark .flex.items-center.justify-between {
-  color: #d1d5db !important;
-}
-
-/* Game type badges */
-.dark .inline-block.px-3.py-1 {
-  background-color: #374151 !important;
-  color: #f9fafb !important;
-}
-
-/* Difficulty indicators */
-.dark .font-semibold {
-  color: #f9fafb !important;
-}
-
-/* Score percentages */
-.dark .text-2xl {
-  color: #f9fafb !important;
-}
-
-.dark .text-3xl {
-  color: #f9fafb !important;
-}
-
-.dark .text-4xl {
-  color: #f9fafb !important;
-}
-
-/* Back button */
-.dark button.bg-gray-200 {
-  background-color: #374151 !important;
-  color: #f9fafb !important;
-}
-
-.dark button.bg-gray-200:hover {
-  background-color: #4b5563 !important;
-}
-
-/* Incomplete attempt banner */
-.dark .bg-orange-50 {
-  background-color: #7c2d12 !important;
-  border-color: #f97316 !important;
-}
-
-.dark .bg-orange-50 * {
-  color: #fed7aa !important;
-}
-
-/* Tip cards */
-.dark .bg-blue-50 {
-  background-color: #1e3a8a !important;
-  border-color: #3b82f6 !important;
-}
-
-.dark .bg-blue-50 * {
-  color: #bfdbfe !important;
-}
-
-/* Game completion indicators */
-.dark .opacity-75 {
-  opacity: 0.6 !important;
-}
-
-/* Mobile adjustments */
-@media (max-width: 640px) {
-  .dark .bg-white {
-    background-color: #1f2937 !important;
+  .game-title {
+    font-size: 18px;
   }
-  
-  .dark .shadow-lg {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+
+  .btn-play,
+  .btn-resume,
+  .btn-clear {
+    font-size: 14px;
+    padding: 10px 16px;
   }
 }
