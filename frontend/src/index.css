@@ -21170,7 +21170,7 @@ body.dark .magical-home p {
   align-items: flex-end !important;
   justify-content: center !important;
   padding: 0 !important;
-  z-index: 9999 !important;
+  z-index: 999999 !important;
   animation: fadeIn 0.2s ease-out !important;
 }
 
