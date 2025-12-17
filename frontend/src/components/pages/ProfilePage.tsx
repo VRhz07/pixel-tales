@@ -52,7 +52,7 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const { profile } = useUserStore();
   const { playButtonClick } = useSoundEffects();
-  const { user, updateUser } = useAuthStore();
+  const { user, setUser } = useAuthStore();
   const { stories, characters, getStats } = useStoryStore();
   
   // Debug: Log user data
@@ -807,9 +807,9 @@ const ProfilePage = () => {
 
               // Update local user state
               if (user) {
-                updateUser({
+                setUser({
                   ...user,
-                  avatar,
+                  avatar: avatar,
                   selected_avatar_border: border
                 });
               }
