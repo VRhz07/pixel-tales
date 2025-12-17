@@ -44,8 +44,13 @@ fi
 echo "Updating word search games to child-friendly 8x8 format..."
 python manage.py update_word_searches --force || echo "No word searches to update"
 
-# Generate educational games for all published stories (ONE-TIME: force regenerate with --regenerate flag)
+# Generate educational games for all published stories
+# IMPORTANT: This includes word search, quiz, and fill-in-the-blank games
 echo "Generating educational games for published stories..."
-python manage.py generate_all_games || echo "Warning: Game generation had some issues, but deployment continues"
+python manage.py generate_all_games --regenerate
+
+# Verify games were created
+echo "Verifying game generation..."
+python manage.py shell -c "from storybook.models import StoryGame; ws_count = StoryGame.objects.filter(game_type='word_search').count(); print(f'Word Search Games: {ws_count}'); quiz_count = StoryGame.objects.filter(game_type='quiz').count(); print(f'Quiz Games: {quiz_count}'); fb_count = StoryGame.objects.filter(game_type='fill_blanks').count(); print(f'Fill Blanks Games: {fb_count}')" || echo "Could not verify game counts"
 
 echo "Build completed successfully!"
