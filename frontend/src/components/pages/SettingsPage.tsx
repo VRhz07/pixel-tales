@@ -9,8 +9,7 @@ import {
   ArrowRightOnRectangleIcon,
   TrashIcon,
   SwatchIcon,
-  ArrowLeftIcon,
-  GiftIcon
+  ArrowLeftIcon
 } from '@heroicons/react/24/outline';
 import Logo from '../common/Logo';
 import { useAuthStore } from '../../stores/authStore';
@@ -18,7 +17,6 @@ import { useThemeStore } from '../../stores/themeStore';
 import { useI18nStore } from '../../stores/i18nStore';
 import { useAccountSwitchStore } from '../../stores/accountSwitchStore';
 import { ProfileEditModal } from '../settings/ProfileEditModal';
-import { RewardsModal } from '../settings/RewardsModal';
 import { EmailChangeModal } from '../settings/EmailChangeModal';
 import { PasswordUpdateModal } from '../settings/PasswordUpdateModal';
 import { ParentPasswordVerificationModal } from '../settings/ParentPasswordVerificationModal';
@@ -48,7 +46,6 @@ const SettingsPage = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [showRewardsModal, setShowRewardsModal] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showParentPasswordModal, setShowParentPasswordModal] = useState(false);
@@ -185,41 +182,6 @@ const SettingsPage = () => {
     }
   };
 
-  // Rewards save handler
-  const handleRewardsSave = async (newAvatar: string, newBorder: string) => {
-    try {
-      // Use the correct endpoint for border updates
-      const response = await api.put('/users/profile/update/', { 
-        avatar_emoji: newAvatar,
-        selected_avatar_border: newBorder 
-      });
-      
-      if (!response.success) {
-        throw new Error(response.error || 'Failed to update rewards');
-      }
-      
-      // Update the store immediately with setUser
-      const { setUser } = useAuthStore.getState();
-      if (currentUser) {
-        const updatedUser = {
-          ...currentUser,
-          avatar: newAvatar,
-          selected_avatar_border: newBorder,
-        };
-        setUser(updatedUser);
-        
-        // Also update cache immediately
-        import('../../stores/cacheStore').then(({ useCacheStore }) => {
-          useCacheStore.getState().setCache('userProfile', updatedUser, 10 * 60 * 1000);
-        });
-      }
-      
-      setSuccessMessage('Rewards updated successfully!');
-    } catch (error: any) {
-      throw new Error(error.message || 'Failed to update rewards');
-    }
-  };
-  
   // Email change handler
   const handleEmailChange = async (newEmail: string, password: string) => {
     try {
@@ -338,60 +300,6 @@ const SettingsPage = () => {
                 className="settings-button-secondary"
               >
                 Update
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* My Rewards Section - Only for Child Accounts */}
-      {!isAnonymous && currentUser?.user_type === 'child' && (
-        <>
-          <div className="settings-section-header">
-            <h2>
-              <GiftIcon className="settings-section-icon" />
-              My Rewards
-            </h2>
-          </div>
-
-          <div className="settings-card">
-            <div className="settings-item">
-              <div className="settings-item-content">
-                <div className="settings-item-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  🎁 Avatars & Borders
-                </div>
-                <div className="settings-item-subtitle">
-                  Level {currentUser?.level || 1} • View and equip unlocked avatars & borders
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  playButtonClick();
-                  setShowRewardsModal(true);
-                }}
-                style={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontWeight: '600',
-                  padding: '0.5rem 1.25rem',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, #5a67d8 0%, #6b4ba2 100%)';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 8px rgba(102, 126, 234, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                View Rewards
               </button>
             </div>
           </div>
@@ -783,16 +691,6 @@ const SettingsPage = () => {
       />
     )}
 
-    {showRewardsModal && (
-      <RewardsModal
-        isOpen={showRewardsModal}
-        onClose={() => setShowRewardsModal(false)}
-        currentAvatar={currentUser?.avatar || '📚'}
-        currentBorder={currentUser?.selected_avatar_border || 'basic'}
-        onSave={handleRewardsSave}
-      />
-    )}
-    
     {showEmailModal && (
       <EmailChangeModal
         isOpen={showEmailModal}

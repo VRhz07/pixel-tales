@@ -107,5 +107,37 @@
   {"name": "Blockbuster", "description": "Get 1,000 story views", "category": "views", "metric_type": "views_received", "icon": "🎬", "color": "gold", "target_value": 1000, "rarity": "epic", "sort_order": 7},
   {"name": "View Champion", "description": "Get 2,500 story views", "category": "views", "metric_type": "views_received", "icon": "🏆", "color": "gold", "target_value": 2500, "rarity": "epic", "sort_order": 8},
   {"name": "Million Eyes", "description": "Get 5,000 story views", "category": "views", "metric_type": "views_received", "icon": "🌟", "color": "gold", "target_value": 5000, "rarity": "legendary", "sort_order": 9},
-  {"name": "View Legend", "description": "Get 10,000 story views", "category": "views", "metric_type": "views_received", "icon": "💫", "color": "rainbow", "target_value": 10000, "rarity": "legendary", "sort_order": 10}
+  {"name": "View Legend", "description": "Get 10,000 story views", "category": "views", "metric_type": "views_received", "icon": "💫", "color": "rainbow", "target_value": 10000, "rarity": "legendary", "sort_order": 10},
+  
+  {"name": "First Game", "description": "Complete your first game", "category": "games", "metric_type": "games_completed", "icon": "🎮", "color": "blue", "target_value": 1, "rarity": "common", "sort_order": 1},
+  {"name": "Gamer", "description": "Complete 5 games", "category": "games", "metric_type": "games_completed", "icon": "🕹️", "color": "blue", "target_value": 5, "rarity": "common", "sort_order": 2},
+  {"name": "Game Master", "description": "Complete 10 games", "category": "games", "metric_type": "games_completed", "icon": "🎯", "color": "green", "target_value": 10, "rarity": "uncommon", "sort_order": 3},
+  {"name": "Game Champion", "description": "Complete 25 games", "category": "games", "metric_type": "games_completed", "icon": "🏅", "color": "green", "target_value": 25, "rarity": "uncommon", "sort_order": 4},
+  {"name": "Gaming Pro", "description": "Complete 50 games", "category": "games", "metric_type": "games_completed", "icon": "🎖️", "color": "purple", "target_value": 50, "rarity": "rare", "sort_order": 5},
+  {"name": "Game Legend", "description": "Complete 100 games", "category": "games", "metric_type": "games_completed", "icon": "👾", "color": "purple", "target_value": 100, "rarity": "rare", "sort_order": 6},
+  {"name": "Gaming God", "description": "Complete 250 games", "category": "games", "metric_type": "games_completed", "icon": "🏆", "color": "gold", "target_value": 250, "rarity": "epic", "sort_order": 7},
+  {"name": "Ultimate Gamer", "description": "Complete 500 games", "category": "games", "metric_type": "games_completed", "icon": "💎", "color": "gold", "target_value": 500, "rarity": "epic", "sort_order": 8},
+  {"name": "Gaming Titan", "description": "Complete 1,000 games", "category": "games", "metric_type": "games_completed", "icon": "⚡", "color": "rainbow", "target_value": 1000, "rarity": "legendary", "sort_order": 9},
+  {"name": "Game Immortal", "description": "Complete 2,500 games", "category": "games", "metric_type": "games_completed", "icon": "🌟", "color": "rainbow", "target_value": 2500, "rarity": "legendary", "sort_order": 10},
+  
+  {"name": "Level 2", "description": "Reach Level 2", "category": "level", "metric_type": "level", "icon": "🌱", "color": "blue", "target_value": 2, "rarity": "common", "sort_order": 1},
+  {"name": "Level 5", "description": "Reach Level 5", "category": "level", "metric_type": "level", "icon": "🌿", "color": "blue", "target_value": 5, "rarity": "common", "sort_order": 2},
+  {"name": "Level 10", "description": "Reach Level 10", "category": "level", "metric_type": "level", "icon": "🌳", "color": "green", "target_value": 10, "rarity": "uncommon", "sort_order": 3},
+  {"name": "Level 15", "description": "Reach Level 15", "category": "level", "metric_type": "level", "icon": "🎄", "color": "green", "target_value": 15, "rarity": "uncommon", "sort_order": 4},
+  {"name": "Level 20", "description": "Reach Level 20", "category": "level", "metric_type": "level", "icon": "🌟", "color": "purple", "target_value": 20, "rarity": "rare", "sort_order": 5},
+  {"name": "Level 25", "description": "Reach Level 25", "category": "level", "metric_type": "level", "icon": "⭐", "color": "purple", "target_value": 25, "rarity": "rare", "sort_order": 6},
+  {"name": "Level 30", "description": "Reach Level 30", "category": "level", "metric_type": "level", "icon": "💫", "color": "gold", "target_value": 30, "rarity": "epic", "sort_order": 7},
+  {"name": "Level 40", "description": "Reach Level 40", "category": "level", "metric_type": "level", "icon": "✨", "color": "gold", "target_value": 40, "rarity": "epic", "sort_order": 8},
+  {"name": "Level 50", "description": "Reach Level 50", "category": "level", "metric_type": "level", "icon": "👑", "color": "gold", "target_value": 50, "rarity": "legendary", "sort_order": 9},
+  {"name": "Level 100", "description": "Reach Level 100", "category": "level", "metric_type": "level", "icon": "💎", "color": "rainbow", "target_value": 100, "rarity": "legendary", "sort_order": 10},
+  
+  {"name": "Avatar Collector", "description": "Unlock 5 different avatars", "category": "rewards", "metric_type": "avatars_unlocked", "icon": "😀", "color": "blue", "target_value": 5, "rarity": "common", "sort_order": 1},
+  {"name": "Avatar Master", "description": "Unlock 10 different avatars", "category": "rewards", "metric_type": "avatars_unlocked", "icon": "😎", "color": "green", "target_value": 10, "rarity": "uncommon", "sort_order": 2},
+  {"name": "Avatar Legend", "description": "Unlock 15 different avatars", "category": "rewards", "metric_type": "avatars_unlocked", "icon": "🤩", "color": "purple", "target_value": 15, "rarity": "rare", "sort_order": 3},
+  {"name": "Avatar God", "description": "Unlock all avatars", "category": "rewards", "metric_type": "avatars_unlocked", "icon": "👑", "color": "gold", "target_value": 20, "rarity": "epic", "sort_order": 4},
+  
+  {"name": "Border Collector", "description": "Unlock 3 different borders", "category": "rewards", "metric_type": "borders_unlocked", "icon": "🖼️", "color": "blue", "target_value": 3, "rarity": "common", "sort_order": 1},
+  {"name": "Border Master", "description": "Unlock 5 different borders", "category": "rewards", "metric_type": "borders_unlocked", "icon": "🎨", "color": "green", "target_value": 5, "rarity": "uncommon", "sort_order": 2},
+  {"name": "Border Legend", "description": "Unlock 7 different borders", "category": "rewards", "metric_type": "borders_unlocked", "icon": "✨", "color": "purple", "target_value": 7, "rarity": "rare", "sort_order": 3},
+  {"name": "Border God", "description": "Unlock all borders", "category": "rewards", "metric_type": "borders_unlocked", "icon": "💎", "color": "gold", "target_value": 10, "rarity": "epic", "sort_order": 4}
 ]

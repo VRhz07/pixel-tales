@@ -3,6 +3,9 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { App as CapacitorApp } from '@capacitor/app';
 import api from '../services/api';
 import gamesCacheService from '../services/gamesCache.service';
+import { useThemeStore } from '../stores/themeStore';
+import { useSoundEffects } from '../hooks/useSoundEffects';
+import './GamePlayPage.css';
 
 interface Question {
   id: number;
@@ -26,6 +29,8 @@ const GamePlayPage: React.FC = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDarkMode } = useThemeStore();
+  const { playButtonClick, playSuccess, playError, playAchievement, playSound } = useSoundEffects();
   
   const [gameData, setGameData] = useState<GameData | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -41,7 +46,7 @@ const GamePlayPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [timeTaken, setTimeTaken] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
-  const [startTime] = useState(Date.now());
+  const [startTime, setStartTime] = useState<number | null>(null);
   
   // Word search interactive state
   const [selectedCells, setSelectedCells] = useState<{row: number, col: number}[]>([]);
@@ -145,6 +150,9 @@ const GamePlayPage: React.FC = () => {
       setGameData(transformedData);
       setAttemptId(response.attempt_id);
       
+      // Start tracking time from now
+      setStartTime(Date.now());
+      
       // Cache the game data for offline play
       gamesCacheService.cacheGameData(gameId!, {
         gameData: transformedData,
@@ -213,6 +221,9 @@ const GamePlayPage: React.FC = () => {
         
         if (response.is_correct) {
           setScore(score + 1);
+          playSuccess(); // Play success sound with haptic
+        } else {
+          playError(); // Play error sound with haptic
         }
       }
     } catch (err) {
@@ -231,6 +242,7 @@ const GamePlayPage: React.FC = () => {
   };
 
   const handleNextQuestion = async () => {
+    playSound('page-turn'); // Play page turn sound
     setShowFeedback(false);
     setUserAnswer('');
     setIsSubmitting(false); // Reset submitting state
@@ -253,12 +265,14 @@ const GamePlayPage: React.FC = () => {
         console.log('✅ Game completed successfully', response);
         
         // Store time and XP from backend response
-        setTimeTaken(response.time_taken_seconds || Math.floor((Date.now() - startTime) / 1000));
+        // Prefer frontend calculated time as it's more accurate for this session
+        const calculatedTime = startTime ? Math.floor((Date.now() - startTime) / 1000) : response.time_taken_seconds;
+        setTimeTaken(calculatedTime || 0);
         setXpEarned(response.xp_earned || 0);
       } catch (err) {
         console.error('Error completing game:', err);
         // Fallback to calculated time if API fails
-        setTimeTaken(Math.floor((Date.now() - startTime) / 1000));
+        setTimeTaken(startTime ? Math.floor((Date.now() - startTime) / 1000) : 0);
       }
       
       setIsComplete(true);
@@ -344,6 +358,7 @@ const GamePlayPage: React.FC = () => {
       const newFoundWords = [...foundWords, foundWord];
       setFoundWords(newFoundWords);
       setCelebrationWord(foundWord);
+      playSound('magic-sparkle'); // Play sparkle sound for found word
       
       // Add the cells to foundWordCells to keep them highlighted green
       setFoundWordCells([...foundWordCells, ...selectedCells]);
@@ -372,7 +387,9 @@ const GamePlayPage: React.FC = () => {
           console.log('✅ Word search game completed successfully', response);
           
           // Store time and XP from backend response
-          setTimeTaken(response.time_taken_seconds || Math.floor((Date.now() - startTime) / 1000));
+          // Prefer frontend calculated time as it's more accurate for this session
+          const calculatedTime = startTime ? Math.floor((Date.now() - startTime) / 1000) : response.time_taken_seconds;
+          setTimeTaken(calculatedTime || 0);
           setXpEarned(response.xp_earned || 0);
           
           // Show completion screen after a delay
@@ -382,7 +399,7 @@ const GamePlayPage: React.FC = () => {
         } catch (err) {
           console.error('Error submitting word search completion:', err);
           // Fallback to calculated time if API fails
-          setTimeTaken(Math.floor((Date.now() - startTime) / 1000));
+          setTimeTaken(startTime ? Math.floor((Date.now() - startTime) / 1000) : 0);
           // Still show completion even if submission fails
           setTimeout(() => {
             setIsComplete(true);
@@ -396,13 +413,13 @@ const GamePlayPage: React.FC = () => {
   };
   
   const handleCellTouchStart = (e: React.TouchEvent, row: number, col: number) => {
-    e.preventDefault(); // Prevent scrolling during selection
+    // Note: touchAction: 'none' in CSS handles scroll prevention
     e.stopPropagation();
     handleCellMouseDown(row, col);
   };
   
   const handleCellTouchMove = (e: React.TouchEvent, grid: string[]) => {
-    e.preventDefault(); // Prevent scrolling during selection
+    // Note: touchAction: 'none' in CSS handles scroll prevention
     e.stopPropagation();
     
     const touch = e.touches[0];
@@ -445,7 +462,7 @@ const GamePlayPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', minHeight: '100vh', backgroundColor: '#ffffff' }}>
+      <div className="gameplay-loading">
         <p>Loading game...</p>
       </div>
     );
@@ -453,21 +470,11 @@ const GamePlayPage: React.FC = () => {
 
   if (error || !gameData) {
     return (
-      <div style={{ 
-        padding: '20px', 
-        minHeight: '100vh', 
-        backgroundColor: '#ffffff' 
-      }}>
-        <div style={{ 
-          padding: '20px', 
-          backgroundColor: '#fee', 
-          border: '1px solid #fcc',
-          borderRadius: '8px',
-          marginBottom: '20px'
-        }}>
+      <div className="gameplay-error-page">
+        <div className="error-box">
           {error || 'Game not found'}
         </div>
-        <button onClick={() => navigate('/games')}>Back to Games</button>
+        <button onClick={() => navigate('/games')} className="btn-back">Back to Games</button>
       </div>
     );
   }
@@ -478,121 +485,92 @@ const GamePlayPage: React.FC = () => {
     const percentage = isWordSearchComplete ? 100 : Math.round((score / gameData.questions.length) * 100);
     
     return (
-      <div style={{ 
-        padding: '20px', 
-        minHeight: '100vh', 
-        backgroundColor: '#ffffff',
-        textAlign: 'center'
-      }}>
-        <div style={{ maxWidth: '600px', margin: '0 auto', paddingTop: '60px' }}>
-          <h1 style={{ fontSize: '48px', margin: '20px 0' }}>
+      <div className="completion-screen">
+        <div className="completion-container">
+          <h1 className="completion-emoji">
             {isWordSearchComplete || percentage >= 80 ? '🎉' : percentage >= 60 ? '👍' : '💪'}
           </h1>
-          <h2>Game Complete!</h2>
+          <h2 className="completion-title">Game Complete!</h2>
           {isWordSearchComplete ? (
-            <div>
-              <p style={{ fontSize: '24px', margin: '20px 0', color: '#10b981', fontWeight: 'bold' }}>
+            <div className="completion-message">
+              <p className="message-primary">
                 🌟 All Words Found! 🌟
               </p>
-              <p style={{ fontSize: '18px', color: '#059669' }}>
+              <p className="message-secondary">
                 You found all {foundWords.length} words!
               </p>
             </div>
           ) : (
-            <p style={{ fontSize: '24px', margin: '20px 0' }}>
+            <p className="completion-score">
               Score: {score} / {gameData.questions.length} ({percentage}%)
             </p>
           )}
           
           {/* Stats Cards */}
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-            gap: '15px',
-            marginTop: '30px',
-            marginBottom: '30px'
-          }}>
+          <div className="stats-grid">
             {/* Time Taken Card */}
-            <div style={{
-              padding: '20px',
-              backgroundColor: '#f0f9ff',
-              borderRadius: '12px',
-              border: '2px solid #3b82f6'
-            }}>
-              <div style={{ fontSize: '32px', marginBottom: '8px' }}>⏱️</div>
-              <div style={{ fontSize: '14px', color: '#666', marginBottom: '4px' }}>Time Taken</div>
-              <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e40af' }}>
-                {Math.floor(timeTaken / 60)}:{String(timeTaken % 60).padStart(2, '0')}
+            <div className="stat-card stat-card-time">
+              <div className="stat-icon">⏱️</div>
+              <div className="stat-label">Time Taken</div>
+              <div className="stat-value">
+                {(() => {
+                  const hours = Math.floor(timeTaken / 3600);
+                  const minutes = Math.floor((timeTaken % 3600) / 60);
+                  const seconds = timeTaken % 60;
+                  
+                  if (hours > 0) {
+                    return `${hours}h ${minutes}m ${seconds}s`;
+                  } else if (minutes > 0) {
+                    return `${minutes}m ${seconds}s`;
+                  } else {
+                    return `${seconds}s`;
+                  }
+                })()}
               </div>
             </div>
             
             {/* XP Earned Card */}
-            <div style={{
-              padding: '20px',
-              backgroundColor: '#fef3c7',
-              borderRadius: '12px',
-              border: '2px solid #f59e0b'
-            }}>
-              <div style={{ fontSize: '32px', marginBottom: '8px' }}>✨</div>
-              <div style={{ fontSize: '14px', color: '#666', marginBottom: '4px' }}>XP Earned</div>
-              <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#92400e' }}>
+            <div className="stat-card stat-card-xp">
+              <div className="stat-icon">✨</div>
+              <div className="stat-label">XP Earned</div>
+              <div className="stat-value">
                 +{xpEarned} XP
               </div>
             </div>
             
             {/* Accuracy Card */}
-            <div style={{
-              padding: '20px',
-              backgroundColor: percentage >= 80 ? '#dcfce7' : percentage >= 60 ? '#fef3c7' : '#fee2e2',
-              borderRadius: '12px',
-              border: `2px solid ${percentage >= 80 ? '#10b981' : percentage >= 60 ? '#f59e0b' : '#ef4444'}`
-            }}>
-              <div style={{ fontSize: '32px', marginBottom: '8px' }}>
+            <div className={`stat-card stat-card-accuracy ${percentage >= 80 ? 'high' : percentage >= 60 ? 'medium' : 'low'}`}>
+              <div className="stat-icon">
                 {percentage >= 80 ? '🎯' : percentage >= 60 ? '👍' : '💪'}
               </div>
-              <div style={{ fontSize: '14px', color: '#666', marginBottom: '4px' }}>Accuracy</div>
-              <div style={{ 
-                fontSize: '20px', 
-                fontWeight: 'bold',
-                color: percentage >= 80 ? '#065f46' : percentage >= 60 ? '#92400e' : '#991b1b'
-              }}>
+              <div className="stat-label">Accuracy</div>
+              <div className="stat-value">
                 {percentage}%
               </div>
             </div>
           </div>
           
-          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '30px' }}>
+          <div className="completion-buttons">
             <button 
-              onClick={handleBackToStory}
-              style={{ 
-                padding: '12px 24px',
-                cursor: 'pointer',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                backgroundColor: '#f9f9f9'
+              onClick={() => {
+                playButtonClick();
+                handleBackToStory();
               }}
+              className="btn-back-to-story"
             >
               Back to Story Games
             </button>
             <button 
               onClick={async () => {
-                // First, delete the current attempt to force a new one
+                playButtonClick();
                 try {
                   await api.post(`/games/${gameId}/clear_incomplete/`);
                 } catch (err) {
                   console.error('Error clearing attempt:', err);
                 }
-                // Then reload to start fresh
                 window.location.reload();
               }}
-              style={{ 
-                padding: '12px 24px',
-                cursor: 'pointer',
-                border: '1px solid #4CAF50',
-                borderRadius: '8px',
-                backgroundColor: '#4CAF50',
-                color: 'white'
-              }}
+              className="btn-play-again"
             >
               Play Again
             </button>
@@ -630,26 +608,39 @@ const GamePlayPage: React.FC = () => {
       paddingRight: '20px',
       paddingBottom: '100px',
       minHeight: '100vh',
-      backgroundColor: '#ffffff'
+      background: isDarkMode 
+        ? 'linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%)'
+        : 'linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 50%, #ffffff 100%)'
     }}>
       {/* Header */}
       <div style={{ marginBottom: '30px' }}>
         <button 
-          onClick={handleBackToStory}
+          onClick={() => {
+            playButtonClick();
+            handleBackToStory();
+          }}
           style={{ 
-            padding: '10px 20px',
+            padding: '12px 24px',
             marginBottom: '20px',
             cursor: 'pointer',
-            border: '1px solid #ddd',
-            borderRadius: '8px',
-            backgroundColor: '#f9f9f9'
+            border: isDarkMode ? '2px solid #4a6fa5' : '2px solid #3b82f6',
+            borderRadius: '10px',
+            background: isDarkMode 
+              ? 'linear-gradient(135deg, #2d3748 0%, #1e293b 100%)'
+              : 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
+            color: isDarkMode ? '#93c5fd' : '#1e40af',
+            fontWeight: '700',
+            boxShadow: isDarkMode 
+              ? '0 4px 12px rgba(59, 130, 246, 0.3)'
+              : '0 4px 12px rgba(59, 130, 246, 0.15)',
+            transition: 'all 0.3s ease'
           }}
         >
           ← Back
         </button>
-        <h2>{gameData.game_type_display}</h2>
-        {!isWordSearch && <p>Question {currentQuestionIndex + 1} of {gameData.questions.length}</p>}
-        <p>Score: {score}</p>
+        <h2 style={{ color: isDarkMode ? '#e2e8f0' : '#1f2937' }}>{gameData.game_type_display}</h2>
+        {!isWordSearch && <p style={{ color: isDarkMode ? '#cbd5e0' : '#4b5563' }}>Question {currentQuestionIndex + 1} of {gameData.questions.length}</p>}
+        <p style={{ color: isDarkMode ? '#cbd5e0' : '#4b5563' }}>Score: {score}</p>
       </div>
 
       {/* Celebration Animation */}
@@ -659,16 +650,17 @@ const GamePlayPage: React.FC = () => {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          backgroundColor: 'rgba(16, 185, 129, 0.95)',
+          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
           color: 'white',
-          padding: '30px 50px',
-          borderRadius: '20px',
-          fontSize: '32px',
+          padding: '35px 55px',
+          borderRadius: '24px',
+          fontSize: '36px',
           fontWeight: 'bold',
           zIndex: 1000,
-          boxShadow: '0 10px 40px rgba(16, 185, 129, 0.5)',
+          boxShadow: '0 20px 60px rgba(16, 185, 129, 0.6), 0 0 0 4px rgba(255,255,255,0.3)',
           animation: 'celebrationPop 1.5s ease-out',
-          border: '3px solid #fff'
+          border: '4px solid #fff',
+          textShadow: '0 2px 4px rgba(0,0,0,0.2)'
         }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '48px', marginBottom: '10px' }}>✨ 🎉 ✨</div>
@@ -700,18 +692,27 @@ const GamePlayPage: React.FC = () => {
           {/* Words to Find */}
           <div style={{ 
             marginBottom: '20px',
-            padding: '15px',
-            backgroundColor: '#f0f9ff',
-            borderRadius: '12px',
-            border: '2px solid #3b82f6'
+            padding: '18px',
+            background: 'linear-gradient(135deg, #e0f2fe 0%, #dbeafe 50%, #e0e7ff 100%)',
+            borderRadius: '16px',
+            border: '3px solid #3b82f6',
+            boxShadow: '0 8px 20px rgba(59, 130, 246, 0.25), inset 0 2px 0 rgba(255,255,255,0.5)'
           }}>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', color: '#1e40af' }}>
+            <h3 style={{ 
+              margin: '0 0 12px 0', 
+              fontSize: '20px', 
+              fontWeight: '700',
+              background: 'linear-gradient(135deg, #1e40af 0%, #7c3aed 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
               🔍 Words to Find ({foundWords.length}/{wordsToFind.length}):
             </h3>
             <div style={{ 
               display: 'flex', 
               flexWrap: 'wrap', 
-              gap: '8px' 
+              gap: '10px' 
             }}>
               {wordsToFind.map((word, idx) => {
                 const isFound = foundWords.some(fw => fw.toUpperCase() === word.toUpperCase());
@@ -719,15 +720,21 @@ const GamePlayPage: React.FC = () => {
                   <span 
                     key={idx}
                     style={{
-                      padding: '8px 16px',
-                      backgroundColor: isFound ? '#10b981' : '#3b82f6',
+                      padding: '10px 18px',
+                      background: isFound 
+                        ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' 
+                        : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
                       color: 'white',
-                      borderRadius: '20px',
+                      borderRadius: '25px',
                       fontSize: '16px',
-                      fontWeight: 'bold',
+                      fontWeight: '700',
                       textDecoration: isFound ? 'line-through' : 'none',
-                      opacity: isFound ? 0.7 : 1,
-                      transition: 'all 0.3s ease'
+                      opacity: isFound ? 0.8 : 1,
+                      transition: 'all 0.3s ease',
+                      boxShadow: isFound 
+                        ? '0 4px 12px rgba(16, 185, 129, 0.4)' 
+                        : '0 4px 12px rgba(59, 130, 246, 0.4)',
+                      textShadow: '0 1px 2px rgba(0,0,0,0.2)'
                     }}
                   >
                     {isFound ? '✓ ' : ''}{word}
@@ -739,10 +746,11 @@ const GamePlayPage: React.FC = () => {
 
           {/* Word Search Grid */}
           <div style={{ 
-            border: '2px solid #ddd',
-            borderRadius: '12px',
-            padding: '15px',
-            backgroundColor: '#f9f9f9',
+            border: '3px solid #e5e7eb',
+            borderRadius: '16px',
+            padding: '18px',
+            background: 'linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8)',
             overflow: isSelecting ? 'hidden' : 'auto',
             maxHeight: '70vh',
             touchAction: isSelecting ? 'none' : 'pan-y pan-x',
@@ -777,22 +785,25 @@ const GamePlayPage: React.FC = () => {
                   
                   // Priority: selected (yellow) > found word (green) > default (white)
                   let backgroundColor = '#fff';
-                  let borderColor = '#ddd';
-                  let textColor = '#000';
-                  let borderWidth = '1px';
+                  let borderColor = '#d1d5db';
+                  let textColor = '#1f2937';
+                  let borderWidth = '2px';
+                  let boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
                   
                   if (isInFoundWord) {
-                    backgroundColor = '#86efac'; // Light green
-                    borderColor = '#10b981'; // Green border
-                    textColor = '#064e3b'; // Dark green text
-                    borderWidth = '2px';
+                    backgroundColor = '#d1fae5'; // Bright green
+                    borderColor = '#10b981';
+                    textColor = '#065f46';
+                    borderWidth = '3px';
+                    boxShadow = '0 4px 12px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255,255,255,0.5)';
                   }
                   
                   if (isSelected) {
-                    backgroundColor = '#fbbf24'; // Yellow (current selection takes priority)
+                    backgroundColor = '#fef3c7'; // Bright yellow (current selection takes priority)
                     borderColor = '#f59e0b';
                     textColor = '#92400e';
-                    borderWidth = '2px';
+                    borderWidth = '3px';
+                    boxShadow = '0 4px 12px rgba(245, 158, 11, 0.4), inset 0 1px 0 rgba(255,255,255,0.5)';
                   }
                   
                   return (
@@ -813,7 +824,7 @@ const GamePlayPage: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        backgroundColor: backgroundColor,
+                        backgroundColor,
                         border: `${borderWidth} solid ${borderColor}`,
                         borderRadius: '8px',
                         fontWeight: '700',
@@ -821,11 +832,11 @@ const GamePlayPage: React.FC = () => {
                         cursor: 'pointer',
                         userSelect: 'none',
                         touchAction: 'none',
-                        transition: 'all 0.15s ease',
+                        transition: 'all 0.2s ease',
                         transform: isSelected ? 'scale(1.05)' : 'scale(1)',
-                        boxShadow: isSelected ? '0 2px 8px rgba(245, 158, 11, 0.3)' : 
-                                   isInFoundWord ? '0 1px 3px rgba(16, 185, 129, 0.2)' : 'none',
+                        boxShadow,
                         color: textColor,
+                        textShadow: isInFoundWord || isSelected ? '0 1px 2px rgba(0,0,0,0.15)' : 'none',
                         lineHeight: '1',
                         padding: '4px',
                         aspectRatio: '1 / 1',
@@ -891,37 +902,88 @@ const GamePlayPage: React.FC = () => {
       ) : (
         /* Regular Question */
         <div style={{ 
-          border: '2px solid #ddd',
-          borderRadius: '12px',
-          padding: '30px',
-          marginBottom: '20px',
-          backgroundColor: '#f9f9f9'
+          border: isDarkMode ? '3px solid #7c3aed' : '3px solid #a855f7',
+          borderRadius: '20px',
+          padding: '35px',
+          marginBottom: '25px',
+          background: isDarkMode
+            ? 'linear-gradient(135deg, #1e1b2e 0%, #2d1b3d 50%, #3a2647 100%)'
+            : 'linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #e9d5ff 100%)',
+          boxShadow: isDarkMode
+            ? '0 10px 30px rgba(124, 58, 237, 0.4)'
+            : '0 10px 30px rgba(168, 85, 247, 0.2), inset 0 2px 0 rgba(255,255,255,0.6)'
         }}>
-          <h3 style={{ marginBottom: '20px', fontSize: '20px' }}>
+          <h3 style={{ 
+            marginBottom: '30px', 
+            fontSize: '26px',
+            fontWeight: '800',
+            color: isDarkMode ? '#c4b5fd' : '#6b21a8',
+            textShadow: isDarkMode ? '0 2px 4px rgba(0,0,0,0.3)' : '0 2px 4px rgba(0,0,0,0.1)',
+            lineHeight: '1.4'
+          }}>
             {currentQuestion.question_text}
           </h3>
 
           {/* Answer Input or Options */}
           {currentQuestion.options && currentQuestion.options.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {currentQuestion.options.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => setUserAnswer(option)}
-                  disabled={showFeedback}
-                  style={{
-                    padding: '15px',
-                    textAlign: 'left',
-                    cursor: showFeedback ? 'default' : 'pointer',
-                    border: userAnswer === option ? '2px solid #4CAF50' : '1px solid #ddd',
-                    borderRadius: '8px',
-                    backgroundColor: userAnswer === option ? '#e8f5e9' : 'white',
-                    fontSize: '16px'
-                  }}
-                >
-                  {option}
-                </button>
-              ))}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              {currentQuestion.options.map((option, index) => {
+                const isSelected = userAnswer === option;
+                const colors = [
+                  { bg: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)', border: '#3b82f6', shadow: 'rgba(59, 130, 246, 0.3)' },
+                  { bg: 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)', border: '#10b981', shadow: 'rgba(16, 185, 129, 0.3)' },
+                  { bg: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)', border: '#f59e0b', shadow: 'rgba(245, 158, 11, 0.3)' },
+                  { bg: 'linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%)', border: '#ec4899', shadow: 'rgba(236, 72, 153, 0.3)' }
+                ];
+                const color = colors[index % colors.length];
+                
+                return (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      playButtonClick();
+                      setUserAnswer(option);
+                    }}
+                    disabled={showFeedback}
+                    style={{
+                      padding: '22px 28px',
+                      textAlign: 'left',
+                      cursor: showFeedback ? 'default' : 'pointer',
+                      border: isSelected ? `4px solid ${color.border}` : `3px solid ${color.border}`,
+                      borderRadius: '16px',
+                      background: isSelected ? color.bg : (isDarkMode ? '#2d3748' : 'white'),
+                      fontSize: '20px',
+                      fontWeight: '700',
+                      color: isSelected ? '#1f2937' : (isDarkMode ? '#e2e8f0' : '#1f2937'),
+                      transition: 'all 0.3s ease',
+                      transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                      boxShadow: isSelected 
+                        ? `0 8px 20px ${color.shadow}, inset 0 2px 0 rgba(255,255,255,0.5)` 
+                        : `0 4px 12px ${color.shadow}`,
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <span style={{
+                      display: 'inline-block',
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      background: color.border,
+                      color: 'white',
+                      textAlign: 'center',
+                      lineHeight: '36px',
+                      marginRight: '15px',
+                      fontWeight: '800',
+                      fontSize: '18px',
+                      boxShadow: `0 2px 8px ${color.shadow}`
+                    }}>
+                      {String.fromCharCode(65 + index)}
+                    </span>
+                    {option}
+                  </button>
+                );
+              })}
             </div>
           ) : (
             <input
@@ -932,10 +994,30 @@ const GamePlayPage: React.FC = () => {
               placeholder="Type your answer here..."
               style={{
                 width: '100%',
-                padding: '15px',
-                fontSize: '16px',
-                border: '1px solid #ddd',
-                borderRadius: '8px'
+                padding: '20px 24px',
+                fontSize: '22px',
+                fontWeight: '600',
+                border: isDarkMode ? '3px solid #059669' : '3px solid #10b981',
+                borderRadius: '16px',
+                background: isDarkMode
+                  ? 'linear-gradient(135deg, #1f2937 0%, #1e3a2e 100%)'
+                  : 'linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%)',
+                color: isDarkMode ? '#e2e8f0' : '#1f2937',
+                boxShadow: isDarkMode
+                  ? '0 4px 12px rgba(16, 185, 129, 0.3)'
+                  : '0 4px 12px rgba(16, 185, 129, 0.2), inset 0 2px 0 rgba(255,255,255,0.5)',
+                transition: 'all 0.3s ease',
+                outline: 'none'
+              }}
+              onFocus={(e) => {
+                e.target.style.border = '4px solid #10b981';
+                e.target.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.4), inset 0 2px 0 rgba(255,255,255,0.5)';
+                e.target.style.transform = 'scale(1.01)';
+              }}
+              onBlur={(e) => {
+                e.target.style.border = '3px solid #10b981';
+                e.target.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.2), inset 0 2px 0 rgba(255,255,255,0.5)';
+                e.target.style.transform = 'scale(1)';
               }}
             />
           )}
@@ -945,18 +1027,49 @@ const GamePlayPage: React.FC = () => {
       {/* Feedback */}
       {showFeedback && (
         <div style={{
-          padding: '20px',
-          marginBottom: '20px',
-          borderRadius: '8px',
-          backgroundColor: isCorrect ? '#e8f5e9' : '#ffebee',
-          border: `2px solid ${isCorrect ? '#4CAF50' : '#f44336'}`
+          padding: '25px 30px',
+          marginBottom: '25px',
+          borderRadius: '20px',
+          background: isDarkMode
+            ? (isCorrect 
+                ? 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)' 
+                : 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)')
+            : (isCorrect 
+                ? 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)' 
+                : 'linear-gradient(135deg, #fecaca 0%, #fca5a5 100%)'),
+          border: isCorrect 
+            ? (isDarkMode ? '4px solid #059669' : '4px solid #10b981')
+            : (isDarkMode ? '4px solid #dc2626' : '4px solid #ef4444'),
+          boxShadow: isCorrect 
+            ? (isDarkMode ? '0 10px 30px rgba(16, 185, 129, 0.4)' : '0 10px 30px rgba(16, 185, 129, 0.3)')
+            : (isDarkMode ? '0 10px 30px rgba(239, 68, 68, 0.4)' : '0 10px 30px rgba(239, 68, 68, 0.3)')
         }}>
-          <p style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 10px 0' }}>
-            {isCorrect ? '✅ Correct!' : '❌ Incorrect'}
+          <p style={{ 
+            fontSize: '24px', 
+            fontWeight: '800', 
+            margin: '0 0 10px 0',
+            color: isDarkMode
+              ? (isCorrect ? '#6ee7b7' : '#fca5a5')
+              : (isCorrect ? '#065f46' : '#7f1d1d'),
+            textShadow: '0 1px 2px rgba(0,0,0,0.2)'
+          }}>
+            {isCorrect ? '✅ Correct! Great Job! 🎉' : '❌ Not Quite Right'}
           </p>
           {!isCorrect && correctAnswer && (
-            <p style={{ margin: 0 }}>
-              The correct answer is: <strong>{correctAnswer}</strong>
+            <p style={{ 
+              margin: 0,
+              fontSize: '18px',
+              fontWeight: '600',
+              color: isDarkMode ? '#fecaca' : '#991b1b'
+            }}>
+              The correct answer is: <strong style={{ 
+                fontSize: '20px',
+                background: isDarkMode ? '#1f2937' : '#ffffff',
+                color: isDarkMode ? '#fbbf24' : '#92400e',
+                padding: '4px 12px',
+                borderRadius: '8px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+              }}>{correctAnswer}</strong>
             </p>
           )}
         </div>
@@ -966,7 +1079,10 @@ const GamePlayPage: React.FC = () => {
       <div style={{ textAlign: 'center' }}>
         {!showFeedback ? (
           <button
-            onClick={handleSubmitAnswer}
+            onClick={() => {
+              playButtonClick();
+              handleSubmitAnswer();
+            }}
             disabled={!userAnswer.trim() || isSubmitting}
             style={{
               padding: '15px 40px',
@@ -974,7 +1090,12 @@ const GamePlayPage: React.FC = () => {
               cursor: (userAnswer.trim() && !isSubmitting) ? 'pointer' : 'not-allowed',
               border: 'none',
               borderRadius: '8px',
-              backgroundColor: (userAnswer.trim() && !isSubmitting) ? '#4CAF50' : '#ccc',
+              background: (userAnswer.trim() && !isSubmitting) 
+                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' 
+                : '#ccc',
+              boxShadow: (userAnswer.trim() && !isSubmitting) 
+                ? '0 6px 16px rgba(16, 185, 129, 0.4)' 
+                : 'none',
               color: 'white',
               fontWeight: 'bold'
             }}
@@ -990,7 +1111,8 @@ const GamePlayPage: React.FC = () => {
               cursor: 'pointer',
               border: 'none',
               borderRadius: '8px',
-              backgroundColor: '#2196F3',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              boxShadow: '0 6px 16px rgba(59, 130, 246, 0.4)',
               color: 'white',
               fontWeight: 'bold'
             }}

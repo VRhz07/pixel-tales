@@ -4,6 +4,7 @@ import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { Capacitor } from '@capacitor/core';
 import { useOnlineStatus } from './useOnlineStatus';
 import { API_BASE_URL } from '../config/constants';
+import soundService from '../services/soundService';
 
 interface TextToSpeechOptions {
   rate?: number; // 0.1 to 10, default 1
@@ -48,6 +49,14 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
   const language = options?.storyLanguage || appLanguage;
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  
+  // Helper function to resume background music when TTS finishes
+  const resumeBackgroundMusic = useCallback(() => {
+    if (soundService.isBackgroundMusicEnabled()) {
+      console.log('🎵 Resuming background music after TTS');
+      soundService.resumeBackgroundMusic();
+    }
+  }, []);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [currentVoice, setCurrentVoice] = useState<SpeechSynthesisVoice | null>(null);
   const [rate, setRate] = useState(1);
@@ -389,6 +398,7 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
         setProgress(100);
         URL.revokeObjectURL(audioUrl);
         audioRef.current = null;
+        resumeBackgroundMusic();
       };
       
       audio.onerror = (error) => {
@@ -397,6 +407,7 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
         setProgress(0);
         URL.revokeObjectURL(audioUrl);
         audioRef.current = null;
+        resumeBackgroundMusic();
       };
       
       // Check again before playing
@@ -430,6 +441,12 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
   // Speak text
   const speak = useCallback(async (text: string, options?: TextToSpeechOptions) => {
     if (!isSupported || !text.trim()) return;
+
+    // Pause background music when TTS starts
+    if (soundService.isBackgroundMusicPlaying()) {
+      console.log('🎵 Pausing background music for TTS');
+      soundService.pauseBackgroundMusic();
+    }
 
     // Store full text for seeking
     fullTextRef.current = text;
@@ -530,6 +547,7 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
           
           setIsSpeaking(false);
           setProgress(100);
+          resumeBackgroundMusic();
           
           // Reset progress after a short delay
           setTimeout(() => {
@@ -545,6 +563,7 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
           
           setIsSpeaking(false);
           setProgress(0);
+          resumeBackgroundMusic();
         });
         
       } catch (error) {
@@ -605,6 +624,7 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
         setIsPaused(false);
         setProgress(100);
         utteranceRef.current = null;
+        resumeBackgroundMusic();
       };
 
       utterance.onerror = (event) => {
@@ -613,6 +633,7 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
         setIsPaused(false);
         setProgress(0);
         utteranceRef.current = null;
+        resumeBackgroundMusic();
       };
 
       utteranceRef.current = utterance;
@@ -706,7 +727,10 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
     setIsPaused(false);
     setProgress(0);
     utteranceRef.current = null;
-  }, [isSupported, isNativePlatform]);
+    
+    // Resume background music when TTS stops
+    resumeBackgroundMusic();
+  }, [isSupported, isNativePlatform, resumeBackgroundMusic]);
 
   // Seek to specific position (0-100)
   const seek = useCallback((progressPercent: number) => {
@@ -760,6 +784,7 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
     
     utterance.onend = () => {
       setIsSpeaking(false);
+      resumeBackgroundMusic();
       setIsPaused(false);
       setProgress(100);
       utteranceRef.current = null;

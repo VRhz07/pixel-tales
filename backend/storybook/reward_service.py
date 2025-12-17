@@ -95,6 +95,17 @@ REWARD_CONFIG = {
     }
 }
 
+# Flatten rewards for achievement tracking
+AVATAR_REWARDS = []
+for level, avatars in REWARD_CONFIG['avatars'].items():
+    for avatar in avatars:
+        AVATAR_REWARDS.append({'emoji': avatar, 'unlock_level': level})
+
+BORDER_REWARDS = []
+for level, borders in REWARD_CONFIG['borders'].items():
+    for border in borders:
+        BORDER_REWARDS.append({'id': border['id'], 'unlock_level': level, **border})
+
 
 class RewardService:
     """Service for managing user rewards (avatars and borders)"""

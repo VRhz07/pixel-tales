@@ -752,6 +752,25 @@ def achievement_progress(request):
         ).filter(story_count__gt=published_stories).count()
         leaderboard_rank = users_with_more_stories + 1
         
+        # Calculate games completed
+        from .models import GameAttempt
+        games_completed = GameAttempt.objects.filter(
+            user=user,
+            is_completed=True
+        ).count()
+        
+        # Get user level
+        user_level = user.level if hasattr(user, 'level') else 1
+        
+        # Calculate unlocked avatars and borders
+        # Count unique avatars and borders that are unlocked at or below current level
+        from .reward_service import AVATAR_REWARDS, BORDER_REWARDS
+        avatars_unlocked = sum(1 for reward in AVATAR_REWARDS if reward['unlock_level'] <= user_level)
+        borders_unlocked = sum(1 for reward in BORDER_REWARDS if reward['unlock_level'] <= user_level)
+        
+        # Also count collaboration completions
+        collaborations_completed = collaboration_count  # Already calculated above
+        
         user_stats = {
             'total_stories': total_stories,
             'published_stories': published_stories,
@@ -765,7 +784,12 @@ def achievement_progress(request):
             'stories_read': stories_read_count,
             'characters_created': characters_created,
             'collaboration_count': collaboration_count,
+            'collaborations_completed': collaborations_completed,
             'leaderboard_rank': leaderboard_rank,
+            'games_completed': games_completed,
+            'level': user_level,
+            'avatars_unlocked': avatars_unlocked,
+            'borders_unlocked': borders_unlocked,
         }
         
         # Get all achievements

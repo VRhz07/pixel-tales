@@ -9,10 +9,13 @@ import {
   HeartIcon,
   CalendarIcon,
   TrophyIcon,
-  CogIcon
+  CogIcon,
+  GiftIcon
 } from '@heroicons/react/24/outline';
 import { AvatarWithBorder } from '../common/AvatarWithBorder';
+import { RewardsModal } from '../settings/RewardsModal';
 import { api } from '@/services/api';
+import { useSoundEffects } from '../../hooks/useSoundEffects';
 
 interface Achievement {
   id: number;
@@ -48,7 +51,8 @@ interface UserStats {
 const ProfilePage = () => {
   const navigate = useNavigate();
   const { profile } = useUserStore();
-  const { user } = useAuthStore();
+  const { playButtonClick } = useSoundEffects();
+  const { user, updateUser } = useAuthStore();
   const { stories, characters, getStats } = useStoryStore();
   
   // Debug: Log user data
@@ -58,6 +62,7 @@ const ProfilePage = () => {
   }, [user]);
   
   const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [showRewardsModal, setShowRewardsModal] = useState(false);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   
   // Detect dark mode
@@ -161,6 +166,9 @@ const ProfilePage = () => {
     'creation_type': { name: 'Creation Type', icon: '🎨', color: '#ec4899', borderColor: '#f472b6' },
     'collab': { name: 'Collaboration', icon: '🤝', color: '#6366f1', borderColor: '#818cf8' },
     'views': { name: 'Story Views', icon: '👁️', color: '#14b8a6', borderColor: '#2dd4bf' },
+    'games': { name: 'Games', icon: '🎮', color: '#9333ea', borderColor: '#a855f7' },
+    'level': { name: 'Level Progress', icon: '⭐', color: '#f59e0b', borderColor: '#fbbf24' },
+    'rewards': { name: 'Rewards Unlocked', icon: '🎁', color: '#ec4899', borderColor: '#f472b6' },
   };
 
   return (
@@ -237,6 +245,79 @@ const ProfilePage = () => {
           <div className="profile-stat-label">Days Active</div>
         </div>
       </div>
+
+      {/* My Rewards Section - Only for Child Accounts */}
+      {user?.user_type === 'child' && (
+        <div style={{ marginBottom: '2rem' }}>
+          <div className="profile-achievements-header">
+            <span className="profile-achievements-emoji">🎁</span>
+            <h2 className="profile-achievements-title">My Rewards</h2>
+          </div>
+          
+          <div style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            borderRadius: '16px',
+            padding: '24px',
+            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.3)',
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+          }}
+          onClick={() => {
+            playButtonClick();
+            setShowRewardsModal(true);
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 6px 24px rgba(102, 126, 234, 0.4)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 4px 20px rgba(102, 126, 234, 0.3)';
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ 
+                  fontSize: '1.25rem', 
+                  fontWeight: '700', 
+                  color: 'white',
+                  marginBottom: '0.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <GiftIcon style={{ width: '1.5rem', height: '1.5rem' }} />
+                  Avatars & Borders
+                </div>
+                <div style={{ 
+                  fontSize: '0.875rem', 
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  marginBottom: '0.75rem'
+                }}>
+                  Level {user?.level || 1} • View and equip unlocked avatars & borders
+                </div>
+                <div style={{
+                  display: 'inline-block',
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  backdropFilter: 'blur(10px)',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '8px',
+                  color: 'white',
+                  fontSize: '0.875rem',
+                  fontWeight: '600'
+                }}>
+                  Click to view rewards →
+                </div>
+              </div>
+              <div style={{ 
+                fontSize: '3rem',
+                filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.2))'
+              }}>
+                🎁
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Achievement Categories Section */}
       <div className="profile-achievements-header">
@@ -705,6 +786,43 @@ const ProfilePage = () => {
           )}
         </div>
       </div>
+
+      {/* Rewards Modal */}
+      {showRewardsModal && (
+        <RewardsModal
+          isOpen={showRewardsModal}
+          onClose={() => setShowRewardsModal(false)}
+          currentAvatar={user?.avatar || '📚'}
+          currentBorder={user?.selected_avatar_border || 'basic'}
+          onSave={async (avatar: string, border: string) => {
+            try {
+              const response = await api.put('/auth/profile/', {
+                avatar,
+                selected_avatar_border: border
+              });
+
+              if (response.error) {
+                throw new Error(response.error || 'Failed to update rewards');
+              }
+
+              // Update local user state
+              if (user) {
+                updateUser({
+                  ...user,
+                  avatar,
+                  selected_avatar_border: border
+                });
+              }
+
+              setShowRewardsModal(false);
+            } catch (error: any) {
+              console.error('Error updating rewards:', error);
+              alert(error.message || 'Failed to update rewards');
+              throw error;
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -516,10 +516,13 @@ class SoundService {
    * Resume background music
    */
   resumeBackgroundMusic() {
-    if (this.backgroundMusic && this.isMusicPlaying && this.backgroundMusicEnabled) {
-      this.backgroundMusic.play().catch(err => {
-        console.debug('Could not resume background music', err);
-      });
+    if (this.backgroundMusic && this.backgroundMusicEnabled) {
+      // Check if music is paused (not ended)
+      if (this.backgroundMusic.paused && !this.backgroundMusic.ended) {
+        this.backgroundMusic.play().catch(err => {
+          console.debug('Could not resume background music', err);
+        });
+      }
     }
   }
 
