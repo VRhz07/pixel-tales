@@ -341,6 +341,10 @@ def jwt_user_profile(request):
             if 'bio' in data:
                 profile.bio = data['bio']
             
+            # Update selected avatar border if provided
+            if 'selected_avatar_border' in data:
+                profile.selected_avatar_border = data['selected_avatar_border']
+            
             # Save profile
             profile.save()
             
