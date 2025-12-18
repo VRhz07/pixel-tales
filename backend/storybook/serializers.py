@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from .models import (
     UserProfile, Story, Character, Comment, Like, Rating, 
     Friendship, Achievement, UserAchievement, Notification,
-    ParentChildRelationship, TeacherStudentRelationship, Message
+    ParentChildRelationship, TeacherStudentRelationship, TeacherClass, Message
 )
 
 
@@ -340,3 +340,33 @@ class CharacterListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
         fields = ['id', 'name', 'creator_name', 'image', 'date_created']
+
+
+class TeacherClassSerializer(serializers.ModelSerializer):
+    """Serializer for teacher classes"""
+    teacher_name = serializers.CharField(source='teacher.profile.display_name', read_only=True)
+    student_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = TeacherClass
+        fields = [
+            'id', 'teacher', 'teacher_name', 'name', 'description', 
+            'grade_level', 'subject', 'school_year', 'is_active', 
+            'student_count', 'date_created', 'date_updated'
+        ]
+        read_only_fields = ['id', 'teacher', 'date_created', 'date_updated']
+
+
+class TeacherStudentRelationshipSerializer(serializers.ModelSerializer):
+    """Serializer for teacher-student relationships"""
+    teacher_name = serializers.CharField(source='teacher.profile.display_name', read_only=True)
+    student_name = serializers.CharField(source='student.profile.display_name', read_only=True)
+    class_name = serializers.CharField(source='teacher_class.name', read_only=True, allow_null=True)
+
+    class Meta:
+        model = TeacherStudentRelationship
+        fields = [
+            'id', 'teacher', 'student', 'teacher_name', 'student_name',
+            'teacher_class', 'class_name', 'date_created', 'is_active', 'notes'
+        ]
+        read_only_fields = ['id', 'date_created']

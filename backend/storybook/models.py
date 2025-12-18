@@ -364,13 +364,38 @@ class ParentChildRelationship(models.Model):
     def __str__(self):
         return f"Parent: {self.parent.username} - Child: {self.child.username}"
 
+class TeacherClass(models.Model):
+    """Model for teacher's classes"""
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teacher_classes')
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+    grade_level = models.CharField(max_length=50, blank=True, null=True)
+    subject = models.CharField(max_length=100, blank=True, null=True)
+    school_year = models.CharField(max_length=20, blank=True, null=True)  # e.g., "2024-2025"
+    is_active = models.BooleanField(default=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Teacher Class"
+        verbose_name_plural = "Teacher Classes"
+        ordering = ['-date_created']
+
+    def __str__(self):
+        return f"{self.name} - {self.teacher.username}"
+    
+    @property
+    def student_count(self):
+        """Get the number of students in this class"""
+        return self.class_students.filter(is_active=True).count()
+
 class TeacherStudentRelationship(models.Model):
     """Model to establish relationship between teacher and student accounts"""
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_accounts')
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teacher_accounts')
+    teacher_class = models.ForeignKey(TeacherClass, on_delete=models.CASCADE, related_name='class_students', null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
-    class_name = models.CharField(max_length=100, blank=True, null=True)  # Optional class/grade identifier
     notes = models.TextField(blank=True, null=True)  # Teacher notes about the student
 
     class Meta:

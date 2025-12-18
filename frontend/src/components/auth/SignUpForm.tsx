@@ -89,7 +89,9 @@ const SignUpForm: React.FC = () => {
       localStorage.removeItem('pendingRegistrationData');
       
       // Navigate based on user type
-      if (registrationData.userType === 'parent' || registrationData.userType === 'teacher') {
+      if (registrationData.userType === 'teacher') {
+        navigate('/teacher-dashboard');
+      } else if (registrationData.userType === 'parent') {
         navigate('/parent-dashboard');
       } else {
         navigate('/home');
@@ -181,6 +183,49 @@ const SignUpForm: React.FC = () => {
         <p>
           Password must be at least 8 characters long and include uppercase, lowercase, and numbers.
         </p>
+      </div>
+
+      {/* Role Selection */}
+      <div className="auth-input-group">
+        <label className="auth-label">I am a:</label>
+        <div className="role-selection-container" style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, userType: 'parent' })}
+            className={`role-option ${formData.userType === 'parent' ? 'selected' : ''}`}
+            style={{
+              flex: 1,
+              padding: '12px',
+              borderRadius: '8px',
+              border: formData.userType === 'parent' ? '2px solid #8b5cf6' : '2px solid #e5e7eb',
+              backgroundColor: formData.userType === 'parent' ? '#f3e8ff' : '#ffffff',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              fontWeight: formData.userType === 'parent' ? '600' : '400',
+              color: formData.userType === 'parent' ? '#6b21a8' : '#4b5563'
+            }}
+          >
+            👨‍👩‍👧‍👦 Parent
+          </button>
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, userType: 'teacher' })}
+            className={`role-option ${formData.userType === 'teacher' ? 'selected' : ''}`}
+            style={{
+              flex: 1,
+              padding: '12px',
+              borderRadius: '8px',
+              border: formData.userType === 'teacher' ? '2px solid #8b5cf6' : '2px solid #e5e7eb',
+              backgroundColor: formData.userType === 'teacher' ? '#f3e8ff' : '#ffffff',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              fontWeight: formData.userType === 'teacher' ? '600' : '400',
+              color: formData.userType === 'teacher' ? '#6b21a8' : '#4b5563'
+            }}
+          >
+            👨‍🏫 Teacher
+          </button>
+        </div>
       </div>
 
       {/* Sign Up Button */}

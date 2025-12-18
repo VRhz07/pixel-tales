@@ -26,6 +26,8 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import CollaborationWaitingPage from './pages/CollaborationWaitingPage';
 import ParentDashboardPage from './pages/ParentDashboardPage';
 import ParentSettingsPage from './pages/ParentSettingsPage';
+import TeacherDashboardPage from './pages/TeacherDashboardPage';
+import TeacherSettingsPage from './pages/TeacherSettingsPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import GamesPage from './pages/GamesPage';
@@ -98,16 +100,21 @@ function AppContent() {
           
           // Determine where to navigate based on account state
           if (accountState.activeAccountType === 'parent' || userType === 'parent' || userType === 'teacher') {
-            // Was in parent view or is parent account
+            // Was in parent view or is parent/teacher account
             const hasParentSession = storage.getItemSync('parent_session');
             if (hasParentSession) {
-              // Parent was viewing a child account
-              console.log('🚀 Parent was viewing as child, redirecting to home (child view)...');
+              // Parent/Teacher was viewing a child account
+              console.log('🚀 Parent/Teacher was viewing as child, redirecting to home (child view)...');
               navigate('/home', { replace: true });
             } else {
-              // Parent in their own account
-              console.log('🚀 Parent account, redirecting to parent dashboard...');
-              navigate('/parent-dashboard', { replace: true });
+              // Parent or Teacher in their own account
+              if (userType === 'teacher') {
+                console.log('🚀 Teacher account, redirecting to teacher dashboard...');
+                navigate('/teacher-dashboard', { replace: true });
+              } else {
+                console.log('🚀 Parent account, redirecting to parent dashboard...');
+                navigate('/parent-dashboard', { replace: true });
+              }
             }
           } else {
             // Regular child account
@@ -474,6 +481,8 @@ function AppContent() {
     location.pathname !== '/admin' &&
     location.pathname !== '/parent-dashboard' &&
     location.pathname !== '/parent-settings' &&
+    location.pathname !== '/teacher-dashboard' &&  // Hide bottom nav on teacher dashboard
+    location.pathname !== '/teacher-settings' &&   // Hide bottom nav on teacher settings
     !location.pathname.startsWith('/story/') &&
     !location.pathname.startsWith('/games/play/') &&   // Hide on gameplay page (but keep on /games and /games/story/*)
     location.pathname !== '/';
@@ -603,6 +612,16 @@ function AppContent() {
         <Route path="/parent-settings" element={
           <ParentRoute>
             <ParentSettingsPage />
+          </ParentRoute>
+        } />
+        <Route path="/teacher-dashboard" element={
+          <ParentRoute>
+            <TeacherDashboardPage />
+          </ParentRoute>
+        } />
+        <Route path="/teacher-settings" element={
+          <ParentRoute>
+            <TeacherSettingsPage />
           </ParentRoute>
         } />
         <Route path="/terms" element={<TermsOfServicePage />} />

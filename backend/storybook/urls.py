@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .jwt_auth import CustomTokenObtainPairView, jwt_register, jwt_logout, jwt_user_profile, jwt_create_session, verify_email, resend_verification_code, verify_password, send_password_reset_code, verify_password_reset_code, reset_password, change_password, delete_account
-from . import views, admin_views, admin_auth, admin_features, admin_profanity, ai_proxy_views, tts_views, game_views
+from . import views, admin_views, admin_auth, admin_features, admin_profanity, ai_proxy_views, tts_views, game_views, teacher_views
 
 # Create a router for ViewSets (we'll add these later)
 router = DefaultRouter()
@@ -159,10 +159,6 @@ urlpatterns = [
     path('admin/relationships/add/', admin_views.admin_add_parent_child, name='admin_add_parent_child'),
     path('admin/relationships/<int:parent_id>/<int:child_id>/remove/', admin_views.admin_remove_parent_child, name='admin_remove_parent_child'),
     
-    # Admin endpoints - Games Management
-    path('admin/games/regenerate-word-searches/', admin_views.admin_regenerate_word_searches, name='admin_regenerate_word_searches'),
-    path('admin/games/regenerate-all/', admin_views.admin_regenerate_all_games, name='admin_regenerate_all_games'),
-    
     # Admin endpoints - Content Moderation
     path('admin/moderation/flagged/', admin_features.get_flagged_content, name='get_flagged_content'),
     path('admin/moderation/story/<int:story_id>/', admin_features.moderate_story, name='moderate_story'),
@@ -219,4 +215,25 @@ urlpatterns = [
     path('parent/children/<int:child_id>/switch-view/', views.switch_to_child_view, name='switch_to_child_view'),
     path('teacher/students/', views.get_teacher_students, name='get_teacher_students'),
     path('teacher/students/<int:student_id>/stats/', views.get_child_statistics, name='get_student_statistics'),
+    
+    # Teacher Dashboard endpoints
+    path('teacher/classes/', teacher_views.TeacherClassViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    }), name='teacher-class-list'),
+    path('teacher/classes/<int:pk>/', teacher_views.TeacherClassViewSet.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'patch': 'partial_update',
+        'delete': 'destroy'
+    }), name='teacher-class-detail'),
+    path('teacher/classes/<int:pk>/students/', teacher_views.TeacherClassViewSet.as_view({
+        'get': 'students'
+    }), name='teacher-class-students'),
+    path('teacher/classes/<int:pk>/add-student/', teacher_views.TeacherClassViewSet.as_view({
+        'post': 'add_student'
+    }), name='teacher-class-add-student'),
+    path('teacher/dashboard-stats/', teacher_views.teacher_dashboard_stats, name='teacher-dashboard-stats'),
+    path('teacher/available-students/', teacher_views.available_students, name='teacher-available-students'),
+    path('teacher/all-students/', teacher_views.teacher_students, name='teacher-all-students'),
 ]

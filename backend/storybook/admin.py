@@ -8,7 +8,7 @@ from django.utils.html import format_html
 from .models import (
     UserProfile, Story, Character, Comment, Rating, Friendship,
     Achievement, UserAchievement, Notification, ParentChildRelationship,
-    TeacherStudentRelationship, Message, EmailVerification,
+    TeacherStudentRelationship, TeacherClass, Message, EmailVerification,
     StoryGame, GameQuestion, GameAttempt, GameAnswer
 )
 
@@ -178,10 +178,14 @@ class ParentChildRelationshipAdmin(admin.ModelAdmin):
 
 @admin.register(TeacherStudentRelationship)
 class TeacherStudentRelationshipAdmin(admin.ModelAdmin):
-    list_display = ('teacher', 'student', 'class_name', 'is_active', 'date_created')
-    list_filter = ('is_active', 'date_created', 'class_name')
-    search_fields = ('teacher__username', 'student__username', 'class_name')
+    list_display = ('teacher', 'student', 'get_class_name', 'is_active', 'date_created')
+    list_filter = ('is_active', 'date_created')
+    search_fields = ('teacher__username', 'student__username', 'notes', 'teacher_class__name')
     readonly_fields = ('date_created',)
+    
+    def get_class_name(self, obj):
+        return obj.teacher_class.name if obj.teacher_class else 'No Class'
+    get_class_name.short_description = 'Class'
 
 
 @admin.register(Message)
@@ -257,6 +261,25 @@ class GameAnswerAdmin(admin.ModelAdmin):
     list_filter = ('is_correct', 'answered_at')
     search_fields = ('attempt__user__username', 'question__question_text')
     readonly_fields = ('answered_at',)
+
+
+@admin.register(TeacherClass)
+class TeacherClassAdmin(admin.ModelAdmin):
+    list_display = ('name', 'teacher', 'grade_level', 'subject', 'student_count', 'is_active', 'date_created')
+    list_filter = ('is_active', 'grade_level', 'subject', 'date_created')
+    search_fields = ('name', 'teacher__username', 'teacher__profile__display_name', 'description')
+    readonly_fields = ('date_created', 'date_updated')
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('teacher', 'name', 'description')
+        }),
+        ('Details', {
+            'fields': ('grade_level', 'subject', 'school_year')
+        }),
+        ('Status', {
+            'fields': ('is_active', 'date_created', 'date_updated')
+        }),
+    )
 
 
 # Customize admin site

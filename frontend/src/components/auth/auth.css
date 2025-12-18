@@ -157,6 +157,21 @@
   color: #ffffff;
 }
 
+/* Dark mode for tabs only */
+.dark .auth-tabs {
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.dark .auth-tab {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.dark .auth-tab.active {
+  background: linear-gradient(to right, #8b5cf6, #7c3aed);
+  color: #ffffff;
+}
+
 /* Form Elements */
 .auth-form-group {
   margin-bottom: 1rem;
@@ -195,6 +210,25 @@
   outline: none;
   border-color: #8b5cf6;
   box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+/* Dark mode for role buttons only */
+.dark .role-option {
+  background-color: rgba(139, 92, 246, 0.15) !important;
+  border-color: rgba(139, 92, 246, 0.3) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.dark .role-option.selected {
+  background-color: rgba(139, 92, 246, 0.3) !important;
+  border-color: #8b5cf6 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+/* Add padding below role selection container */
+.role-selection-container {
+  margin-bottom: 24px;
 }
 
 .auth-input-icon {

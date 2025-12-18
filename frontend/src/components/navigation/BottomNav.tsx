@@ -3,10 +3,27 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../stores/authStore';
 import { useNotificationStore } from '../../stores/notificationStore';
 import { useI18nStore } from '../../stores/i18nStore';
-import { HomeIcon, BookOpenIcon, UserIcon, UsersIcon, CogIcon } from '@heroicons/react/24/outline';
+import { 
+  HomeIcon, 
+  BookOpenIcon, 
+  UserIcon, 
+  UsersIcon, 
+  CogIcon,
+  AcademicCapIcon,
+  UserGroupIcon,
+  ChartBarIcon
+} from '@heroicons/react/24/outline';
+import {
+  HomeIcon as HomeIconSolid,
+  AcademicCapIcon as AcademicCapIconSolid,
+  UserGroupIcon as UserGroupIconSolid,
+  ChartBarIcon as ChartBarIconSolid,
+  UserIcon as UserIconSolid
+} from '@heroicons/react/24/solid';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
 import { Keyboard } from '@capacitor/keyboard';
 import { useAndroidNavBarHeight } from '../../hooks/useAndroidNavBarHeight';
+import './ParentBottomNav.css';
 
 const BottomNav = () => {
   const location = useLocation();
@@ -17,6 +34,9 @@ const BottomNav = () => {
   const { playSound } = useSoundEffects();
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const androidNavBarHeight = useAndroidNavBarHeight();
+  
+  // Determine if user is a teacher
+  const isTeacher = user?.role === 'teacher';
   
   const handleLogout = () => {
     signOut();
@@ -83,6 +103,21 @@ const BottomNav = () => {
     window.addEventListener('new-message', handleNewMessage);
     return () => window.removeEventListener('new-message', handleNewMessage);
   }, [isAuthenticated, user?.id, fetchNotificationCounts]);
+
+  // Listen for teacher tab changes
+  useEffect(() => {
+    if (!isTeacher) return;
+    
+    const handleTabChange = (e: CustomEvent) => {
+      // Teacher tab changes are handled by the TeacherDashboardPage
+      // This ensures the nav stays in sync
+    };
+    
+    window.addEventListener('teacher-tab-change' as any, handleTabChange as any);
+    return () => {
+      window.removeEventListener('teacher-tab-change' as any, handleTabChange as any);
+    };
+  }, [isTeacher]);
   
   const getLabelColor = (iconName: string) => {
     switch (iconName) {
@@ -156,7 +191,67 @@ const BottomNav = () => {
     }
   };
   
-  const navItems = [
+  // Teacher navigation handler
+  const handleTeacherNavigation = (item: any) => {
+    playSound('tab-switch');
+    if (item.path) {
+      // Navigate to external page (like settings)
+      navigate(item.path);
+    } else if (item.tab) {
+      // Navigate within teacher dashboard with tab state
+      navigate('/teacher-dashboard', { state: { tab: item.tab } });
+      // Dispatch event for dashboard to listen to
+      window.dispatchEvent(new CustomEvent('teacher-tab-change', { detail: { tab: item.tab } }));
+    }
+  };
+
+  // Define teacher navigation items
+  const teacherNavItems = [
+    {
+      id: 'dashboard',
+      label: 'Dashboard',
+      icon: HomeIcon,
+      iconSolid: HomeIconSolid,
+      tab: 'overview',
+      color: '#8b5cf6'
+    },
+    {
+      id: 'classes',
+      label: 'Classes',
+      icon: AcademicCapIcon,
+      iconSolid: AcademicCapIconSolid,
+      tab: 'classes',
+      color: '#3b82f6'
+    },
+    {
+      id: 'students',
+      label: 'Students',
+      icon: UserGroupIcon,
+      iconSolid: UserGroupIconSolid,
+      tab: 'students',
+      color: '#10b981'
+    },
+    {
+      id: 'reports',
+      label: 'Reports',
+      icon: ChartBarIcon,
+      iconSolid: ChartBarIconSolid,
+      tab: 'reports',
+      color: '#f59e0b'
+    },
+    {
+      id: 'settings',
+      label: 'Settings',
+      icon: UserIcon,
+      iconSolid: UserIconSolid,
+      tab: null,
+      color: '#ec4899',
+      path: '/teacher-settings'
+    }
+  ];
+
+  // Define student navigation items
+  const studentNavItems = [
     { path: '/home', icon: 'home', label: t('nav.home') },
     { path: '/games', icon: 'games', label: 'Games' },
     { path: '/library', icon: 'library', label: t('nav.library') },
@@ -164,6 +259,42 @@ const BottomNav = () => {
     { path: '/profile', icon: 'profile', label: t('nav.profile') },
   ];
 
+  const isTeacherTabActive = (tab: string | null) => {
+    if (tab === null) return false; // Settings is handled separately
+    // Get current tab from URL state or default to 'overview'
+    const currentTab = (location.state as any)?.tab || 'overview';
+    return currentTab === tab;
+  };
+
+  // Render teacher navigation
+  if (isTeacher) {
+    return (
+      <nav className={`parent-bottom-nav ${isKeyboardVisible ? 'keyboard-visible' : ''}`}>
+        <div className="parent-bottom-nav-container">
+          {teacherNavItems.map((item) => {
+            const active = item.path ? location.pathname === item.path : isTeacherTabActive(item.tab);
+            const Icon = active ? item.iconSolid : item.icon;
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleTeacherNavigation(item)}
+                className={`parent-bottom-nav-item ${active ? 'active' : ''}`}
+                style={{
+                  color: active ? item.color : undefined
+                }}
+              >
+                <Icon className="parent-bottom-nav-icon" />
+                <span className="parent-bottom-nav-label">{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+    );
+  }
+
+  // Render student navigation
   return (
     <nav 
       className={`nav-glass ${isKeyboardVisible ? 'translate-y-full' : ''}`}
@@ -187,7 +318,7 @@ const BottomNav = () => {
       {/* Navigation Items */}
       <div style={{ padding: 0 }}>
         <div className="flex justify-around items-center max-w-md mx-auto" style={{ minHeight: '48px' }}>
-          {navItems.map((item) => {
+          {studentNavItems.map((item) => {
             const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
             // Show notification badge on Social icon for friend requests, unread messages, AND collaboration invites
             const hasSocialNotification = item.icon === 'social' && (counts.friend_requests > 0 || counts.unread_messages > 0 || counts.collaboration_invites > 0);

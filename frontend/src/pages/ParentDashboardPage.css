@@ -168,7 +168,7 @@
 
 @media (max-width: 768px) {
   .parent-container {
-    padding: 0 16px;
+    padding: 0 20px;
   }
 }
 
@@ -269,6 +269,332 @@
   max-width: 320px;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Children Grid - Student & Class Cards */
+.children-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.child-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.child-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.child-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.child-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.child-avatar .text-4xl {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.child-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.child-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.child-username {
+  font-size: 13px;
+  color: #6B7280;
+  margin: 0;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.child-stats {
+  display: flex;
+  gap: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #F3F4F6;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.stat-icon {
+  width: 18px;
+  height: 18px;
+  color: #8B5CF6;
+  flex-shrink: 0;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6B7280;
+  line-height: 1;
+}
+
+.child-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.action-button {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.action-button.primary {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+}
+
+.action-button.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.action-button.secondary {
+  background: #F3F4F6;
+  color: #4B5563;
+}
+
+.action-button.secondary:hover {
+  background: #E5E7EB;
+}
+
+.action-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Dark mode for student cards */
+.dark .child-card {
+  background: rgba(139, 92, 246, 0.08);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.dark .child-card:hover {
+  background: rgba(139, 92, 246, 0.12);
+  border-color: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
+}
+
+.dark .child-avatar {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(124, 58, 237, 0.2) 100%);
+}
+
+.dark .child-name {
+  color: #FFFFFF;
+}
+
+.dark .child-username {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.dark .child-stats {
+  border-top-color: rgba(139, 92, 246, 0.15);
+}
+
+.dark .stat-icon {
+  color: #A78BFA;
+}
+
+.dark .stat-value {
+  color: #FFFFFF;
+}
+
+.dark .stat-label {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.dark .action-button.secondary {
+  background: rgba(139, 92, 246, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.dark .action-button.secondary:hover {
+  background: rgba(139, 92, 246, 0.25);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .children-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .child-stats {
+    gap: 12px;
+  }
+}
+
+/* Teacher Classes List (Overview Tab) */
+.teacher-classes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.teacher-class-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.teacher-class-item:hover {
+  background: #F9FAFB;
+  border-color: #D1D5DB;
+}
+
+.teacher-class-emoji {
+  font-size: 32px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.teacher-class-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.teacher-class-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+}
+
+.teacher-class-details {
+  font-size: 14px;
+  color: #6B7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Dark mode for teacher classes list */
+.dark .teacher-class-item {
+  background: rgba(139, 92, 246, 0.08);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.dark .teacher-class-item:hover {
+  background: rgba(139, 92, 246, 0.12);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.dark .teacher-class-name {
+  color: #FFFFFF;
+}
+
+.dark .teacher-class-details {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Teacher Dashboard - 3 cards in horizontal row */
+.teacher-stats-grid {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  margin-bottom: 24px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+.teacher-stats-grid .stat-card {
+  flex: 0 0 auto;
+  min-width: 140px;
+  max-width: 170px;
+  padding: 8px !important;
+  min-height: 70px !important;
+  max-height: 85px !important;
+  gap: 6px !important;
+}
+
+/* Dark mode support for teacher stats cards */
+.dark .teacher-stats-grid .stat-card {
+  background: rgba(139, 92, 246, 0.08);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.dark .teacher-stats-grid .stat-card:hover {
+  background: rgba(139, 92, 246, 0.12);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.dark .teacher-stats-grid .stat-icon-bg {
+  opacity: 0.2;
+}
+
+.dark .teacher-stats-grid .stat-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.dark .teacher-stats-grid .stat-value {
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .stat-card {
@@ -996,7 +1322,7 @@
   /* Navigation responsive styles now handled by ParentBottomNav component */
 
   .parent-container {
-    padding: 0 16px;
+    padding: 0 20px;
   }
 
   .parent-main {
