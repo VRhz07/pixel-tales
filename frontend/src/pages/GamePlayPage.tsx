@@ -114,9 +114,56 @@ const GamePlayPage: React.FC = () => {
       const cachedGame = gamesCacheService.getCachedGameData(gameId!);
       if (cachedGame && !gamesCacheService.isOnline()) {
         console.log('🎮 Loading game from cache (offline mode)');
-        setGameData(cachedGame.gameData);
-        setAttemptId(cachedGame.attemptId || 0);
+        console.log('📦 Cached game data:', cachedGame);
+        
+        // Handle both old and new cache formats
+        // Old format: { gameData: {...}, attemptId: ... }
+        // New format: { game_id: ..., questions: [...], ... }
+        let gameInfo = cachedGame;
+        
+        // If it's the old double-wrapped format, unwrap it
+        if (cachedGame.gameData && !cachedGame.game_id) {
+          console.log('🔄 Converting old cache format to new format');
+          gameInfo = cachedGame.gameData;
+        }
+        
+        console.log('📋 Questions in cache:', gameInfo.questions);
+        
+        // Check if we have questions
+        if (!gameInfo.questions || gameInfo.questions.length === 0) {
+          console.error('❌ No questions found in cached game data!');
+          setError('No questions available for this game');
+          setLoading(false);
+          return;
+        }
+        
+        // Transform cached preview data to GameData format
+        const transformedData: GameData = {
+          id: gameInfo.id || gameInfo.game_id || parseInt(gameId!),
+          game_type: gameInfo.game_type,
+          game_type_display: gameInfo.game_type_display || gameInfo.game_type,
+          story_id: gameInfo.story_id || 0,
+          story_title: gameInfo.story_title || '',
+          questions: gameInfo.questions.map((q: any) => ({
+            id: q.id,
+            question_text: q.question_text,
+            options: q.options,
+            correct_answer: '',
+            context: q.context,
+            hint: q.hint
+          }))
+        };
+        
+        console.log('✅ Transformed game data:', transformedData);
+        console.log('✅ Questions count:', transformedData.questions.length);
+        console.log('✅ First question:', transformedData.questions[0]);
+        
+        setGameData(transformedData);
+        // Use negative attempt ID to indicate offline mode
+        setAttemptId(-(parseInt(gameId!)));
+        setStartTime(Date.now());
         setLoading(false);
+        setError('📴 Playing offline - progress will sync when online');
         return;
       }
       
@@ -154,10 +201,8 @@ const GamePlayPage: React.FC = () => {
       setStartTime(Date.now());
       
       // Cache the game data for offline play
-      gamesCacheService.cacheGameData(gameId!, {
-        gameData: transformedData,
-        attemptId: response.attempt_id
-      });
+      // Note: Don't wrap in gameData/attemptId - we're caching preview format now
+      // This old code is for when playing online, so we can skip caching here
       
       // If resuming, set the current score and find first unanswered question
       if (response.is_resume) {
@@ -176,9 +221,36 @@ const GamePlayPage: React.FC = () => {
       const cachedGame = gamesCacheService.getCachedGameData(gameId!);
       if (cachedGame) {
         console.log('⚠️ API failed, loading from cache');
-        setGameData(cachedGame.gameData);
-        setAttemptId(cachedGame.attemptId || 0);
-        setError('Playing in offline mode - progress will sync when online');
+        
+        // Handle both old and new cache formats
+        let gameInfo = cachedGame;
+        if (cachedGame.gameData && !cachedGame.game_id) {
+          console.log('🔄 Converting old cache format to new format');
+          gameInfo = cachedGame.gameData;
+        }
+        
+        // Transform cached preview data to GameData format
+        const transformedData: GameData = {
+          id: gameInfo.id || gameInfo.game_id || parseInt(gameId!),
+          game_type: gameInfo.game_type,
+          game_type_display: gameInfo.game_type_display || gameInfo.game_type,
+          story_id: gameInfo.story_id || 0,
+          story_title: gameInfo.story_title || '',
+          questions: gameInfo.questions.map((q: any) => ({
+            id: q.id,
+            question_text: q.question_text,
+            options: q.options,
+            correct_answer: '',
+            context: q.context,
+            hint: q.hint
+          }))
+        };
+        
+        setGameData(transformedData);
+        // Use negative attempt ID to indicate offline mode
+        setAttemptId(-(parseInt(gameId!)));
+        setStartTime(Date.now());
+        setError('📴 Playing offline - progress will sync when online');
       } else {
         setError('Failed to start game');
       }
@@ -598,6 +670,16 @@ const GamePlayPage: React.FC = () => {
   console.log('🎮 Game type:', gameData.game_type);
   console.log('🎮 Is word search:', isWordSearch);
   console.log('🎮 Current question:', currentQuestion);
+  console.log('🎮 Current question JSON:', JSON.stringify(currentQuestion, null, 2));
+  console.log('🎮 Question properties:', {
+    id: currentQuestion?.id,
+    question_text: currentQuestion?.question_text,
+    options: currentQuestion?.options,
+    optionsLength: currentQuestion?.options?.length,
+    context: currentQuestion?.context,
+    hint: currentQuestion?.hint,
+    allKeys: currentQuestion ? Object.keys(currentQuestion) : []
+  });
   console.log('🎮 Words to find:', wordsToFind);
   console.log('🎮 Grid:', wordSearchGrid);
 
@@ -606,11 +688,12 @@ const GamePlayPage: React.FC = () => {
       paddingTop: '20px',
       paddingLeft: '20px',
       paddingRight: '20px',
-      paddingBottom: '100px',
+      paddingBottom: '140px', // Increased from 100px to ensure content clears bottom nav
       minHeight: '100vh',
       background: isDarkMode 
         ? 'linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f1419 100%)'
-        : 'linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 50%, #ffffff 100%)'
+        : 'linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 50%, #ffffff 100%)',
+      overflowY: 'auto' // Ensure scrolling is enabled
     }}>
       {/* Header */}
       <div style={{ marginBottom: '30px' }}>

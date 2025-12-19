@@ -71,17 +71,32 @@ class GamesCacheService {
    */
   cacheGameData(gameId: string | number, gameData: any): void {
     try {
+      console.log('💾 Attempting to cache game:', gameId);
+      console.log('💾 Game data to cache:', gameData);
+      console.log('💾 Questions to cache:', gameData?.questions);
+      
       const cacheData: CachedData<any> = {
         data: gameData,
         timestamp: Date.now()
       };
+      
+      const jsonString = JSON.stringify(cacheData);
+      console.log('💾 JSON string length:', jsonString.length);
+      console.log('💾 JSON preview:', jsonString.substring(0, 200));
+      
       localStorage.setItem(
         `${CACHE_KEY_PREFIX}${CACHE_GAME_DATA}${gameId}`,
-        JSON.stringify(cacheData)
+        jsonString
       );
+      
+      // Verify it was stored correctly
+      const verification = localStorage.getItem(`${CACHE_KEY_PREFIX}${CACHE_GAME_DATA}${gameId}`);
+      const parsed = JSON.parse(verification!);
       console.log('✅ Cached game data:', gameId);
+      console.log('✅ Verification - data keys:', Object.keys(parsed.data));
+      console.log('✅ Verification - questions count:', parsed.data?.questions?.length);
     } catch (error) {
-      console.error('Error caching game data:', error);
+      console.error('❌ Error caching game data:', error);
     }
   }
 
@@ -90,10 +105,17 @@ class GamesCacheService {
    */
   getCachedGameData(gameId: string | number): any | null {
     try {
-      const cached = localStorage.getItem(`${CACHE_KEY_PREFIX}${CACHE_GAME_DATA}${gameId}`);
-      if (!cached) return null;
+      const key = `${CACHE_KEY_PREFIX}${CACHE_GAME_DATA}${gameId}`;
+      console.log('🔍 Looking for cached game with key:', key);
+      const cached = localStorage.getItem(key);
+      
+      if (!cached) {
+        console.log('❌ No cached data found for key:', key);
+        return null;
+      }
 
       const cacheData: CachedData<any> = JSON.parse(cached);
+      console.log('📦 Raw cached data:', cacheData);
       
       // Check if cache is expired
       if (Date.now() - cacheData.timestamp > CACHE_EXPIRY) {
@@ -102,7 +124,12 @@ class GamesCacheService {
         return null;
       }
 
-      console.log('✅ Retrieved cached game data:', gameId);
+      console.log('✅ Retrieved cached game data for game:', gameId);
+      console.log('📋 Data structure:', {
+        hasData: !!cacheData.data,
+        dataKeys: cacheData.data ? Object.keys(cacheData.data) : [],
+        questions: cacheData.data?.questions ? cacheData.data.questions.length : 0
+      });
       return cacheData.data;
     } catch (error) {
       console.error('Error retrieving cached game data:', error);

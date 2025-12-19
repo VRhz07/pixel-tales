@@ -83,6 +83,8 @@ const StoryGamesPage: React.FC = () => {
         if (gamesCacheService.isOnline()) {
           console.log('🔄 Refreshing games in background');
           fetchFreshGames();
+        } else {
+          console.log('📴 Offline mode - using cached games');
         }
         return;
       }
@@ -91,6 +93,18 @@ const StoryGamesPage: React.FC = () => {
       await fetchFreshGames();
     } catch (err) {
       console.error('Error in fetchGames:', err);
+      
+      // Try to load from cache as fallback
+      const cachedGames = gamesCacheService.getCachedStoryGames(storyId!);
+      if (cachedGames && cachedGames.length > 0) {
+        console.log('⚠️ API failed, loading from cache');
+        setGames(cachedGames);
+        setLoading(false);
+        setError('Playing offline - using cached games');
+      } else {
+        setError('Failed to load games');
+        setLoading(false);
+      }
     }
   };
 
@@ -146,6 +160,28 @@ const StoryGamesPage: React.FC = () => {
         </button>
         <h1 className="story-title">{storyTitle}</h1>
         <p className="story-subtitle">Choose a game to play</p>
+        
+        {/* Offline indicator */}
+        {!gamesCacheService.isOnline() && games.length > 0 && (
+          <div style={{
+            marginTop: '12px',
+            padding: '10px 16px',
+            background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+            borderRadius: '12px',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '600',
+            textAlign: 'center',
+            boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px'
+          }}>
+            <span style={{ fontSize: '18px' }}>📴</span>
+            <span>Playing Offline - Progress will sync when online</span>
+          </div>
+        )}
       </div>
 
       {/* Error */}

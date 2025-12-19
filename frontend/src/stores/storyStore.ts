@@ -543,7 +543,14 @@ export const useStoryStore = create<StoryState>()(
       getStory: (id: string) => {
         const state = get();
         if (!state.currentUserId) return undefined;
-        return state.userLibraries[state.currentUserId]?.stories.find(story => story.id === id);
+        
+        // First check regular stories
+        const regularStory = state.userLibraries[state.currentUserId]?.stories.find(story => story.id === id);
+        if (regularStory) return regularStory;
+        
+        // If not found, check offline stories
+        const offlineStory = state.userLibraries[state.currentUserId]?.offlineStories?.find(story => story.id === id);
+        return offlineStory;
       },
 
       setCurrentStory: (story: Story | null) => {
@@ -965,8 +972,11 @@ export const useStoryStore = create<StoryState>()(
         // Ensure offlineStories array exists
         const offlineStories = currentLibrary.offlineStories || [];
         
-        // Check if story is already saved offline
-        const isAlreadySaved = offlineStories.some(s => s.id === story.id);
+        // Check if story is already saved offline (by both id and backendId)
+        const isAlreadySaved = offlineStories.some(s => 
+          s.id === story.id || 
+          (s.backendId && story.backendId && s.backendId === story.backendId)
+        );
         if (isAlreadySaved) {
           console.log('ℹ️ Story already saved offline');
           return;
@@ -996,12 +1006,16 @@ export const useStoryStore = create<StoryState>()(
         // Ensure offlineStories array exists
         const offlineStories = currentLibrary.offlineStories || [];
         
+        // Filter by both id and backendId to handle different story ID formats
         set((state) => ({
           userLibraries: {
             ...state.userLibraries,
             [state.currentUserId!]: {
               ...currentLibrary,
-              offlineStories: offlineStories.filter(s => s.id !== storyId)
+              offlineStories: offlineStories.filter(s => 
+                s.id !== storyId && 
+                (!s.backendId || s.backendId.toString() !== storyId)
+              )
             }
           }
         }));
@@ -1016,7 +1030,12 @@ export const useStoryStore = create<StoryState>()(
         const currentLibrary = state.userLibraries[state.currentUserId];
         if (!currentLibrary || !currentLibrary.offlineStories) return false;
         
-        return currentLibrary.offlineStories.some(s => s.id === storyId);
+        // Check by both id and backendId to handle different story ID formats
+        return currentLibrary.offlineStories.some(s => 
+          s.id === storyId || 
+          (s.backendId && s.backendId.toString() === storyId) ||
+          (s.id === storyId.toString())
+        );
       },
 
       // Initialize demo data for John Doe

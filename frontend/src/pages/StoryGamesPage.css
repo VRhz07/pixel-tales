@@ -17,9 +17,10 @@
 /* Main Page Container */
 .story-games-page {
   padding: 20px;
-  padding-bottom: 100px;
+  padding-bottom: 120px; /* Increased from 100px to ensure content clears bottom nav */
   min-height: 100vh;
   background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 50%, #ffffff 100%);
+  overflow-y: auto; /* Ensure scrolling is enabled */
 }
 
 .dark .story-games-page {
@@ -113,6 +114,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding-bottom: 20px; /* Extra padding to ensure last card is fully visible */
 }
 
 /* Game Card - Base Styles */

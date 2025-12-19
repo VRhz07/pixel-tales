@@ -44,9 +44,11 @@
 /* Completion Screen */
 .completion-screen {
   padding: 20px;
+  padding-bottom: 140px; /* Increased to ensure content clears bottom nav */
   min-height: 100vh;
   background-color: #fafafa;
   text-align: center;
+  overflow-y: auto; /* Ensure scrolling is enabled */
 }
 
 .dark .completion-screen {

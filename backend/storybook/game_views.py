@@ -128,6 +128,31 @@ class StoryGameViewSet(viewsets.ReadOnlyModelViewSet):
             'games': games_data
         })
     
+    @action(detail=True, methods=['get'])
+    def preview(self, request, pk=None):
+        """
+        Preview game questions without creating an attempt (for offline caching)
+        """
+        game = self.get_object()
+        
+        # Get questions without revealing answers
+        questions = game.questions.filter(is_active=True).order_by('order').values(
+            'id', 'question_type', 'question_text', 'options',
+            'order', 'hint', 'context', 'points'
+        )
+        
+        questions_data = list(questions)
+        
+        return Response({
+            'game_id': game.id,
+            'game_type': game.game_type,
+            'game_type_display': game.get_game_type_display(),
+            'total_questions': len(questions_data),
+            'questions': questions_data,
+            'story_id': game.story.id,
+            'story_title': game.story.title
+        })
+    
     @action(detail=True, methods=['post'])
     def start_game(self, request, pk=None):
         """

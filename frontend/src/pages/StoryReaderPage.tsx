@@ -30,6 +30,7 @@ import ConfirmationModal from '../components/common/ConfirmationModal';
 import pdfExportService from '../services/pdfExportService';
 import { useSoundEffects } from '../hooks/useSoundEffects';
 import api from '../services/api';
+import gamesCacheService from '../services/gamesCache.service';
 import './StoryReaderPage.css';
 
 type ReadingMode = 'verticalScroll' | 'leftToRight';
@@ -258,11 +259,46 @@ const StoryReaderPage: React.FC = () => {
 
   // Check games status when story loads
   useEffect(() => {
-    console.log('🎮 Checking games - backendStoryId:', backendStoryId, 'user:', user?.username);
+    console.log('🎮 Checking games - backendStoryId:', backendStoryId, 'storyId:', storyId, 'user:', user?.username);
+    
+    // Check if we have cached games for offline play
+    // Try multiple ID formats to find cached games
+    const idsToCheck = [
+      backendStoryId,
+      storyId,
+      story?.backendId,
+      story?.id
+    ].filter(Boolean); // Remove null/undefined values
+    
+    console.log('🔍 Checking cache with IDs:', idsToCheck);
+    
+    let foundGames = null;
+    let foundId = null;
+    
+    for (const id of idsToCheck) {
+      const cachedGames = gamesCacheService.getCachedStoryGames(id!);
+      if (cachedGames && cachedGames.length > 0) {
+        console.log('🎮 Found cached games with ID:', id, 'count:', cachedGames.length);
+        foundGames = cachedGames;
+        foundId = id;
+        break;
+      } else {
+        console.log('❌ No cached games found for ID:', id);
+      }
+    }
+    
+    if (foundGames) {
+      setHasGames(true);
+      setGamesCount(foundGames.length);
+    } else {
+      console.log('❌ No cached games found for any ID variant');
+    }
+    
+    // Also check backend status if we have backend ID and user
     if (backendStoryId && user) {
       checkGamesStatus();
     }
-  }, [backendStoryId, user]);
+  }, [backendStoryId, storyId, user, story]);
 
   // Keyboard navigation - must be before conditional returns
   useEffect(() => {
@@ -398,8 +434,9 @@ const StoryReaderPage: React.FC = () => {
 
   const handleViewGames = () => {
     playButtonClick();
-    if (backendStoryId) {
-      navigate(`/games/story/${backendStoryId}`);
+    const idToUse = backendStoryId || storyId;
+    if (idToUse) {
+      navigate(`/games/story/${idToUse}`);
     }
     setShowViewControls(false);
   };
@@ -495,7 +532,7 @@ const StoryReaderPage: React.FC = () => {
     }
   };
 
-  const handleSaveOffline = () => {
+  const handleSaveOffline = async () => {
     if (!story || !storyId) return;
     
     if (isSavedOffline) {
@@ -504,12 +541,61 @@ const StoryReaderPage: React.FC = () => {
       setIsSavedOffline(false);
       playButtonClick();
       console.log('✅ Removed story from offline storage');
+      
+      // Also clear cached games for this story
+      const idToUse = backendStoryId || storyId;
+      gamesCacheService.clearStoryGamesCache(idToUse);
+      console.log('✅ Cleared cached games for story');
     } else {
       // Save to offline storage
       saveStoryOffline(story);
       setIsSavedOffline(true);
       playSuccess();
       console.log('✅ Saved story for offline reading');
+      
+      // Fetch and cache games for offline play
+      try {
+        const idToUse = backendStoryId || storyId;
+        console.log('🎮 Fetching games to cache for offline play...');
+        console.log('📝 Using ID for caching:', idToUse, 'backendStoryId:', backendStoryId, 'storyId:', storyId);
+        console.log('📖 Story object:', {
+          id: story?.id,
+          backendId: story?.backendId,
+          title: story?.title
+        });
+        const response = await api.get(`/games/story/${idToUse}/`);
+        
+        if (response.games && response.games.length > 0) {
+          // Cache the story games list
+          gamesCacheService.cacheStoryGames(idToUse, response.games);
+          console.log(`✅ Cached ${response.games.length} games list`);
+          
+          // Fetch and cache each game's questions for offline play
+          let cachedCount = 0;
+          for (const game of response.games) {
+            try {
+              // Use the preview endpoint to get questions without creating an attempt
+              const gamePreview = await api.get(`/games/${game.id}/preview/`);
+              console.log(`📦 Game preview response for ${game.id}:`, gamePreview);
+              console.log(`📋 Questions in preview:`, gamePreview.questions);
+              
+              // Cache the game preview data
+              gamesCacheService.cacheGameData(game.id, gamePreview);
+              cachedCount++;
+              console.log(`✅ Cached game ${game.id} (${game.game_type_display}) with ${gamePreview.questions?.length || 0} questions`);
+            } catch (err) {
+              console.warn(`⚠️ Could not cache game ${game.id}:`, err);
+            }
+          }
+          
+          console.log(`🎉 Story and ${cachedCount}/${response.games.length} games saved for offline play!`);
+        } else {
+          console.log('ℹ️ No games available for this story');
+        }
+      } catch (err) {
+        console.warn('⚠️ Could not cache games (will still work when online):', err);
+        // Don't fail the offline save if games caching fails
+      }
     }
   };
 
@@ -1175,7 +1261,7 @@ const StoryReaderPage: React.FC = () => {
           />
 
           {/* Games Button - Always visible below TTS controls */}
-          {backendStoryId && (hasGames || canGenerateGames || isStoryAuthor) && (
+          {(backendStoryId || hasGames) && (hasGames || canGenerateGames || isStoryAuthor) && (
             <div style={{ marginTop: '12px', width: '100%' }}>
               {hasGames ? (
                 <button

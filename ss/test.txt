@@ -1,0 +1,2 @@
+console.log('Current question full data:',
+JSON.stringify(gameData.questions[0], null, 2));
