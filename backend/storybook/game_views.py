@@ -177,33 +177,41 @@ class StoryGameViewSet(viewsets.ReadOnlyModelViewSet):
                 attempt=attempt
             ).values_list('question_id', flat=True)
             
-            # Get all questions with answered status
-            all_questions = game.questions.filter(is_active=True).order_by('order')
-            questions_data = []
-            for q in all_questions:
-                questions_data.append({
-                    'id': q.id,
-                    'question_type': q.question_type,
-                    'question_text': q.question_text,
-                    'options': q.options,
-                    'order': q.order,
-                    'hint': q.hint,
-                    'context': q.context,
-                    'points': q.points,
-                    'is_answered': q.id in answered_question_ids
-                })
-            
-            return Response({
-                'attempt_id': attempt.id,
-                'game_type': game.game_type,
-                'total_questions': attempt.total_questions,
-                'max_points': attempt.max_points,
-                'questions': questions_data,
-                'started_at': attempt.started_at,
-                'is_resume': True,
-                'current_score': attempt.correct_answers,
-                'answered_count': len(answered_question_ids)
-            }, status=status.HTTP_200_OK)
+            # Safety check: If all questions are answered, this should have been completed
+            # Force complete it now and start a new game instead
+            if len(answered_question_ids) >= attempt.total_questions:
+                print(f"⚠️ Found incomplete attempt {attempt.id} with all answers - force completing")
+                GameGenerationService.complete_game_attempt(attempt)
+                # Start a new attempt instead
+                force_new = True
+            else:
+                # Get all questions with answered status
+                all_questions = game.questions.filter(is_active=True).order_by('order')
+                questions_data = []
+                for q in all_questions:
+                    questions_data.append({
+                        'id': q.id,
+                        'question_type': q.question_type,
+                        'question_text': q.question_text,
+                        'options': q.options,
+                        'order': q.order,
+                        'hint': q.hint,
+                        'context': q.context,
+                        'points': q.points,
+                        'is_answered': q.id in answered_question_ids
+                    })
+                
+                return Response({
+                    'attempt_id': attempt.id,
+                    'game_type': game.game_type,
+                    'total_questions': attempt.total_questions,
+                    'max_points': attempt.max_points,
+                    'questions': questions_data,
+                    'started_at': attempt.started_at,
+                    'is_resume': True,
+                    'current_score': attempt.correct_answers,
+                    'answered_count': len(answered_question_ids)
+                }, status=status.HTTP_200_OK)
         
         # Delete old incomplete attempt if force_new is True
         if incomplete_attempt and force_new:
@@ -336,6 +344,8 @@ def complete_game(request):
     """
     Complete a game attempt and get results
     """
+    from django.db import transaction
+    
     attempt_id = request.data.get('attempt_id')
     
     if not attempt_id:
@@ -353,17 +363,51 @@ def complete_game(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    # Complete the attempt
-    results = GameGenerationService.complete_game_attempt(attempt)
+    # Use atomic transaction to ensure all changes commit before response
+    with transaction.atomic():
+        # Complete the attempt (this marks it as is_completed=True)
+        results = GameGenerationService.complete_game_attempt(attempt)
+        
+        # Refresh to get the updated state AFTER completion
+        attempt.refresh_from_db()
+        
+        # Verify it's actually completed
+        if not attempt.is_completed:
+            return Response(
+                {'error': 'Failed to mark attempt as completed'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+        # Clean up any OTHER incomplete attempts for this game
+        # This should now find nothing since THIS attempt is marked completed
+        deleted_count = GameAttempt.objects.filter(
+            user=request.user,
+            game=attempt.game,
+            is_completed=False
+        ).delete()[0]
+        
+        if deleted_count > 0:
+            print(f"⚠️ WARNING: Found and deleted {deleted_count} stale incomplete attempts")
     
-    # Clean up any other incomplete attempts for this game
-    GameAttempt.objects.filter(
+    # CRITICAL: Double-check after transaction commits
+    # Sometimes database replication lag can cause issues
+    remaining_incomplete = GameAttempt.objects.filter(
         user=request.user,
         game=attempt.game,
         is_completed=False
-    ).exclude(id=attempt.id).delete()
+    ).count()
     
-    # Get all answers for review
+    if remaining_incomplete > 0:
+        print(f"🚨 CRITICAL: Still found {remaining_incomplete} incomplete attempts after transaction commit!")
+        # Force delete them
+        GameAttempt.objects.filter(
+            user=request.user,
+            game=attempt.game,
+            is_completed=False
+        ).delete()
+        print(f"✅ Force deleted {remaining_incomplete} incomplete attempts")
+    
+    # Get all answers for review (after transaction commits)
     answers = GameAnswer.objects.filter(attempt=attempt).select_related('question').values(
         'question__question_text',
         'question__correct_answer',

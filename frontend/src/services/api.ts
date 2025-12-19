@@ -19,7 +19,7 @@ class ApiService {
   constructor() {
     this.axiosInstance = axios.create({
       baseURL: API_BASE_URL,
-      timeout: 30000,
+      timeout: 5000, // 5 seconds - faster offline detection
       headers: {
         'Content-Type': 'application/json',
       },

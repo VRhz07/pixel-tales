@@ -13,13 +13,17 @@ const config: CapacitorConfig = {
       backgroundColor: '#1a0d2e',
       overlaysWebView: false
     },
+    NavigationBar: {
+      color: '#00000000', // Transparent
+      style: 'dark'
+    },
     SplashScreen: {
       launchShowDuration: 2000,
       backgroundColor: '#1a0d2e',
       showSpinner: false
     },
     Keyboard: {
-      resize: 'body',
+      resize: 'ionic',
       style: 'dark',
       resizeOnFullScreen: true
     },

@@ -555,9 +555,11 @@ class GameGenerationService:
         
         return {
             'is_correct': is_correct,
+            'correct_answer': question.correct_answer,  # Return correct answer for display
             'feedback': feedback,
             'points_earned': points_earned,
-            'total_points': attempt.total_points
+            'total_points': attempt.total_points,
+            'current_score': attempt.correct_answers  # Return updated score count
         }
     
     @classmethod

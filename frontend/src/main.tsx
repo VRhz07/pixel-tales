@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.tsx'
 import { Capacitor } from '@capacitor/core'
 import { StatusBar, Style } from '@capacitor/status-bar'
+import { initializeSafeArea } from './utils/safeAreaHelper'
 
 // Detect if running in Capacitor and apply body class for safe areas
 if (Capacitor.isNativePlatform()) {
@@ -21,6 +22,9 @@ if (Capacitor.isNativePlatform()) {
   };
   
   initializeStatusBar();
+  
+  // Initialize safe area detection for bottom navigation
+  initializeSafeArea();
 }
 
 createRoot(document.getElementById('root')!).render(

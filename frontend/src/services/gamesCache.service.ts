@@ -23,7 +23,33 @@ interface PendingProgress {
 
 class GamesCacheService {
   /**
-   * Cache games list for a story
+   * Generate all possible ID variants for a story
+   */
+  private getStoryIdVariants(storyId: string | number): string[] {
+    const variants = new Set<string>();
+    const idStr = String(storyId);
+    
+    // Add the original ID
+    variants.add(idStr);
+    
+    // Add numeric version if it's a number-like string
+    if (/^\d+$/.test(idStr)) {
+      variants.add(idStr);
+    }
+    
+    // Add prefixed versions
+    variants.add(`story-${idStr}`);
+    
+    // If it has a prefix, also add without prefix
+    if (idStr.startsWith('story-')) {
+      variants.add(idStr.replace('story-', ''));
+    }
+    
+    return Array.from(variants);
+  }
+
+  /**
+   * Cache games list for a story with all ID variants
    */
   cacheStoryGames(storyId: string | number, games: any[]): void {
     try {
@@ -31,35 +57,54 @@ class GamesCacheService {
         data: games,
         timestamp: Date.now()
       };
-      localStorage.setItem(
-        `${CACHE_KEY_PREFIX}${CACHE_STORY_GAMES}${storyId}`,
-        JSON.stringify(cacheData)
-      );
-      console.log('✅ Cached games for story:', storyId);
+      
+      const jsonData = JSON.stringify(cacheData);
+      const variants = this.getStoryIdVariants(storyId);
+      
+      // Cache with all ID variants for reliability
+      variants.forEach(variant => {
+        localStorage.setItem(
+          `${CACHE_KEY_PREFIX}${CACHE_STORY_GAMES}${variant}`,
+          jsonData
+        );
+      });
+      
+      console.log('✅ Cached games for story with IDs:', variants);
     } catch (error) {
       console.error('Error caching story games:', error);
     }
   }
 
   /**
-   * Get cached games for a story
+   * Get cached games for a story (tries all ID variants)
    */
   getCachedStoryGames(storyId: string | number): any[] | null {
     try {
-      const cached = localStorage.getItem(`${CACHE_KEY_PREFIX}${CACHE_STORY_GAMES}${storyId}`);
-      if (!cached) return null;
-
-      const cacheData: CachedData<any[]> = JSON.parse(cached);
+      const variants = this.getStoryIdVariants(storyId);
+      console.log('🔍 Searching cache with ID variants:', variants);
       
-      // Check if cache is expired
-      if (Date.now() - cacheData.timestamp > CACHE_EXPIRY) {
-        console.log('⏰ Cache expired for story:', storyId);
-        this.clearStoryGamesCache(storyId);
-        return null;
-      }
+      // Try each variant until we find cached data
+      for (const variant of variants) {
+        const key = `${CACHE_KEY_PREFIX}${CACHE_STORY_GAMES}${variant}`;
+        const cached = localStorage.getItem(key);
+        
+        if (cached) {
+          const cacheData: CachedData<any[]> = JSON.parse(cached);
+          
+          // Check if cache is expired
+          if (Date.now() - cacheData.timestamp > CACHE_EXPIRY) {
+            console.log('⏰ Cache expired for story:', variant);
+            this.clearStoryGamesCache(storyId);
+            return null;
+          }
 
-      console.log('✅ Retrieved cached games for story:', storyId);
-      return cacheData.data;
+          console.log('✅ Retrieved cached games for story:', variant);
+          return cacheData.data;
+        }
+      }
+      
+      console.log('❌ No cached games found for any ID variant');
+      return null;
     } catch (error) {
       console.error('Error retrieving cached story games:', error);
       return null;
@@ -189,12 +234,15 @@ class GamesCacheService {
   }
 
   /**
-   * Clear story games cache
+   * Clear story games cache (clears all ID variants)
    */
   clearStoryGamesCache(storyId: string | number): void {
     try {
-      localStorage.removeItem(`${CACHE_KEY_PREFIX}${CACHE_STORY_GAMES}${storyId}`);
-      console.log('🗑️ Cleared story games cache:', storyId);
+      const variants = this.getStoryIdVariants(storyId);
+      variants.forEach(variant => {
+        localStorage.removeItem(`${CACHE_KEY_PREFIX}${CACHE_STORY_GAMES}${variant}`);
+      });
+      console.log('🗑️ Cleared story games cache for all variants:', variants);
     } catch (error) {
       console.error('Error clearing story games cache:', error);
     }
@@ -235,6 +283,50 @@ class GamesCacheService {
    */
   isOnline(): boolean {
     return navigator.onLine;
+  }
+
+  /**
+   * Sync pending progress to backend when online
+   * Returns number of successfully synced items
+   */
+  async syncPendingProgress(api: any): Promise<number> {
+    if (!this.isOnline()) {
+      console.log('📴 Cannot sync - device is offline');
+      return 0;
+    }
+
+    const pending = this.getPendingProgress();
+    if (pending.length === 0) {
+      console.log('✅ No pending progress to sync');
+      return 0;
+    }
+
+    console.log(`🔄 Syncing ${pending.length} pending game progress items...`);
+    let syncedCount = 0;
+
+    for (const progress of pending) {
+      try {
+        // Submit each answer to the backend
+        for (const answer of progress.answers) {
+          await api.post('/games/submit_answer/', {
+            attempt_id: progress.attemptId,
+            question_id: answer.question_id,
+            answer: answer.answer
+          });
+        }
+
+        // If all answers synced successfully, remove from pending
+        this.removePendingProgress(progress.attemptId);
+        syncedCount++;
+        console.log(`✅ Synced progress for attempt ${progress.attemptId}`);
+      } catch (error) {
+        console.error(`❌ Failed to sync progress for attempt ${progress.attemptId}:`, error);
+        // Keep it in pending for next sync attempt
+      }
+    }
+
+    console.log(`✅ Successfully synced ${syncedCount}/${pending.length} items`);
+    return syncedCount;
   }
 }
 

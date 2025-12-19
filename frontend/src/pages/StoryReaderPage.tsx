@@ -566,9 +566,9 @@ const StoryReaderPage: React.FC = () => {
         const response = await api.get(`/games/story/${idToUse}/`);
         
         if (response.games && response.games.length > 0) {
-          // Cache the story games list
+          // Cache with primary ID - service will handle all variants automatically
           gamesCacheService.cacheStoryGames(idToUse, response.games);
-          console.log(`✅ Cached ${response.games.length} games list`);
+          console.log(`✅ Cached ${response.games.length} games with all ID variants`);
           
           // Fetch and cache each game's questions for offline play
           let cachedCount = 0;

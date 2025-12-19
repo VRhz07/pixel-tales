@@ -47,6 +47,7 @@ const GamePlayPage: React.FC = () => {
   const [timeTaken, setTimeTaken] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
+  const [finalScore, setFinalScore] = useState<number | null>(null);
   
   // Word search interactive state
   const [selectedCells, setSelectedCells] = useState<{row: number, col: number}[]>([]);
@@ -66,23 +67,84 @@ const GamePlayPage: React.FC = () => {
       console.log('🌐 Back online! Syncing pending progress...');
       const pending = gamesCacheService.getPendingProgress();
       
+      if (pending.length === 0) {
+        console.log('✅ No pending progress to sync');
+        return;
+      }
+      
+      // Show syncing notification
+      setError('🔄 Syncing your offline progress...');
+      
+      let syncedCount = 0;
       for (const progress of pending) {
         try {
-          // Submit each pending answer
+          // If this is an offline attempt (negative ID), we need to create a new attempt first
+          let actualAttemptId = progress.attemptId;
+          
+          if (progress.attemptId < 0) {
+            console.log('🔄 Creating new attempt for offline game:', progress.gameId);
+            try {
+              const startResponse = await api.post(`/games/${progress.gameId}/start_game/`, {
+                force_new: true
+              });
+              actualAttemptId = startResponse.attempt_id;
+              console.log('✅ Created new attempt:', actualAttemptId);
+            } catch (err) {
+              console.error('❌ Failed to create attempt:', err);
+              throw err; // Skip this progress item
+            }
+          }
+          
+          // Submit each pending answer with the actual attempt ID
           for (const answer of progress.answers) {
             await api.post('/games/submit_answer/', {
-              attempt_id: progress.attemptId,
+              attempt_id: actualAttemptId,
               question_id: answer.question_id,
               answer: answer.answer
             });
           }
           
+          // Complete the game
+          try {
+            const response = await api.post('/games/complete/', {
+              attempt_id: actualAttemptId
+            });
+            
+            console.log('✅ Game completed and synced:', response);
+            
+            // Update XP and time if this is our current game and we're on completion screen
+            if (Math.abs(progress.attemptId) === parseInt(gameId!) && isComplete) {
+              setXpEarned(response.xp_earned || 0);
+              setTimeTaken(response.time_taken_seconds || timeTaken);
+            }
+          } catch (err) {
+            console.error('❌ Failed to complete game on backend:', err);
+          }
+          
           // Remove from pending after successful sync
           gamesCacheService.removePendingProgress(progress.attemptId);
+          syncedCount++;
           console.log('✅ Synced progress for attempt:', progress.attemptId);
         } catch (err) {
           console.error('❌ Failed to sync progress:', err);
         }
+      }
+      
+      // Show success notification
+      if (syncedCount > 0) {
+        setError(`✅ Successfully synced ${syncedCount} offline game${syncedCount > 1 ? 's' : ''}!`);
+        
+        // Clear cache so that next time the games page loads, it fetches fresh data with updated stats
+        const storyId = location.state?.storyId || gameData?.story_id;
+        if (storyId) {
+          gamesCacheService.clearStoryGamesCache(storyId);
+          console.log('🗑️ Cleared story games cache to force refresh with updated stats');
+        }
+        
+        setTimeout(() => setError(null), 3000);
+      } else {
+        setError('⚠️ Failed to sync offline progress. Will retry later.');
+        setTimeout(() => setError(null), 3000);
       }
     };
     
@@ -104,7 +166,7 @@ const GamePlayPage: React.FC = () => {
         backButtonListener.remove();
       }
     };
-  }, [gameId]);
+  }, [gameId, isComplete, timeTaken]);
 
   const fetchGame = async () => {
     try {
@@ -163,7 +225,7 @@ const GamePlayPage: React.FC = () => {
         setAttemptId(-(parseInt(gameId!)));
         setStartTime(Date.now());
         setLoading(false);
-        setError('📴 Playing offline - progress will sync when online');
+        setError(null); // Clear error - will show offline badge in UI
         return;
       }
       
@@ -250,7 +312,7 @@ const GamePlayPage: React.FC = () => {
         // Use negative attempt ID to indicate offline mode
         setAttemptId(-(parseInt(gameId!)));
         setStartTime(Date.now());
-        setError('📴 Playing offline - progress will sync when online');
+        setError(null); // Clear error - will show offline badge in UI
       } else {
         setError('Failed to start game');
       }
@@ -276,10 +338,11 @@ const GamePlayPage: React.FC = () => {
         }]);
         
         // Show generic feedback (can't validate offline)
-        setIsCorrect(false);
-        setCorrectAnswer('Answer saved offline - will be checked when online');
+        // In offline mode, we allow progression without validation
+        setIsCorrect(true); // Set to true so user sees positive feedback
+        setCorrectAnswer(''); // Don't show correct answer in offline mode
         setShowFeedback(true);
-        setError('Playing offline - progress will sync when online');
+        console.log('📴 Offline answer stored, showing feedback');
       } else {
         const response = await api.post('/games/submit_answer/', {
           attempt_id: attemptId,
@@ -291,8 +354,12 @@ const GamePlayPage: React.FC = () => {
         setCorrectAnswer(response.correct_answer);
         setShowFeedback(true);
         
+        // Update score from backend response (source of truth)
+        if (response.current_score !== undefined) {
+          setScore(response.current_score);
+        }
+        
         if (response.is_correct) {
-          setScore(score + 1);
           playSuccess(); // Play success sound with haptic
         } else {
           playError(); // Play error sound with haptic
@@ -300,7 +367,6 @@ const GamePlayPage: React.FC = () => {
       }
     } catch (err) {
       console.error('Error submitting answer:', err);
-      setError('Failed to submit answer - saved offline');
       
       // Store offline as fallback
       gamesCacheService.storePendingProgress(gameData.id, attemptId, [{
@@ -308,6 +374,12 @@ const GamePlayPage: React.FC = () => {
         answer: userAnswer.trim(),
         timestamp: Date.now()
       }]);
+      
+      // Show feedback to allow progression
+      setIsCorrect(true);
+      setCorrectAnswer('');
+      setShowFeedback(true);
+      setError('Answer saved offline - will sync when online');
     } finally {
       setIsSubmitting(false);
     }
@@ -318,6 +390,7 @@ const GamePlayPage: React.FC = () => {
     setShowFeedback(false);
     setUserAnswer('');
     setIsSubmitting(false); // Reset submitting state
+    setError(null); // Clear any error messages
     
     // Reset word search state
     setSelectedCells([]);
@@ -331,20 +404,60 @@ const GamePlayPage: React.FC = () => {
     } else {
       // Complete the game by calling the backend
       try {
-        const response = await api.post('/games/complete/', {
-          attempt_id: attemptId
-        });
-        console.log('✅ Game completed successfully', response);
-        
-        // Store time and XP from backend response
-        // Prefer frontend calculated time as it's more accurate for this session
-        const calculatedTime = startTime ? Math.floor((Date.now() - startTime) / 1000) : response.time_taken_seconds;
-        setTimeTaken(calculatedTime || 0);
-        setXpEarned(response.xp_earned || 0);
+        // Only call backend if online
+        if (gamesCacheService.isOnline()) {
+          const response = await api.post('/games/complete/', {
+            attempt_id: attemptId
+          });
+          console.log('✅ Game completed successfully', response);
+          
+          // Store final score from backend (source of truth) for completion page
+          const backendScore = response.correct_answers !== undefined ? response.correct_answers : score;
+          setFinalScore(backendScore);
+          setScore(backendScore);
+          
+          // Store time and XP from backend response
+          // Prefer frontend calculated time as it's more accurate for this session
+          const calculatedTime = startTime ? Math.floor((Date.now() - startTime) / 1000) : response.time_taken_seconds;
+          setTimeTaken(calculatedTime || 0);
+          setXpEarned(response.xp_earned || 0);
+          
+          // Wait longer to ensure database transaction has fully committed
+          // This gives time for backend transaction to commit and propagate
+          console.log('⏳ Waiting 1000ms for database transaction to commit and propagate...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          console.log('✅ Wait complete, proceeding with cache clear');
+          
+          // Clear cache so the games list shows updated stats
+          const storyId = location.state?.storyId || gameData?.story_id;
+          console.log('🔍 Attempting to clear cache for storyId:', storyId);
+          console.log('🔍 location.state:', location.state);
+          console.log('🔍 gameData?.story_id:', gameData?.story_id);
+          
+          if (storyId) {
+            gamesCacheService.clearStoryGamesCache(storyId);
+            console.log('🗑️ Cleared story games cache after online completion for storyId:', storyId);
+            
+            // Also clear the game data cache to force fresh fetch
+            gamesCacheService.clearGameDataCache(gameData!.id);
+            console.log('🗑️ Also cleared game data cache for gameId:', gameData!.id);
+          } else {
+            console.error('❌ Could not clear cache - storyId is undefined!');
+            console.error('❌ location.state:', location.state);
+            console.error('❌ gameData:', gameData);
+          }
+        } else {
+          // Offline mode - use local calculations
+          console.log('📴 Completing game offline');
+          const calculatedTime = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+          setTimeTaken(calculatedTime);
+          setXpEarned(0); // No XP in offline mode
+        }
       } catch (err) {
         console.error('Error completing game:', err);
         // Fallback to calculated time if API fails
         setTimeTaken(startTime ? Math.floor((Date.now() - startTime) / 1000) : 0);
+        setXpEarned(0);
       }
       
       setIsComplete(true);
@@ -464,6 +577,21 @@ const GamePlayPage: React.FC = () => {
           setTimeTaken(calculatedTime || 0);
           setXpEarned(response.xp_earned || 0);
           
+          // Clear cache so the games list shows updated stats
+          const storyId = location.state?.storyId || gameData?.story_id;
+          console.log('🔍 Word search - clearing cache for storyId:', storyId);
+          
+          if (storyId) {
+            gamesCacheService.clearStoryGamesCache(storyId);
+            console.log('🗑️ Cleared story games cache after word search completion for storyId:', storyId);
+            
+            // Also clear the game data cache
+            gamesCacheService.clearGameDataCache(gameData!.id);
+            console.log('🗑️ Also cleared game data cache for gameId:', gameData!.id);
+          } else {
+            console.error('❌ Word search - could not clear cache - storyId is undefined!');
+          }
+          
           // Show completion screen after a delay
           setTimeout(() => {
             setIsComplete(true);
@@ -519,13 +647,31 @@ const GamePlayPage: React.FC = () => {
     handleCellMouseUp(grid, wordsToFind);
   };
 
-  const handleBackToStory = () => {
+  const handleBackToStory = async () => {
     // Navigate back to the story games page
     const storyId = location.state?.storyId || gameData?.story_id;
     if (storyId) {
-      // Use React Router navigate instead of window.location.href
-      // This prevents asset loading issues in Capacitor
-      navigate(`/games/story/${storyId}`);
+      const isOnline = gamesCacheService.isOnline();
+      
+      if (isOnline) {
+        // Only wait and force refresh if online
+        console.log('⏳ Waiting additional 500ms before navigation (online mode)...');
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Clear cache to ensure fresh data from API
+        gamesCacheService.clearStoryGamesCache(storyId);
+        console.log('🗑️ Cleared cache before navigation to force fresh fetch');
+        
+        // Navigate with refreshNeeded flag for online mode
+        navigate(`/games/story/${storyId}`, { 
+          state: { refreshNeeded: true, timestamp: Date.now() }
+        });
+      } else {
+        // Offline mode - just navigate without forcing refresh
+        // Let the cache-first strategy work
+        console.log('📴 Offline mode - navigating to cached games list');
+        navigate(`/games/story/${storyId}`);
+      }
     } else {
       // Fallback: go to games list
       navigate('/games');
@@ -554,7 +700,9 @@ const GamePlayPage: React.FC = () => {
   if (isComplete) {
     // Calculate completion for word search
     const isWordSearchComplete = gameData.game_type === 'word_search' && foundWords.length > 0;
-    const percentage = isWordSearchComplete ? 100 : Math.round((score / gameData.questions.length) * 100);
+    // Use finalScore if available (from backend), otherwise fall back to score state
+    const displayScore = finalScore !== null ? finalScore : score;
+    const percentage = isWordSearchComplete ? 100 : Math.round((displayScore / gameData.questions.length) * 100);
     
     return (
       <div className="completion-screen">
@@ -574,7 +722,7 @@ const GamePlayPage: React.FC = () => {
             </div>
           ) : (
             <p className="completion-score">
-              Score: {score} / {gameData.questions.length} ({percentage}%)
+              Score: {displayScore} / {gameData.questions.length} ({percentage}%)
             </p>
           )}
           
@@ -636,11 +784,21 @@ const GamePlayPage: React.FC = () => {
               onClick={async () => {
                 playButtonClick();
                 try {
+                  // Clear any incomplete attempts
                   await api.post(`/games/${gameId}/clear_incomplete/`);
                 } catch (err) {
                   console.error('Error clearing attempt:', err);
                 }
-                window.location.reload();
+                // Navigate to start a fresh game
+                const storyId = location.state?.storyId || gameData?.story_id;
+                if (storyId) {
+                  navigate(`/games/play/${gameId}`, { 
+                    state: { storyId: storyId, forceNew: true },
+                    replace: true
+                  });
+                } else {
+                  window.location.reload();
+                }
               }}
               className="btn-play-again"
             >
@@ -721,6 +879,29 @@ const GamePlayPage: React.FC = () => {
         >
           ← Back
         </button>
+        
+        {/* Offline Mode Indicator */}
+        {!gamesCacheService.isOnline() && (
+          <div style={{
+            marginBottom: '20px',
+            padding: '12px 18px',
+            background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+            borderRadius: '12px',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '600',
+            textAlign: 'center',
+            boxShadow: '0 4px 12px rgba(245, 158, 11, 0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px'
+          }}>
+            <span style={{ fontSize: '18px' }}>📴</span>
+            <span>Playing Offline - Progress will sync when online</span>
+          </div>
+        )}
+        
         <h2 style={{ color: isDarkMode ? '#e2e8f0' : '#1f2937' }}>{gameData.game_type_display}</h2>
         {!isWordSearch && <p style={{ color: isDarkMode ? '#cbd5e0' : '#4b5563' }}>Question {currentQuestionIndex + 1} of {gameData.questions.length}</p>}
         <p style={{ color: isDarkMode ? '#cbd5e0' : '#4b5563' }}>Score: {score}</p>

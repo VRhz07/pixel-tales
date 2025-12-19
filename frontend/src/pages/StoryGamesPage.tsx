@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import gamesCacheService from '../services/gamesCache.service';
 import { useSoundEffects } from '../hooks/useSoundEffects';
@@ -30,6 +30,7 @@ interface Game {
 const StoryGamesPage: React.FC = () => {
   const { storyId } = useParams<{ storyId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { playButtonClick } = useSoundEffects();
   
   const [storyTitle, setStoryTitle] = useState('');
@@ -39,16 +40,23 @@ const StoryGamesPage: React.FC = () => {
 
   useEffect(() => {
     if (storyId) {
-      fetchGames();
+      // Check if we need to skip cache (e.g., after game completion)
+      const state = location.state as any;
+      if (state?.refreshNeeded) {
+        console.log('🔄 Refresh needed, skipping cache and forcing refresh');
+        fetchGames(true); // Force refresh, skip cache
+      } else {
+        fetchGames(false); // Normal cache-first
+      }
     }
-  }, [storyId]);
+  }, [storyId, location.state]);
 
   // Also refresh when location state changes (when navigating back)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden && storyId) {
         console.log('🔄 Page became visible, refreshing games...');
-        fetchGames();
+        fetchGames(false); // Use cache-first
       }
     };
     
@@ -60,7 +68,7 @@ const StoryGamesPage: React.FC = () => {
   useEffect(() => {
     const handleFocus = () => {
       if (storyId) {
-        fetchGames();
+        fetchGames(false); // Use cache-first
       }
     };
     
@@ -68,56 +76,100 @@ const StoryGamesPage: React.FC = () => {
     return () => window.removeEventListener('focus', handleFocus);
   }, [storyId]);
 
-  const fetchGames = async () => {
-    try {
+  const fetchGames = async (forceRefresh: boolean = false) => {
+    // If force refresh, skip cache entirely
+    if (forceRefresh) {
+      console.log('🔄 Force refresh - skipping cache entirely');
       setLoading(true);
+      await fetchFreshGames();
+      return;
+    }
+    
+    // CACHE-FIRST STRATEGY: Always show cache immediately
+    const cachedGames = gamesCacheService.getCachedStoryGames(storyId!);
+    
+    if (cachedGames && cachedGames.length > 0) {
+      console.log('⚡ Loading games from cache instantly');
+      console.log('📦 Cached games:', cachedGames);
       
-      // Try to load from cache first for instant display
-      const cachedGames = gamesCacheService.getCachedStoryGames(storyId!);
-      if (cachedGames && cachedGames.length > 0) {
-        console.log('⚡ Loading games from cache');
-        setGames(cachedGames);
-        setLoading(false);
-        
-        // Still fetch fresh data in background if online
-        if (gamesCacheService.isOnline()) {
-          console.log('🔄 Refreshing games in background');
-          fetchFreshGames();
-        } else {
-          console.log('📴 Offline mode - using cached games');
+      // Set games and show immediately
+      setGames(cachedGames);
+      setLoading(false);
+      setError(null);
+      
+      // Cache each game's data for offline play if not already cached
+      cachedGames.forEach(async (game) => {
+        const cachedGameData = gamesCacheService.getCachedGameData(game.id);
+        if (!cachedGameData) {
+          console.log(`⚠️ Game ${game.id} not cached, attempting to cache...`);
+          try {
+            const gamePreview = await api.get(`/games/${game.id}/preview/`);
+            gamesCacheService.cacheGameData(game.id, gamePreview);
+            console.log(`✅ Cached game ${game.id} for offline play`);
+          } catch (err) {
+            console.log(`⚠️ Could not cache game ${game.id}:`, err);
+          }
         }
-        return;
-      }
+      });
       
-      // No cache, fetch from API
+      // Try to refresh from API in background (non-blocking) if online
+      if (gamesCacheService.isOnline()) {
+        try {
+          console.log('🔄 Attempting background refresh...');
+          const response = await api.get(`/games/story/${storyId}/`);
+          
+          console.log('✅ Background refresh successful');
+          setStoryTitle(response.story_title);
+          setGames(response.games);
+          
+          // Update cache with fresh data
+          gamesCacheService.cacheStoryGames(storyId!, response.games);
+        } catch (err) {
+          // Silent fail - we already have cache
+          console.log('📴 Background refresh failed, using cached version');
+        }
+      } else {
+        console.log('📴 Offline mode - using cached games only');
+      }
+      return;
+    }
+    
+    // No cache available - must fetch from API
+    console.log('📡 No cache found, fetching from API...');
+    setLoading(true);
+    
+    try {
       await fetchFreshGames();
     } catch (err) {
-      console.error('Error in fetchGames:', err);
-      
-      // Try to load from cache as fallback
-      const cachedGames = gamesCacheService.getCachedStoryGames(storyId!);
-      if (cachedGames && cachedGames.length > 0) {
-        console.log('⚠️ API failed, loading from cache');
-        setGames(cachedGames);
-        setLoading(false);
-        setError('Playing offline - using cached games');
-      } else {
-        setError('Failed to load games');
-        setLoading(false);
-      }
+      console.error('❌ Error fetching games:', err);
+      setError('Failed to load games. Please check your connection.');
+      setLoading(false);
     }
   };
 
   const fetchFreshGames = async () => {
     try {
+      console.log('🔄 Fetching fresh games from API for storyId:', storyId);
       const response = await api.get(`/games/story/${storyId}/`);
       setStoryTitle(response.story_title);
       
       console.log('📊 Games data received:', response.games);
+      
+      // Log each game's status for debugging
+      response.games.forEach((game: Game) => {
+        console.log(`🎮 Game ${game.id}:`, {
+          has_last_attempt: !!game.last_attempt,
+          last_attempt: game.last_attempt,
+          has_incomplete_attempt: !!game.incomplete_attempt,
+          incomplete_attempt: game.incomplete_attempt
+        });
+      });
+      
       setGames(response.games);
       
       // Cache the games for offline use
       gamesCacheService.cacheStoryGames(storyId!, response.games);
+      console.log('💾 Cached fresh games data');
       
       setError(null);
       setLoading(false);
@@ -161,25 +213,38 @@ const StoryGamesPage: React.FC = () => {
         <h1 className="story-title">{storyTitle}</h1>
         <p className="story-subtitle">Choose a game to play</p>
         
-        {/* Offline indicator */}
-        {!gamesCacheService.isOnline() && games.length > 0 && (
+        {/* Offline indicator - show when using cached data */}
+        {games.length > 0 && error === null && (
           <div style={{
             marginTop: '12px',
             padding: '10px 16px',
-            background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+            background: !gamesCacheService.isOnline() 
+              ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)'
+              : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
             borderRadius: '12px',
             color: 'white',
             fontSize: '14px',
             fontWeight: '600',
             textAlign: 'center',
-            boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+            boxShadow: !gamesCacheService.isOnline()
+              ? '0 4px 12px rgba(245, 158, 11, 0.3)'
+              : '0 4px 12px rgba(16, 185, 129, 0.3)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '8px'
           }}>
-            <span style={{ fontSize: '18px' }}>📴</span>
-            <span>Playing Offline - Progress will sync when online</span>
+            {!gamesCacheService.isOnline() ? (
+              <>
+                <span style={{ fontSize: '18px' }}>📴</span>
+                <span>Playing Offline - Progress will sync when online</span>
+              </>
+            ) : (
+              <>
+                <span style={{ fontSize: '18px' }}>✅</span>
+                <span>Games loaded from cache - Online mode active</span>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -212,7 +277,8 @@ const StoryGamesPage: React.FC = () => {
               </p>
               
               {/* Incomplete Attempt - Priority */}
-              {game.incomplete_attempt && (
+              {/* Only show incomplete badge if user has actually answered at least one question */}
+              {game.incomplete_attempt && game.incomplete_attempt.answered_count > 0 && (
                 <div className="incomplete-attempt-badge">
                   <div className="badge-title">
                     ⚠️ Incomplete Game
@@ -227,7 +293,8 @@ const StoryGamesPage: React.FC = () => {
               )}
               
               {/* Last Attempt Stats */}
-              {game.last_attempt && !game.incomplete_attempt && (
+              {/* Show last attempt if exists AND (no incomplete OR incomplete has no answers) */}
+              {game.last_attempt && (!game.incomplete_attempt || game.incomplete_attempt.answered_count === 0) && (
                 <div className="last-attempt-badge">
                   <div className="badge-title">Last Score:</div>
                   <div className="badge-score-value">
@@ -242,7 +309,8 @@ const StoryGamesPage: React.FC = () => {
               
               {/* Buttons */}
               <div className="game-buttons">
-                {game.incomplete_attempt ? (
+                {/* Only show resume if there's an incomplete attempt with at least 1 answer */}
+                {game.incomplete_attempt && game.incomplete_attempt.answered_count > 0 ? (
                   <>
                     <button
                       onClick={() => {
@@ -289,7 +357,7 @@ const StoryGamesPage: React.FC = () => {
                     onClick={() => {
                       playButtonClick();
                       navigate(`/games/play/${game.id}`, { 
-                        state: { storyId: storyId }
+                        state: { storyId: storyId, forceNew: game.last_attempt ? true : false }
                       });
                     }}
                     className="btn-play"
