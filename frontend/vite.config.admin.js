@@ -12,31 +12,14 @@ export default defineConfig({
             '@': path.resolve(__dirname, './src'),
         },
     },
+    // Specify public directory to copy static files
+    publicDir: 'public',
     build: {
         outDir: 'dist-admin',
-        sourcemap: false, // Disable source maps for admin (security)
-        minify: 'terser',
-        // Admin dashboard optimizations
+        emptyOutDir: true,
+        // Specify the admin HTML entry point (using index.admin.html)
         rollupOptions: {
-            output: {
-                manualChunks: {
-                    'admin-core': [
-                        './src/pages/AdminDashboardPage.tsx',
-                        './src/services/admin.service.ts',
-                        './src/services/adminAuth.service.ts',
-                    ],
-                    'admin-components': [
-                        './src/components/admin/DashboardStats.tsx',
-                        './src/components/admin/UserManagement.tsx',
-                        './src/components/admin/ProfanityManagement.tsx',
-                    ],
-                    'vendor': [
-                        'react',
-                        'react-dom',
-                        'react-router-dom',
-                    ],
-                },
-            },
+            input: path.resolve(__dirname, 'index.admin.html'),
         },
     },
     // Environment variables

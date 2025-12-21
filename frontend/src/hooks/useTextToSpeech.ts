@@ -3,6 +3,7 @@ import { useI18nStore } from '../stores/i18nStore';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { Capacitor } from '@capacitor/core';
 import { useOnlineStatus } from './useOnlineStatus';
+import { AndroidTtsVoices } from '../services/androidTtsVoices';
 import { API_BASE_URL } from '../config/constants';
 import soundService from '../services/soundService';
 
@@ -59,6 +60,13 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
   }, []);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [currentVoice, setCurrentVoice] = useState<SpeechSynthesisVoice | null>(null);
+
+  // Persist device voice selection (native TTS) using a stable key
+  // Format: name|||lang|||originalIndex
+  const [deviceVoiceId, setDeviceVoiceId] = useState<string>(() => {
+    const saved = localStorage.getItem('tts_deviceVoiceId');
+    return saved || '';
+  });
   const [rate, setRate] = useState(1);
   const [pitch, setPitch] = useState(1);
   const [volume, setVolume] = useState(1);
@@ -87,6 +95,9 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const isMountedRef = useRef(true);
+
+  // Used to ignore late native completion callbacks after Stop is pressed
+  const nativeSpeakTokenRef = useRef(0);
   
   const isNativePlatform = Capacitor.isNativePlatform();
   
@@ -102,6 +113,15 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
     console.log('🎤 TTS: Saved cloud TTS preference:', useCloudTTS);
   }, [useCloudTTS]);
 
+  // Save device voice selection key to localStorage when it changes
+  useEffect(() => {
+    if (deviceVoiceId) {
+      localStorage.setItem('tts_deviceVoiceId', deviceVoiceId);
+    } else {
+      localStorage.removeItem('tts_deviceVoiceId');
+    }
+  }, [deviceVoiceId]);
+
   // Check if TTS is supported (always true on mobile with plugin, check Web Speech API on web)
   const isSupported = isNativePlatform || (typeof window !== 'undefined' && 'speechSynthesis' in window);
 
@@ -114,12 +134,37 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
         // Load native platform voices using Capacitor TTS
         try {
           console.log('📢 TTS: Loading native voices from device...');
-          const result = await TextToSpeech.getSupportedVoices();
-          console.log('📢 TTS: Native voices loaded:', result.voices.length, result.voices);
-          
-          if (result.voices && result.voices.length > 0) {
+          const isAndroid = Capacitor.getPlatform() === 'android';
+
+          // Always fetch the community plugin voices, because the `voice` you pass to `TextToSpeech.speak()`
+          // must be an index into *this* list.
+          const supported = await TextToSpeech.getSupportedVoices();
+          const supportedVoices: any[] = supported?.voices || [];
+
+          // Android: also fetch the real installed/offline voices from the native engine.
+          // We'll use this as an allow-list to hide voices that are not actually downloaded.
+          let installedKeys = new Set<string>();
+          if (isAndroid) {
+            try {
+              const installed = await AndroidTtsVoices.getInstalledVoices({ localOnly: true });
+              const installedVoices: any[] = (installed as any).voices || [];
+              installedKeys = new Set(
+                installedVoices.map(v => `${(v.name || '').toLowerCase()}|||${(v.lang || '').toLowerCase()}`)
+              );
+              console.log('📢 TTS: Android installed/offline voices:', installedVoices.length, installedVoices);
+            } catch (e) {
+              console.warn('📢 TTS: Failed to query Android installed voices. Falling back to supported voices only.', e);
+            }
+          }
+
+          console.log('📢 TTS: Native supported voices loaded:', supportedVoices.length, supportedVoices);
+
+          if (supportedVoices.length > 0) {
+            const rawVoices: any[] = supportedVoices;
             // Filter to show only EN-US and Filipino voices
-            const filteredVoices = result.voices.filter(v => {
+            // On Android we also *prefer* offline (downloaded) voices, which are typically marked as "local".
+            // Some engines expose "network" voices which can cause glitches when selected while offline.
+            const baseFiltered = rawVoices.filter(v => {
               if (!v.lang) return false;
               const langLower = v.lang.toLowerCase();
               const nameLower = v.name ? v.name.toLowerCase() : '';
@@ -140,28 +185,66 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
               const isBengali = langLower.startsWith('bn') || nameLower.includes('bengali') || nameLower.includes('বাংলা');
               
               return (isEnglishUS || isFilipino) && !isArabic && !isBengali;
-            }).map((v, index) => ({
+            });
+
+            // If we have an installed/offline allow-list (Android), restrict to those voices.
+            const allowListed = (isAndroid && installedKeys.size > 0)
+              ? baseFiltered.filter(v => installedKeys.has(`${(v.name || '').toLowerCase()}|||${(v.lang || '').toLowerCase()}`))
+              : baseFiltered;
+
+            // IMPORTANT: voice index passed to TextToSpeech.speak must match supportedVoices ordering.
+            const mappedVoices = allowListed.map((v) => ({
               ...v,
-              originalIndex: result.voices.indexOf(v) // Store original index for voice selection
+              originalIndex: rawVoices.indexOf(v)
             }));
-            
+
+            // Android: at this point, if installedKeys was available, we are already limited to installed voices.
+            // Keep the extra heuristic as a safety net when installedKeys is empty.
+            let filteredVoices = mappedVoices;
+            if (isAndroid && installedKeys.size === 0) {
+              const explicitLocal = mappedVoices.filter(v => (v.name || '').toLowerCase().includes('local'));
+              filteredVoices = explicitLocal.length > 0
+                ? explicitLocal
+                : mappedVoices.filter(v => !(v.name || '').toLowerCase().includes('network'));
+            }
+
             console.log('📢 TTS: Filtered voices (English & Filipino only):', filteredVoices.length, filteredVoices);
             setVoices(filteredVoices);
-            
-            // Auto-select voice based on current language
-            if (!currentVoice && filteredVoices.length > 0) {
-              // For Tagalog, look for Filipino voices
-              const langCode = language === 'tl' ? 'fil' : language;
-              const preferredVoice = filteredVoices.find(v => 
-                v.lang && (
-                  v.lang.toLowerCase().includes(langCode) || 
-                  v.lang.toLowerCase().startsWith('fil') ||
-                  (language === 'tl' && v.lang.toLowerCase().includes('ph'))
-                )
-              ) || filteredVoices[0];
-              
-              console.log('📢 TTS: Auto-selected voice:', preferredVoice);
+
+            // Restore saved device voice if available; otherwise auto-select by language
+            if (filteredVoices.length > 0) {
+              let preferredVoice: any = null;
+
+              if (deviceVoiceId) {
+                const [savedName, savedLang, savedIndexStr] = deviceVoiceId.split('|||');
+                const savedIndex = Number(savedIndexStr);
+                preferredVoice = filteredVoices.find(v => {
+                  const originalIndex = (v as any).originalIndex;
+                  return (
+                    (savedName ? v.name === savedName : true) &&
+                    (savedLang ? v.lang === savedLang : true) &&
+                    (!Number.isNaN(savedIndex) ? originalIndex === savedIndex : true)
+                  );
+                }) || null;
+              }
+
+              if (!preferredVoice) {
+                // For Tagalog, look for Filipino voices
+                const langCode = language === 'tl' ? 'fil' : language;
+                preferredVoice = filteredVoices.find(v =>
+                  v.lang && (
+                    v.lang.toLowerCase().includes(langCode) ||
+                    v.lang.toLowerCase().startsWith('fil') ||
+                    (language === 'tl' && v.lang.toLowerCase().includes('ph'))
+                  )
+                ) || filteredVoices[0];
+              }
+
+              // Ensure currentVoice always references an object from the current voices array
               setCurrentVoice(preferredVoice);
+
+              const preferredId = `${preferredVoice.name || ''}|||${preferredVoice.lang || ''}|||${(preferredVoice as any).originalIndex ?? ''}`;
+              setDeviceVoiceId(preferredId);
             }
           } else {
             console.warn('📢 TTS: No native voices found. User may need to install a TTS engine.');
@@ -237,7 +320,7 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
         }
       };
     }
-  }, [isSupported, isNativePlatform, language, currentVoice]);
+  }, [isSupported, isNativePlatform, language]);
 
   // Auto-switch voice when language changes (for story language switching)
   useEffect(() => {
@@ -439,6 +522,19 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
   }, [language, cloudVoiceId, rate, pitch, volume]);
 
   // Speak text
+  const setVoice = useCallback((voice: SpeechSynthesisVoice | null) => {
+    setCurrentVoice(voice);
+
+    // Persist native/device voice selection as a stable key
+    if (voice) {
+      const originalIndex = (voice as any).originalIndex;
+      const id = `${voice.name || ''}|||${voice.lang || ''}|||${originalIndex ?? ''}`;
+      setDeviceVoiceId(id);
+    } else {
+      setDeviceVoiceId('');
+    }
+  }, []);
+
   const speak = useCallback(async (text: string, options?: TextToSpeechOptions) => {
     if (!isSupported || !text.trim()) return;
 
@@ -474,6 +570,9 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
         
         // Stop any ongoing speech
         await TextToSpeech.stop();
+
+        // New token for this speak call
+        const speakToken = ++nativeSpeakTokenRef.current;
         
         setIsSpeaking(true);
         setIsPaused(false);
@@ -537,6 +636,12 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
         
         // Start speaking (this is fire-and-forget, doesn't wait for completion)
         TextToSpeech.speak(ttsOptions).then(() => {
+          // If a newer speak/stop happened, ignore this completion
+          if (speakToken !== nativeSpeakTokenRef.current) {
+            console.log('📢 TTS: Ignoring stale native completion callback');
+            return;
+          }
+
           console.log('📢 TTS: Speech completed successfully');
           
           // Clear interval and set final state
@@ -554,6 +659,12 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
             setProgress(0);
           }, 1000);
         }).catch((error) => {
+          // If a newer speak/stop happened, ignore this error
+          if (speakToken !== nativeSpeakTokenRef.current) {
+            console.log('📢 TTS: Ignoring stale native error callback');
+            return;
+          }
+
           console.error('📢 TTS: Speech error:', error);
           
           if (progressIntervalRef.current) {
@@ -654,11 +765,8 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
     }
     
     if (isNativePlatform) {
-      // Capacitor TTS doesn't support pause, so we'll just stop
-      await TextToSpeech.stop();
-      setIsSpeaking(false);
-      setIsPaused(false);
-      setProgress(0);
+      // Native (Android/iOS) plugin does not support pause. Treat pause as stop.
+      await stop();
     } else {
       if (typeof window !== 'undefined' && window.speechSynthesis) {
         window.speechSynthesis.pause();
@@ -680,8 +788,9 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
     }
     
     if (isNativePlatform) {
-      // On mobile, we can't resume, so just note that it's not paused
-      setIsPaused(false);
+      // Native plugin cannot resume because it cannot pause.
+      // No-op.
+      return;
     } else {
       if (typeof window !== 'undefined' && window.speechSynthesis) {
         window.speechSynthesis.resume();
@@ -716,6 +825,8 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
     }
     
     if (isNativePlatform) {
+      // Invalidate any pending native completion callbacks
+      nativeSpeakTokenRef.current++;
       await TextToSpeech.stop();
     } else {
       if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -847,7 +958,7 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
     isSupported,
     voices,
     currentVoice,
-    setVoice: setCurrentVoice,
+    setVoice,
     rate,
     setRate,
     pitch,

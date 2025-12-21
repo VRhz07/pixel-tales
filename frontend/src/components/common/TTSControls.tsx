@@ -380,7 +380,7 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
                             : languageLabel;
                           
                           return {
-                            value: `${voice.name}|||${voice.lang}|||${index}`,
+                            value: `${voice.name || ''}|||${voice.lang || ''}|||${(voice as any).originalIndex ?? index}`, 
                             label: label,
                             voiceData: {
                               index,
@@ -402,18 +402,27 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
                         
                         return options;
                       })()}
-                      value={currentVoice ? `${currentVoice.name}|||${currentVoice.lang}|||${voices.indexOf(currentVoice)}` : ''}
+                      value={currentVoice ? `${currentVoice.name || ''}|||${currentVoice.lang || ''}|||${(currentVoice as any).originalIndex ?? ''}` : ''}
                       onChange={(value) => {
-                        const [name, lang, indexStr] = value.split('|||');
-                        const index = parseInt(indexStr);
-                        if (index >= 0 && index < voices.length) {
+                        const [name, lang, originalIndexStr] = value.split('|||');
+                        const originalIndex = Number(originalIndexStr);
+
+                        const selected = voices.find(v => {
+                          const oi = (v as any).originalIndex;
+                          return (
+                            (name ? v.name === name : true) &&
+                            (lang ? v.lang === lang : true) &&
+                            (!Number.isNaN(originalIndex) ? oi === originalIndex : true)
+                          );
+                        });
+
+                        if (selected) {
                           console.log('🎤 TTS: User selected voice:', JSON.stringify({
-                            index,
-                            name: voices[index].name,
-                            lang: voices[index].lang,
-                            originalIndex: (voices[index] as any).originalIndex
+                            name: selected.name,
+                            lang: selected.lang,
+                            originalIndex: (selected as any).originalIndex
                           }, null, 2));
-                          setVoice(voices[index]);
+                          setVoice(selected);
                         }
                       }}
                       className="tts-select"

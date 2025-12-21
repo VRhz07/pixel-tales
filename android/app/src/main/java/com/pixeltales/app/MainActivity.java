@@ -9,5 +9,6 @@ public class MainActivity extends BridgeActivity {
         
         // Register custom plugins
         registerPlugin(MediaNotificationPlugin.class);
+        registerPlugin(AndroidTtsVoicesPlugin.class);
     }
 }
