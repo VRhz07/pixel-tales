@@ -2,7 +2,7 @@
 
 /* Main container */
 .story-reader-page {
-  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height - updates with keyboard */
   padding-bottom: 5rem; /* Space for bottom navigation */
   position: relative;
   z-index: 1;

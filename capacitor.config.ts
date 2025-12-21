@@ -23,7 +23,7 @@ const config: CapacitorConfig = {
       showSpinner: false
     },
     Keyboard: {
-      resize: 'ionic',
+      resize: 'none',
       style: 'dark',
       resizeOnFullScreen: true
     },

@@ -43,23 +43,26 @@ const BottomNav = () => {
     navigate('/auth');
   };
 
-  // Hide bottom nav when keyboard is visible
+  // DISABLED: No longer hide bottom nav when keyboard is visible
+  // This was causing gray gaps above keyboard
   useEffect(() => {
     let showListener: any;
     let hideListener: any;
 
-    // Only set up keyboard listeners on mobile (Capacitor)
+    // NOTE: We now use Capacitor resize: 'none', so manual nav hiding is not needed
+    // Leaving listeners commented for debugging but not setting isKeyboardVisible
     const setupKeyboardListeners = async () => {
       try {
         showListener = await Keyboard.addListener('keyboardWillShow', () => {
+          console.log('🔧 Keyboard shown - hiding bottom nav to prevent overlap');
           setIsKeyboardVisible(true);
         });
 
         hideListener = await Keyboard.addListener('keyboardWillHide', () => {
+          console.log('🔧 Keyboard hidden - showing bottom nav');
           setIsKeyboardVisible(false);
         });
       } catch (error) {
-        // Keyboard plugin not available on web, ignore
         console.log('Keyboard plugin not available (web environment)');
       }
     };

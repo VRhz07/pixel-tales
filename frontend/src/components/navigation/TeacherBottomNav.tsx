@@ -25,10 +25,12 @@ const TeacherBottomNav: React.FC = () => {
     const setupListeners = async () => {
       try {
         showListener = await Keyboard.addListener('keyboardWillShow', () => {
+          console.log('🔧 Teacher: Keyboard shown - hiding bottom nav to prevent overlap');
           setIsKeyboardVisible(true);
         });
 
         hideListener = await Keyboard.addListener('keyboardWillHide', () => {
+          console.log('🔧 Teacher: Keyboard hidden - showing bottom nav');
           setIsKeyboardVisible(false);
         });
       } catch (error) {

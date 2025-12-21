@@ -52,7 +52,7 @@
 
 /* Page Container */
 .auth-page-container {
-  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height - updates with keyboard */
   background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%) !important;
   padding: 1.5rem;
   display: flex;

@@ -394,35 +394,63 @@ const CanvasDrawingPage: React.FC = () => {
     { id: '3', name: 'Side Character', addedDate: '1/13/2024', imageUrl: '/api/placeholder/200/200' }
   ];
 
-  // Detect keyboard height on mobile using Visual Viewport API
+  // Canvas-specific keyboard handling: Ensure tools remain accessible
   useEffect(() => {
-    if (!showTextModal || !isMobile) return;
-
-    const handleViewportResize = () => {
+    const handleCanvasKeyboard = () => {
       if (window.visualViewport) {
         const viewportHeight = window.visualViewport.height;
         const windowHeight = window.innerHeight;
         const keyboardHeight = windowHeight - viewportHeight;
         setKeyboardHeight(keyboardHeight > 0 ? keyboardHeight : 0);
+        
+        // For canvas page, adjust layout when keyboard is open
+        const canvasStudio = document.querySelector('.canvas-studio') as HTMLElement;
+        const mobileToolbar = document.querySelector('.canvas-studio-mobile-toolbar') as HTMLElement;
+        
+        if (canvasStudio && keyboardHeight > 0) {
+          // Keyboard is open - adjust canvas to fit above keyboard
+          canvasStudio.style.height = `${viewportHeight}px`;
+          
+          // Move toolbar above keyboard
+          if (mobileToolbar) {
+            mobileToolbar.style.bottom = `${keyboardHeight + 10}px`;
+          }
+        } else if (canvasStudio) {
+          // Keyboard is closed - reset to normal
+          canvasStudio.style.height = '100vh';
+          
+          // Reset toolbar to normal position
+          if (mobileToolbar) {
+            mobileToolbar.style.bottom = '';
+          }
+        }
       }
     };
 
     // Initial check
-    handleViewportResize();
+    handleCanvasKeyboard();
 
     // Listen for viewport changes (keyboard show/hide)
     if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleViewportResize);
-      window.visualViewport.addEventListener('scroll', handleViewportResize);
+      window.visualViewport.addEventListener('resize', handleCanvasKeyboard);
     }
 
     return () => {
       if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleViewportResize);
-        window.visualViewport.removeEventListener('scroll', handleViewportResize);
+        window.visualViewport.removeEventListener('resize', handleCanvasKeyboard);
+      }
+      // Reset canvas and toolbar on cleanup
+      const canvasStudio = document.querySelector('.canvas-studio') as HTMLElement;
+      const mobileToolbar = document.querySelector('.canvas-studio-mobile-toolbar') as HTMLElement;
+      
+      if (canvasStudio) {
+        canvasStudio.style.height = '100vh';
+      }
+      if (mobileToolbar) {
+        mobileToolbar.style.bottom = '';
       }
     };
-  }, [showTextModal, isMobile]);
+  }, [isMobile]); // Always monitor for canvas keyboard changes
 
   // Handle orientation and resize changes
   useEffect(() => {
@@ -3729,7 +3757,8 @@ const CanvasDrawingPage: React.FC = () => {
           <div 
             className="canvas-text-font-styles"
             style={{
-              bottom: keyboardHeight > 0 ? `${keyboardHeight + 20}px` : undefined
+              // DISABLED: Manual keyboard positioning not needed with resize: none
+              // bottom: keyboardHeight > 0 ? `${keyboardHeight + 20}px` : undefined
             }}
           >
             {/* Classic - Clean and readable */}

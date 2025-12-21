@@ -2,7 +2,7 @@
 
 /* ========== Layout ========== */
 .parent-dashboard {
-  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height - updates with keyboard */
   background: #F9FAFB;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   transition: background-color 0.3s ease;

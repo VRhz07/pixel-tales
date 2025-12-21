@@ -6,7 +6,7 @@
 .story-games-loading {
   padding: 40px;
   text-align: center;
-  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height - updates with keyboard */
   background-color: #fafafa;
 }
 
@@ -18,7 +18,7 @@
 .story-games-page {
   padding: 20px;
   padding-bottom: 120px; /* Increased from 100px to ensure content clears bottom nav */
-  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height - updates with keyboard */
   background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 50%, #ffffff 100%);
   overflow-y: auto; /* Ensure scrolling is enabled */
 }

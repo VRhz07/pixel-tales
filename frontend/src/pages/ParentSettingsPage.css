@@ -1,6 +1,6 @@
 /* Parent Settings Page */
 .parent-settings {
-  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height - updates with keyboard */
   background: #F5F7FA;
   transition: background-color 0.3s ease;
   /* Space for bottom nav + safe area for Android navigation */
