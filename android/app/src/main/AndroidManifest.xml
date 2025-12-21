@@ -43,6 +43,7 @@
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize"
             android:fitsSystemWindows="false"
+            android:hardwareAccelerated="true"
             android:exported="true">
 
             <intent-filter>

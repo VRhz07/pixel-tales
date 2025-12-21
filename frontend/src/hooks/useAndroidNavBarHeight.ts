@@ -15,29 +15,63 @@ export const useAndroidNavBarHeight = (): number => {
         return 0;
       }
 
-      // Get the actual viewport height vs window height
-      // The difference is the navigation bar height
-      const windowHeight = window.innerHeight;
-      const visualViewportHeight = window.visualViewport?.height || windowHeight;
+      // Method 1: Use CSS variable set by safeAreaHelper
+      const cssInset = getComputedStyle(document.documentElement)
+        .getPropertyValue('--safe-area-inset-bottom')
+        .trim();
       
-      // On Android, window.innerHeight includes the navigation bar
-      // visualViewport.height excludes it
-      const navHeight = windowHeight - visualViewportHeight;
-      
-      // If we can't detect it, use a safe default based on screen density
-      if (navHeight <= 0) {
-        // Default height based on device pixel ratio
-        const pixelRatio = window.devicePixelRatio || 1;
-        if (pixelRatio >= 3) {
-          return 24; // High DPI devices
-        } else if (pixelRatio >= 2) {
-          return 20; // Medium DPI devices
-        } else {
-          return 16; // Low DPI devices
+      if (cssInset && cssInset !== '0px') {
+        const insetValue = parseFloat(cssInset);
+        if (insetValue > 0) {
+          console.log('🎯 Using CSS safe area variable:', insetValue);
+          return insetValue;
         }
       }
+
+      // Method 2: Try CSS env() directly
+      const testElement = document.createElement('div');
+      testElement.style.position = 'fixed';
+      testElement.style.top = '0';
+      testElement.style.left = '0';
+      testElement.style.width = '1px';
+      testElement.style.height = '1px';
+      testElement.style.paddingBottom = 'env(safe-area-inset-bottom, 0px)';
+      document.body.appendChild(testElement);
+
+      const computedPadding = window.getComputedStyle(testElement).paddingBottom;
+      document.body.removeChild(testElement);
+
+      const envInset = parseFloat(computedPadding);
+      if (envInset > 0) {
+        console.log('🎯 Using CSS env() detection:', envInset);
+        return envInset;
+      }
+
+      // Method 3: Visual viewport calculation (original logic but improved)
+      const windowHeight = window.innerHeight;
+      const visualViewportHeight = window.visualViewport?.height || windowHeight;
+      const calculated = windowHeight - visualViewportHeight;
       
-      return Math.max(navHeight, 16); // Minimum 16px
+      if (calculated > 10 && calculated < 200) {
+        console.log('🎯 Using visual viewport calculation:', calculated);
+        return calculated;
+      }
+
+      // Method 4: Screen vs window height
+      const screenHeight = window.screen.height;
+      const screenDiff = screenHeight - windowHeight;
+      
+      if (screenDiff > 10 && screenDiff < 200) {
+        const cappedHeight = Math.min(screenDiff, 80);
+        console.log('🎯 Using screen height calculation (capped):', cappedHeight);
+        return cappedHeight;
+      }
+      
+      // Fallback: Use density-based default
+      const pixelRatio = window.devicePixelRatio || 1;
+      const fallback = pixelRatio >= 3 ? 32 : pixelRatio >= 2 ? 28 : 24;
+      console.log('🎯 Using density fallback:', fallback, '(ratio:', pixelRatio, ')');
+      return fallback;
     };
 
     const updateHeight = () => {

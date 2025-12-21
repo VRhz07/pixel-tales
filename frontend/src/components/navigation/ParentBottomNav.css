@@ -12,13 +12,16 @@
   z-index: 100;
   transition: transform 0.3s ease;
   transform: translateY(0);
-  /* Add safe area padding for Android/iOS devices - similar to status bar */
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  padding-bottom: var(--safe-area-inset-bottom, 0px);
-  /* Height includes the safe area */
-  min-height: 70px;
-  height: calc(70px + env(safe-area-inset-bottom, 0px));
-  height: calc(70px + var(--safe-area-inset-bottom, 0px));
+  /* Add safe area padding for Android/iOS devices - FORCE minimum for Android */
+  padding-bottom: env(safe-area-inset-bottom, 24px) !important;
+  padding-bottom: var(--safe-area-inset-bottom, 24px) !important;
+  padding-bottom: var(--android-nav-height, var(--safe-area-inset-bottom, 24px)) !important;
+  
+  /* Height includes the safe area - FORCE minimum height */
+  min-height: 94px !important;
+  height: calc(70px + env(safe-area-inset-bottom, 24px)) !important;
+  height: calc(70px + var(--safe-area-inset-bottom, 24px)) !important;
+  height: calc(70px + var(--android-nav-height, var(--safe-area-inset-bottom, 24px))) !important;
 }
 
 .parent-bottom-nav.keyboard-visible {
@@ -102,13 +105,16 @@
 /* Responsive */
 @media (max-width: 640px) {
   .parent-bottom-nav {
-    /* Height includes the safe area on mobile */
-    min-height: 65px;
-    height: calc(65px + env(safe-area-inset-bottom, 0px));
-    height: calc(65px + var(--safe-area-inset-bottom, 0px));
-    /* Ensure safe area is respected on mobile */
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-    padding-bottom: var(--safe-area-inset-bottom, 0px);
+    /* Height includes the safe area on mobile - FORCE minimum */
+    min-height: 89px !important;
+    height: calc(65px + env(safe-area-inset-bottom, 24px)) !important;
+    height: calc(65px + var(--safe-area-inset-bottom, 24px)) !important;
+    height: calc(65px + var(--android-nav-height, var(--safe-area-inset-bottom, 24px))) !important;
+    
+    /* Ensure safe area is respected on mobile - FORCE minimum */
+    padding-bottom: env(safe-area-inset-bottom, 24px) !important;
+    padding-bottom: var(--safe-area-inset-bottom, 24px) !important;
+    padding-bottom: var(--android-nav-height, var(--safe-area-inset-bottom, 24px)) !important;
   }
 
   .parent-bottom-nav-container {

@@ -312,7 +312,7 @@ const BottomNav = () => {
         transition: 'transform 300ms',
         minHeight: '60px',
         height: 'auto',
-        padding: `12px 16px ${12 + androidNavBarHeight}px 16px`
+        padding: `12px 16px ${Math.max(12 + androidNavBarHeight, 36)}px 16px`
       }}
     >
       {/* Navigation Items */}

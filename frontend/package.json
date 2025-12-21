@@ -17,6 +17,7 @@
     "build:mobile": "npm run build && npm run cap:sync"
   },
   "dependencies": {
+    "@capacitor-community/safe-area": "^7.0.0-beta.8",
     "@capacitor-community/text-to-speech": "^6.1.0",
     "@capacitor/app": "^7.1.0",
     "@capacitor/filesystem": "^7.1.5",
