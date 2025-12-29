@@ -1,0 +1,362 @@
+/**
+ * Kid-Friendly Color Scheme for Canvas Drawing Page
+ * Isolated theme - only affects CanvasDrawingPage with .canvas-kids-theme wrapper
+ * 
+ * Color System:
+ * - Background: #F8FAFF (soft baby blue)
+ * - Primary: #7C6CF6 (purple)
+ * - Secondary: #60A5FA (blue), #FB7185 (pink), #FACC15 (yellow), #4ADE80 (green), #FB923C (orange)
+ */
+
+.canvas-kids-theme {
+  /* ===== ROOT CONTAINER ===== */
+  background-color: #F8FAFF;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== CANVAS AREA ===== */
+.canvas-kids-theme .canvas-studio-canvas-area {
+  background-color: #FFFFFF;
+}
+
+.canvas-kids-theme .canvas-studio-canvas-wrapper {
+  border-color: #E0E7FF;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.15);
+}
+
+/* ===== TOP BAR (UNDO/REDO/ZOOM) ===== */
+.canvas-kids-theme .canvas-studio-topbar {
+  background-color: #EEF2FF;
+  border-bottom-color: #E0E7FF;
+}
+
+.canvas-kids-theme .canvas-studio-topbar-button {
+  background-color: #FFFFFF;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  color: #6B7280;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.canvas-kids-theme .canvas-studio-topbar-button:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+.canvas-kids-theme .canvas-studio-topbar-button.active,
+.canvas-kids-theme .canvas-studio-topbar-button.active:hover {
+  background-color: #7C6CF6;
+  color: #FFFFFF;
+}
+
+/* Zoom pill specific styling */
+.canvas-kids-theme .canvas-studio-zoom-controls {
+  background-color: #1F2937;
+  border-radius: 999px;
+  color: #FFFFFF;
+}
+
+.canvas-kids-theme .canvas-studio-zoom-controls button {
+  color: #FFFFFF;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.canvas-kids-theme .canvas-studio-zoom-controls button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== TOOLBAR BUTTONS ===== */
+.canvas-kids-theme .canvas-studio-tool-button {
+  background-color: #FFFFFF;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  color: #6B7280;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.canvas-kids-theme .canvas-studio-tool-button:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.canvas-kids-theme .canvas-studio-tool-button.active {
+  background-color: #7C6CF6;
+  color: #FFFFFF;
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(124, 108, 246, 0.35);
+}
+
+/* Tool-to-Color Mapping */
+.canvas-kids-theme .canvas-studio-tool-button[data-tool="brush"].active {
+  background-color: #7C6CF6;
+}
+
+.canvas-kids-theme .canvas-studio-tool-button[data-tool="paintbucket"].active {
+  background-color: #FACC15;
+  color: #1F2937;
+}
+
+.canvas-kids-theme .canvas-studio-tool-button[data-tool="eraser"].active {
+  background-color: #FB7185;
+}
+
+.canvas-kids-theme .canvas-studio-tool-button[data-tool="shapes"].active {
+  background-color: #4ADE80;
+  color: #1F2937;
+}
+
+.canvas-kids-theme .canvas-studio-tool-button[data-tool="text"].active {
+  background-color: #FB923C;
+}
+
+.canvas-kids-theme .canvas-studio-tool-button[data-tool="layers"].active {
+  background-color: #60A5FA;
+  color: #FFFFFF;
+}
+
+.canvas-kids-theme .canvas-studio-tool-button[data-tool="delete"].active {
+  background-color: #EF4444;
+  color: #FFFFFF;
+}
+
+/* ===== SLIDERS (SIZE & OPACITY) ===== */
+.canvas-kids-theme .canvas-studio-slider {
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #E5E7EB;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+/* Slider track */
+.canvas-kids-theme .canvas-studio-slider::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    #7C6CF6 0%,
+    #7C6CF6 var(--slider-percentage, 0%),
+    #E5E7EB var(--slider-percentage, 0%),
+    #E5E7EB 100%
+  );
+  height: 6px;
+  border-radius: 3px;
+}
+
+.canvas-kids-theme .canvas-studio-slider::-moz-range-track {
+  background: #E5E7EB;
+  height: 6px;
+  border-radius: 3px;
+  border: none;
+}
+
+.canvas-kids-theme .canvas-studio-slider::-moz-range-progress {
+  background-color: #7C6CF6;
+  height: 6px;
+  border-radius: 3px;
+}
+
+/* Slider knob/thumb - larger and with shadow */
+.canvas-kids-theme .canvas-studio-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  border: 2px solid #7C6CF6;
+  transition: all 0.2s ease;
+}
+
+.canvas-kids-theme .canvas-studio-slider::-webkit-slider-thumb:hover {
+  width: 20px;
+  height: 20px;
+  box-shadow: 0 4px 10px rgba(124, 108, 246, 0.4);
+}
+
+.canvas-kids-theme .canvas-studio-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  border: 2px solid #7C6CF6;
+  transition: all 0.2s ease;
+}
+
+.canvas-kids-theme .canvas-studio-slider::-moz-range-thumb:hover {
+  width: 20px;
+  height: 20px;
+  box-shadow: 0 4px 10px rgba(124, 108, 246, 0.4);
+}
+
+/* ===== SLIDERS PANEL ===== */
+.canvas-kids-theme .canvas-studio-mobile-sliders {
+  background-color: #FFFFFF;
+  border-color: #E0E7FF;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+.canvas-kids-theme .canvas-studio-sliders-header {
+  color: #1F2937;
+  border-bottom-color: #E0E7FF;
+}
+
+.canvas-kids-theme .canvas-studio-sliders-title {
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.canvas-kids-theme .canvas-studio-reset-btn {
+  background-color: #F3F4F6;
+  border: none;
+  border-radius: 8px;
+  color: #6B7280;
+  transition: all 0.2s ease;
+  padding: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvas-kids-theme .canvas-studio-reset-btn:hover {
+  background-color: #E5E7EB;
+  color: #7C6CF6;
+}
+
+.canvas-kids-theme .canvas-studio-slider-label {
+  color: #374151;
+  font-weight: 500;
+}
+
+.canvas-kids-theme .canvas-studio-slider-value {
+  color: #7C6CF6;
+  font-weight: 600;
+}
+
+/* ===== LEFT TOOLBAR (Desktop) ===== */
+.canvas-kids-theme .canvas-studio-left-toolbar {
+  background-color: #F8FAFF;
+  border-right-color: #E0E7FF;
+}
+
+/* ===== RIGHT TOOLBAR (Mobile) ===== */
+.canvas-kids-theme .canvas-studio-right-toolbar {
+  background-color: #F8FAFF;
+  border-left-color: #E0E7FF;
+}
+
+.canvas-kids-theme .canvas-studio-mobile-toolbar {
+  background-color: #F8FAFF;
+  border-top-color: #E0E7FF;
+}
+
+/* ===== MODALS & OVERLAYS ===== */
+.canvas-kids-theme .canvas-studio-modal-backdrop {
+  background-color: rgba(31, 41, 55, 0.5);
+}
+
+.canvas-kids-theme .canvas-studio-modal-overlay {
+  background-color: #FFFFFF;
+  border-color: #E0E7FF;
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
+}
+
+/* ===== BUTTONS IN MODALS ===== */
+.canvas-kids-theme .canvas-studio-modal-button {
+  background-color: #7C6CF6;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.canvas-kids-theme .canvas-studio-modal-button:hover {
+  background-color: #5B4FE9;
+  box-shadow: 0 4px 12px rgba(91, 79, 233, 0.3);
+}
+
+.canvas-kids-theme .canvas-studio-modal-button.secondary {
+  background-color: #F3F4F6;
+  color: #6B7280;
+}
+
+.canvas-kids-theme .canvas-studio-modal-button.secondary:hover {
+  background-color: #E5E7EB;
+}
+
+/* ===== COLOR PICKER ===== */
+.canvas-kids-theme .canvas-studio-color-picker {
+  border-color: #E0E7FF;
+  background-color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+/* ===== LAYERS PANEL ===== */
+.canvas-kids-theme .canvas-studio-layers-panel {
+  background-color: #FFFFFF;
+  border-color: #E0E7FF;
+}
+
+.canvas-kids-theme .canvas-studio-layer-item {
+  background-color: #F9FAFB;
+  border-color: #E5E7EB;
+  transition: all 0.2s ease;
+}
+
+.canvas-kids-theme .canvas-studio-layer-item:hover {
+  background-color: #F3F4F6;
+  border-color: #7C6CF6;
+}
+
+.canvas-kids-theme .canvas-studio-layer-item.active {
+  background-color: #EEF2FF;
+  border-color: #7C6CF6;
+  box-shadow: inset 0 0 0 2px #7C6CF6;
+}
+
+/* ===== SCROLLBARS ===== */
+.canvas-kids-theme ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.canvas-kids-theme ::-webkit-scrollbar-track {
+  background-color: #F3F4F6;
+}
+
+.canvas-kids-theme ::-webkit-scrollbar-thumb {
+  background-color: #D1D5DB;
+  border-radius: 4px;
+}
+
+.canvas-kids-theme ::-webkit-scrollbar-thumb:hover {
+  background-color: #9CA3AF;
+}
+
+/* ===== TRANSITIONS FOR BETTER FEEL ===== */
+.canvas-kids-theme * {
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+/* Prevent transition on transforms for smooth interactions */
+.canvas-kids-theme .canvas-studio-tool-button,
+.canvas-kids-theme .canvas-studio-topbar-button {
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}

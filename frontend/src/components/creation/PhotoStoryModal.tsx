@@ -310,6 +310,31 @@ EXAMPLE of good imagePrompt:
       
       const newStory = createStory(storyData.title);
       
+      // Step 2.3: Check image service health (25-28%)
+      setGenerationStage('🔍 Checking image service...');
+      setGenerationProgress(27);
+      
+      const { checkPollinationsHealth } = await import('../../services/imageGenerationService');
+      const isServiceHealthy = await checkPollinationsHealth();
+      
+      if (!isServiceHealthy) {
+        const shouldContinue = window.confirm(
+          '⚠️ Image Generation Service Unavailable\n\n' +
+          'The image generation service (Pollinations AI) is currently down or unavailable. ' +
+          'This may be temporary.\n\n' +
+          'Your story will still be created with text, but images may not load.\n\n' +
+          'Options:\n' +
+          '• Click "OK" to continue without images (you can add them later)\n' +
+          '• Click "Cancel" to wait and try again later'
+        );
+        
+        if (!shouldContinue) {
+          throw new Error('Image generation service is unavailable. Please try again later.');
+        }
+        
+        console.warn('⚠️ User chose to continue despite service being down');
+      }
+      
       // Step 2.5: Generate cover illustration (25-35%)
       setGenerationStage('Creating cover illustration...');
       setGenerationProgress(30);

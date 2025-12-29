@@ -525,7 +525,7 @@ button.bg-gradient-to-r.from-purple-500:hover {
 }
 
 /* Input fields - clean and simple */
-input[type="text"],
+input[type="text"]:not(.canvas-studio-zoom-input),
 input[type="text"]:not([class*="jumbled"]) {
   background: #ffffff !important;
   border: 2px solid #e2e8f0 !important;
@@ -533,22 +533,35 @@ input[type="text"]:not([class*="jumbled"]) {
   transition: all 0.3s ease !important;
 }
 
-input[type="text"]:focus {
+input[type="text"]:not(.canvas-studio-zoom-input):focus {
   border-color: #7ba3d1 !important;
   box-shadow: 0 0 0 3px rgba(123, 163, 209, 0.15) !important;
   outline: none !important;
 }
 
-.dark input[type="text"],
+.dark input[type="text"]:not(.canvas-studio-zoom-input),
 .dark input[type="text"]:not([class*="jumbled"]) {
   background: #2d3748 !important;
   border: 2px solid #4a5568 !important;
   color: #e2e8f0 !important;
 }
 
-.dark input[type="text"]:focus {
+.dark input[type="text"]:not(.canvas-studio-zoom-input):focus {
   border-color: #6a93c1 !important;
   box-shadow: 0 0 0 3px rgba(106, 147, 193, 0.2) !important;
+}
+
+/* Canvas Studio Zoom Input Exception */
+.canvas-studio-zoom-input {
+  background: #404650 !important;
+  border: 1px solid #404650 !important;
+  color: #000000 !important;
+}
+
+.canvas-studio-zoom-input:focus {
+  background: #1F2329 !important;
+  border-color: #8b5cf6 !important;
+  color: #FFFFFF !important;
 }
 
 /* Jumbled letters - pastel tiles */

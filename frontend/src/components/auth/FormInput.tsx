@@ -48,7 +48,7 @@ const FormInput: React.FC<FormInputProps> = ({
           required={required}
           className="auth-input"
           style={{
-            paddingRight: type === 'password' ? '2.5rem' : '1rem'
+            paddingRight: type === 'password' ? '2.75rem' : '1rem'
           }}
         />
         

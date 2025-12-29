@@ -1814,6 +1814,19 @@ html.dark .library-page .library-story-list {
   color: #ffffff !important;
 }
 
+/* Exception for canvas studio zoom input */
+.dark .canvas-studio-zoom-input {
+  background-color: #404650 !important;
+  border-color: #404650 !important;
+  color: #FFFFFF !important;
+}
+
+.dark .canvas-studio-zoom-input:focus {
+  background-color: #1F2329 !important;
+  border-color: #8b5cf6 !important;
+  color: #FFFFFF !important;
+}
+
 .dark input::placeholder,
 .dark textarea::placeholder {
   color: #808090 !important;

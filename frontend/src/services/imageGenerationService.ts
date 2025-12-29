@@ -73,6 +73,45 @@ const getMoodColorTones = (mood?: string): string => {
 }
 
 /**
+ * Check if Pollinations AI service is healthy and operational
+ * @returns true if service is up, false if down
+ */
+export const checkPollinationsHealth = async (): Promise<boolean> => {
+  try {
+    // Test with a simple image request
+    const testPrompt = 'test';
+    const testUrl = `https://image.pollinations.ai/prompt/${testPrompt}?width=64&height=64&nologo=true`;
+    
+    console.log('🔍 Checking Pollinations AI service health...');
+    
+    // Use fetch with a timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    
+    const response = await fetch(testUrl, {
+      method: 'HEAD',
+      signal: controller.signal,
+      cache: 'no-cache'
+    });
+    
+    clearTimeout(timeoutId);
+    
+    const isHealthy = response.ok && response.status === 200;
+    
+    if (isHealthy) {
+      console.log('✅ Pollinations AI service is healthy');
+    } else {
+      console.warn(`⚠️ Pollinations AI returned status: ${response.status}`);
+    }
+    
+    return isHealthy;
+  } catch (error) {
+    console.error('❌ Pollinations AI service health check failed:', error);
+    return false;
+  }
+};
+
+/**
  * Generate an image using Pollinations.ai (Free service, no API key required)
  * @param params Image generation parameters
  * @returns URL of the generated image or null if service is down

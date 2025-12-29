@@ -2550,6 +2550,11 @@ const CanvasDrawingPage: React.FC = () => {
               }
             }}
             aria-label="Zoom percentage"
+            style={{
+              backgroundColor: '#404650',
+              color: '#FFFFFF',
+              borderColor: '#404650'
+            }}
           />
           <span className="canvas-studio-zoom-percent">%</span>
           <button 

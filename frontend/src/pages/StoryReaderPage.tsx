@@ -72,6 +72,7 @@ const StoryReaderPage: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set());
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const [regeneratingImages, setRegeneratingImages] = useState<Set<string>>(new Set());
   const horizontalCardRef = React.useRef<HTMLDivElement>(null);
   
   // Games state
@@ -699,6 +700,57 @@ const StoryReaderPage: React.FC = () => {
     setEditingCommentText('');
   };
 
+  const handleRegenerateImage = async (pageId: string, imageType: 'page' | 'cover') => {
+    if (regeneratingImages.has(pageId)) return;
+    
+    setRegeneratingImages(prev => new Set([...prev, pageId]));
+    setFailedImages(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(pageId);
+      return newSet;
+    });
+    
+    try {
+      // Import the image generation service
+      const { checkPollinationsHealth } = await import('../services/imageGenerationService');
+      
+      // Check if service is healthy
+      const isHealthy = await checkPollinationsHealth();
+      
+      if (!isHealthy) {
+        alert('⚠️ Image Generation Service Still Unavailable\n\nThe image service is still down. Please try again later.');
+        setFailedImages(prev => new Set([...prev, pageId]));
+        return;
+      }
+      
+      // Service is healthy, force reload the image by adding a cache-busting parameter
+      const imageElement = document.querySelector(`img[data-page-id="${pageId}"]`) as HTMLImageElement;
+      if (imageElement && imageElement.src) {
+        const originalSrc = imageElement.src.split('?')[0]; // Remove existing query params
+        const newSrc = `${originalSrc}?refresh=${Date.now()}`;
+        
+        // Show the image element again if it was hidden
+        imageElement.style.display = '';
+        
+        // Trigger reload
+        imageElement.src = newSrc;
+        
+        playButtonClick();
+        console.log(`🔄 Regenerating image for ${imageType} ${pageId}`);
+      }
+    } catch (error) {
+      console.error('Failed to regenerate image:', error);
+      setFailedImages(prev => new Set([...prev, pageId]));
+      alert('Failed to regenerate image. Please try again.');
+    } finally {
+      setRegeneratingImages(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(pageId);
+        return newSet;
+      });
+    }
+  };
+
   const handlePreviousPage = () => {
     if (currentPage > 0) {
       playPageTurn();
@@ -784,12 +836,93 @@ const StoryReaderPage: React.FC = () => {
                   </div>
                 )}
                 
+                {/* Regenerate Button - Show when image fails */}
+                {failedImages.has(page.id) && !regeneratingImages.has(page.id) && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 10,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    backgroundColor: isDarkMode ? 'rgba(42, 36, 53, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                    padding: '1.5rem',
+                    borderRadius: '1rem',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                  }}>
+                    <span style={{ 
+                      color: isDarkMode ? '#e5e7eb' : '#374151',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      textAlign: 'center'
+                    }}>
+                      ⚠️ Image failed to load
+                    </span>
+                    <button
+                      onClick={() => handleRegenerateImage(page.id, 'page')}
+                      style={{
+                        padding: '0.5rem 1rem',
+                        backgroundColor: '#8b5cf6',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.875rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7c3aed'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8b5cf6'}
+                    >
+                      🔄 Retry Loading
+                    </button>
+                  </div>
+                )}
+                
+                {/* Regenerating Spinner */}
+                {regeneratingImages.has(page.id) && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 10,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}>
+                    <div style={{
+                      width: '40px',
+                      height: '40px',
+                      border: '4px solid rgba(139, 92, 246, 0.2)',
+                      borderTop: '4px solid #8b5cf6',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite'
+                    }} />
+                    <span style={{ 
+                      color: isDarkMode ? '#a78bfa' : '#8b5cf6',
+                      fontSize: '0.875rem',
+                      fontWeight: '500'
+                    }}>
+                      Retrying...
+                    </span>
+                  </div>
+                )}
+                
                 <img
+                  data-page-id={page.id}
                   src={canvasData}
                   alt={`Page ${index + 1} illustration`}
                   className="story-reader-illustration"
                   style={{ 
-                    opacity: loadingImages.has(page.id) ? 0.3 : 1,
+                    opacity: loadingImages.has(page.id) || failedImages.has(page.id) ? 0.3 : 1,
                     transition: 'opacity 0.3s ease-in-out'
                   }}
                   onLoadStart={() => {
@@ -805,12 +938,21 @@ const StoryReaderPage: React.FC = () => {
                       return newSet;
                     });
                     setFailedImages(prev => new Set([...prev, page.id]));
-                    // Hide the image container if loading fails
-                    e.currentTarget.style.display = 'none';
+                    // Don't hide the image - show regenerate button instead
                   }}
                   onLoad={() => {
                     console.log(`✅ Successfully loaded image for page ${index + 1}`);
                     setLoadingImages(prev => {
+                      const newSet = new Set(prev);
+                      newSet.delete(page.id);
+                      return newSet;
+                    });
+                    setFailedImages(prev => {
+                      const newSet = new Set(prev);
+                      newSet.delete(page.id);
+                      return newSet;
+                    });
+                    setRegeneratingImages(prev => {
                       const newSet = new Set(prev);
                       newSet.delete(page.id);
                       return newSet;
@@ -907,12 +1049,93 @@ const StoryReaderPage: React.FC = () => {
                     </div>
                   )}
                   
+                  {/* Regenerate Button - Horizontal Mode */}
+                  {page && failedImages.has(page.id) && !regeneratingImages.has(page.id) && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      zIndex: 10,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '1rem',
+                      backgroundColor: isDarkMode ? 'rgba(42, 36, 53, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                      padding: '1.5rem',
+                      borderRadius: '1rem',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                    }}>
+                      <span style={{ 
+                        color: isDarkMode ? '#e5e7eb' : '#374151',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        textAlign: 'center'
+                      }}>
+                        ⚠️ Image failed to load
+                      </span>
+                      <button
+                        onClick={() => handleRegenerateImage(page.id, 'page')}
+                        style={{
+                          padding: '0.5rem 1rem',
+                          backgroundColor: '#8b5cf6',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '0.5rem',
+                          fontSize: '0.875rem',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          transition: 'background-color 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7c3aed'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8b5cf6'}
+                      >
+                        🔄 Retry Loading
+                      </button>
+                    </div>
+                  )}
+                  
+                  {/* Regenerating Spinner - Horizontal Mode */}
+                  {page && regeneratingImages.has(page.id) && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      zIndex: 10,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}>
+                      <div style={{
+                        width: '50px',
+                        height: '50px',
+                        border: '5px solid rgba(139, 92, 246, 0.2)',
+                        borderTop: '5px solid #8b5cf6',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite'
+                      }} />
+                      <span style={{ 
+                        color: isDarkMode ? '#a78bfa' : '#8b5cf6',
+                        fontSize: '1rem',
+                        fontWeight: '500'
+                      }}>
+                        Retrying...
+                      </span>
+                    </div>
+                  )}
+                  
                   <img
+                    data-page-id={page?.id}
                     src={canvasData}
                     alt={`Page ${currentPage + 1} illustration`}
                     className="story-reader-horizontal-illustration"
                     style={{ 
-                      opacity: page && loadingImages.has(page.id) ? 0.3 : 1,
+                      opacity: page && (loadingImages.has(page.id) || failedImages.has(page.id)) ? 0.3 : 1,
                       transition: 'opacity 0.3s ease-in-out'
                     }}
                     onLoadStart={() => {
@@ -932,13 +1155,22 @@ const StoryReaderPage: React.FC = () => {
                         });
                         setFailedImages(prev => new Set([...prev, page.id]));
                       }
-                      // Hide the image if loading fails
-                      e.currentTarget.style.display = 'none';
+                      // Don't hide - show regenerate button instead
                     }}
                     onLoad={() => {
                       console.log(`✅ Successfully loaded image for page ${currentPage + 1}`);
                       if (page) {
                         setLoadingImages(prev => {
+                          const newSet = new Set(prev);
+                          newSet.delete(page.id);
+                          return newSet;
+                        });
+                        setFailedImages(prev => {
+                          const newSet = new Set(prev);
+                          newSet.delete(page.id);
+                          return newSet;
+                        });
+                        setRegeneratingImages(prev => {
                           const newSet = new Set(prev);
                           newSet.delete(page.id);
                           return newSet;
@@ -1141,12 +1373,93 @@ const StoryReaderPage: React.FC = () => {
               </div>
             )}
             
+            {/* Regenerate Button for Cover */}
+            {failedImages.has('cover') && !regeneratingImages.has('cover') && (
+              <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '1rem',
+                backgroundColor: isDarkMode ? 'rgba(42, 36, 53, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                padding: '2rem',
+                borderRadius: '1rem',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+              }}>
+                <span style={{ 
+                  color: isDarkMode ? '#e5e7eb' : '#374151',
+                  fontSize: '1rem',
+                  fontWeight: '600',
+                  textAlign: 'center'
+                }}>
+                  ⚠️ Cover image failed to load
+                </span>
+                <button
+                  onClick={() => handleRegenerateImage('cover', 'cover')}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    backgroundColor: '#8b5cf6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7c3aed'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8b5cf6'}
+                >
+                  🔄 Retry Loading Cover
+                </button>
+              </div>
+            )}
+            
+            {/* Regenerating Spinner for Cover */}
+            {regeneratingImages.has('cover') && (
+              <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '0.75rem'
+              }}>
+                <div style={{
+                  width: '60px',
+                  height: '60px',
+                  border: '6px solid rgba(139, 92, 246, 0.2)',
+                  borderTop: '6px solid #8b5cf6',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }} />
+                <span style={{ 
+                  color: isDarkMode ? '#a78bfa' : '#8b5cf6',
+                  fontSize: '1rem',
+                  fontWeight: '600'
+                }}>
+                  Retrying...
+                </span>
+              </div>
+            )}
+            
             <img
+              data-page-id="cover"
               src={story.coverImage}
               alt={`${story.title} cover`}
               className="story-reader-cover-image"
               style={{ 
-                opacity: loadingImages.has('cover') ? 0.3 : 1,
+                opacity: loadingImages.has('cover') || failedImages.has('cover') ? 0.3 : 1,
                 transition: 'opacity 0.3s ease-in-out'
               }}
               onLoadStart={() => {
@@ -1161,12 +1474,21 @@ const StoryReaderPage: React.FC = () => {
                   return newSet;
                 });
                 setFailedImages(prev => new Set([...prev, 'cover']));
-                // Hide cover if loading fails
-                e.currentTarget.style.display = 'none';
+                // Don't hide - show regenerate button instead
               }}
               onLoad={() => {
                 console.log('✅ Successfully loaded cover image');
                 setLoadingImages(prev => {
+                  const newSet = new Set(prev);
+                  newSet.delete('cover');
+                  return newSet;
+                });
+                setFailedImages(prev => {
+                  const newSet = new Set(prev);
+                  newSet.delete('cover');
+                  return newSet;
+                });
+                setRegeneratingImages(prev => {
                   const newSet = new Set(prev);
                   newSet.delete('cover');
                   return newSet;

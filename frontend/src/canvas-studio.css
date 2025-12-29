@@ -65,19 +65,19 @@ body.capacitor .canvas-studio {
   grid-column: 1 / -1;
   background: var(--cs-bg-darker);
   border-bottom: 1px solid var(--cs-border);
-  padding: 0.5rem 0.5rem; /* Reduced padding to prevent cutoff */
+  padding: 0.4rem 0.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem; /* Reduced gap to fit all buttons */
+  gap: 0.3rem;
   z-index: 100;
-  overflow-x: hidden; /* Prevent horizontal overflow */
+  overflow-x: hidden;
   max-width: 100vw;
 }
 
 /* Capacitor safe area for topbar */
 body.capacitor .canvas-studio-topbar {
-  padding-top: 0;
+  padding-top: 0.4rem;
 }
 
 .canvas-studio-topbar-left,
@@ -85,9 +85,9 @@ body.capacitor .canvas-studio-topbar {
 .canvas-studio-topbar-right {
   display: flex;
   align-items: center;
-  gap: 0.5rem; /* Reduced gap */
-  flex-shrink: 1; /* Allow sections to shrink if needed */
-  min-width: 0; /* Allow sections to shrink below content size */
+  gap: 0.2rem;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .canvas-studio-title {
@@ -101,14 +101,16 @@ body.capacitor .canvas-studio-topbar {
   background: transparent;
   color: var(--cs-text-secondary);
   border: none;
-  border-radius: 0.5rem;
-  padding: 0.4rem; /* Reduced padding */
+  border-radius: 0.375rem;
+  padding: 0.2rem;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0; /* Prevent buttons from shrinking */
+  flex-shrink: 0;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
 }
 
 .canvas-studio-topbar-btn:hover {
@@ -117,8 +119,8 @@ body.capacitor .canvas-studio-topbar {
 }
 
 .canvas-studio-topbar-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 0.9rem;
+  height: 0.9rem;
 }
 
 .canvas-studio-zoom-display {
@@ -128,29 +130,45 @@ body.capacitor .canvas-studio-topbar {
 }
 
 .canvas-studio-zoom-input {
-  width: 3.5rem;
-  background: var(--cs-bg-light);
-  border: 1px solid var(--cs-border);
+  width: 2.5rem;
+  background: var(--cs-surface-light) !important;
+  border: 1px solid var(--cs-border) !important;
   border-radius: 0.375rem;
-  color: var(--cs-text-primary);
-  font-size: 0.875rem;
+  color: var(--cs-text-primary) !important;
+  font-size: 0.625rem;
   font-weight: 500;
   text-align: center;
-  padding: 0.25rem 0.5rem;
+  padding: 0.125rem;
   outline: none;
   transition: all 0.2s ease;
 }
 
 .canvas-studio-zoom-input:focus {
-  border-color: var(--cs-purple);
-  background: var(--cs-bg-darker);
+  border-color: var(--cs-purple) !important;
+  background: var(--cs-bg-darker) !important;
+  color: var(--cs-text-primary) !important;
+}
+
+/* Support for light mode */
+@media (prefers-color-scheme: light) {
+  .canvas-studio-zoom-input {
+    background: #f3f4f6 !important;
+    color: #1f2937 !important;
+    border-color: #d1d5db !important;
+  }
+  
+  .canvas-studio-zoom-input:focus {
+    background: #e5e7eb !important;
+    color: #1f2937 !important;
+    border-color: var(--cs-purple) !important;
+  }
 }
 
 .canvas-studio-zoom-percent {
   color: var(--cs-text-secondary);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  margin-left: 0.25rem;
+  margin-left: 0.15rem;
 }
 
 /* ============================================
@@ -1242,6 +1260,72 @@ body.capacitor .canvas-studio-mobile-sliders {
     height: 500px !important;
     aspect-ratio: 1 / 1 !important;
   }
+
+  /* Mobile toolbar with 2 rows for portrait */
+  .canvas-studio-mobile-toolbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--cs-bg-darker);
+    border-top: 1px solid var(--cs-border);
+    padding: 0.5rem 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    max-width: 100vw;
+    overflow-x: hidden;
+    flex-wrap: wrap;
+    row-gap: 0.4rem;
+  }
+
+  /* Capacitor safe area for mobile toolbar */
+  body.capacitor .canvas-studio-mobile-toolbar {
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  }
+
+  /* Larger buttons for portrait mode */
+  .canvas-studio-mobile-tool {
+    width: 2.8rem;
+    height: 2.8rem;
+    min-width: 2.8rem;
+    min-height: 2.8rem;
+  }
+
+  .canvas-studio-mobile-tool-icon {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  .canvas-studio-color-indicator {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  /* Canvas area adjustment for 2-row toolbar */
+  .canvas-studio-canvas-area-mobile {
+    bottom: 220px;
+  }
+
+  body.capacitor .canvas-studio-canvas-area-mobile {
+    bottom: calc(220px + env(safe-area-inset-bottom));
+  }
+
+  .canvas-studio-canvas-area-mobile.has-settings {
+    bottom: 280px;
+  }
+
+  /* Move brush settings higher in portrait mode */
+  .canvas-studio-mobile-sliders {
+    bottom: 160px;
+  }
+
+  body.capacitor .canvas-studio-mobile-sliders {
+    bottom: calc(160px + env(safe-area-inset-bottom));
+  }
 }
 
 /* Phone Landscape - Use mobile landscape layout */
@@ -1286,7 +1370,130 @@ body.capacitor .canvas-studio-mobile-sliders {
   }
 }
 
-@media (max-width: 768px) {
+/* Scaling for tablets and larger phones in portrait */
+@media (min-width: 600px) and (max-width: 1024px) and (orientation: portrait) {
+  .canvas-studio-topbar {
+    padding: 0.6rem 0.8rem;
+    gap: 0.5rem;
+  }
+
+  .canvas-studio-topbar-btn {
+    padding: 0.35rem;
+    min-width: 2.2rem;
+    min-height: 2.2rem;
+  }
+
+  .canvas-studio-topbar-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  .canvas-studio-zoom-input {
+    width: 3rem;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .canvas-studio-zoom-percent {
+    font-size: 0.85rem;
+  }
+
+  .canvas-studio-mobile-tool {
+    width: 3.2rem;
+    height: 3.2rem;
+    min-width: 3.2rem;
+    min-height: 3.2rem;
+  }
+
+  .canvas-studio-mobile-tool-icon {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+
+  /* Tablet portrait: brush settings panel optimized for visibility and access */
+  .canvas-studio-mobile-sliders {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 520px;
+    bottom: 70px;
+    padding: 1rem 1.5rem;
+    gap: 1rem;
+    background: var(--cs-bg-main);
+    border: 1px solid var(--cs-border);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    margin-bottom: 0.75rem;
+    z-index: 91;
+    display: flex;
+    flex-direction: column;
+    max-height: auto;
+    overflow-y: auto;
+  }
+
+  body.capacitor .canvas-studio-mobile-sliders {
+    bottom: calc(70px + env(safe-area-inset-bottom));
+    margin-bottom: 0.75rem;
+  }
+
+  .canvas-studio-slider-container {
+    gap: 0.6rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .canvas-studio-slider-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--cs-text-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 0.8rem;
+  }
+
+  .canvas-studio-slider-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--cs-purple);
+    min-width: 70px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .canvas-studio-sliders-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--cs-text-primary);
+  }
+
+  .canvas-studio-reset-btn {
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 0.375rem;
+  }
+
+  .canvas-studio-reset-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  /* Make sliders full width and larger on tablet */
+  .canvas-studio-slider {
+    width: 100%;
+    height: 8px;
+  }
+}
+
+/* This rule is for tablets and small screens, but won't override portrait mode */
+@media (max-width: 768px) and (orientation: landscape) {
   .canvas-studio-topbar {
     padding: 0.4rem 0.4rem; /* Further reduced for small screens */
     gap: 0.35rem; /* Tighter gap for small screens */
@@ -1380,7 +1587,7 @@ body.capacitor .canvas-studio-mobile-sliders {
   /* Change to horizontal layout: left bar | canvas | right bar */
   .canvas-studio-mobile {
     display: grid;
-    grid-template-columns: 48px 1fr 60px; /* Updated to 60px for toolbar */
+    grid-template-columns: 48px 1fr 140px; /* Updated to 140px for 2-column toolbar */
     grid-template-rows: 1fr;
     height: 100vh; /* Fixed viewport - canvas needs stable height */
     overflow: hidden; /* Prevent scrolling */
@@ -1394,7 +1601,7 @@ body.capacitor .canvas-studio-mobile-sliders {
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
     /* Adjust grid to account for padding */
-    grid-template-columns: calc(48px) 1fr calc(60px); /* Updated to 60px */
+    grid-template-columns: calc(48px) 1fr calc(140px); /* Updated to 140px */
   }
   
   /* Override the default canvas-studio padding in landscape */
@@ -1447,6 +1654,15 @@ body.capacitor .canvas-studio-mobile-sliders {
     width: 2.5rem;
     font-size: 0.625rem;
     padding: 0.125rem;
+    background: var(--cs-surface-light) !important;
+    color: var(--cs-text-primary) !important;
+    border-color: var(--cs-border) !important;
+  }
+
+  .canvas-studio-zoom-input:focus {
+    background: var(--cs-bg-darker) !important;
+    color: var(--cs-text-primary) !important;
+    border-color: var(--cs-purple) !important;
   }
 
   .canvas-studio-zoom-percent {
@@ -1480,15 +1696,15 @@ body.capacitor .canvas-studio-mobile-sliders {
     bottom: auto;
   }
 
-  /* Bottom toolbar becomes right vertical bar */
+  /* Bottom toolbar becomes right vertical bar with 2-row layout */
   .canvas-studio-mobile-toolbar {
     grid-column: 3;
     grid-row: 1;
     position: static;
-    flex-direction: column;
-    width: 60px; /* Further reduced to fit 2.4rem buttons */
+    flex-direction: row;
+    width: 140px; /* Wide enough for 2 columns of 2.8rem buttons */
     height: 100%;
-    padding: 0.4rem 0; /* Reduced padding */
+    padding: 0.4rem 0.3rem;
     border-left: 1px solid var(--cs-border);
     border-top: none;
     bottom: auto;
@@ -1496,8 +1712,10 @@ body.capacitor .canvas-studio-mobile-sliders {
     right: auto;
     overflow-y: auto;
     overflow-x: hidden;
-    gap: 0.35rem; /* Match portrait mode gap */
-    flex-wrap: nowrap; /* Ensure no wrapping in vertical mode */
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: center;
   }
   
   /* Override Capacitor safe area for toolbar in landscape */
@@ -1506,15 +1724,15 @@ body.capacitor .canvas-studio-mobile-sliders {
   }
 
   .canvas-studio-mobile-tool {
-    width: 2.4rem; /* Same as portrait mode */
-    height: 2.4rem;
-    min-width: 2.4rem;
-    min-height: 2.4rem;
+    width: 3.2rem; /* Even larger buttons for landscape */
+    height: 3.2rem;
+    min-width: 3.2rem;
+    min-height: 3.2rem;
   }
 
   .canvas-studio-mobile-tool-icon {
-    width: 1.2rem; /* Same as portrait mode */
-    height: 1.2rem;
+    width: 1.6rem; /* Even larger icons for landscape */
+    height: 1.6rem;
   }
   
   .canvas-eraser-icon {
@@ -1544,22 +1762,66 @@ body.capacitor .canvas-studio-mobile-sliders {
   /* Sliders positioned to the right side (vertical/standing orientation) */
   .canvas-studio-mobile-sliders {
     position: fixed;
-    right: 68px; /* 60px toolbar + 8px gap */
-    top: 50%;
-    transform: translateY(-50%);
+    right: 155px; /* 140px toolbar + 15px gap for better spacing */
+    top: 0;
+    bottom: 0;
+    transform: none;
     left: auto;
-    bottom: auto;
-    width: 120px;
-    height: auto;
-    max-height: 80vh;
+    width: 130px;
+    height: 100vh;
+    max-height: none;
     background: var(--cs-bg-main);
     border: 1px solid var(--cs-border);
     border-radius: 0.5rem;
-    padding: 1rem 0.75rem;
+    padding: 1.2rem 0.8rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.2rem;
+    overflow-y: auto;
+    z-index: 91;
+  }
+
+  /* Account for safe-area on devices with notches/camera cutouts when using Capacitor */
+  body.capacitor .canvas-studio-mobile-sliders {
+    top: env(safe-area-inset-top);
+    bottom: env(safe-area-inset-bottom);
+    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+
+  /* Use dynamic viewport units where supported to avoid URL bar shrink issues */
+  @supports (height: 100dvh) {
+    .canvas-studio-mobile-sliders {
+      height: 100dvh;
+    }
+    body.capacitor .canvas-studio-mobile-sliders {
+      height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+  }
+
+  /* Position brush selection menu on the right in landscape */
+  .canvas-studio-submenu-mobile {
+    left: auto;
+    right: 8px;
+    transform: none;
+    bottom: auto;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateY(-50%) translateX(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+  }
+
+  .canvas-studio-submenu-mobile {
+    animation: slideInRight 0.2s ease-out;
   }
 
   .canvas-studio-sliders-header {
@@ -1569,19 +1831,22 @@ body.capacitor .canvas-studio-mobile-sliders {
   }
 
   .canvas-studio-sliders-title {
-    font-size: 0.625rem;
+    font-size: 0.7rem;
     writing-mode: horizontal-tb;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    font-weight: 700;
   }
 
   .canvas-studio-reset-btn {
-    padding: 0.375rem;
+    padding: 0.5rem;
+    width: 100%;
+    font-size: 0.75rem;
   }
 
   .canvas-studio-reset-icon {
-    width: 1rem;
-    height: 1rem;
+    width: 1.1rem;
+    height: 1.1rem;
   }
 
   .canvas-studio-slider-container {
@@ -1592,15 +1857,11 @@ body.capacitor .canvas-studio-mobile-sliders {
   }
 
   .canvas-studio-slider-label {
-    font-size: 0.625rem;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--cs-text-secondary);
+    text-align: center;
     width: 100%;
-  }
-
-  .canvas-studio-slider-label > span:first-child {
-    font-weight: 600;
   }
 
   .canvas-studio-slider-preview {
@@ -1627,15 +1888,6 @@ body.capacitor .canvas-studio-mobile-sliders {
     width: 100%;
   }
 
-  /* Submenu positioning in landscape - next to left toolbar where brush tool is */
-  .canvas-studio-submenu-mobile {
-    left: 88px; /* 80px toolbar + 8px gap - brush tool is on the left in landscape */
-    right: auto;
-    bottom: auto;
-    top: 50%;
-    transform: translateY(-50%) !important;
-    animation: fadeIn 0.2s ease-out !important; /* Use fade instead of slide */
-  }
 
   .canvas-studio-submenu-backdrop {
     z-index: 1000;

@@ -1,24 +1,35 @@
 package com.pixeltales.app;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.media.session.MediaButtonReceiver;
 
 import com.getcapacitor.JSObject;
+import com.getcapacitor.PermissionState;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.annotation.PermissionCallback;
 
-@CapacitorPlugin(name = "MediaNotification")
+@CapacitorPlugin(
+    name = "MediaNotification",
+    permissions = {
+        @Permission(strings = { Manifest.permission.POST_NOTIFICATIONS }, alias = "notifications")
+    }
+)
 public class MediaNotificationPlugin extends Plugin {
 
     private static final String CHANNEL_ID = "tts_playback_channel";
@@ -108,6 +119,29 @@ public class MediaNotificationPlugin extends Plugin {
 
     @PluginMethod
     public void showNotification(PluginCall call) {
+        // Check notification permission for Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.POST_NOTIFICATIONS) 
+                != PackageManager.PERMISSION_GRANTED) {
+                // Request permission
+                requestPermissionForAlias("notifications", call, "notificationPermissionCallback");
+                return;
+            }
+        }
+        
+        showNotificationInternal(call);
+    }
+    
+    @PermissionCallback
+    private void notificationPermissionCallback(PluginCall call) {
+        if (getPermissionState("notifications") == PermissionState.GRANTED) {
+            showNotificationInternal(call);
+        } else {
+            call.reject("Notification permission denied");
+        }
+    }
+    
+    private void showNotificationInternal(PluginCall call) {
         String title = call.getString("title", "Pixel Tales");
         String text = call.getString("text", "Playing story...");
         boolean isPlaying = call.getBoolean("isPlaying", true);
