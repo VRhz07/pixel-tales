@@ -1,11 +1,13 @@
 """
 WebSocket consumers for real-time collaborative drawing
+Optimized for memory efficiency on limited resources
 """
 import json
 import uuid
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from .models import CollaborationSession, SessionParticipant, DrawingOperation
 
 
@@ -49,6 +51,15 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
             await self.mark_host_reconnected()
             print(f"🎉 Host {self.user.username} reconnected to session {self.session_id}")
         
+        # Memory optimization: Track active connections for this session
+        collab_conn_key = f'collab_connections_{self.session_id}'
+        current_connections = cache.get(collab_conn_key, 0)
+        
+        if current_connections >= 10:  # Max 10 concurrent connections per session
+            print(f"⚠️ Session {self.session_id} has reached max connections ({current_connections})")
+            await self.close(code=4002)  # Session is full
+            return
+        
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
@@ -56,6 +67,9 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
         )
         
         await self.accept()
+        
+        # Increment connection count
+        cache.set(collab_conn_key, current_connections + 1, 7200)  # 2 hour timeout
         
         # Add user as participant
         participant = await self.add_participant(session)
@@ -87,7 +101,14 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
         }))
     
     async def disconnect(self, close_code):
-        """Handle WebSocket disconnection"""
+        """Handle WebSocket disconnection with memory cleanup"""
+        # Decrement connection count for this session
+        if hasattr(self, 'session_id'):
+            collab_conn_key = f'collab_connections_{self.session_id}'
+            current_connections = cache.get(collab_conn_key, 1)
+            if current_connections > 0:
+                cache.set(collab_conn_key, current_connections - 1, 7200)
+        
         if hasattr(self, 'room_group_name'):
             # Determine if this user is the host before removing
             is_host = await self.is_user_host()

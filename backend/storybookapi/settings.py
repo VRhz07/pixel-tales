@@ -93,8 +93,21 @@ if DATABASE_URL and DATABASE_URL.startswith('sqlite'):
     }
 elif DATABASE_URL:
     # PostgreSQL or other database URL
+    db_config = dj_database_url.parse(DATABASE_URL, conn_max_age=0)
+    
+    # Optimize connection pooling for limited memory environments
+    db_config['CONN_MAX_AGE'] = 300  # 5 minutes (reduced from 600 to limit memory)
+    db_config['CONN_HEALTH_CHECKS'] = True  # Verify connections are alive before using
+    
+    # Add PostgreSQL-specific optimizations
+    if 'postgres' in DATABASE_URL:
+        db_config['OPTIONS'] = {
+            'connect_timeout': 10,  # 10 second connection timeout
+            'options': '-c statement_timeout=30000',  # 30 second query timeout
+        }
+    
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+        'default': db_config
     }
 else:
     # Local development default

@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.db.models import Q
+from django.core.cache import cache
 from .models import ProfanityWord
 from .admin_decorators import admin_required
 
@@ -127,6 +128,13 @@ def add_profanity_word(request):
         is_active=is_active
     )
     
+    # Invalidate cache when adding new words
+    cache.delete('profanity_words_all')
+    cache.delete(f'profanity_words_{language}')
+    if language == 'both':
+        cache.delete('profanity_words_en')
+        cache.delete('profanity_words_tl')
+    
     return Response({
         'success': True,
         'message': 'Profanity word added successfully',
@@ -192,11 +200,20 @@ def update_profanity_word(request, word_id):
         }, status=status.HTTP_400_BAD_REQUEST)
     
     # Update word
+    old_language = profanity_word.language
     profanity_word.word = word
     profanity_word.language = language
     profanity_word.severity = severity
     profanity_word.is_active = is_active
     profanity_word.save()
+    
+    # Invalidate cache when updating words
+    cache.delete('profanity_words_all')
+    cache.delete(f'profanity_words_{old_language}')
+    cache.delete(f'profanity_words_{language}')
+    if old_language == 'both' or language == 'both':
+        cache.delete('profanity_words_en')
+        cache.delete('profanity_words_tl')
     
     return Response({
         'success': True,
@@ -229,7 +246,15 @@ def delete_profanity_word(request, word_id):
         }, status=status.HTTP_404_NOT_FOUND)
     
     word_text = profanity_word.word
+    word_language = profanity_word.language
     profanity_word.delete()
+    
+    # Invalidate cache when deleting words
+    cache.delete('profanity_words_all')
+    cache.delete(f'profanity_words_{word_language}')
+    if word_language == 'both':
+        cache.delete('profanity_words_en')
+        cache.delete('profanity_words_tl')
     
     return Response({
         'success': True,
@@ -305,24 +330,41 @@ def get_active_profanity_words(request):
     """
     Public endpoint to get active profanity words for filtering
     Used by the frontend profanity filter
+    Now with caching to reduce memory usage
     """
     
     language = request.GET.get('language', 'all')
     
-    # Build query for active words
-    queryset = ProfanityWord.objects.filter(is_active=True)
+    # Try to get from cache first (1 hour cache)
+    cache_key = f'profanity_words_{language}'
+    cached_words = cache.get(cache_key)
+    
+    if cached_words is not None:
+        return Response({
+            'success': True,
+            'words': cached_words,
+            'count': len(cached_words),
+            'cached': True
+        })
+    
+    # Build query for active words - only get word field to reduce memory
+    queryset = ProfanityWord.objects.filter(is_active=True).only('word', 'language')
     
     # Filter by language
     if language and language != 'all':
         queryset = queryset.filter(Q(language=language) | Q(language='both'))
     
-    # Get words
-    words = queryset.values_list('word', flat=True)
+    # Get words as list
+    words = list(queryset.values_list('word', flat=True))
+    
+    # Cache for 1 hour (3600 seconds)
+    cache.set(cache_key, words, 3600)
     
     return Response({
         'success': True,
-        'words': list(words),
-        'count': len(words)
+        'words': words,
+        'count': len(words),
+        'cached': False
     })
 
 

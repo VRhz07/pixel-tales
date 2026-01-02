@@ -1,10 +1,13 @@
 """
 WebSocket consumer for real-time notifications and user presence
+Optimized for memory efficiency on limited resources
 """
 import json
+import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import User
+from django.core.cache import cache
 
 
 class NotificationConsumer(AsyncWebsocketConsumer):
@@ -13,12 +16,20 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     """
     
     async def connect(self):
-        """Handle WebSocket connection"""
+        """Handle WebSocket connection with memory-efficient checks"""
         self.user = self.scope.get('user')
         
         # Check if user is authenticated
         if not self.user or not self.user.is_authenticated:
             await self.close()
+            return
+        
+        # Memory optimization: Limit concurrent connections per user
+        connection_key = f'ws_connections_{self.user.id}'
+        current_connections = cache.get(connection_key, 0)
+        
+        if current_connections >= 3:  # Max 3 connections per user
+            await self.close(code=4001)  # Custom close code for too many connections
             return
         
         # Join user's personal notification room
@@ -30,6 +41,9 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         )
         
         await self.accept()
+        
+        # Track connection count
+        cache.set(connection_key, current_connections + 1, 3600)  # 1 hour timeout
         
         # Mark user as online
         await self.set_user_online(True)
@@ -45,8 +59,15 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         }))
     
     async def disconnect(self, close_code):
-        """Handle WebSocket disconnection"""
+        """Handle WebSocket disconnection with cleanup"""
         if hasattr(self, 'room_group_name'):
+            # Decrement connection count
+            if hasattr(self, 'user') and self.user:
+                connection_key = f'ws_connections_{self.user.id}'
+                current_connections = cache.get(connection_key, 1)
+                if current_connections > 0:
+                    cache.set(connection_key, current_connections - 1, 3600)
+            
             # Mark user as offline
             await self.set_user_online(False)
             
