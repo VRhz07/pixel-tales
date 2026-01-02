@@ -95,16 +95,18 @@ elif DATABASE_URL:
     # PostgreSQL or other database URL
     db_config = dj_database_url.parse(DATABASE_URL, conn_max_age=0)
     
-    # Optimize connection pooling for limited memory environments
-    db_config['CONN_MAX_AGE'] = 300  # 5 minutes (reduced from 600 to limit memory)
-    db_config['CONN_HEALTH_CHECKS'] = True  # Verify connections are alive before using
+    # AGGRESSIVE memory optimization for Render free tier
+    db_config['CONN_MAX_AGE'] = 60  # 1 minute only (was 300)
+    db_config['CONN_HEALTH_CHECKS'] = True
     
     # Add PostgreSQL-specific optimizations
     if 'postgres' in DATABASE_URL:
         db_config['OPTIONS'] = {
-            'connect_timeout': 10,  # 10 second connection timeout
-            'options': '-c statement_timeout=30000',  # 30 second query timeout
+            'connect_timeout': 10,
+            'options': '-c statement_timeout=30000',
         }
+        # Limit database pool size
+        db_config['CONN_MAX_AGE'] = 60
     
     DATABASES = {
         'default': db_config
@@ -250,11 +252,26 @@ elif GOOGLE_APPLICATION_CREDENTIALS and os.path.exists(GOOGLE_APPLICATION_CREDEN
 else:
     print("⚠️ Google Cloud TTS credentials not configured. TTS features will be disabled.")
 
+# Cache configuration for memory efficiency
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        'OPTIONS': {
+            'MAX_ENTRIES': 500,  # Limit cache size to 500 entries
+        }
+    }
+}
+
 # Channels Configuration
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer'
-    }
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        'CONFIG': {
+            'capacity': 100,  # Limit messages in memory (default 100)
+            'expiry': 60,  # Messages expire after 60 seconds
+        },
+    },
 }
 
 # Render.com specific settings
