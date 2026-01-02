@@ -95,8 +95,8 @@ elif DATABASE_URL:
     # PostgreSQL or other database URL
     db_config = dj_database_url.parse(DATABASE_URL, conn_max_age=0)
     
-    # AGGRESSIVE memory optimization for Render free tier
-    db_config['CONN_MAX_AGE'] = 60  # 1 minute only (was 300)
+    # ULTRA AGGRESSIVE memory optimization for Render free tier with WebSockets
+    db_config['CONN_MAX_AGE'] = 30  # 30 seconds only (minimal pooling)
     db_config['CONN_HEALTH_CHECKS'] = True
     
     # Add PostgreSQL-specific optimizations
@@ -104,9 +104,10 @@ elif DATABASE_URL:
         db_config['OPTIONS'] = {
             'connect_timeout': 10,
             'options': '-c statement_timeout=30000',
+            'max_connections': 20,  # Limit total connections
         }
-        # Limit database pool size
-        db_config['CONN_MAX_AGE'] = 60
+        # Minimal connection pooling
+        db_config['CONN_MAX_AGE'] = 30
     
     DATABASES = {
         'default': db_config
@@ -263,16 +264,20 @@ CACHES = {
     }
 }
 
-# Channels Configuration
+# Channels Configuration - ULTRA MINIMAL for free tier
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
         'CONFIG': {
-            'capacity': 100,  # Limit messages in memory (default 100)
-            'expiry': 60,  # Messages expire after 60 seconds
+            'capacity': 50,  # REDUCED: Only 50 messages in memory
+            'expiry': 30,  # REDUCED: Messages expire after 30 seconds
         },
     },
 }
+
+# ASGI application timeout settings for memory efficiency
+ASGI_APPLICATION = 'storybookapi.asgi.application'
+ASGI_THREADS = 1  # Single thread for ASGI to reduce memory
 
 # Render.com specific settings
 RENDER = os.getenv('RENDER', 'False').lower() == 'true'
