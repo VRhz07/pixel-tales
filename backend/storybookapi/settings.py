@@ -104,7 +104,6 @@ elif DATABASE_URL:
         db_config['OPTIONS'] = {
             'connect_timeout': 10,
             'options': '-c statement_timeout=30000',
-            'max_connections': 20,  # Limit total connections
         }
         # Minimal connection pooling
         db_config['CONN_MAX_AGE'] = 30
@@ -253,13 +252,14 @@ elif GOOGLE_APPLICATION_CREDENTIALS and os.path.exists(GOOGLE_APPLICATION_CREDEN
 else:
     print("⚠️ Google Cloud TTS credentials not configured. TTS features will be disabled.")
 
-# Cache configuration for memory efficiency
+# Cache configuration for memory efficiency - MINIMAL for WebSocket mode
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'unique-snowflake',
         'OPTIONS': {
-            'MAX_ENTRIES': 500,  # Limit cache size to 500 entries
+            'MAX_ENTRIES': 300,  # REDUCED to 300 entries for WebSocket mode
+            'CULL_FREQUENCY': 3,  # Cull cache more frequently
         }
     }
 }
