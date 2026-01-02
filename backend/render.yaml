@@ -7,7 +7,7 @@ services:
     plan: free
     branch: main
     buildCommand: "chmod +x build-minimal.sh && ./build-minimal.sh"
-    startCommand: "daphne -b 0.0.0.0 -p $PORT --verbosity 1 storybookapi.asgi:application"
+    startCommand: "gunicorn storybookapi.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 2 --timeout 120 --max-requests 1000 --max-requests-jitter 50"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
