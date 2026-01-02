@@ -2,56 +2,62 @@
 # exit on error
 set -o errexit
 
+echo "🚀 Starting optimized build process for Render free tier..."
+
 # Install Python dependencies
+echo "📦 Installing Python dependencies..."
 pip install --upgrade pip
 pip install -r requirements.txt
 
 # Create necessary directories
+echo "📁 Creating directories..."
 mkdir -p data
 mkdir -p staticfiles
 mkdir -p media
 
 # Collect static files
+echo "📋 Collecting static files..."
 python manage.py collectstatic --no-input
 
 # Run migrations
+echo "🗄️ Running database migrations..."
 python manage.py migrate --no-input
 
-# Create superuser automatically if environment variables are set
+# MEMORY OPTIMIZATION: Only run heavy operations if not skipped
+# Set SKIP_HEAVY_BUILD=true in Render environment to skip memory-intensive operations
+
+if [ "$SKIP_HEAVY_BUILD" = "true" ]; then
+    echo "⚡ SKIP_HEAVY_BUILD enabled - skipping memory-intensive operations"
+    echo "✅ Build completed successfully (lightweight mode)!"
+    exit 0
+fi
+
+# Create superuser (lightweight)
 if [ -f "create_superuser.py" ]; then
-    echo "Creating superuser..."
-    python create_superuser.py
+    echo "👤 Creating superuser..."
+    python create_superuser.py || echo "Superuser already exists or skipped"
 fi
 
-# Run deployment setup (includes profanity import and achievements)
+# Run deployment setup - profanity import (lightweight)
 if [ -f "deploy_setup.py" ]; then
-    echo "Running deployment setup..."
-    python deploy_setup.py
+    echo "⚙️ Running deployment setup..."
+    python deploy_setup.py || echo "Deployment setup skipped"
 fi
 
-# Populate achievements if not already done
-echo "Checking achievements..."
-python manage.py shell -c "from storybook.models import Achievement; count = Achievement.objects.count(); print(f'Achievements: {count}'); exit()" || echo "Could not check achievements"
+# Check achievements count (lightweight query)
+echo "🏆 Checking achievements..."
+ACHIEVEMENT_COUNT=$(python manage.py shell -c "from storybook.models import Achievement; print(Achievement.objects.count())" 2>/dev/null || echo "0")
 
-if python manage.py shell -c "from storybook.models import Achievement; exit(0 if Achievement.objects.count() >= 128 else 1)"; then
-    echo "Achievements already populated"
+if [ "$ACHIEVEMENT_COUNT" -lt 128 ]; then
+    echo "📝 Populating achievements..."
+    python manage.py populate_achievements || echo "Achievement population skipped"
 else
-    echo "Populating achievements..."
-    python manage.py populate_achievements
+    echo "✅ Achievements already populated ($ACHIEVEMENT_COUNT/128)"
 fi
 
-# Generate educational games for NEW published stories only
-# Only generates games for stories that don't have them yet (unless --regenerate flag is set)
-echo "Checking for stories without games..."
-if python manage.py shell -c "from storybook.models import Story, StoryGame; stories = Story.objects.filter(is_published=True); stories_without_games = [s for s in stories if not StoryGame.objects.filter(story=s).exists()]; print(f'Stories without games: {len(stories_without_games)}'); exit(1 if len(stories_without_games) > 0 else 0)"; then
-    echo "All published stories already have games - skipping generation"
-else
-    echo "Generating games for new published stories..."
-    python manage.py generate_all_games
-fi
+# SKIP game generation during build - too memory intensive for free tier
+# Games will be generated on-demand when users access them
+echo "🎮 Skipping game generation during build (memory optimization)"
+echo "   Games will be generated on-demand or run manually if needed"
 
-# Verify game counts
-echo "Current game statistics..."
-python manage.py shell -c "from storybook.models import StoryGame, Story; ws_count = StoryGame.objects.filter(game_type='word_search').count(); quiz_count = StoryGame.objects.filter(game_type='quiz').count(); fb_count = StoryGame.objects.filter(game_type='fill_blanks').count(); story_count = Story.objects.filter(is_published=True).count(); print(f'Published Stories: {story_count}'); print(f'Word Search Games: {ws_count}'); print(f'Quiz Games: {quiz_count}'); print(f'Fill Blanks Games: {fb_count}')" || echo "Could not verify game counts"
-
-echo "Build completed successfully!"
+echo "✅ Build completed successfully!"

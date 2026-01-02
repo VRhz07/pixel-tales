@@ -29,3 +29,5 @@ services:
         value: 365
       - key: DATABASE_URL
         sync: false
+      - key: SKIP_HEAVY_BUILD
+        value: true
