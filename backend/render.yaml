@@ -6,7 +6,7 @@ services:
     region: oregon
     plan: free
     branch: main
-    buildCommand: "./build.sh"
+    buildCommand: "chmod +x build-minimal.sh && ./build-minimal.sh"
     startCommand: "daphne -b 0.0.0.0 -p $PORT storybookapi.asgi:application"
     envVars:
       - key: PYTHON_VERSION
