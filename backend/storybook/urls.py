@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .jwt_auth import CustomTokenObtainPairView, jwt_register, jwt_logout, jwt_user_profile, jwt_create_session, verify_email, resend_verification_code, verify_password, send_password_reset_code, verify_password_reset_code, reset_password, change_password, delete_account
-from . import views, admin_views, admin_auth, admin_features, admin_profanity, ai_proxy_views, tts_views, game_views, teacher_views
+from . import views, admin_views, admin_auth, admin_features, admin_profanity, ai_proxy_views, tts_views, game_views, teacher_views, notification_views
 
 # Create a router for ViewSets (we'll add these later)
 router = DefaultRouter()
@@ -236,4 +236,14 @@ urlpatterns = [
     path('teacher/dashboard-stats/', teacher_views.teacher_dashboard_stats, name='teacher-dashboard-stats'),
     path('teacher/available-students/', teacher_views.available_students, name='teacher-available-students'),
     path('teacher/all-students/', teacher_views.teacher_students, name='teacher-all-students'),
+    
+    # Notification Preferences endpoints
+    path('notifications/preferences/', notification_views.get_notification_preferences, name='get_notification_preferences'),
+    path('notifications/preferences/update/', notification_views.update_notification_preferences, name='update_notification_preferences'),
+    path('notifications/register-token/', notification_views.register_push_token, name='register_push_token'),
+    
+    # Email Notification endpoints
+    path('notifications/send-test-email/', notification_views.send_test_email, name='send_test_email'),
+    path('notifications/send-achievement/', notification_views.send_achievement_notification, name='send_achievement_notification'),
+    path('notifications/send-weekly-report/', notification_views.send_weekly_report, name='send_weekly_report'),
 ]

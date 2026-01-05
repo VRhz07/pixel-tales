@@ -7,6 +7,7 @@ import { X, UserPlus, Users, Link as LinkIcon, Check, Copy } from 'lucide-react'
 import { socialService } from '../../services/social.service';
 import { createCollaborationSession } from '../../services/collaborationApi';
 import { collaborationService } from '../../services/collaborationService';
+import { apiConfigService } from '../../services/apiConfig.service';
 import { AvatarWithBorder } from '../common/AvatarWithBorder';
 import './CollaborationModal.css';
 
@@ -118,7 +119,7 @@ export const CollaborationInviteModal: React.FC<CollaborationInviteModalProps> =
 
       // Send invitation via API
       const token = localStorage.getItem('access_token');
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/invite/`, {
+      const response = await fetch(`${apiConfigService.getApiUrl()}/collaborate/invite/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

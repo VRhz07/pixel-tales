@@ -9,7 +9,7 @@ from .models import (
     UserProfile, Story, Character, Comment, Rating, Friendship,
     Achievement, UserAchievement, Notification, ParentChildRelationship,
     TeacherStudentRelationship, TeacherClass, Message, EmailVerification,
-    StoryGame, GameQuestion, GameAttempt, GameAnswer
+    StoryGame, GameQuestion, GameAttempt, GameAnswer, NotificationPreferences
 )
 
 
@@ -261,6 +261,31 @@ class GameAnswerAdmin(admin.ModelAdmin):
     list_filter = ('is_correct', 'answered_at')
     search_fields = ('attempt__user__username', 'question__question_text')
     readonly_fields = ('answered_at',)
+
+
+@admin.register(NotificationPreferences)
+class NotificationPreferencesAdmin(admin.ModelAdmin):
+    list_display = ('user', 'weekly_reports', 'achievement_alerts', 'goal_completion', 'realtime_updates', 'share_usage_data', 'allow_analytics', 'public_profile', 'updated_at')
+    list_filter = ('weekly_reports', 'achievement_alerts', 'goal_completion', 'realtime_updates', 'share_usage_data', 'allow_analytics', 'public_profile', 'device_type')
+    search_fields = ('user__username', 'user__email')
+    readonly_fields = ('created_at', 'updated_at')
+    fieldsets = (
+        ('User', {
+            'fields': ('user',)
+        }),
+        ('Email Notifications', {
+            'fields': ('weekly_reports', 'achievement_alerts', 'goal_completion')
+        }),
+        ('Push Notifications', {
+            'fields': ('realtime_updates', 'push_token', 'device_type')
+        }),
+        ('Privacy Settings', {
+            'fields': ('share_usage_data', 'allow_analytics', 'public_profile')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
 
 
 @admin.register(TeacherClass)

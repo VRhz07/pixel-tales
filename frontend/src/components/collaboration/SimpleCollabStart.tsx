@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { UserGroupIcon } from '@heroicons/react/24/outline';
+import { apiConfigService } from '../../services/apiConfig.service';
 
 interface SimpleCollabStartProps {
   onStartCollab: (sessionId: string) => void;
@@ -17,7 +18,7 @@ export const SimpleCollabStart: React.FC<SimpleCollabStartProps> = ({ onStartCol
       console.log('📡 Sending request to create session...');
       
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/create/`,
+        `${apiConfigService.getApiUrl()}/collaborate/create/`,
         {
           method: 'POST',
           headers: {
@@ -65,7 +66,7 @@ export const SimpleCollabStart: React.FC<SimpleCollabStartProps> = ({ onStartCol
     try {
       const token = localStorage.getItem('access_token');
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/${sid}/`,
+        `${apiConfigService.getApiUrl()}/collaborate/${sid}/`,
         {
           headers: {
             'Authorization': `Bearer ${token}`

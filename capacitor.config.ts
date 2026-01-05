@@ -5,7 +5,9 @@ const config: CapacitorConfig = {
   appName: 'Pixel Tales',
   webDir: 'frontend/dist',
   server: {
-    androidScheme: 'https'
+    androidScheme: 'http',
+    // Allow cleartext traffic for local development
+    cleartext: true
   },
   plugins: {
     StatusBar: {

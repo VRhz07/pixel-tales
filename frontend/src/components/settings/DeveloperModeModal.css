@@ -1,0 +1,423 @@
+.dev-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+}
+
+.dev-modal-content {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 20px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.dev-modal-header {
+  padding: 24px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dev-modal-header h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.dev-modal-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 32px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.dev-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(90deg);
+}
+
+.dev-modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.dev-current-config {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dev-current-config h3 {
+  margin: 0 0 8px 0;
+  color: #a0a0a0;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.dev-current-url {
+  color: #4fc3f7;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  word-break: break-all;
+  margin-bottom: 8px;
+}
+
+.dev-custom-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dev-presets {
+  margin-bottom: 24px;
+}
+
+.dev-presets h3 {
+  margin: 0 0 12px 0;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.dev-preset-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dev-preset-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.dev-preset-item.selected {
+  background: rgba(103, 126, 234, 0.2);
+  border-color: #667eea;
+  box-shadow: 0 0 20px rgba(103, 126, 234, 0.3);
+}
+
+.dev-preset-icon {
+  font-size: 32px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.dev-preset-info {
+  flex: 1;
+}
+
+.dev-preset-name {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.dev-preset-desc {
+  color: #a0a0a0;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.dev-preset-url {
+  color: #4fc3f7;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.dev-preset-radio {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4fc3f7;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.dev-custom-input {
+  margin-bottom: 24px;
+}
+
+.dev-custom-input label {
+  display: block;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.dev-url-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-family: 'Courier New', monospace;
+  transition: all 0.3s ease;
+}
+
+.dev-url-input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 20px rgba(103, 126, 234, 0.3);
+}
+
+.dev-input-hint {
+  margin-top: 8px;
+  color: #a0a0a0;
+  font-size: 12px;
+}
+
+.dev-input-hint code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  color: #4fc3f7;
+}
+
+.dev-test-section {
+  margin-bottom: 24px;
+}
+
+.dev-test-button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dev-test-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(103, 126, 234, 0.4);
+}
+
+.dev-test-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dev-test-result {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.dev-test-result.success {
+  background: rgba(76, 175, 80, 0.2);
+  border: 1px solid rgba(76, 175, 80, 0.5);
+  color: #4caf50;
+}
+
+.dev-test-result.error {
+  background: rgba(244, 67, 54, 0.2);
+  border: 1px solid rgba(244, 67, 54, 0.5);
+  color: #f44336;
+}
+
+.dev-test-icon {
+  font-size: 20px;
+}
+
+.dev-instructions {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.dev-instructions h4 {
+  margin: 0 0 12px 0;
+  color: #ffc107;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dev-instructions ol {
+  margin: 0;
+  padding-left: 20px;
+  color: #fff;
+}
+
+.dev-instructions li {
+  margin-bottom: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.dev-instructions code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  color: #4fc3f7;
+  font-size: 12px;
+}
+
+.dev-modal-footer {
+  padding: 24px;
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.dev-footer-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.dev-reset-button,
+.dev-cancel-button,
+.dev-save-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dev-reset-button {
+  background: rgba(244, 67, 54, 0.2);
+  border: 1px solid rgba(244, 67, 54, 0.5);
+  color: #f44336;
+}
+
+.dev-reset-button:hover {
+  background: rgba(244, 67, 54, 0.3);
+  transform: translateY(-2px);
+}
+
+.dev-cancel-button {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.dev-cancel-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.dev-save-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.dev-save-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(103, 126, 234, 0.4);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .dev-modal-content {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .dev-modal-header,
+  .dev-modal-body,
+  .dev-modal-footer {
+    padding: 16px;
+  }
+
+  .dev-preset-item {
+    padding: 12px;
+  }
+
+  .dev-preset-icon {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .dev-preset-name {
+    font-size: 14px;
+  }
+
+  .dev-preset-desc {
+    font-size: 12px;
+  }
+
+  .dev-modal-footer {
+    flex-direction: column;
+  }
+
+  .dev-footer-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .dev-footer-actions button {
+    flex: 1;
+  }
+
+  .dev-reset-button {
+    width: 100%;
+  }
+}

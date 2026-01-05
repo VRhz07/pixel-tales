@@ -28,8 +28,8 @@ class NotificationWebSocketService {
   /**
    * Connect to the notification WebSocket
    */
-  connect(handlers: NotificationHandler = {}): Promise<void> {
-    return new Promise((resolve, reject) => {
+  async connect(handlers: NotificationHandler = {}): Promise<void> {
+    return new Promise(async (resolve, reject) => {
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
         console.log('Already connected to notification WebSocket');
         resolve();
@@ -53,13 +53,15 @@ class NotificationWebSocketService {
         return;
       }
 
-      // Get WebSocket URL from environment
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      // Get WebSocket URL from dynamic API config (Developer Mode support)
+      const { apiConfigService } = await import('./apiConfig.service');
+      const apiUrl = apiConfigService.getApiUrl();
       const wsProtocol = apiUrl.startsWith('https') ? 'wss' : 'ws';
       const wsHost = apiUrl.replace('http://', '').replace('https://', '').replace('/api', '');
       const wsUrl = `${wsProtocol}://${wsHost}/ws/notifications/?token=${token}`;
 
       console.log('🔔 Connecting to notification WebSocket...');
+      console.log('🔔 WebSocket URL:', wsUrl.replace(token, '***TOKEN***'));
 
       try {
         this.ws = new WebSocket(wsUrl);

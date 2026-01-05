@@ -117,13 +117,15 @@ export class CollaborationService {
       }
     }
 
-    // Get WebSocket URL from environment
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    // Get WebSocket URL from dynamic API config (Developer Mode support)
+    const { apiConfigService } = await import('./apiConfig.service');
+    const apiUrl = apiConfigService.getApiUrl();
     const wsProtocol = apiUrl.startsWith('https') ? 'wss' : 'ws';
     const wsHost = apiUrl.replace('http://', '').replace('https://', '').replace('/api', '');
     const wsUrl = `${wsProtocol}://${wsHost}/ws/collaborate/${sessionId}/?token=${token}`;
 
-    console.log('Connecting to WebSocket:', wsUrl.replace(token, '***TOKEN***'));
+    console.log('Connecting to Collaboration WebSocket:', wsUrl.replace(token, '***TOKEN***'));
+    console.log('API URL from config:', apiUrl);
 
     return new Promise((resolve, reject) => {
 
@@ -327,7 +329,8 @@ export class CollaborationService {
     }
     
     const token = localStorage.getItem('access_token');
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    const { apiConfigService } = await import('./apiConfig.service');
+    const apiUrl = apiConfigService.getApiUrl();
     
     const response = await fetch(`${apiUrl}/collaborate/${this.sessionId}/vote/`, {
       method: 'POST',
@@ -353,7 +356,8 @@ export class CollaborationService {
     }
     
     const token = localStorage.getItem('access_token');
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    const { apiConfigService } = await import('./apiConfig.service');
+    const apiUrl = apiConfigService.getApiUrl();
     
     const response = await fetch(`${apiUrl}/collaborate/${this.sessionId}/vote/cast/`, {
       method: 'POST',
@@ -516,7 +520,8 @@ export class CollaborationService {
    */
   async getPresence(sessionId: string): Promise<any> {
     const token = localStorage.getItem('access_token');
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    const { apiConfigService } = await import('./apiConfig.service');
+    const apiUrl = apiConfigService.getApiUrl();
     
     const response = await fetch(`${apiUrl}/collaborate/${sessionId}/presence/`, {
       headers: {
@@ -536,7 +541,8 @@ export class CollaborationService {
    */
   async kickParticipant(sessionId: string, userId: number): Promise<any> {
     const token = localStorage.getItem('access_token');
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    const { apiConfigService } = await import('./apiConfig.service');
+    const apiUrl = apiConfigService.getApiUrl();
     
     const response = await fetch(`${apiUrl}/collaborate/${sessionId}/kick/`, {
       method: 'POST',
@@ -559,7 +565,8 @@ export class CollaborationService {
    */
   async updateDraft(sessionId: string, storyDraft: any): Promise<any> {
     const token = localStorage.getItem('access_token');
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    const { apiConfigService } = await import('./apiConfig.service');
+    const apiUrl = apiConfigService.getApiUrl();
     
     const response = await fetch(`${apiUrl}/collaborate/${sessionId}/draft/update/`, {
       method: 'POST',
@@ -582,7 +589,8 @@ export class CollaborationService {
    */
   async getDraft(sessionId: string): Promise<any> {
     const token = localStorage.getItem('access_token');
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    const { apiConfigService } = await import('./apiConfig.service');
+    const apiUrl = apiConfigService.getApiUrl();
     
     const response = await fetch(`${apiUrl}/collaborate/${sessionId}/draft/`, {
       headers: {
@@ -602,7 +610,8 @@ export class CollaborationService {
    */
   async closeLobby(sessionId: string): Promise<any> {
     const token = localStorage.getItem('access_token');
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    const { apiConfigService } = await import('./apiConfig.service');
+    const apiUrl = apiConfigService.getApiUrl();
     
     const response = await fetch(`${apiUrl}/collaborate/${sessionId}/lobby/close/`, {
       method: 'POST',
@@ -624,7 +633,8 @@ export class CollaborationService {
    */
   async endSession(sessionId: string): Promise<any> {
     const token = localStorage.getItem('access_token');
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    const { apiConfigService } = await import('./apiConfig.service');
+    const apiUrl = apiConfigService.getApiUrl();
     
     const response = await fetch(`${apiUrl}/collaborate/${sessionId}/end/`, {
       method: 'POST',
@@ -645,7 +655,8 @@ export class CollaborationService {
    */
   async getCollaborativeStories(): Promise<any> {
     const token = localStorage.getItem('access_token');
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    const { apiConfigService } = await import('./apiConfig.service');
+    const apiUrl = apiConfigService.getApiUrl();
     
     const response = await fetch(`${apiUrl}/collaborate/stories/`, {
       headers: {
@@ -665,7 +676,8 @@ export class CollaborationService {
    */
   async publishCollaborativeStory(storyId: number): Promise<any> {
     const token = localStorage.getItem('access_token');
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    const { apiConfigService } = await import('./apiConfig.service');
+    const apiUrl = apiConfigService.getApiUrl();
     
     const response = await fetch(`${apiUrl}/stories/${storyId}/publish-collaborative/`, {
       method: 'POST',
@@ -692,7 +704,8 @@ export class CollaborationService {
    */
   async getUserSessions(): Promise<any> {
     const token = localStorage.getItem('access_token');
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    const { apiConfigService } = await import('./apiConfig.service');
+    const apiUrl = apiConfigService.getApiUrl();
     
     const response = await fetch(`${apiUrl}/collaborate/sessions/user/`, {
       headers: {
@@ -866,7 +879,8 @@ export class CollaborationService {
    */
   async getOperationHistory(sessionId: string, pageNumber?: number): Promise<any[]> {
     const token = localStorage.getItem('access_token');
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    const { apiConfigService } = await import('./apiConfig.service');
+    const apiUrl = apiConfigService.getApiUrl();
     
     let url = `${apiUrl}/collaborate/${sessionId}/operations/`;
     if (pageNumber !== undefined) {
@@ -934,7 +948,8 @@ export class CollaborationService {
         return null;
       }
 
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      const { apiConfigService } = await import('./apiConfig.service');
+      const apiUrl = apiConfigService.getApiUrl();
       const response = await fetch(`${apiUrl}/auth/token/refresh/`, {
         method: 'POST',
         headers: {

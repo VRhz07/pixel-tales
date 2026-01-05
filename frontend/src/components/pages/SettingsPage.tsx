@@ -20,6 +20,7 @@ import { ProfileEditModal } from '../settings/ProfileEditModal';
 import { EmailChangeModal } from '../settings/EmailChangeModal';
 import { PasswordUpdateModal } from '../settings/PasswordUpdateModal';
 import { ParentPasswordVerificationModal } from '../settings/ParentPasswordVerificationModal';
+import DeveloperModeModal from '../settings/DeveloperModeModal';
 import { CustomDropdown } from '../common/CustomDropdown';
 import { storage } from '../../utils/storage';
 import { authService } from '../../services/auth.service';
@@ -49,6 +50,8 @@ const SettingsPage = () => {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showParentPasswordModal, setShowParentPasswordModal] = useState(false);
+  const [showDeveloperMode, setShowDeveloperMode] = useState(false);
+  const [logoClickCount, setLogoClickCount] = useState(0);
   const [successMessage, setSuccessMessage] = useState('');
   
   // Check if viewing as child (parent session exists)
@@ -82,6 +85,21 @@ const SettingsPage = () => {
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
+  
+  // Developer mode trigger - tap logo 5 times
+  useEffect(() => {
+    if (logoClickCount >= 5) {
+      setShowDeveloperMode(true);
+      setLogoClickCount(0);
+      playButtonClick();
+    }
+    
+    // Reset counter after 3 seconds of inactivity
+    if (logoClickCount > 0) {
+      const timer = setTimeout(() => setLogoClickCount(0), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [logoClickCount, playButtonClick]);
 
   const handleSignOut = async () => {
     try {
@@ -668,7 +686,34 @@ const SettingsPage = () => {
 
       {/* App Info Footer */}
       <div className="settings-app-info">
-        <Logo className="settings-app-icon" width="150px" height="150px" />
+        <div 
+          onClick={() => setLogoClickCount(prev => prev + 1)}
+          style={{ cursor: 'pointer', position: 'relative' }}
+          title="Tap 5 times for developer mode"
+        >
+          <Logo className="settings-app-icon" width="150px" height="150px" />
+          {logoClickCount > 0 && logoClickCount < 5 && (
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              background: 'rgba(102, 126, 234, 0.9)',
+              color: 'white',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              animation: 'pulse 0.3s ease-out'
+            }}>
+              {logoClickCount}
+            </div>
+          )}
+        </div>
         <div className="settings-app-version">Version 1.0.0</div>
         <div className="settings-app-tagline">
           <span>Made with</span>
@@ -717,6 +762,12 @@ const SettingsPage = () => {
       />,
       document.body
     )}
+    
+    {/* Developer Mode Modal */}
+    <DeveloperModeModal
+      isOpen={showDeveloperMode}
+      onClose={() => setShowDeveloperMode(false)}
+    />
     
     {/* Delete Account Confirmation Modal - Using Portal to render at document root */}
     {showDeleteConfirm && createPortal(

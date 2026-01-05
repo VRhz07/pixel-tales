@@ -43,17 +43,22 @@ const TeacherSettingsPage: React.FC = () => {
   const [deleteError, setDeleteError] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   
   // Notification preferences state
   const [weeklyReports, setWeeklyReports] = useState(true);
   const [achievementAlerts, setAchievementAlerts] = useState(true);
   const [goalCompletion, setGoalCompletion] = useState(true);
   const [realtimeUpdates, setRealtimeUpdates] = useState(false);
+  const [loadingPreferences, setLoadingPreferences] = useState(false);
+  const [savingPreferences, setSavingPreferences] = useState(false);
+  const [sendingTestEmail, setSendingTestEmail] = useState(false);
   
   // Privacy preferences state
   const [shareUsageData, setShareUsageData] = useState(true);
   const [allowAnalytics, setAllowAnalytics] = useState(true);
   const [publicProfile, setPublicProfile] = useState(false);
+  const [savingPrivacy, setSavingPrivacy] = useState(false);
 
   // Manage children state
   const [children, setChildren] = useState<Child[]>([]);
@@ -109,6 +114,117 @@ const TeacherSettingsPage: React.FC = () => {
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error: any) {
       throw new Error(error.message || 'Failed to update profile');
+    }
+  };
+
+  // Load notification and privacy preferences on mount
+  useEffect(() => {
+    const loadNotificationPreferences = async () => {
+      try {
+        setLoadingPreferences(true);
+        const { notificationPreferencesService } = await import('../services/notificationPreferences.service');
+        const preferences = await notificationPreferencesService.getPreferences();
+        
+        // Load notification preferences
+        setWeeklyReports(preferences.weekly_reports);
+        setAchievementAlerts(preferences.achievement_alerts);
+        setGoalCompletion(preferences.goal_completion);
+        setRealtimeUpdates(preferences.realtime_updates);
+        
+        // Load privacy preferences
+        setShareUsageData(preferences.share_usage_data);
+        setAllowAnalytics(preferences.allow_analytics);
+        setPublicProfile(preferences.public_profile);
+      } catch (error) {
+        console.error('Error loading preferences:', error);
+      } finally {
+        setLoadingPreferences(false);
+      }
+    };
+
+    loadNotificationPreferences();
+  }, []);
+
+  // Save notification preferences when changed
+  const handlePreferenceChange = async (preference: string, value: boolean) => {
+    try {
+      setSavingPreferences(true);
+      
+      // Update local state immediately
+      if (preference === 'weekly_reports') setWeeklyReports(value);
+      else if (preference === 'achievement_alerts') setAchievementAlerts(value);
+      else if (preference === 'goal_completion') setGoalCompletion(value);
+      else if (preference === 'realtime_updates') setRealtimeUpdates(value);
+      
+      // Save to backend
+      const { notificationPreferencesService } = await import('../services/notificationPreferences.service');
+      await notificationPreferencesService.updatePreferences({
+        [preference]: value
+      });
+      
+      setSuccessMessage('Notification preferences saved!');
+      setTimeout(() => setSuccessMessage(''), 2000);
+    } catch (error) {
+      console.error('Error saving notification preferences:', error);
+      // Revert on error
+      if (preference === 'weekly_reports') setWeeklyReports(!value);
+      else if (preference === 'achievement_alerts') setAchievementAlerts(!value);
+      else if (preference === 'goal_completion') setGoalCompletion(!value);
+      else if (preference === 'realtime_updates') setRealtimeUpdates(!value);
+    } finally {
+      setSavingPreferences(false);
+    }
+  };
+
+  // Send test email
+  const handleSendTestEmail = async () => {
+    try {
+      setSendingTestEmail(true);
+      const { notificationPreferencesService } = await import('../services/notificationPreferences.service');
+      const result = await notificationPreferencesService.sendTestEmail();
+      
+      if (result.success) {
+        setSuccessMessage('Test email sent! Check your inbox.');
+        setTimeout(() => setSuccessMessage(''), 3000);
+      } else {
+        setErrorMessage(result.message);
+        setTimeout(() => setErrorMessage(''), 3000);
+      }
+    } catch (error) {
+      console.error('Error sending test email:', error);
+      setErrorMessage('Failed to send test email');
+      setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
+      setSendingTestEmail(false);
+    }
+  };
+
+  // Handle privacy preference changes
+  const handlePrivacyChange = async (preference: string, value: boolean) => {
+    try {
+      setSavingPrivacy(true);
+      
+      // Update local state immediately
+      if (preference === 'share_usage_data') setShareUsageData(value);
+      else if (preference === 'allow_analytics') setAllowAnalytics(value);
+      else if (preference === 'public_profile') setPublicProfile(value);
+      
+      // Save to backend
+      const { notificationPreferencesService } = await import('../services/notificationPreferences.service');
+      await notificationPreferencesService.updatePreferences({
+        [preference]: value
+      });
+      
+      setSuccessMessage('Privacy settings saved!');
+      setTimeout(() => setSuccessMessage(''), 2000);
+    } catch (error) {
+      console.error('Error saving privacy settings:', error);
+      // Revert on error
+      if (preference === 'share_usage_data') setShareUsageData(!value);
+      else if (preference === 'allow_analytics') setAllowAnalytics(!value);
+      else if (preference === 'public_profile') setPublicProfile(!value);
+    } finally {
+      setSavingPrivacy(false);
     }
   };
 
@@ -556,6 +672,24 @@ const TeacherSettingsPage: React.FC = () => {
                   <div className="parent-settings-card">
                     <div className="parent-settings-card-header">
                       <h3>Email Notifications</h3>
+                      <button 
+                        className="parent-settings-test-btn"
+                        onClick={handleSendTestEmail}
+                        disabled={sendingTestEmail}
+                        style={{
+                          padding: '8px 16px',
+                          fontSize: '14px',
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          cursor: sendingTestEmail ? 'not-allowed' : 'pointer',
+                          opacity: sendingTestEmail ? 0.6 : 1,
+                          fontWeight: '500'
+                        }}
+                      >
+                        {sendingTestEmail ? '📧 Sending...' : '📧 Send Test Email'}
+                      </button>
                     </div>
                     <div className="parent-settings-card-body">
                       <div className="parent-settings-toggle-item">
@@ -567,7 +701,8 @@ const TeacherSettingsPage: React.FC = () => {
                           <input 
                             type="checkbox" 
                             checked={weeklyReports}
-                            onChange={(e) => setWeeklyReports(e.target.checked)}
+                            onChange={(e) => handlePreferenceChange('weekly_reports', e.target.checked)}
+                            disabled={savingPreferences}
                           />
                           <span className="parent-settings-toggle-slider"></span>
                         </label>
@@ -581,7 +716,8 @@ const TeacherSettingsPage: React.FC = () => {
                           <input 
                             type="checkbox" 
                             checked={achievementAlerts}
-                            onChange={(e) => setAchievementAlerts(e.target.checked)}
+                            onChange={(e) => handlePreferenceChange('achievement_alerts', e.target.checked)}
+                            disabled={savingPreferences}
                           />
                           <span className="parent-settings-toggle-slider"></span>
                         </label>
@@ -595,7 +731,8 @@ const TeacherSettingsPage: React.FC = () => {
                           <input 
                             type="checkbox" 
                             checked={goalCompletion}
-                            onChange={(e) => setGoalCompletion(e.target.checked)}
+                            onChange={(e) => handlePreferenceChange('goal_completion', e.target.checked)}
+                            disabled={savingPreferences}
                           />
                           <span className="parent-settings-toggle-slider"></span>
                         </label>
@@ -617,7 +754,8 @@ const TeacherSettingsPage: React.FC = () => {
                           <input 
                             type="checkbox" 
                             checked={realtimeUpdates}
-                            onChange={(e) => setRealtimeUpdates(e.target.checked)}
+                            onChange={(e) => handlePreferenceChange('realtime_updates', e.target.checked)}
+                            disabled={savingPreferences}
                           />
                           <span className="parent-settings-toggle-slider"></span>
                         </label>

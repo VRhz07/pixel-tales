@@ -945,3 +945,44 @@ class GameAnswer(models.Model):
     
     def __str__(self):
         return f"{self.attempt.user.username} - Q{self.question.order} - {'✓' if self.is_correct else '✗'}"
+
+
+class NotificationPreferences(models.Model):
+    """
+    User notification and privacy preferences for parents and teachers
+    """
+    DEVICE_TYPE_CHOICES = [
+        ('ios', 'iOS'),
+        ('android', 'Android'),
+        ('web', 'Web'),
+    ]
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='notification_preferences')
+    
+    # Email notification preferences
+    weekly_reports = models.BooleanField(default=True, help_text='Receive weekly progress reports via email')
+    achievement_alerts = models.BooleanField(default=True, help_text='Get notified when achievements are earned')
+    goal_completion = models.BooleanField(default=True, help_text='Receive alerts when learning goals are completed')
+    
+    # Push notification preferences
+    realtime_updates = models.BooleanField(default=False, help_text='Enable push notifications for real-time updates')
+    
+    # Device information for push notifications
+    push_token = models.CharField(max_length=500, blank=True, null=True, help_text='Device push notification token for mobile')
+    device_type = models.CharField(max_length=10, choices=DEVICE_TYPE_CHOICES, blank=True, null=True)
+    
+    # Privacy preferences
+    share_usage_data = models.BooleanField(default=True, help_text='Share anonymous usage data to help improve the app')
+    allow_analytics = models.BooleanField(default=True, help_text='Enable detailed analytics to track reading patterns')
+    public_profile = models.BooleanField(default=False, help_text='Allow profile to be visible to other users')
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Notification Preference'
+        verbose_name_plural = 'Notification Preferences'
+    
+    def __str__(self):
+        return f"Preferences for {self.user.username}"

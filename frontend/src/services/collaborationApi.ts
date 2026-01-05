@@ -2,8 +2,9 @@
  * API Service for Collaboration Sessions
  */
 import axios from 'axios';
+import { apiConfigService } from './apiConfig.service';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const getApiBaseUrl = () => apiConfigService.getApiUrl();
 
 interface CollaborationSession {
   session_id: string;
@@ -66,7 +67,7 @@ export const createCollaborationSession = async (
 ): Promise<CollaborationSession> => {
   try {
     const response = await axios.post(
-      `${API_BASE_URL}/collaborate/create/`,
+      `${getApiBaseUrl()}/collaborate/create/`,
       params,
       { headers: getAuthHeaders() }
     );
@@ -85,7 +86,7 @@ export const getCollaborationSession = async (
 ): Promise<SessionDetails> => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/collaborate/${sessionId}/`,
+      `${getApiBaseUrl()}/collaborate/${sessionId}/`,
       { headers: getAuthHeaders() }
     );
     return response.data.session;
@@ -103,7 +104,7 @@ export const endCollaborationSession = async (
 ): Promise<void> => {
   try {
     await axios.post(
-      `${API_BASE_URL}/collaborate/${sessionId}/end/`,
+      `${getApiBaseUrl()}/collaborate/${sessionId}/end/`,
       {},
       { headers: getAuthHeaders() }
     );
@@ -122,7 +123,7 @@ export const listUserSessions = async (): Promise<{
 }> => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/collaborate/sessions/list/`,
+      `${getApiBaseUrl()}/collaborate/sessions/list/`,
       { headers: getAuthHeaders() }
     );
     return response.data;
@@ -140,7 +141,7 @@ export const joinSessionByCode = async (
 ): Promise<SessionDetails> => {
   try {
     const response = await axios.post(
-      `${API_BASE_URL}/collaborate/join-by-code/`,
+      `${getApiBaseUrl()}/collaborate/join-by-code/`,
       { join_code: joinCode.toUpperCase() },
       { headers: getAuthHeaders() }
     );

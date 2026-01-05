@@ -7,6 +7,7 @@ import { X, User, Users, UserPlus, Check, Loader, Sparkles, Info } from 'lucide-
 import { socialService } from '../../services/social.service';
 import { createCollaborationSession } from '../../services/collaborationApi';
 import { collaborationService } from '../../services/collaborationService';
+import { apiConfigService } from '../../services/apiConfig.service';
 import { useThemeStore } from '../../stores/themeStore';
 import { AvatarWithBorder } from '../common/AvatarWithBorder';
 import './CollaborationModal.css';
@@ -116,7 +117,7 @@ export const StoryModeSelectionModal: React.FC<StoryModeSelectionModalProps> = (
     try {
       const token = localStorage.getItem('access_token');
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/${sessionId}/`,
+        `${apiConfigService.getApiUrl()}/collaborate/${sessionId}/`,
         {
           headers: { 'Authorization': `Bearer ${token}` }
         }
@@ -172,7 +173,7 @@ export const StoryModeSelectionModal: React.FC<StoryModeSelectionModalProps> = (
       // Send invitation
       const token = localStorage.getItem('access_token');
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/invite/`,
+        `${apiConfigService.getApiUrl()}/collaborate/invite/`,
         {
           method: 'POST',
           headers: {

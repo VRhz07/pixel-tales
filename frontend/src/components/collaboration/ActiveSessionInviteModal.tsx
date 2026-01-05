@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { X, UserPlus, Copy, Check } from 'lucide-react';
 import { socialService } from '../../services/social.service';
+import { apiConfigService } from '../../services/apiConfig.service';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { AvatarWithBorder } from '../common/AvatarWithBorder';
 
@@ -62,7 +63,7 @@ export const ActiveSessionInviteModal: React.FC<ActiveSessionInviteModalProps> =
   const handleInviteFriend = async (friendId: number) => {
     try {
       const token = localStorage.getItem('access_token');
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/invite/`, {
+      const response = await fetch(`${apiConfigService.getApiUrl()}/collaborate/invite/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

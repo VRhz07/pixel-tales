@@ -7,6 +7,7 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } f
 import { API_BASE_URL, STORAGE_KEYS, ERROR_MESSAGES } from '@/config/constants';
 import { storage } from '@/utils/storage';
 import type { ApiError, ApiResponse } from '@/types/api.types';
+import { apiConfigService } from './apiConfig.service';
 
 class ApiService {
   private axiosInstance: AxiosInstance;
@@ -17,8 +18,17 @@ class ApiService {
   }> = [];
 
   constructor() {
+    // Use dynamic API URL from developer mode if set
+    const baseURL = apiConfigService.getApiUrl();
+    
+    console.log('=== API SERVICE INITIALIZATION ===');
+    console.log('[API Service] Reading from apiConfigService.getApiUrl():', baseURL);
+    console.log('[API Service] localStorage dev_api_url:', localStorage.getItem('dev_api_url'));
+    console.log('[API Service] Default URL from env:', import.meta.env.VITE_API_BASE_URL);
+    console.log('===================================');
+    
     this.axiosInstance = axios.create({
-      baseURL: API_BASE_URL,
+      baseURL: baseURL,
       timeout: 5000, // 5 seconds - faster offline detection
       headers: {
         'Content-Type': 'application/json',
@@ -26,6 +36,23 @@ class ApiService {
     });
 
     this.setupInterceptors();
+    
+    console.log('[API Service] Initialized with base URL:', baseURL);
+  }
+  
+  /**
+   * Get the current API base URL
+   */
+  getBaseUrl(): string {
+    return this.axiosInstance.defaults.baseURL || API_BASE_URL;
+  }
+  
+  /**
+   * Update the API base URL (useful for developer mode)
+   */
+  updateBaseUrl(newUrl: string): void {
+    this.axiosInstance.defaults.baseURL = newUrl;
+    console.log('[API Service] Base URL updated to:', newUrl);
   }
 
   /**
