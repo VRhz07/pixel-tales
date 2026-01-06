@@ -3661,9 +3661,31 @@ def get_session_presence(request, session_id):
                     is_active=True
                 )
             else:
-                return Response({
-                    'error': 'You are not a participant in this session'
-                }, status=status.HTTP_403_FORBIDDEN)
+                # Check if user has been invited or has access via the session
+                # This allows invited users to see presence before connecting via WebSocket
+                has_invite = CollaborationInvite.objects.filter(
+                    session=session,
+                    receiver=request.user,
+                    status='pending'
+                ).exists()
+                
+                # Also check if user has already been a participant (inactive participants)
+                was_participant = SessionParticipant.objects.filter(
+                    session=session,
+                    user=request.user
+                ).exists()
+                
+                # Check if lobby is open (allows anyone to join via join code)
+                is_lobby_open = session.is_lobby_open if hasattr(session, 'is_lobby_open') else True
+                
+                # If user doesn't have invite, wasn't a participant, and lobby is closed, deny access
+                if not has_invite and not was_participant and not is_lobby_open:
+                    return Response({
+                        'error': 'You are not a participant in this session'
+                    }, status=status.HTTP_403_FORBIDDEN)
+                
+                # User has invite, was a participant, or lobby is open - allow them to view presence
+                # They will be properly added as active participant when they connect via WebSocket
         
         # Get all active participants
         participants = SessionParticipant.objects.filter(
@@ -3816,6 +3838,24 @@ def close_lobby(request, session_id):
         
         session.is_lobby_open = False
         session.save()
+        
+        # Notify all participants in the collaboration WebSocket channel that the session has started
+        from channels.layers import get_channel_layer
+        from asgiref.sync import async_to_sync
+        
+        channel_layer = get_channel_layer()
+        if channel_layer:
+            # Send to the collaboration WebSocket group
+            collaboration_group_name = f'collab_{session_id}'
+            async_to_sync(channel_layer.group_send)(
+                collaboration_group_name,
+                {
+                    'type': 'session_started',
+                    'session_id': session_id,
+                    'story_title': session.canvas_name
+                }
+            )
+            print(f'✅ Sent session_started message to collaboration group: {collaboration_group_name}')
         
         return Response({
             'success': True,

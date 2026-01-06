@@ -1084,6 +1084,15 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
             'total_participants': event.get('total_participants', 0)
         }))
     
+    async def session_started(self, event):
+        """Send session started notification to all participants"""
+        print(f"✅ session_started handler called: {event}")
+        await self.send(text_data=json.dumps({
+            'type': 'session_started',
+            'session_id': event.get('session_id'),
+            'story_title': event.get('story_title')
+        }))
+    
     async def session_ended(self, event):
         """Send session ended notification"""
         print(f"🎬 session_ended handler called: {event}")

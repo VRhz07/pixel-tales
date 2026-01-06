@@ -396,14 +396,14 @@ const ManualStoryCreationPage: React.FC = () => {
             const user = JSON.parse(userStr);
             setIsHost(sessionData.host_id === user.id);
           }
-          // Set join code if available and persist it
+      // Set join code if available and persist it
           if (sessionData.join_code) {
             setJoinCode(sessionData.join_code);
             sessionStorage.setItem('collab_join_code', sessionData.join_code);
           }
         })
         .catch((error) => {
-          console.error('❌ Failed to fetch session info:', error);
+      console.error('❌ Failed to fetch session info:', error);
         });
       
       return;
@@ -438,10 +438,10 @@ const ManualStoryCreationPage: React.FC = () => {
         console.log('🔑 Checking for join code in storage when returning from canvas:', storedJoinCode);
         if (storedJoinCode) {
           setJoinCode(storedJoinCode);
-          console.log('✅ Restored join code when returning from canvas:', storedJoinCode);
+      console.log('✅ Restored join code when returning from canvas:', storedJoinCode);
         } else {
-          console.log('⚠️ No join code found in storage, fetching from server...');
-          // Fetch from server as fallback
+      console.log('⚠️ No join code found in storage, fetching from server...');
+      // Fetch from server as fallback
           getCollaborationSession(collabSessionId)
             .then((sessionData) => {
               if (sessionData.join_code) {
@@ -457,20 +457,20 @@ const ManualStoryCreationPage: React.FC = () => {
         
         // Ensure story exists (it should already exist when returning from canvas)
         if (!currentStory && !hasCreatedStory.current) {
-          console.log('⚠️ No story found when returning from canvas, creating one...');
+      console.log('⚠️ No story found when returning from canvas, creating one...');
           const newStory = createStory('Collaborative Story');
-          setStoryTitle(newStory.title);
+      setStoryTitle(newStory.title);
           setCurrentStory(newStory);
           hasCreatedStory.current = true;
         }
       } else {
         // First time starting collaboration (or accepting invitation)
         if (isHostFromNav) {
-          console.log('🎯 User is HOST - starting collaboration immediately');
+      console.log('🎯 User is HOST - starting collaboration immediately');
           handleHostSessionStart(collabSessionId);
         } else {
-          console.log('👥 User is PARTICIPANT - joining session');
-          console.log('🔍 Calling handleSessionJoined with sessionId:', collabSessionId);
+      console.log('👥 User is PARTICIPANT - joining session');
+      console.log('🔍 Calling handleSessionJoined with sessionId:', collabSessionId);
           handleSessionJoined(collabSessionId);
         }
       }
@@ -505,8 +505,8 @@ const ManualStoryCreationPage: React.FC = () => {
     const syncParticipants = () => {
       collaborationService.getPresence(currentSessionId)
         .then(data => {
-          console.log('🔄 Periodic participant sync:', data.participants?.length);
-          setParticipants(data.participants || []);
+      console.log('🔄 Periodic participant sync:', data.participants?.length);
+      setParticipants(data.participants || []);
         })
         .catch(err => console.error('❌ Periodic sync failed:', err));
     };
@@ -526,21 +526,27 @@ const ManualStoryCreationPage: React.FC = () => {
       return;
     }
 
-    console.log('🔌 Connecting to collaboration session:', currentSessionId);
+    console.log('🔌 Setting up collaboration event handlers for session:', currentSessionId);
+    
+    // CRITICAL: Only connect once if not already connected
+    const needsConnection = !collaborationService.isConnected() || 
+                           collaborationService.getSessionId() !== currentSessionId;
+    
+    if (needsConnection) {
+      console.log('🔌 Connecting to collaboration session:', currentSessionId);
+    } else {
+      console.log('✅ Already connected to session:', currentSessionId);
+    }
 
-    collaborationService
-      .connect(currentSessionId)
-      .then(() => {
-        console.log('✅ Connected to collaboration session');
-
-        const handleInit = (message: any) => {
-          if (message.type !== 'init') return;
+    // Define all event handlers
+    const handleInit = (message: any) => {
+      if (message.type !== 'init') return;
 
           if (message.current_user_id) {
             setCurrentUserId(message.current_user_id);
           }
           
-          // Load participants from init message or fetch them
+      // Load participants from init message or fetch them
           if (message.participants && Array.isArray(message.participants)) {
             console.log('👥 Setting participants from init message:', message.participants.length);
             setParticipants(message.participants);
@@ -613,8 +619,8 @@ const ManualStoryCreationPage: React.FC = () => {
             }
           }
           
-          // Load canvas data for all pages and cover
-          console.log('📦 Loading canvas data from server:', canvasData);
+      // Load canvas data for all pages and cover
+      console.log('📦 Loading canvas data from server:', canvasData);
           if (currentStory && canvasData) {
             // Load cover image canvas
             if (canvasData.cover_image) {
@@ -633,30 +639,30 @@ const ManualStoryCreationPage: React.FC = () => {
         };
 
         const handleTitleEdit = (message: any) => {
-          if (message.type !== 'title_edit') return;
-          console.log('🖊️ Title update received:', message.title);
-          setStoryTitle(message.title);
+      if (message.type !== 'title_edit') return;
+      console.log('🖊️ Title update received:', message.title);
+      setStoryTitle(message.title);
           if (currentStory) {
             updateStory(currentStory.id, { title: message.title });
           }
         };
         
         const handleReconnectionFailed = (message: any) => {
-          if (message.type !== 'reconnection_failed') return;
-          console.error('❌ Reconnection failed - showing notification');
-          setNotificationMessage('Lost connection to collaboration session. Please refresh the page to reconnect.');
-          setShowSuccessNotification(true);
+      if (message.type !== 'reconnection_failed') return;
+      console.error('❌ Reconnection failed - showing notification');
+      setNotificationMessage('Lost connection to collaboration session. Please refresh the page to reconnect.');
+      setShowSuccessNotification(true);
         };
 
         const handleUserJoined = (message: any) => {
-          if (message.type !== 'user_joined') return;
-          console.log('👋 User joined:', message.username);
+      if (message.type !== 'user_joined') return;
+      console.log('👋 User joined:', message.username);
           
-          // Show toast notification with deduplication
-          showDedupedToast(`${message.username} joined the session`);
+      // Show toast notification with deduplication
+      showDedupedToast(`${message.username} joined the session`);
           
-          // Immediately refresh participant list
-          setTimeout(() => {
+      // Immediately refresh participant list
+      setTimeout(() => {
             collaborationService.getPresence(currentSessionId!)
               .then(data => {
                 console.log('🔄 Refreshed participants after join:', data.participants?.length);
@@ -667,14 +673,14 @@ const ManualStoryCreationPage: React.FC = () => {
         };
 
         const handleUserLeft = (message: any) => {
-          if (message.type !== 'user_left') return;
-          console.log('👋 User left:', message.username);
+      if (message.type !== 'user_left') return;
+      console.log('👋 User left:', message.username);
           
-          // Show toast notification with deduplication
-          showDedupedToast(`${message.username} left the session`);
+      // Show toast notification with deduplication
+      showDedupedToast(`${message.username} left the session`);
           
-          // Immediately refresh participant list
-          setTimeout(() => {
+      // Immediately refresh participant list
+      setTimeout(() => {
             collaborationService.getPresence(currentSessionId!)
               .then(data => {
                 console.log('🔄 Refreshed participants after leave:', data.participants?.length);
@@ -685,9 +691,9 @@ const ManualStoryCreationPage: React.FC = () => {
         };
 
         const handlePresenceUpdate = (message: any) => {
-          if (message.type !== 'presence_update') return;
-          // Merge presence info into participants state
-          setParticipants(prev => {
+      if (message.type !== 'presence_update') return;
+      // Merge presence info into participants state
+      setParticipants(prev => {
             const existed = prev.find(p => p.id === message.user_id);
             if (existed) {
               return prev.map(p => p.id === message.user_id ? {
@@ -717,34 +723,34 @@ const ManualStoryCreationPage: React.FC = () => {
         };
 
         const handlePageChangeEvent = (message: any) => {
-          // SECURITY FIX: Only handle actual page_change messages
-          if (message.type !== 'page_change') return;
+      // SECURITY FIX: Only handle actual page_change messages
+      if (message.type !== 'page_change') return;
           
-          console.log(`📄 ${message.username} moved to page ${message.page_number}`);
+      console.log(`📄 ${message.username} moved to page ${message.page_number}`);
           
-          // Update who is on what page (only for page_change messages)
-          setParticipants(prev => prev.map(p => 
+      // Update who is on what page (only for page_change messages)
+      setParticipants(prev => prev.map(p => 
             p.username === message.username 
               ? { ...p, current_page: message.page_number } 
               : p
           ));
           
-          // Request fresh page viewers data when someone changes pages (for the modal)
+      // Request fresh page viewers data when someone changes pages (for the modal)
           if (showPageDeletionModal && currentSessionId) {
             collaborationService.requestPageViewers();
           }
           
-          // CRITICAL: Do NOT change currentPageIndex here!
-          // Users should stay on their own page and only see remote updates
-          // Page navigation only happens through explicit user action
+      // CRITICAL: Do NOT change currentPageIndex here!
+      // Users should stay on their own page and only see remote updates
+      // Page navigation only happens through explicit user action
         };
 
         const handlePageAdded = (message: any) => {
-          if (message.type !== 'page_added') return;
+      if (message.type !== 'page_added') return;
           
-          console.log('➕ Page added by', message.username, 'data:', message.page_data);
+      console.log('➕ Page added by', message.username, 'data:', message.page_data);
           
-          // Get the latest story state from the store
+      // Get the latest story state from the store
           const latestStory = useStoryStore.getState().currentStory;
           if (!latestStory) {
             console.error('❌ No current story found when handling page_added');
@@ -754,7 +760,7 @@ const ManualStoryCreationPage: React.FC = () => {
           const currentPageCount = latestStory.pages.length;
           const expectedIndex = message.page_data?.page_index;
           
-          console.log('📊 Page addition check:', {
+      console.log('📊 Page addition check:', {
             currentPageCount,
             expectedIndex,
             messageData: message.page_data,
@@ -762,7 +768,7 @@ const ManualStoryCreationPage: React.FC = () => {
             currentUser: currentUsername
           });
           
-          // Check if we already have this page (prevent duplicate additions)
+      // Check if we already have this page (prevent duplicate additions)
           if (typeof expectedIndex === 'number') {
             if (expectedIndex < currentPageCount) {
               console.log('⚠️ Page at index', expectedIndex, 'already exists, skipping addition');
@@ -811,10 +817,10 @@ const ManualStoryCreationPage: React.FC = () => {
             }
           }
           
-          // Clear the adding page flag
+      // Clear the adding page flag
           (window as any).addingPage = false;
           
-          // Force a re-render by updating the story reference
+      // Force a re-render by updating the story reference
           const refreshedStory = useStoryStore.getState().getStory(latestStory.id);
           if (refreshedStory) {
             setCurrentStory(refreshedStory);
@@ -822,10 +828,10 @@ const ManualStoryCreationPage: React.FC = () => {
         };
 
         const handlePageDeleted = (message: any) => {
-          if (message.type !== 'page_deleted') return;
-          console.log('🗑️ Page deleted by', message.username, 'page_index:', message.page_index, 'page_id:', message.page_id);
+      if (message.type !== 'page_deleted') return;
+      console.log('🗑️ Page deleted by', message.username, 'page_index:', message.page_index, 'page_id:', message.page_id);
           
-          // Get the latest story state from the store
+      // Get the latest story state from the store
           const latestStory = useStoryStore.getState().currentStory;
           if (!latestStory) {
             console.error('❌ No current story found when handling page_deleted');
@@ -874,17 +880,17 @@ const ManualStoryCreationPage: React.FC = () => {
         };
 
         const handleTextUpdate = (message: any) => {
-          if (message.type !== 'text_edit') return;
-          console.log('📨 Text update message received:', message);
+      if (message.type !== 'text_edit') return;
+      console.log('📨 Text update message received:', message);
           if (message.user_id === currentUserId) {
             console.log('🔇 Ignoring own echo');
             return;
           }
 
-          // Set flag to prevent sending our own updates while applying remote changes
+      // Set flag to prevent sending our own updates while applying remote changes
           isReceivingRemoteTextRef.current = true;
 
-          // Prefer authoritative server index for mapping; id is local-only and differs per client
+      // Prefer authoritative server index for mapping; id is local-only and differs per client
           const pageId = message.page_id;
           let idx = -1;
           if (currentStory) {
@@ -921,22 +927,22 @@ const ManualStoryCreationPage: React.FC = () => {
             }
           }
 
-          // Clear the flag after a short delay
-          setTimeout(() => {
+      // Clear the flag after a short delay
+      setTimeout(() => {
             isReceivingRemoteTextRef.current = false;
           }, 100);
         };
 
         const handleSessionStarted = (message: any) => {
-          if (message.type !== 'session_started' && message.type !== 'collaboration_session_started') return;
-          console.log('🎉 Session started message received from WebSocket:', message);
+      if (message.type !== 'session_started' && message.type !== 'collaboration_session_started') return;
+      console.log('🎉 Session started message received from WebSocket:', message);
           
-          // IMMEDIATELY close lobby and start collaborating
-          console.log('✅ Closing lobby and starting collaboration NOW');
+      // IMMEDIATELY close lobby and start collaborating
+      console.log('✅ Closing lobby and starting collaboration NOW');
           setShowLobby(false);
           setIsCollaborating(true);
           
-          // Also dispatch browser event for any other listeners
+      // Also dispatch browser event for any other listeners
           window.dispatchEvent(new CustomEvent('collaboration-session-started', { 
             detail: { session_id: currentSessionId } 
           }));
@@ -944,7 +950,7 @@ const ManualStoryCreationPage: React.FC = () => {
 
         // Voting handlers
         const handleVoteInitiated = async (message: any) => {
-          // Fetch fresh participant list before showing voting modal
+      // Fetch fresh participant list before showing voting modal
           if (currentSessionId) {
             try {
               const presenceData = await collaborationService.getPresence(currentSessionId);
@@ -966,7 +972,7 @@ const ManualStoryCreationPage: React.FC = () => {
           voteInitiatorRef.current = message.initiated_by;
           setShowVotingModal(true);
           
-          // Auto-vote "agree" if this user initiated the vote
+      // Auto-vote "agree" if this user initiated the vote
           if (message.initiated_by == currentUserId) {
             console.log('🚀 Vote initiator: Auto-voting YES and preventing saving overlay');
             // Ensure the saving overlay never shows for the vote initiator
@@ -986,7 +992,7 @@ const ManualStoryCreationPage: React.FC = () => {
 
         const handleVoteUpdate = (message: any) => {
           
-          // Update the voting data with new votes
+      // Update the voting data with new votes
           setVotingData((prev: any) => {
             if (!prev || prev.vote_id !== message.vote_id) return prev;
             
@@ -1004,7 +1010,7 @@ const ManualStoryCreationPage: React.FC = () => {
           const voteInitiatorId = voteInitiatorRef.current;
           const isCurrentUserInitiator = voteInitiatorId && voteInitiatorId == currentUserId;
           
-          console.log('🗳️ Vote result received:', {
+      console.log('🗳️ Vote result received:', {
             approved: message.approved,
             voteInitiatorId,
             currentUserId,
@@ -1061,8 +1067,8 @@ const ManualStoryCreationPage: React.FC = () => {
             setShowVotingModal(false);
           }
           
-          // Don't clear voteInitiatorRef yet - we need it in handleStoryFinalized
-          // It will be cleared in handleSessionEnded
+      // Don't clear voteInitiatorRef yet - we need it in handleStoryFinalized
+      // It will be cleared in handleSessionEnded
           setVotingData(null);
         };
 
@@ -1076,22 +1082,22 @@ const ManualStoryCreationPage: React.FC = () => {
         };
 
         const handleSaveCancelled = (message: any) => {
-          if (message.type !== 'save_cancelled') return;
-          console.log('🚫 Save process cancelled by vote initiator');
-          // Hide the saving overlay for other participants
+      if (message.type !== 'save_cancelled') return;
+      console.log('🚫 Save process cancelled by vote initiator');
+      // Hide the saving overlay for other participants
           setShowSavingOverlay(false);
           const cancellerName = message.cancelled_by_username || 'Host';
           showInfoToast(`${cancellerName} cancelled the save process. Collaboration continues.`);
         };
 
         const handleStoryFinalized = (message: any) => {
-          console.log('✅ Story finalized message received:', message);
+      console.log('✅ Story finalized message received:', message);
           
-          // Check if current user is the vote initiator
+      // Check if current user is the vote initiator
           const voteInitiatorId = voteInitiatorRef.current;
           const isCurrentUserInitiator = voteInitiatorId && voteInitiatorId == currentUserId;
           
-          // Only show saving overlay for NON-initiators
+      // Only show saving overlay for NON-initiators
           if (!isCurrentUserInitiator) {
             // Show success notification for participants
             setNotificationMessage('Story saved successfully to everyone\'s library!');
@@ -1103,9 +1109,9 @@ const ManualStoryCreationPage: React.FC = () => {
         };
 
         const handleSessionEnded = (message: any) => {
-          console.log('🎬 Session ended message received:', message);
+      console.log('🎬 Session ended message received:', message);
           
-          // Clear all safety timeouts
+      // Clear all safety timeouts
           if ((window as any).sessionEndTimeoutId) {
             clearTimeout((window as any).sessionEndTimeoutId);
             (window as any).sessionEndTimeoutId = null;
@@ -1115,45 +1121,45 @@ const ManualStoryCreationPage: React.FC = () => {
             (window as any).participantTimeoutId = null;
           }
           
-          // Clear vote initiator ref now that session is ending
+      // Clear vote initiator ref now that session is ending
           const wasInitiator = voteInitiatorRef.current === currentUserId;
           voteInitiatorRef.current = null;
           
-          console.log('🔄 Cleaning up collaboration state...');
+      console.log('🔄 Cleaning up collaboration state...');
           setShowSavingOverlay(false);
           setShowSaveModal(false); // Also close save modal if it's open
-          setShowSuccessNotification(false);
+      setShowSuccessNotification(false);
           collaborationService.disconnect();
           setIsCollaborating(false);
           setCurrentSessionId(null);
           
-          // Only show toast if not the vote initiator (they already completed save)
+      // Only show toast if not the vote initiator (they already completed save)
           if (!wasInitiator) {
             showInfoToast(`🎉 Collaboration session ended.`);
           }
           
-          // Navigate to library immediately for vote initiator, after delay for others
+      // Navigate to library immediately for vote initiator, after delay for others
           const navDelay = wasInitiator ? 500 : 2000;
-          console.log(`🚀 Navigating to library in ${navDelay}ms...`);
-          setTimeout(() => {
+      console.log(`🚀 Navigating to library in ${navDelay}ms...`);
+      setTimeout(() => {
             console.log('📍 Executing navigation to library');
             navigate('/library', { state: { activeTab: 'private' } });
           }, navDelay);
         };
 
         const handlePageViewersResponse = (message: any) => {
-          if (message.type !== 'page_viewers_response') return;
+      if (message.type !== 'page_viewers_response') return;
           setPageViewers(message.page_viewers || {});
         };
 
         // CROSS-PAGE COLLABORATION: Handle canvas drawing events from other users
         const handleCanvasDrawing = (message: any) => {
-          if (message.type !== 'draw' && message.type !== 'drawing_update') {
+      if (message.type !== 'draw' && message.type !== 'drawing_update') {
             return;
           }
           
           
-          // Update canvas data in the store so it's available when user switches to canvas
+      // Update canvas data in the store so it's available when user switches to canvas
           if (currentStory && message.page_id) {
             const messagePageId = message.page_id;
             const messagePageIndex = message.page_index;
@@ -1294,10 +1300,10 @@ const ManualStoryCreationPage: React.FC = () => {
 
         // CROSS-PAGE COLLABORATION: Handle canvas clear events
         const handleCanvasClear = (message: any) => {
-          if (message.type !== 'clear' && message.type !== 'canvas_cleared') return;
-          console.log('🧹 Canvas cleared by collaborator:', message.username || 'Unknown', 'for page:', message.page_id);
+      if (message.type !== 'clear' && message.type !== 'canvas_cleared') return;
+      console.log('🧹 Canvas cleared by collaborator:', message.username || 'Unknown', 'for page:', message.page_id);
           
-          // Clear canvas data in the store
+      // Clear canvas data in the store
           if (currentStory && message.page_id) {
             const pageId = message.page_id;
             const isCoverImageClear = message.is_cover_image || pageId === 'cover_image';
@@ -1350,9 +1356,9 @@ const ManualStoryCreationPage: React.FC = () => {
 
         // Debug: Listen to ALL messages and track setCurrentPageIndex calls
         const handleAllMessages = (message: any) => {
-          console.log('🔔 WebSocket message received (all):', message.type, message);
+      console.log('🔔 WebSocket message received (all):', message.type, message);
           
-          // CRITICAL DEBUG: Track if any message tries to change page
+      // CRITICAL DEBUG: Track if any message tries to change page
           if (message.page_number !== undefined || message.page_index !== undefined) {
             console.warn('⚠️ Message contains page info:', {
               type: message.type,
@@ -1392,56 +1398,86 @@ const ManualStoryCreationPage: React.FC = () => {
         collaborationService.on('clear', handleCanvasClear);
         collaborationService.on('canvas_cleared', handleCanvasClear);
 
-        // optional presence load (ignore errors) - only for active participants (not in lobby)
-        if (isCollaborating && !showLobby) {
-          setTimeout(() => {
-            collaborationService.getPresence(currentSessionId).catch((err) => {
-              console.log('⚠️ Could not load presence:', err.message);
-            });
-          }, 1500);
-        }
+    // Register all event handlers immediately (BEFORE connection)
+    console.log('✅ Registering all event handlers NOW');
+    collaborationService.on('all', handleAllMessages);
+    collaborationService.on('init', handleInit);
+    collaborationService.on('title_edit', handleTitleEdit);
+    collaborationService.on('reconnection_failed', handleReconnectionFailed);
+    collaborationService.on('text_edit', handleTextUpdate);
+    collaborationService.on('user_joined', handleUserJoined);
+    collaborationService.on('user_left', handleUserLeft);
+    collaborationService.on('presence_update', handlePresenceUpdate);
+    collaborationService.on('page_change', handlePageChangeEvent);
+    collaborationService.on('page_added', handlePageAdded);
+    collaborationService.on('page_deleted', handlePageDeleted);
+    collaborationService.on('page_viewers_response', handlePageViewersResponse);
+    collaborationService.on('session_started', handleSessionStarted);
+    collaborationService.on('collaboration_session_started', handleSessionStarted);
+    collaborationService.on('vote_initiated', handleVoteInitiated);
+    collaborationService.on('vote_update', handleVoteUpdate);
+    collaborationService.on('vote_result', handleVoteResult);
+    collaborationService.on('story_saved_success', handleStorySavedSuccess);
+    collaborationService.on('save_cancelled', handleSaveCancelled);
+    collaborationService.on('story_finalized', handleStoryFinalized);
+    collaborationService.on('session_ended', handleSessionEnded);
+    collaborationService.on('draw', handleCanvasDrawing);
+    collaborationService.on('drawing_update', handleCanvasDrawing);
+    collaborationService.on('clear', handleCanvasClear);
+    collaborationService.on('canvas_cleared', handleCanvasClear);
+    console.log('✅ All event handlers registered');
 
-        // cleanup for these handlers only
-        return () => {
-          collaborationService.off('all', handleAllMessages);
-          collaborationService.off('init', handleInit);
-          collaborationService.off('title_edit', handleTitleEdit);
-          collaborationService.off('reconnection_failed', handleReconnectionFailed);
-          collaborationService.off('text_edit', handleTextUpdate);
-          collaborationService.off('user_joined', handleUserJoined);
-          collaborationService.off('user_left', handleUserLeft);
-          collaborationService.off('presence_update', handlePresenceUpdate);
-          collaborationService.off('page_change', handlePageChangeEvent);
-          collaborationService.off('page_added', handlePageAdded);
-          collaborationService.off('page_deleted', handlePageDeleted);
-          collaborationService.off('page_viewers_response', handlePageViewersResponse);
-          collaborationService.off('session_started', handleSessionStarted);
-          collaborationService.off('collaboration_session_started', handleSessionStarted);
-          // Voting cleanup
-          collaborationService.off('vote_initiated', handleVoteInitiated);
-          collaborationService.off('vote_update', handleVoteUpdate);
-          collaborationService.off('vote_result', handleVoteResult);
-          collaborationService.off('story_saved_success', handleStorySavedSuccess);
-          collaborationService.off('save_cancelled', handleSaveCancelled);
-          collaborationService.off('story_finalized', handleStoryFinalized);
-          collaborationService.off('session_ended', handleSessionEnded);
-          // Cross-page collaboration cleanup
-          collaborationService.off('draw', handleCanvasDrawing);
-          collaborationService.off('drawing_update', handleCanvasDrawing);
-          collaborationService.off('clear', handleCanvasClear);
-          collaborationService.off('canvas_cleared', handleCanvasClear);
-        };
-      })
-      .catch((error) => {
-        console.error('❌ Failed to connect to collaboration:', error);
-      });
+    // Now connect if needed (handlers are already registered so no race condition)
+    if (needsConnection) {
+      collaborationService
+        .connect(currentSessionId)
+        .then(() => {
+          console.log('✅ Connected to collaboration session');
+          
+          // Optional presence load (only for active participants, not in lobby)
+          if (isCollaborating && !showLobby) {
+            setTimeout(() => {
+              collaborationService.getPresence(currentSessionId).catch((err) => {
+                console.log('⚠️ Could not load presence:', err.message);
+              });
+            }, 1500);
+          }
+        })
+        .catch((error) => {
+          console.error('❌ Failed to connect to collaboration:', error);
+        });
+    }
 
     // Cleanup on unmount/exit
     // DON'T disconnect here - we want to keep the connection when navigating to canvas
     // The connection will be reused by CanvasDrawingPage
     return () => {
-      // Only cleanup event listeners, not the WebSocket connection
-      console.log('🔌 ManualStoryCreationPage unmounting (keeping WebSocket connection)');
+      console.log('🧹 Cleaning up event handlers (keeping WebSocket connection)');
+      collaborationService.off('all', handleAllMessages);
+      collaborationService.off('init', handleInit);
+      collaborationService.off('title_edit', handleTitleEdit);
+      collaborationService.off('reconnection_failed', handleReconnectionFailed);
+      collaborationService.off('text_edit', handleTextUpdate);
+      collaborationService.off('user_joined', handleUserJoined);
+      collaborationService.off('user_left', handleUserLeft);
+      collaborationService.off('presence_update', handlePresenceUpdate);
+      collaborationService.off('page_change', handlePageChangeEvent);
+      collaborationService.off('page_added', handlePageAdded);
+      collaborationService.off('page_deleted', handlePageDeleted);
+      collaborationService.off('page_viewers_response', handlePageViewersResponse);
+      collaborationService.off('session_started', handleSessionStarted);
+      collaborationService.off('collaboration_session_started', handleSessionStarted);
+      collaborationService.off('vote_initiated', handleVoteInitiated);
+      collaborationService.off('vote_update', handleVoteUpdate);
+      collaborationService.off('vote_result', handleVoteResult);
+      collaborationService.off('story_saved_success', handleStorySavedSuccess);
+      collaborationService.off('save_cancelled', handleSaveCancelled);
+      collaborationService.off('story_finalized', handleStoryFinalized);
+      collaborationService.off('session_ended', handleSessionEnded);
+      collaborationService.off('draw', handleCanvasDrawing);
+      collaborationService.off('drawing_update', handleCanvasDrawing);
+      collaborationService.off('clear', handleCanvasClear);
+      collaborationService.off('canvas_cleared', handleCanvasClear);
     };
   }, [isCollaborating, showLobby, currentSessionId]);
 
@@ -1525,7 +1561,7 @@ const ManualStoryCreationPage: React.FC = () => {
       if (coverPreviewRef.current && coverPreviewRef.current.getCanvasDataUrl) {
         const coverThumbnail = coverPreviewRef.current.getCanvasDataUrl();
         if (coverThumbnail) {
-          console.log('💾 Saving cover image thumbnail');
+      console.log('💾 Saving cover image thumbnail');
           updateStory(currentStory.id, { coverImage: coverThumbnail });
         }
       }
@@ -1539,7 +1575,7 @@ const ManualStoryCreationPage: React.FC = () => {
     if (!isHost && showLobby && currentSessionId) {
       const handleSessionStart = (event: any) => {
         if (event.detail.session_id === currentSessionId) {
-          // Create story BEFORE setting isCollaborating to avoid white screen
+      // Create story BEFORE setting isCollaborating to avoid white screen
           if (!currentStory && !hasCreatedStory.current) {
             console.log('Creating new story for participant collaboration');
             const newStory = createStory(storyTitle || 'Collaborative Story');
@@ -1548,7 +1584,7 @@ const ManualStoryCreationPage: React.FC = () => {
             hasCreatedStory.current = true;
           }
           
-          // Now set collaboration state after story exists
+      // Now set collaboration state after story exists
           setShowLobby(false);
           setIsCollaborating(true);
         }
@@ -1821,11 +1857,8 @@ const ManualStoryCreationPage: React.FC = () => {
         sessionStorage.setItem('collab_join_code', sessionData.join_code);
       }
       
-      // Connect to WebSocket (only if not already connected)
-      if (currentSessionId !== sessionId) {
-        await collaborationService.connect(sessionId);
-      }
-      
+      // CRITICAL FIX: Set session ID and lobby state BEFORE connecting to WebSocket
+      // This ensures the useEffect that registers event handlers runs before any messages arrive
       setCurrentSessionId(sessionId);
       setIsHost(false);
       
@@ -1857,9 +1890,9 @@ const ManualStoryCreationPage: React.FC = () => {
         
         // Create story if needed
         if (!currentStory && !hasCreatedStory.current) {
-          console.log('Creating new story for participant joining active session');
+      console.log('Creating new story for participant joining active session');
           const newStory = createStory(sessionData.story_title || 'Collaborative Story');
-          setStoryTitle(newStory.title);
+      setStoryTitle(newStory.title);
           setCurrentStory(newStory);
           hasCreatedStory.current = true;
         }
@@ -1872,6 +1905,18 @@ const ManualStoryCreationPage: React.FC = () => {
         // Show lobby for participants - wait for host to start
         setShowLobby(true);
         // Don't set isCollaborating yet - wait until host starts
+      }
+      
+      // CRITICAL FIX: Connect to WebSocket AFTER setting state
+      // This allows the useEffect to register event handlers before connection completes
+      // Use setTimeout to ensure state updates have been processed
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Connect to WebSocket (only if not already connected)
+      if (!collaborationService.isConnected() || collaborationService.getSessionId() !== sessionId) {
+        console.log('🔌 Connecting to WebSocket for session:', sessionId);
+        await collaborationService.connect(sessionId);
+        console.log('✅ WebSocket connected, event handlers should be registered');
       }
     } catch (err) {
       console.error('Failed to join session:', err);
@@ -2016,7 +2061,7 @@ const ManualStoryCreationPage: React.FC = () => {
           storyId: currentStory.id,
           pageId: currentPage.id,
           pageIndex: currentPageIndex, // Save current page index
-          // Pass collaboration info if active
+      // Pass collaboration info if active
           sessionId: isCollaborating ? currentSessionId : undefined,
           isCollaborating: isCollaborating,
           isHost: isHost
@@ -2033,7 +2078,7 @@ const ManualStoryCreationPage: React.FC = () => {
           pageId: 'cover', // Special ID for cover image
           pageIndex: -1, // -1 indicates cover image
           isCoverImage: true,
-          // Pass collaboration info if active
+      // Pass collaboration info if active
           sessionId: isCollaborating ? currentSessionId : undefined,
           isCollaborating: isCollaborating,
           isHost: isHost
@@ -2160,7 +2205,7 @@ const ManualStoryCreationPage: React.FC = () => {
         
         // Wait for session_ended, but add safety timeout
         const sessionEndTimeout = setTimeout(() => {
-          console.warn('⚠️ Session end timeout - forcing navigation');
+      console.warn('⚠️ Session end timeout - forcing navigation');
           setShowSaveModal(false);
           setShowSavingOverlay(false);
           collaborationService.disconnect();
@@ -2525,7 +2570,7 @@ const ManualStoryCreationPage: React.FC = () => {
         // Only update if there are actual changes (don't update title if user is editing it)
         if (hasChanges || refreshedStory.pages.length !== currentStory.pages.length) {
           setCurrentStory(refreshedStory);
-          // Only update title if it's different from what's in the store AND we're not currently editing
+      // Only update title if it's different from what's in the store AND we're not currently editing
           if (refreshedStory.title !== storyTitle && !hasUnsavedChanges) {
             setStoryTitle(refreshedStory.title);
           }
@@ -3006,8 +3051,8 @@ const ManualStoryCreationPage: React.FC = () => {
       <SaveStoryModal
         isOpen={showSaveModal}
         onClose={() => {
-          // If the vote initiator cancels the save, notify other participants
-          console.log('🚫 SaveStoryModal closed - wasVoteInitiator:', wasVoteInitiator, 'isCollaborating:', isCollaborating);
+      // If the vote initiator cancels the save, notify other participants
+      console.log('🚫 SaveStoryModal closed - wasVoteInitiator:', wasVoteInitiator, 'isCollaborating:', isCollaborating);
           if (wasVoteInitiator && isCollaborating) {
             console.log('🚫 Vote initiator cancelled save - notifying other participants');
             collaborationService.sendMessage({

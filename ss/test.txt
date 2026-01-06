@@ -1,14 +1,200 @@
- V  To native (Capacitor plugin): callbackId: 79139268, pluginId: Preferences, methodName: set
-2026-01-05 22:23:07.130 15856-15856 Capacitor               com.pixeltales.app                   V  callback: 79139268, pluginId: Preferences, methodName: set, methodData: {"key":"auth-storage","value":{"state":{"user":{"id":43,"username":"nclaude","email":"nclaude@child.pixeltales.local","name":"NanaClaude","first_name":"NanaClaude","last_name":"","user_type":"child","display_name":"NanaClaude","avatar":"📚","selected_avatar_border":"basic","bio":null,"date_of_birth":null,"created_at":"2026-01-05T06:36:55.567855Z","experience_points":245,"level":1,"xp_for_next_level":500,"xp_progress":245,"xp_progress_percentage":49},"isAuthenticated":true},"version":0}}
-2026-01-05 22:23:07.131 15856-15856 Capacitor/Plugin        com.pixeltales.app                   V  To native (Capacitor plugin): callbackId: 79139269, pluginId: Preferences, methodName: set
-2026-01-05 22:23:07.132 15856-15856 Capacitor               com.pixeltales.app                   V  callback: 79139269, pluginId: Preferences, methodName: set, methodData: {"key":"auth-storage","value":{"state":{"user":{"id":43,"username":"nclaude","email":"nclaude@child.pixeltales.local","name":"NanaClaude","first_name":"NanaClaude","last_name":"","user_type":"child","display_name":"NanaClaude","avatar":"📚","selected_avatar_border":"basic","bio":null,"date_of_birth":null,"created_at":"2026-01-05T06:36:55.567855Z","experience_points":245,"level":1,"xp_for_next_level":500,"xp_progress":245,"xp_progress_percentage":49},"isAuthenticated":true},"version":0}}
-2026-01-05 22:23:07.138 15856-15856 Capacitor/Console       com.pixeltales.app                   I  File:  - Line 333 - Msg: undefined
-2026-01-05 22:23:07.138 15856-15856 Capacitor/Console       com.pixeltales.app                   I  File:  - Line 333 - Msg: undefined
-2026-01-05 22:23:07.148 15856-15856 Capacitor/Plugin        com.pixeltales.app                   V  To native (Capacitor plugin): callbackId: 79139270, pluginId: Preferences, methodName: set
-2026-01-05 22:23:07.155 15856-15856 Capacitor               com.pixeltales.app                   V  callback: 79139270, pluginId: Preferences, methodName: set, methodData: {"key":"app-cache","value":{"state":{"userProfile":{"data":{"id":43,"username":"nclaude","email":"nclaude@child.pixeltales.local","name":"NanaClaude","first_name":"NanaClaude","last_name":"","user_type":"child","display_name":"NanaClaude","avatar":"📚","selected_avatar_border":"basic","bio":null,"date_of_birth":null,"created_at":"2026-01-05T06:36:55.567855Z","experience_points":245,"level":1,"xp_for_next_level":500,"xp_progress":245,"xp_progress_percentage":49},"timestamp":1767622987137,"expiresIn":600000},"friendsList":{"data":[{"id":45,"name":"Justin Bieber ","avatar":"📚","selected_avatar_border":"basic","username":"henderson","is_online":true,"story_count":0},{"id":4,"name":"harvz","avatar":"🐉","selected_avatar_border":"bronze","username":"harvz","is_online":false,"story_count":1}],"timestamp":1767622973430,"expiresIn":180000},"friendRequests":{"data":[],"timestamp":1767622973431,"expiresIn":180000},"publishedStories":null,"achievements":{"data":[{"id":471,"name":"First Collaboration","description":"Complete your first collaborative story","category":"collab","metric_type":"collaborations_completed","icon":"🤝","color":"blue","target_value":1,"rarity":"common","sort_order":1,"progress":0,"progress_percentage":0,"is_earned":false,"earned_at":null},{"id":472,"name":"Team Player","description":"Complete 3 collaborative stories","category":"collab","metric_type":"collaborations_completed","icon":"👥","color":"blue","target_value":3,"rarity":"common","sort_order":2,"progress":0,"progress_percentage":0,"is_earned":false,"earned_at":null},{"id":473,"name":"Collab Creator","description":"Complete 5 collaborative stories","category":"collab","metric_type":"collaborations_completed","icon":"🎨","color":"blue","target_value":5,"rarity":"uncommon","sort_order":3,"progress":0,"progress_percentage":0,"is_earned":false,"earned_at":null},{"id":474,"name":"Collaboration Master","description":"Complete 10 collaborative stories","category":"collab","metric_type":"collaborations_completed","icon":"🌟","color":"purple","target_value":10,"rarity":"uncommon","sort_order":4,"progress":0,"progress_percentage":0,"is_earned":false,"earned_at":null},{"id":475,"name":"Team Builder","description":"Complete 25 collaborative stories","category":"collab","metric_type":"collaborations_completed","icon":"🎪","color":"purple","target_value":25,"rarity":"rare","sort_order":5,"progress":0,"progress_percentage":0,"is_earned":false,"earned_at":null},{"id":476,"name":"Collab Champion","description":"Complete 50 collaborative stories","category":"collab","metric_type":"collaborations_completed","icon":"🌌","color":"purple","target_value":50,"rarity":"rare","sort_order":6,"progress":0,"progress_percentage":0,"is_earned":false,"earned_at":null},{"id":477,"name":"Legendary Collaborator","description":"Complete 75 collaborative stories","category":"collab","metric_type":"collaborations_completed","icon":"👑","color":"gold","target_value":75,"rarity":"epic","sort_order":7,"progress":0,"progress_percentage":0,"is_earned":false,"earned_at":null},{"id":478,"name":"Collab God","description":"Complete 100 collaborative stories","category":"collab","metric_type":"collaborations_completed","icon":"⚡","color":"gold","target_value":100,"rarity":"epic","sort_order":8,"progress":0,"progress_percentage":0,"is_earned":false,"earned_at":null},{"id":479,"name":"Team Legend","description":"Complete 150 collaborative stories","category":"collab","metric_type":"collaborations_completed","icon":"🏛️","color":"rainbow","target_value":150,"rarity":"legendary","sort_order":9,"progress":0,"progress_percentage":0,"is_earned":false,"earned_at":null},{"id":480,"name":"Ultimate Collaborator","description":"Complete 200 collaborative stories","category":"collab","metric_type":"collaborations_completed","icon":"💎","color":"rainbow","target_value":200,"rarity":"legendary","sort_order":10,"progress":0,"progress_percentage":0,"is_earned":false,"earned_at"
-2026-01-05 22:23:07.156 15856-15856 Capacitor/Console       com.pixeltales.app                   E  File: http://localhost/assets/index-idTr7Aqu.js - Line 166 - Msg: ❌ Failed to load participants: TypeError: Failed to fetch
-2026-01-05 22:23:07.213 15856-15856 Capacitor/Console       com.pixeltales.app                   I  File:  - Line 333 - Msg: undefined
-2026-01-05 22:23:09.319 15856-19471 Capacitor/NetworkPlugin com.pixeltales.app                   V  Notifying listeners for event networkStatusChange
-2026-01-05 22:23:09.319 15856-19471 Capacitor/NetworkPlugin com.pixeltales.app                   D  No listeners found for event networkStatusChange
-2026-01-05 22:23:10.135 15856-15856 Capacitor/Console       com.pixeltales.app                   E  File: http://localhost/assets/index-idTr7Aqu.js - Line 166 - Msg: ❌ Failed to load participants: TypeError: Failed to fetch
-2026-01-05 22:23:13.139 15856-15856 Capacitor/Console       com.pixeltales.app                   E  File: http://localhost/assets/index-idTr7Aqu.js - Line 166 - Msg: ❌ Failed to load participants: TypeError: Failed to fetch
+useBackgroundMusic.ts:68 Failed to start background music: NotAllowedError: play() failed because the user didn't interact with the document first. https://goo.gl/xX8pDD
+startOnInteraction @ useBackgroundMusic.ts:68
+collaborationService.ts:526  GET http://localhost:8000/api/collaborate/02b75ca0-b936-4a9e-93a6-842f75251bce/presence/ 500 (Internal Server Error)
+getPresence @ collaborationService.ts:526
+await in getPresence
+loadParticipants @ CollaborationLobby.tsx:94
+(anonymous) @ CollaborationLobby.tsx:40
+react_stack_bottom_frame @ react-dom_client.js?v=a09f2148:17486
+runWithFiberInDEV @ react-dom_client.js?v=a09f2148:1485
+commitHookEffectListMount @ react-dom_client.js?v=a09f2148:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=a09f2148:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9899
+flushPassiveEffects @ react-dom_client.js?v=a09f2148:11302
+flushPendingEffects @ react-dom_client.js?v=a09f2148:11276
+performSyncWorkOnRoot @ react-dom_client.js?v=a09f2148:11632
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=a09f2148:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=a09f2148:11558
+(anonymous) @ react-dom_client.js?v=a09f2148:11649
+<CollaborationLobby>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=a09f2148:250
+ManualStoryCreationPage @ ManualStoryCreationPage.tsx:2564
+react_stack_bottom_frame @ react-dom_client.js?v=a09f2148:17424
+renderWithHooksAgain @ react-dom_client.js?v=a09f2148:4281
+renderWithHooks @ react-dom_client.js?v=a09f2148:4217
+updateFunctionComponent @ react-dom_client.js?v=a09f2148:6619
+beginWork @ react-dom_client.js?v=a09f2148:7654
+runWithFiberInDEV @ react-dom_client.js?v=a09f2148:1485
+performUnitOfWork @ react-dom_client.js?v=a09f2148:10868
+workLoopSync @ react-dom_client.js?v=a09f2148:10728
+renderRootSync @ react-dom_client.js?v=a09f2148:10711
+performWorkOnRoot @ react-dom_client.js?v=a09f2148:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=a09f2148:11623
+performWorkUntilDeadline @ react-dom_client.js?v=a09f2148:36
+<ManualStoryCreationPage>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=a09f2148:250
+AppContent @ App.tsx:583
+react_stack_bottom_frame @ react-dom_client.js?v=a09f2148:17424
+renderWithHooksAgain @ react-dom_client.js?v=a09f2148:4281
+renderWithHooks @ react-dom_client.js?v=a09f2148:4217
+updateFunctionComponent @ react-dom_client.js?v=a09f2148:6619
+beginWork @ react-dom_client.js?v=a09f2148:7654
+runWithFiberInDEV @ react-dom_client.js?v=a09f2148:1485
+performUnitOfWork @ react-dom_client.js?v=a09f2148:10868
+workLoopSync @ react-dom_client.js?v=a09f2148:10728
+renderRootSync @ react-dom_client.js?v=a09f2148:10711
+performWorkOnRoot @ react-dom_client.js?v=a09f2148:10338
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=a09f2148:11623
+performWorkUntilDeadline @ react-dom_client.js?v=a09f2148:36
+CollaborationLobby.tsx:131 ❌ Failed to load participants: Error: Failed to get presence
+    at CollaborationService.getPresence (collaborationService.ts:533:13)
+    at async loadParticipants (CollaborationLobby.tsx:94:20)
+loadParticipants @ CollaborationLobby.tsx:131
+await in loadParticipants
+(anonymous) @ CollaborationLobby.tsx:40
+react_stack_bottom_frame @ react-dom_client.js?v=a09f2148:17486
+runWithFiberInDEV @ react-dom_client.js?v=a09f2148:1485
+commitHookEffectListMount @ react-dom_client.js?v=a09f2148:8460
+commitHookPassiveMountEffects @ react-dom_client.js?v=a09f2148:8518
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9887
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9881
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9984
+recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=a09f2148:9868
+commitPassiveMountOnFiber @ react-dom_client.js?v=a09f2148:9899
+flushPassiveEffects @ react-dom_client.js?v=a09f2148:11302
+flushPendingEffects @ react-dom_client.js?v=a09f2148:11276
+performSyncWorkOnRoot @ react-dom_client.js?v=a09f2148:11632
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=a09f2148:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=a09f2148:11558
+(anonymous) @ react-dom_client.js?v=a09f2148:11649
+<CollaborationLobby>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=a09f2148:250
+ManualStoryCreationPage @ ManualStoryCreationPage.tsx:2564
+react_stack_bottom_frame @ react-dom_client.js?v=a09f2148:17424
+renderWithHooksAgain @ react-dom_client.js?v=a09f2148:4281
+renderWithHooks @ react-dom_client.js?v=a09f2148:4217
+updateFunctionComponent @ react-dom_client.js?v=a09f2148:6619
+beginWork @ react-dom_client.js?v=a09f2148:7654
+runWithFiberInDEV @ react-dom_client.js?v=a09f2148:1485
+performUnitOfWork @ react-dom_client.js?v=a09f2148:10868
+workLoopSync @ react-dom_client.js?v=a09f2148:10728
+renderRootSync @ react-dom_client.js?v=a09f2148:10711
+performWorkOnRoot @ react-dom_client.js?v=a09f2148:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=a09f2148:11623
+performWorkUntilDeadline @ react-dom_client.js?v=a09f2148:36
+<ManualStoryCreationPage>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=a09f2148:250
+AppContent @ App.tsx:583
+react_stack_bottom_frame @ react-dom_client.js?v=a09f2148:17424
+renderWithHooksAgain @ react-dom_client.js?v=a09f2148:4281
+renderWithHooks @ react-dom_client.js?v=a09f2148:4217
+updateFunctionComponent @ react-dom_client.js?v=a09f2148:6619
+beginWork @ react-dom_client.js?v=a09f2148:7654
+runWithFiberInDEV @ react-dom_client.js?v=a09f2148:1485
+performUnitOfWork @ react-dom_client.js?v=a09f2148:10868
+workLoopSync @ react-dom_client.js?v=a09f2148:10728
+renderRootSync @ react-dom_client.js?v=a09f2148:10711
+performWorkOnRoot @ react-dom_client.js?v=a09f2148:10338
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=a09f2148:11623
+performWorkUntilDeadline @ react-dom_client.js?v=a09f2148:36
+ManualStoryCreationPage.tsx:1357 ⚠️ Message contains page info: {type: 'page_change', page_number: 0, page_index: undefined, username: 'harvz', currentPageIndex: 0}
+
+✅ User nclaude joining session 02b75ca0-b936-4a9e-93a6-842f75251bce
+INFO WebSocket CONNECT /ws/collaborate/02b75ca0-b936-4a9e-93a6-842f75251bce/ [127.0.0.1:41592]
+Error in get_session_presence: Cannot resolve keyword 'invitee' into field. Choices are: created_at, id, message, receiver, receiver_id, responded_at, sender, sender_id, session, session_id, status
+Traceback (most recent call last):
+  File "D:\Development\PixelTales\backend\storybook\views.py", line 3666, in get_session_presence
+    has_invite = CollaborationInvite.objects.filter(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Haesias\AppData\Roaming\Python\Python312\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Haesias\AppData\Roaming\Python\Python312\site-packages\django\db\models\query.py", line 1436, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Haesias\AppData\Roaming\Python\Python312\site-packages\django\db\models\query.py", line 1454, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "C:\Users\Haesias\AppData\Roaming\Python\Python312\site-packages\django\db\models\query.py", line 1461, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\Haesias\AppData\Roaming\Python\Python312\site-packages\django\db\models\sql\query.py", line 1545, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Haesias\AppData\Roaming\Python\Python312\site-packages\django\db\models\sql\query.py", line 1576, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Haesias\AppData\Roaming\Python\Python312\site-packages\django\db\models\sql\query.py", line 1426, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Haesias\AppData\Roaming\Python\Python312\site-packages\django\db\models\sql\query.py", line 1236, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Haesias\AppData\Roaming\Python\Python312\site-packages\django\db\models\sql\query.py", line 1724, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'invitee' into field. Choices are: created_at, id, message, receiver, receiver_id, responded_at, sender, sender_id, session, session_id, status
+ERROR Internal Server Error: /api/collaborate/02b75ca0-b936-4a9e-93a6-842f75251bce/presence/    
+ERROR HTTP GET /api/collaborate/02b75ca0-b936-4a9e-93a6-842f75251bce/presence/ 500 [0.23, 127.0.0.1:53107]
+INFO HTTP GET /api/collaborate/02b75ca0-b936-4a9e-93a6-842f75251bce/presence/ 200 [0.03, 127.0.0.1:3542]
