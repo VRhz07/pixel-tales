@@ -350,42 +350,12 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
   }, [language, voices, isSupported]); // Watch language changes
 
   // Auto-switch Cloud TTS voice ID when language changes
+  // DISABLED: Let users manually choose their preferred voice
+  // The voice selection should persist across language changes
   useEffect(() => {
-    console.log('🌥️ TTS: Checking Cloud voice for language:', language, 'Current voice:', cloudVoiceId);
-    
-    // Define default cloud voice IDs for each language
-    const defaultCloudVoices: { [key: string]: string } = {
-      'en': 'female_english',
-      'tl': 'female_filipino'
-    };
-    
-    const langKey = language === 'tl' ? 'tl' : 'en';
-    const recommendedVoiceId = defaultCloudVoices[langKey];
-    
-    // Only auto-switch if the current voice doesn't match the language
-    // Check if current voice ID contains language indicator
-    const currentIsEnglish = cloudVoiceId.toLowerCase().includes('english');
-    const currentIsFilipino = cloudVoiceId.toLowerCase().includes('filipino') || cloudVoiceId.toLowerCase().includes('tagalog');
-    const needsEnglish = language === 'en';
-    const needsFilipino = language === 'tl';
-    
-    console.log('🌥️ TTS: Voice check -', {
-      cloudVoiceId,
-      currentIsEnglish,
-      currentIsFilipino,
-      needsEnglish,
-      needsFilipino,
-      recommendedVoiceId
-    });
-    
-    // Auto-switch if language doesn't match current voice
-    if ((needsEnglish && !currentIsEnglish) || (needsFilipino && !currentIsFilipino)) {
-      console.log('🌥️ TTS: Auto-switching Cloud voice from', cloudVoiceId, 'to', recommendedVoiceId);
-      setCloudVoiceId(recommendedVoiceId);
-    } else {
-      console.log('🌥️ TTS: Cloud voice already matches language:', cloudVoiceId);
-    }
-  }, [language, cloudVoiceId]); // Watch language AND cloudVoiceId changes
+    console.log('🌥️ TTS: Current voice:', cloudVoiceId, 'Language:', language);
+    // No auto-switching - user's choice is respected
+  }, [language, cloudVoiceId]);
 
   // Speak with Google Cloud TTS
   const speakWithCloudTTS = useCallback(async (text: string) => {

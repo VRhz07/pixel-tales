@@ -352,6 +352,7 @@ Each page should have text and an imagePrompt for illustration generation.
             coverImage: coverUrl
           });
         }
+
       } catch (error) {
         console.error('Failed to generate cover illustration:', error);
         warnings.push('Cover image failed to generate');

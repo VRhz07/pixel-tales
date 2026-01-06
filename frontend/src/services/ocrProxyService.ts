@@ -4,7 +4,7 @@
  * This replaces direct frontend calls to OCR APIs
  */
 
-import { API_BASE_URL } from '../config/constants';
+import { apiConfigService } from './apiConfig.service';
 
 interface OCRResult {
   text: string;
@@ -40,7 +40,7 @@ export async function processImageWithOCR(
       throw new Error('Authentication required. Please log in.');
     }
 
-    const response = await fetch(`${API_BASE_URL}/ai/ocr/process/`, {
+    const response = await fetch(`${apiConfigService.getApiUrl()}/ai/ocr/process/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ export async function isOCRAvailable(): Promise<boolean> {
       return false;
     }
 
-    const response = await fetch(`${API_BASE_URL}/ai/status/`, {
+    const response = await fetch(`${apiConfigService.getApiUrl()}/ai/status/`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

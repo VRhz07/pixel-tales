@@ -454,7 +454,14 @@ class StoryApiService {
     let pages: StoryPage[] = [];
     
     try {
-      const canvasPages = JSON.parse(apiStory.canvas_data || '[]');
+      let canvasPages = JSON.parse(apiStory.canvas_data || '[]');
+      
+      // CRITICAL FIX: Ensure canvasPages is always an array
+      if (!Array.isArray(canvasPages)) {
+        console.warn('⚠️ canvas_data is not an array, defaulting to empty array');
+        canvasPages = [];
+      }
+      
       const contentPages = (apiStory.content || '').split('\n\n---PAGE BREAK---\n\n');
       
       console.log('📄 Parsed canvas pages:', canvasPages.length);
@@ -492,7 +499,8 @@ class StoryApiService {
         }];
       }
     } catch (error) {
-      console.warn('❌ Failed to parse canvas data, creating single page:', error);
+      console.warn('❌ Failed to parse canvas data, creating pages from content only:', error);
+      console.error('Canvas data value:', apiStory.canvas_data);
       pages = [{
         id: 'page-0',
         text: apiStory.content || '',

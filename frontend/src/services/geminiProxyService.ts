@@ -4,7 +4,7 @@
  * This replaces direct frontend calls to Gemini API
  */
 
-import { API_BASE_URL } from '../config/constants';
+import { apiConfigService } from './apiConfig.service';
 
 interface GenerationConfig {
   temperature?: number;
@@ -38,7 +38,7 @@ export async function generateStoryWithGemini(
       throw new Error('Authentication required. Please log in.');
     }
 
-    const response = await fetch(`${API_BASE_URL}/ai/gemini/generate-story/`, {
+    const response = await fetch(`${apiConfigService.getApiUrl()}/ai/gemini/generate-story/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export async function generateCharacterWithGemini(prompt: string): Promise<strin
       throw new Error('Authentication required. Please log in.');
     }
 
-    const response = await fetch(`${API_BASE_URL}/ai/gemini/generate-character/`, {
+    const response = await fetch(`${apiConfigService.getApiUrl()}/ai/gemini/generate-character/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ export async function analyzeImageWithGemini(
       throw new Error('Authentication required. Please log in.');
     }
 
-    const response = await fetch(`${API_BASE_URL}/ai/gemini/analyze-image/`, {
+    const response = await fetch(`${apiConfigService.getApiUrl()}/ai/gemini/analyze-image/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -178,7 +178,7 @@ export async function checkAIServiceStatus(): Promise<{
       throw new Error('Authentication required. Please log in.');
     }
 
-    const response = await fetch(`${API_BASE_URL}/ai/status/`, {
+    const response = await fetch(`${apiConfigService.getApiUrl()}/ai/status/`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

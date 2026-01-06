@@ -1121,19 +1121,31 @@ export const useStoryStore = create<StoryState>()(
           const backendStories = apiStories.map(apiStory => storyApiService.convertFromApiFormat(apiStory));
           console.log('✅ Converted stories:', backendStories);
 
+          // CRITICAL: Sanitize backend stories to remove large images
+          // This prevents localStorage quota exceeded errors
+          const sanitizedBackendStories = backendStories.map(story => ({
+            ...story,
+            coverImage: undefined, // Remove cover images
+            pages: story.pages.map(page => ({
+              ...page,
+              canvasData: undefined, // Remove canvas images
+              canvasDrawingState: undefined, // Remove drawing state
+            }))
+          }));
+
           // Get existing localStorage stories
           const localStories = state.userLibraries[state.currentUserId!]?.stories || [];
           
           // Find stories that exist in localStorage but not in backend (unsaved drafts)
           const localOnlyStories = localStories.filter(localStory => 
             !localStory.backendId && // No backend ID
-            !backendStories.some(backendStory => backendStory.id === localStory.id) // Not in backend
+            !sanitizedBackendStories.some(backendStory => backendStory.id === localStory.id) // Not in backend
           );
           
           console.log(`📝 Found ${localOnlyStories.length} local-only stories (unsaved drafts)`);
           
           // Merge backend stories with local stories, preserving local draft state
-          const mergedStories = backendStories.map(backendStory => {
+          const mergedStories = sanitizedBackendStories.map(backendStory => {
             // Find matching local story by backend ID
             const localStory = localStories.find(ls => ls.backendId === backendStory.backendId);
             
@@ -1263,12 +1275,42 @@ export const useStoryStore = create<StoryState>()(
     }),
     {
       name: 'story-store',
-      version: 3, // Incremented to clear old data with duplicate stories
+      version: 4, // Incremented to clear old data and prevent storing large images
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        userLibraries: state.userLibraries,
-        currentUserId: state.currentUserId
-      }),
+      partialize: (state) => {
+        // CRITICAL FIX: Don't store base64 images in localStorage
+        // This prevents "QuotaExceededError" when creating AI stories
+        // Images should be stored on backend, not in localStorage
+        
+        const sanitizedLibraries: Record<string, UserLibrary> = {};
+        
+        Object.keys(state.userLibraries).forEach(userId => {
+          const library = state.userLibraries[userId];
+          
+          sanitizedLibraries[userId] = {
+            stories: library.stories.map(story => ({
+              ...story,
+              // Remove large base64 images to prevent quota errors
+              coverImage: undefined, // Images stored on backend
+              pages: story.pages.map(page => ({
+                ...page,
+                canvasData: undefined, // Remove base64 canvas images
+                canvasDrawingState: undefined, // Remove large drawing state
+              }))
+            })),
+            characters: library.characters.map(char => ({
+              ...char,
+              imageData: undefined // Remove character images
+            })),
+            offlineStories: library.offlineStories || []
+          };
+        });
+        
+        return {
+          userLibraries: sanitizedLibraries,
+          currentUserId: state.currentUserId
+        };
+      },
       // Ensure proper hydration from localStorage
       onRehydrateStorage: () => {
         return (state, error) => {
