@@ -2039,8 +2039,24 @@ def start_collaboration_session(request, session_id):
         participants = session.participants.filter(is_active=True)
         
         # Broadcast session start to all participants via WebSocket
+        # CRITICAL FIX: Send to BOTH notification channel AND collaboration channel
+        # because participants waiting in lobby are connected to collaboration WebSocket
         channel_layer = get_channel_layer()
         if channel_layer:
+            # Send to collaboration group (this is where participants are listening!)
+            collaboration_group_name = f'collab_{session_id}'
+            print(f'🎯 Broadcasting session_started to collaboration group: {collaboration_group_name}')
+            async_to_sync(channel_layer.group_send)(
+                collaboration_group_name,
+                {
+                    'type': 'session_started',
+                    'session_id': session_id,
+                    'story_title': session.canvas_name
+                }
+            )
+            print(f'✅ Sent session_started message to collaboration group: {collaboration_group_name}')
+            
+            # Also send to individual notification channels as backup
             for participant in participants:
                 async_to_sync(channel_layer.group_send)(
                     f'notifications_{participant.user.id}',

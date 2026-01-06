@@ -235,14 +235,17 @@ if GOOGLE_CLOUD_CREDENTIALS_BASE64:
         credentials_json = base64.b64decode(GOOGLE_CLOUD_CREDENTIALS_BASE64).decode('utf-8')
         credentials_dict = json.loads(credentials_json)
         
-        # Write to temporary file
-        temp_credentials_path = '/tmp/google-credentials.json'
+        # Write to temporary file (cross-platform)
+        import tempfile
+        temp_dir = tempfile.gettempdir()
+        temp_credentials_path = os.path.join(temp_dir, 'google-credentials.json')
+        
         with open(temp_credentials_path, 'w') as f:
             json.dump(credentials_dict, f)
         
         # Set environment variable for Google Cloud libraries
         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = temp_credentials_path
-        print(f"✅ Google Cloud credentials loaded from base64 (production mode)")
+        print(f"✅ Google Cloud credentials loaded from base64: {temp_credentials_path}")
     except Exception as e:
         print(f"❌ Failed to decode Google Cloud credentials: {e}")
 elif GOOGLE_APPLICATION_CREDENTIALS and os.path.exists(GOOGLE_APPLICATION_CREDENTIALS):
