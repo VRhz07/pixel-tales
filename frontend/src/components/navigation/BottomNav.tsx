@@ -256,7 +256,7 @@ const BottomNav = () => {
   // Define student navigation items
   const studentNavItems = [
     { path: '/home', icon: 'home', label: t('nav.home') },
-    { path: '/games', icon: 'games', label: 'Games' },
+    { path: '/games', icon: 'games', label: t('nav.games') },
     { path: '/library', icon: 'library', label: t('nav.library') },
     { path: '/social', icon: 'social', label: t('nav.social') },
     { path: '/profile', icon: 'profile', label: t('nav.profile') },

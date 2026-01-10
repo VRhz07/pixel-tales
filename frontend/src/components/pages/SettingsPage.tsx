@@ -227,9 +227,9 @@ const SettingsPage = () => {
     <div className="min-h-screen settings-page">
       {/* Page Header */}
       <div className="settings-header px-6 py-4">
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('settings.settings')}</h1>
         <p className="text-sm text-gray-500 mt-1">
-          {isAnonymous ? 'Manage app preferences' : 'Manage your account and app preferences'}
+          {isAnonymous ? t('settings.managePreferences') : t('settings.manageAccountPreferences')}
         </p>
       </div>
       
@@ -245,10 +245,10 @@ const SettingsPage = () => {
       {isAnonymous && (
         <div className="mx-6 mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
           <p className="text-sm text-purple-900 font-medium mb-2">
-            👋 Browsing as Guest
+            👋 {t('settings.browsingAsGuest')}
           </p>
           <p className="text-xs text-purple-700 mb-3">
-            Sign up for a free account to access account settings, privacy controls, and social features.
+            {t('settings.signUpPrompt')}
           </p>
           <button
             onClick={() => window.location.href = '/auth'}
@@ -273,9 +273,9 @@ const SettingsPage = () => {
           <div className="settings-card">
             <div className="settings-item">
               <div className="settings-item-content">
-                <div className="settings-item-title">Profile Information</div>
+                <div className="settings-item-title">{t('settings.profileInfo')}</div>
                 <div className="settings-item-subtitle">
-                  {currentUser?.name || 'Update your personal details'}
+                  {currentUser?.name || t('settings.updatePersonalDetails')}
                 </div>
               </div>
               <button 
@@ -291,7 +291,7 @@ const SettingsPage = () => {
 
             <div className="settings-item">
               <div className="settings-item-content">
-                <div className="settings-item-title">Email Address</div>
+                <div className="settings-item-title">{t('settings.email')}</div>
                 <div className="settings-item-subtitle">{currentUser?.email || 'user@example.com'}</div>
               </div>
               <button 
@@ -307,7 +307,7 @@ const SettingsPage = () => {
 
             <div className="settings-item">
               <div className="settings-item-content">
-                <div className="settings-item-title">Password</div>
+                <div className="settings-item-title">{t('settings.password')}</div>
                 <div className="settings-item-subtitle">••••••••</div>
               </div>
               <button 
@@ -335,9 +335,9 @@ const SettingsPage = () => {
       <div className="settings-card">
         <div className="settings-item">
           <div className="settings-item-content">
-            <div className="settings-item-title">Dark Mode</div>
+            <div className="settings-item-title">{t('settings.darkMode')}</div>
             <div className="settings-item-subtitle">
-              {theme === 'dark' ? 'Dark theme enabled' : 'Light theme enabled'}
+              {theme === 'dark' ? t('settings.darkModeEnabled') : t('settings.lightModeEnabled')}
             </div>
           </div>
           <button
@@ -351,9 +351,9 @@ const SettingsPage = () => {
 
         <div className="settings-item">
           <div className="settings-item-content">
-            <div className="settings-item-title">Animations</div>
+            <div className="settings-item-title">{t('settings.animations')}</div>
             <div className="settings-item-subtitle">
-              {animationsEnabled ? 'Smooth animations and transitions' : 'Reduced motion for better performance'}
+              {animationsEnabled ? t('settings.smoothAnimations') : t('settings.reducedMotion')}
             </div>
           </div>
           <button
@@ -367,10 +367,10 @@ const SettingsPage = () => {
 
         <div className="settings-item">
           <div className="settings-item-content">
-            <div className="settings-item-title">Language / Wika</div>
+            <div className="settings-item-title">{t('settings.languageWika')}</div>
             <div className="settings-item-subtitle">
-              {language === 'en' && 'English - App interface in English'}
-              {language === 'tl' && 'Tagalog - Interface sa Tagalog'}
+              {language === 'en' && t('settings.englishInterface')}
+              {language === 'tl' && t('settings.tagalogInterface')}
             </div>
           </div>
           <CustomDropdown
@@ -390,9 +390,9 @@ const SettingsPage = () => {
         {/* Sound Effects */}
         <div className="settings-item">
           <div className="settings-item-content">
-            <div className="settings-item-title">Sound Effects</div>
+            <div className="settings-item-title">{t('settings.soundEffects')}</div>
             <div className="settings-item-subtitle">
-              {soundEnabled ? 'UI sounds and haptic feedback enabled' : 'Sounds and haptics disabled'}
+              {soundEnabled ? t('settings.soundsEnabled') : t('settings.soundsDisabled')}
             </div>
           </div>
           <button
@@ -415,9 +415,9 @@ const SettingsPage = () => {
         {soundEnabled && (
           <div className="settings-item" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
             <div className="settings-item-content" style={{ marginBottom: '1rem' }}>
-              <div className="settings-item-title">Sound Volume</div>
+              <div className="settings-item-title">{t('settings.soundVolume')}</div>
               <div className="settings-item-subtitle">
-                Adjust the volume of sound effects ({Math.round(soundVolume * 100)}%)
+                {t('settings.adjustSoundVolume')} ({Math.round(soundVolume * 100)}%)
               </div>
             </div>
             <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
@@ -453,7 +453,7 @@ const SettingsPage = () => {
               <div className="settings-item-content">
                 <div className="settings-item-title">🎵 Background Music</div>
                 <div className="settings-item-subtitle">
-                  {backgroundMusicEnabled ? 'Playful music while you create' : 'Music disabled'}
+                  {backgroundMusicEnabled ? t('settings.playfulMusic') : t('settings.musicDisabled')}
                 </div>
               </div>
               <button
@@ -481,9 +481,9 @@ const SettingsPage = () => {
               <>
                 <div className="settings-item" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
                   <div className="settings-item-content" style={{ marginBottom: '1rem' }}>
-                    <div className="settings-item-title">Music Volume</div>
+                    <div className="settings-item-title">{t('settings.musicVolume')}</div>
                     <div className="settings-item-subtitle">
-                      Adjust background music volume ({Math.round(backgroundMusicVolume * 100)}%)
+                      {t('settings.adjustMusicVolume')} ({Math.round(backgroundMusicVolume * 100)}%)
                     </div>
                   </div>
                   <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
@@ -512,10 +512,10 @@ const SettingsPage = () => {
                 {/* Track Selection */}
                 <div className="settings-item" style={{ flexDirection: 'column', alignItems: 'flex-start', paddingTop: '1.5rem', borderTop: theme === 'dark' ? '1px solid #3d3349' : '1px solid #e5e7eb' }}>
                   <div className="settings-item-content" style={{ marginBottom: '0.75rem' }}>
-                    <div className="settings-item-title">Choose Music Track</div>
+                    <div className="settings-item-title">{t('settings.chooseMusicTrack')}</div>
                     {currentTrackName && (
                       <div className="settings-item-subtitle" style={{ color: theme === 'dark' ? '#a78bfa' : '#8b5cf6', fontStyle: 'italic' }}>
-                        ♪ Now playing: {currentTrackName}
+                        ♪ {t('settings.nowPlaying')} {currentTrackName}
                       </div>
                     )}
                   </div>
@@ -583,7 +583,7 @@ const SettingsPage = () => {
                     padding: '0 1rem',
                     textAlign: 'center',
                   }}>
-                    💡 Select "Random" to hear a different song each time, or choose your favorite track!
+                    💡 {t('settings.randomTrackTip')}
                   </p>
                 </div>
               </>
@@ -600,7 +600,7 @@ const SettingsPage = () => {
             className="settings-sign-out-button"
           >
             <ArrowRightOnRectangleIcon className="h-4 w-4" />
-            <span>Sign Out</span>
+            <span>{t('settings.signOut')}</span>
           </button>
 
           <button 
@@ -608,7 +608,7 @@ const SettingsPage = () => {
             className="settings-button-destructive w-full px-6 py-3"
           >
             <TrashIcon className="h-4 w-4" />
-            <span>Delete Account</span>
+            <span>{t('settings.deleteAccount')}</span>
           </button>
         </div>
       )}
@@ -714,11 +714,11 @@ const SettingsPage = () => {
             </div>
           )}
         </div>
-        <div className="settings-app-version">Version 1.0.0</div>
+        <div className="settings-app-version">{t('settings.version')} 1.0.0</div>
         <div className="settings-app-tagline">
-          <span>Made with</span>
+          <span>{t('settings.madeWith')}</span>
           <span>✨</span>
-          <span>for young creators</span>
+          <span>{t('settings.forYoungCreators')}</span>
         </div>
       </div>
 
@@ -794,34 +794,34 @@ const SettingsPage = () => {
           {/* Warning Message */}
           <div className="delete-modal-warning">
             <p className="delete-modal-warning-title">
-              ⚠️ This action cannot be undone!
+              ⚠️ {t('deleteAccount.warning')}
             </p>
             <p className="delete-modal-warning-text">
-              All your data will be permanently deleted and cannot be recovered.
+              {t('deleteAccount.permanentDelete')}
             </p>
           </div>
 
           {/* What will be deleted */}
           <div className="delete-modal-content">
             <p className="delete-modal-content-title">
-              The following will be permanently deleted:
+              {t('deleteAccount.willBeDeleted')}
             </p>
             <div className="delete-modal-list">
               <div className="delete-modal-list-item">
                 <span className="delete-modal-list-bullet">•</span>
-                <span>All your stories and characters</span>
+                <span>{t('deleteAccount.storiesCharacters')}</span>
               </div>
               <div className="delete-modal-list-item">
                 <span className="delete-modal-list-bullet">•</span>
-                <span>Progress, achievements, and statistics</span>
+                <span>{t('deleteAccount.progressAchievements')}</span>
               </div>
               <div className="delete-modal-list-item">
                 <span className="delete-modal-list-bullet">•</span>
-                <span>Account settings and preferences</span>
+                <span>{t('deleteAccount.accountSettings')}</span>
               </div>
               <div className="delete-modal-list-item">
                 <span className="delete-modal-list-bullet">•</span>
-                <span>Friends and social connections</span>
+                <span>{t('deleteAccount.friendsSocial')}</span>
               </div>
             </div>
           </div>

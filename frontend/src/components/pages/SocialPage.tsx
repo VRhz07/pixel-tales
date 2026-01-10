@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserPlusIcon, ChatBubbleLeftIcon, UsersIcon, TrophyIcon, CheckIcon, XMarkIcon, MagnifyingGlassIcon, UserMinusIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { socialService, SearchedUser, Friend, FriendRequest } from '../../services/social.service';
 import { useAuthStore } from '../../stores/authStore';
+import { useI18nStore } from '../../stores/i18nStore';
 import { useNotificationStore } from '../../stores/notificationStore';
 import AnonymousPrompt from '../ui/AnonymousPrompt';
 import ChatModal from '../social/ChatModal';
@@ -10,6 +11,7 @@ import ChatModal from '../social/ChatModal';
 const SocialPage = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthStore();
+  const { t } = useI18nStore();
   const { decrementFriendRequests, fetchNotificationCounts } = useNotificationStore();
   const isAnonymous = user?.id === 'anonymous' || !isAuthenticated;
   
@@ -220,17 +222,17 @@ const SocialPage = () => {
         <div className="social-section-title-row">
           <div className="social-section-left">
             <UsersIcon className="social-section-icon" />
-            <h2 className="social-section-title">Friends ({friends.length})</h2>
+            <h2 className="social-section-title">{t('social.friends')} ({friends.length})</h2>
           </div>
           <button 
             className="add-friends-button"
             onClick={handleOpenAddFriendsModal}
           >
             <UserPlusIcon className="button-icon" />
-            Add Friends
+            {t('social.addFriends')}
           </button>
         </div>
-        <p className="social-section-subtitle">Connect with fellow creators</p>
+        <p className="social-section-subtitle">{t('social.connectWithCreators')}</p>
       </div>
 
       <div className="social-list-container">
@@ -246,7 +248,7 @@ const SocialPage = () => {
                 </div>
                 <div>
                   <div className="user-info-name">{friend.name}</div>
-                  <div className="user-info-activity">{friend.story_count} stories published</div>
+                  <div className="user-info-activity">{friend.story_count} {t('social.storiesPublished')}</div>
                 </div>
               </div>
               <div className="social-item-right">
@@ -272,7 +274,7 @@ const SocialPage = () => {
           ))
         ) : (
           <div style={{ textAlign: 'center', padding: '2rem', color: '#6B7280' }}>
-            No friends yet. Click "Add Friends" to find creators!
+            {t('social.noFriends')}. Click "{t('social.addFriends')}" to find creators!
           </div>
         )}
       </div>
@@ -298,10 +300,10 @@ const SocialPage = () => {
             <div className="social-section-title-row">
               <div className="social-section-left">
                 <UserPlusIcon className="social-section-icon" />
-                <h2 className="social-section-title">Friend Requests ({friendRequests.length})</h2>
+                <h2 className="social-section-title">{t('social.friendRequests')} ({friendRequests.length})</h2>
               </div>
             </div>
-            <p className="social-section-subtitle">People who want to connect with you</p>
+            <p className="social-section-subtitle">{t('social.peopleWantToConnect')}</p>
           </div>
 
           <div className="social-list-container">
@@ -314,7 +316,7 @@ const SocialPage = () => {
                   <div>
                     <div className="user-info-name">{request.sender_name}</div>
                     <div className="user-info-activity">
-                      {request.mutual_friends > 0 && `${request.mutual_friends} mutual friends • `}
+                      {request.mutual_friends > 0 && `$${request.mutual_friends} ${t('social.mutualFriends')} • `}
                       {getTimeAgo(request.created_at)}
                     </div>
                   </div>
@@ -346,7 +348,7 @@ const SocialPage = () => {
         <div className="modal-overlay" onClick={() => setIsAddFriendsModalOpen(false)}>
           <div className="glassmorphism-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2 className="modal-title">Find Friends</h2>
+              <h2 className="modal-title">{t('social.findFriends')}</h2>
               <button 
                 className="modal-close-button"
                 onClick={() => setIsAddFriendsModalOpen(false)}
@@ -360,7 +362,7 @@ const SocialPage = () => {
                 <MagnifyingGlassIcon className="modal-search-icon" />
                 <input
                   type="text"
-                  placeholder="Search for creators..."
+                  placeholder={t('social.searchPlaceholder')}
                   className="modal-search-input"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -407,12 +409,12 @@ const SocialPage = () => {
               {isLoadingUsers ? (
                 <div style={{ textAlign: 'center', padding: '2rem', color: '#9CA3AF' }}>
                   <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>⏳</div>
-                  <p>Loading available users...</p>
+                  <p>{t('social.loadingUsers')}</p>
                 </div>
               ) : isSearching ? (
                 <div style={{ textAlign: 'center', padding: '2rem', color: '#9CA3AF' }}>
                   <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔍</div>
-                  <p>Searching...</p>
+                  <p>{t('social.searching')}</p>
                 </div>
               ) : searchResults.length > 0 ? (
                 searchResults.map((user) => (
@@ -425,7 +427,7 @@ const SocialPage = () => {
                         <div className="modal-user-name">{user.name}</div>
                         <div className="modal-user-bio">{user.bio || `@${user.username}`}</div>
                         <div className="modal-user-bio" style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>
-                          {user.story_count} {user.story_count === 1 ? 'story' : 'stories'} published
+                          {user.story_count} {user.story_count === 1 ? t('social.storyPublished') : t('social.storiesPublished')}
                         </div>
                       </div>
                     </div>
@@ -433,15 +435,15 @@ const SocialPage = () => {
                       {user.is_friend ? (
                         <button className="modal-add-friend-button" disabled style={{ opacity: 0.5 }}>
                           <CheckIcon className="button-icon" />
-                          Friends
+                          {t('social.friends')}
                         </button>
                       ) : user.request_sent ? (
                         <button className="modal-add-friend-button" disabled style={{ opacity: 0.5 }}>
-                          Request Sent
+                          {t('social.requestSent')}
                         </button>
                       ) : user.request_received ? (
                         <button className="modal-add-friend-button" disabled style={{ opacity: 0.5 }}>
-                          Pending
+                          {t('social.pending')}
                         </button>
                       ) : (
                         <button 
@@ -460,8 +462,8 @@ const SocialPage = () => {
                   <div className="modal-no-results-icon">🔍</div>
                   <div className="modal-no-results-text">
                     {searchQuery 
-                      ? `No users found for "${searchQuery}"` 
-                      : 'No new users to add as friends. You\'ve already connected with everyone!'}
+                      ? `${t('social.noUsersFound')} "${searchQuery}"` 
+                      : t('social.noNewUsers')}
                   </div>
                 </div>
               )}

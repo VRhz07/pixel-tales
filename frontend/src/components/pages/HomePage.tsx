@@ -153,8 +153,8 @@ const HomePage = () => {
                 <span className="feature-button-icon">🤖</span>
               </div>
               <div className="feature-button-content">
-                <h3 className="feature-button-title">AI Story</h3>
-                <p className="feature-button-subtitle">Create with AI magic</p>
+                <h3 className="feature-button-title">{t('home.aiStory')}</h3>
+                <p className="feature-button-subtitle">{t('home.aiStoryDesc')}</p>
               </div>
             </div>
 
@@ -170,8 +170,8 @@ const HomePage = () => {
                 <span className="feature-button-icon">✍️</span>
               </div>
               <div className="feature-button-content">
-                <h3 className="feature-button-title">Draw Story</h3>
-                <p className="feature-button-subtitle">Make your own illustrations</p>
+                <h3 className="feature-button-title">{t('home.drawStory')}</h3>
+                <p className="feature-button-subtitle">{t('home.drawStoryDesc')}</p>
               </div>
             </div>
 
@@ -188,8 +188,8 @@ const HomePage = () => {
                 <span className="feature-button-icon">📸</span>
               </div>
               <div className="feature-button-content">
-                <h3 className="feature-button-title">Photo AI</h3>
-                <p className="feature-button-subtitle">Turn photos into stories</p>
+                <h3 className="feature-button-title">{t('home.photoAI')}</h3>
+                <p className="feature-button-subtitle">{t('home.photoAIDesc')}</p>
               </div>
             </div>
           </div>
@@ -211,10 +211,10 @@ const HomePage = () => {
                       {story.title}
                     </h4>
                     <p className="draft-meta">
-                      {story.pages.length} pages • {story.wordCount} words
+                      {story.pages.length} pages • {story.wordCount} {t('home.words')}
                     </p>
                     <p className="draft-date">
-                      Last edited: {new Date(story.lastModified).toLocaleDateString()}
+                      {t('home.lastEditedLabel')} {new Date(story.lastModified).toLocaleDateString()}
                     </p>
                   </div>
                   <button 
@@ -243,7 +243,7 @@ const HomePage = () => {
             <div>
               <div className="status-icon">📝</div>
               <p className="status-text">
-                No drafts yet. Start creating your first magical story and watch it come to life!
+                {t('home.noDraftsMessage')}
               </p>
             </div>
           )}
@@ -252,15 +252,15 @@ const HomePage = () => {
         {/* Quick Actions Section - Child-Friendly Colorful Design */}
         <div className="section-header" style={{marginTop: '3rem'}}>
           <div className="section-icon">🌟</div>
-          <h2 className="section-title">Quick Actions</h2>
+          <h2 className="section-title">{t('home.quickActions')}</h2>
         </div>
 
         <div className="quick-actions-grid">
           <div className="quick-action-card quick-action-library">
             <div className="quick-action-icon">📚</div>
             <div className="quick-action-content">
-              <h4 className="quick-action-title">Browse Library</h4>
-              <p className="quick-action-description">Explore stories from other creators</p>
+              <h4 className="quick-action-title">{t('home.browseLibrary')}</h4>
+              <p className="quick-action-description">{t('home.browseLibraryDesc')}</p>
             </div>
             <button 
               className="quick-action-button"
@@ -273,8 +273,8 @@ const HomePage = () => {
           <div className="quick-action-card quick-action-friends">
             <div className="quick-action-icon">👥</div>
             <div className="quick-action-content">
-              <h4 className="quick-action-title">Find Friends</h4>
-              <p className="quick-action-description">Connect with other storytellers</p>
+              <h4 className="quick-action-title">{t('home.findFriends')}</h4>
+              <p className="quick-action-description">{t('home.findFriendsDesc')}</p>
             </div>
             <button 
               className="quick-action-button"

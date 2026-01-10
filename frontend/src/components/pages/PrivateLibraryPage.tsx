@@ -107,7 +107,7 @@ const PrivateLibraryPage = () => {
     ...story,
     author: story.is_collaborative && story.authors_names && story.authors_names.length > 0 
       ? story.authors_names.join(', ') 
-      : (story.author || 'Unknown Author')
+      : (story.author || t('library.unknownAuthor'))
   }));
   
   const handleEditStory = (storyId: string) => {
@@ -201,7 +201,7 @@ const PrivateLibraryPage = () => {
     setModalState({
       isOpen: true,
       type: 'warning',
-      title: 'Unpublish Story',
+      title: t('library.unpublishTitle'),
       message: `Are you sure you want to unpublish "${story?.title || 'this story'}"? It will be removed from the public library and moved back to Drafts.`,
       confirmText: 'Unpublish',
       onConfirm: async () => {
@@ -225,8 +225,8 @@ const PrivateLibraryPage = () => {
           setModalState({
             isOpen: true,
             type: 'danger',
-            title: 'Unpublish Failed',
-            message: 'Failed to unpublish story. Please try again.',
+            title: t('library.unpublishFailed'),
+            message: t('library.unpublishFailedMessage'),
             confirmText: 'OK',
             onConfirm: closeModal,
           });
@@ -240,7 +240,7 @@ const PrivateLibraryPage = () => {
     setModalState({
       isOpen: true,
       type: 'danger',
-      title: 'Delete Story',
+      title: t('library.deleteTitle'),
       message: `Are you sure you want to permanently delete "${story?.title || 'this story'}"? This action cannot be undone.`,
       confirmText: 'Delete',
       onConfirm: () => {
@@ -255,7 +255,7 @@ const PrivateLibraryPage = () => {
     setModalState({
       isOpen: true,
       type: 'danger',
-      title: 'Delete All Drafts',
+      title: t('library.deleteAllDraftsTitle'),
       message: `Are you sure you want to permanently delete all ${draftStories.length} draft${draftStories.length !== 1 ? 's' : ''}? This action cannot be undone.`,
       confirmText: 'Delete All',
       onConfirm: async () => {
@@ -289,7 +289,7 @@ const PrivateLibraryPage = () => {
           setModalState({
             isOpen: true,
             type: 'danger',
-            title: 'Delete Failed',
+            title: t('library.deleteFailed'),
             message: 'Failed to delete all drafts. Please try again.',
             confirmText: 'OK',
             onConfirm: closeModal,
@@ -303,7 +303,7 @@ const PrivateLibraryPage = () => {
     setModalState({
       isOpen: true,
       type: 'danger',
-      title: 'Delete All Works',
+      title: t('library.deleteAllWorksTitle'),
       message: `Are you sure you want to permanently delete all ${yourWorks.length} work${yourWorks.length !== 1 ? 's' : ''}? This action cannot be undone.`,
       confirmText: 'Delete All',
       onConfirm: async () => {
@@ -337,7 +337,7 @@ const PrivateLibraryPage = () => {
           setModalState({
             isOpen: true,
             type: 'danger',
-            title: 'Delete Failed',
+            title: t('library.deleteFailed'),
             message: 'Failed to delete all works. Please try again.',
             confirmText: 'OK',
             onConfirm: closeModal,
@@ -351,7 +351,7 @@ const PrivateLibraryPage = () => {
     setModalState({
       isOpen: true,
       type: 'danger',
-      title: 'Unsave All Stories',
+      title: t('library.unsaveAllTitle'),
       message: `Are you sure you want to unsave all ${savedStories.length} saved stor${savedStories.length !== 1 ? 'ies' : 'y'}? This will not delete the stories, just remove them from your saved list.`,
       confirmText: 'Unsave All',
       onConfirm: async () => {
@@ -414,7 +414,7 @@ const PrivateLibraryPage = () => {
           setModalState({
             isOpen: true,
             type: 'danger',
-            title: 'Delete Failed',
+            title: t('library.deleteFailed'),
             message: 'Failed to delete all offline stories. Please try again.',
             confirmText: 'OK',
             onConfirm: closeModal,
@@ -623,7 +623,7 @@ const PrivateLibraryPage = () => {
                       <span className="library-story-title-inner">{story.title}</span>
                     </h3>
                     <p className="library-story-author">
-                      {t('common.by')} {story.author || 'Unknown Author'}
+                      {t('common.by')} {story.author || t('library.unknownAuthor')}
                     </p>
                   </div>
                   <div className="library-story-actions">
@@ -636,7 +636,7 @@ const PrivateLibraryPage = () => {
                       title="Edit Story"
                     >
                       <PencilIcon className="h-4 w-4" />
-                      <span>Edit</span>
+                      <span>{t('library.edit')}</span>
                     </button>
                     <button 
                       className="library-action-button view"
@@ -647,7 +647,7 @@ const PrivateLibraryPage = () => {
                       title="View Story"
                     >
                       <EyeIcon className="h-4 w-4" />
-                      <span>View</span>
+                      <span>{t('library.view')}</span>
                     </button>
                     <button 
                       className="library-action-button save"
@@ -739,7 +739,7 @@ const PrivateLibraryPage = () => {
                       <span className="library-story-title-inner">{story.title}</span>
                     </h3>
                     <p className="library-story-author">
-                      {t('common.by')} {story.author || 'Unknown Author'}
+                      {t('common.by')} {story.author || t('library.unknownAuthor')}
                     </p>
                   </div>
                   <div className="library-story-actions">
@@ -752,7 +752,7 @@ const PrivateLibraryPage = () => {
                       title="Edit Story"
                     >
                       <PencilIcon className="h-4 w-4" />
-                      <span>Edit</span>
+                      <span>{t('library.edit')}</span>
                     </button>
                     <button 
                       className="library-action-button view"
@@ -763,7 +763,7 @@ const PrivateLibraryPage = () => {
                       title="View Story"
                     >
                       <EyeIcon className="h-4 w-4" />
-                      <span>View</span>
+                      <span>{t('library.view')}</span>
                     </button>
                     {story.isPublished ? (
                       <button 
@@ -775,7 +775,7 @@ const PrivateLibraryPage = () => {
                         title="Unpublish from Public Library"
                       >
                         <XCircleIcon className="h-4 w-4" />
-                        <span>Unpublish</span>
+                        <span>{t('library.unpublish')}</span>
                       </button>
                     ) : (
                       <button 
@@ -787,7 +787,7 @@ const PrivateLibraryPage = () => {
                         title="Publish to Public Library"
                       >
                         <GlobeAltIcon className="h-4 w-4" />
-                        <span>Publish</span>
+                        <span>{t('library.publish')}</span>
                       </button>
                     )}
                     <button 
@@ -833,7 +833,7 @@ const PrivateLibraryPage = () => {
                 }}
               >
                 <TrashIcon className="h-4 w-4" />
-                <span>Unsave All</span>
+                <span>{t('library.unsaveAll')}</span>
               </button>
             )}
           </div>
@@ -874,7 +874,7 @@ const PrivateLibraryPage = () => {
                       <span className="library-story-title-inner">{story.title}</span>
                     </h3>
                     <p className="library-story-author">
-                      {t('common.by')} {story.author || 'Unknown Author'}
+                      {t('common.by')} {story.author || t('library.unknownAuthor')}
                     </p>
                   </div>
                 </div>
@@ -908,7 +908,7 @@ const PrivateLibraryPage = () => {
                 }}
               >
                 <TrashIcon className="h-4 w-4" />
-                <span>Delete All</span>
+                <span>{t('library.deleteAll')}</span>
               </button>
             )}
           </div>
@@ -916,7 +916,7 @@ const PrivateLibraryPage = () => {
           {filteredOffline.length === 0 ? (
             <div className="library-empty-state">
               <BookOpenIcon className="library-empty-icon" />
-              <h3 className="library-empty-title">No offline stories</h3>
+              <h3 className="library-empty-title">t('library.noOffline')</h3>
               <p className="library-empty-description">Save stories from the public library for offline reading</p>
             </div>
           ) : (
@@ -944,7 +944,7 @@ const PrivateLibraryPage = () => {
                       <span className="library-story-title-inner">{story.title}</span>
                     </h3>
                     <p className="library-story-author">
-                      {t('common.by')} {story.author || 'Unknown Author'}
+                      {t('common.by')} {story.author || t('library.unknownAuthor')}
                     </p>
                   </div>
                   <div className="library-story-actions">
@@ -957,7 +957,7 @@ const PrivateLibraryPage = () => {
                       title="View Story"
                     >
                       <EyeIcon className="h-4 w-4" />
-                      <span>View</span>
+                      <span>{t('library.view')}</span>
                     </button>
                     <button 
                       className="library-action-button delete"

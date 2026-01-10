@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useI18nStore } from '../../stores/i18nStore';
 import { 
   StarIcon,
   BookOpenIcon,
@@ -40,7 +41,7 @@ const mockPublicStories = {
       rating: 4.9,
       downloads: 2100,
       likes: 580,
-      tags: ["Superhero", "Friendship", "Coming of Age"],
+      tags: ["Superhero", "Friendship", "Coming {t('library.of')} Age"],
       coverImage: null,
       publishedAt: new Date('2024-01-20'),
       pages: 72,
@@ -108,9 +109,9 @@ const mockPublicStories = {
   top: [
     {
       id: 't1',
-      title: "Chronicles of the Crystal Realm",
+      title: "Chronicles {t('library.of')} the Crystal Realm",
       author: "Isabella Garcia",
-      description: "An epic fantasy saga spanning multiple kingdoms where crystals hold the power of creation and destruction.",
+      description: "An epic fantasy saga spanning multiple kingdoms where crystals hold the power {t('library.of')} creation and destruction.",
       rating: 4.9,
       downloads: 3400,
       likes: 890,
@@ -153,6 +154,7 @@ const mockPublicStories = {
 
 const PublicLibraryPage = () => {
   const navigate = useNavigate();
+  const { t } = useI18nStore();
   const { user } = useAuthStore();
   const isDarkMode = useThemeStore((state) => state.isDarkMode);
   const [searchQuery, setSearchQuery] = useState('');
@@ -162,23 +164,23 @@ const PublicLibraryPage = () => {
 
   // Genre options matching backend CATEGORY_CHOICES
   const genres = [
-    { value: '', label: 'All Genres' },
-    { value: 'adventure', label: 'Adventure' },
-    { value: 'fantasy', label: 'Fantasy' },
-    { value: 'mystery', label: 'Mystery' },
-    { value: 'action', label: 'Action' },
-    { value: 'friendship', label: 'Friendship' },
-    { value: 'scifi', label: 'Sci-Fi' },
-    { value: 'comedy', label: 'Comedy' },
-    { value: 'sci_fi', label: 'Science Fiction' },
-    { value: 'fairy_tale', label: 'Fairy Tale' },
-    { value: 'educational', label: 'Educational' },
-    { value: 'animal', label: 'Animal Stories' },
-    { value: 'other', label: 'Other' },
+    { value: '', label: t('library.allGenres') },
+    { value: t('library.adventure'), label: t('library.adventure') },
+    { value: t('library.fantasy'), label: t('library.fantasy') },
+    { value: t('library.mystery'), label: t('library.mystery') },
+    { value: t('library.action'), label: t('library.action') },
+    { value: t('library.friendship'), label: t('library.friendship') },
+    { value: 'scifi', label: t('library.sciFi') },
+    { value: t('library.comedy'), label: t('library.comedy') },
+    { value: 'sci_fi', label: t('library.scienceFiction') },
+    { value: 'fairy_tale', label: t('library.fairyTale') },
+    { value: t('library.educational'), label: t('library.educational') },
+    { value: 'animal', label: t('library.animalStories') },
+    { value: t('library.other'), label: t('library.other') },
   ];
 
   const languages = [
-    { value: '', label: 'All Languages' },
+    { value: '', label: t('library.allLanguages') },
     { value: 'en', label: '🇺🇸 English' },
     { value: 'tl', label: '🇵🇭 Tagalog' },
   ];
@@ -360,7 +362,7 @@ const PublicLibraryPage = () => {
       stories = stories.filter((story: any) => story.language === selectedLanguage);
     }
     
-    // Filter by genre - check if any of the story's genres match the selected genre
+    // Filter by genre - check if any {t('library.of')} the story's genres match the selected genre
     if (selectedGenre) {
       stories = stories.filter((story: any) => 
         story.tags && story.tags.some((tag: string) => tag.toLowerCase() === selectedGenre.toLowerCase())
@@ -503,10 +505,10 @@ const PublicLibraryPage = () => {
         {/* Active Filters Display */}
         {(selectedLanguage || selectedGenre || searchQuery) && (
           <div className="library-active-filters">
-            <span className="library-active-filters-label">Active filters:</span>
+            <span className="library-active-filters-label">{t('library.activeFilters')}</span>
             {searchQuery && (
               <span className="library-filter-tag">
-                Search: "{searchQuery}"
+                {t('library.search')}: "{searchQuery}"
                 <button onClick={() => setSearchQuery('')}>×</button>
               </span>
             )}
@@ -702,7 +704,7 @@ const PublicLibraryPage = () => {
                 fontWeight: '600',
                 color: '#6b21a8'
               }}>
-                Showing {startIndex + 1}-{Math.min(endIndex, allPublishedStories.length)} of {allPublishedStories.length} stories
+                Showing {startIndex + 1}-{Math.min(endIndex, allPublishedStories.length)} {t('library.of')} {allPublishedStories.length} stories
               </div>
               <div style={{
                 display: 'flex',
@@ -916,7 +918,7 @@ const PublicLibraryPage = () => {
           {/* Recent Stories Carousel */}
           <div className="library-carousel-section" style={{ display: 'none' }}>
         <div className="library-carousel-header">
-          <h2 className="library-carousel-title">Recent Stories</h2>
+          <h2 className="library-carousel-title">{t('library.recentStories')}</h2>
           <button 
             className="library-carousel-more-button"
             onClick={() => navigate('/public-library')}
@@ -1032,7 +1034,7 @@ const PublicLibraryPage = () => {
                 fontWeight: '600',
                 color: '#6b21a8'
               }}>
-                Showing {startIndex + 1}-{Math.min(endIndex, allPublishedStories.length)} of {allPublishedStories.length} stories
+                Showing {startIndex + 1}-{Math.min(endIndex, allPublishedStories.length)} {t('library.of')} {allPublishedStories.length} stories
               </div>
               <div style={{
                 display: 'flex',
@@ -1069,7 +1071,7 @@ const PublicLibraryPage = () => {
           {allPublishedStories.length === 0 ? (
             <div className="library-empty-state">
               <BookOpenIcon className="library-empty-icon" />
-              <h3 className="library-empty-title">No stories found</h3>
+              <h3 className="library-empty-title">{t('library.noResults')}</h3>
               <p className="library-empty-description">
                 Try adjusting your search terms or filters
               </p>

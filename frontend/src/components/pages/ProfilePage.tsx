@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../../stores/userStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useStoryStore } from '../../stores/storyStore';
+import { useI18nStore } from '../../stores/i18nStore';
 import { 
   BookOpenIcon,
   UserGroupIcon,
@@ -50,6 +51,7 @@ interface UserStats {
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const { t } = useI18nStore();
   const { profile } = useUserStore();
   const { playButtonClick } = useSoundEffects();
   const { user, setUser } = useAuthStore();
@@ -156,26 +158,26 @@ const ProfilePage = () => {
 
   // Category configuration
   const categoryConfig: Record<string, { name: string; icon: string; color: string; borderColor: string }> = {
-    'published_stories': { name: 'Published Stories', icon: '📚', color: '#3b82f6', borderColor: '#60a5fa' },
-    'friends': { name: 'Friends & Social', icon: '👥', color: '#10b981', borderColor: '#34d399' },
-    'words': { name: 'Word Count', icon: '✍️', color: '#f59e0b', borderColor: '#fbbf24' },
-    'likes': { name: 'Likes Received', icon: '❤️', color: '#ef4444', borderColor: '#f87171' },
-    'comments': { name: 'Comments Received', icon: '💬', color: '#8b5cf6', borderColor: '#a78bfa' },
-    'stories_read': { name: 'Stories Read', icon: '📖', color: '#06b6d4', borderColor: '#22d3ee' },
-    'leaderboard': { name: 'Leaderboard', icon: '🏆', color: '#eab308', borderColor: '#facc15' },
-    'creation_type': { name: 'Creation Type', icon: '🎨', color: '#ec4899', borderColor: '#f472b6' },
-    'collab': { name: 'Collaboration', icon: '🤝', color: '#6366f1', borderColor: '#818cf8' },
-    'views': { name: 'Story Views', icon: '👁️', color: '#14b8a6', borderColor: '#2dd4bf' },
-    'games': { name: 'Games', icon: '🎮', color: '#9333ea', borderColor: '#a855f7' },
-    'level': { name: 'Level Progress', icon: '⭐', color: '#f59e0b', borderColor: '#fbbf24' },
-    'rewards': { name: 'Rewards Unlocked', icon: '🎁', color: '#ec4899', borderColor: '#f472b6' },
+    'published_stories': { name: t('profile.category.publishedStories'), icon: '📚', color: '#3b82f6', borderColor: '#60a5fa' },
+    'friends': { name: t('profile.category.friendsSocial'), icon: '👥', color: '#10b981', borderColor: '#34d399' },
+    'words': { name: t('profile.category.wordCount'), icon: '✍️', color: '#f59e0b', borderColor: '#fbbf24' },
+    'likes': { name: t('profile.category.likesReceived'), icon: '❤️', color: '#ef4444', borderColor: '#f87171' },
+    'comments': { name: t('profile.category.commentsReceived'), icon: '💬', color: '#8b5cf6', borderColor: '#a78bfa' },
+    'stories_read': { name: t('profile.category.storiesRead'), icon: '📖', color: '#06b6d4', borderColor: '#22d3ee' },
+    'leaderboard': { name: t('profile.category.leaderboard'), icon: '🏆', color: '#eab308', borderColor: '#facc15' },
+    'creation_type': { name: t('profile.category.creationType'), icon: '🎨', color: '#ec4899', borderColor: '#f472b6' },
+    'collab': { name: t('profile.category.collaboration'), icon: '🤝', color: '#6366f1', borderColor: '#818cf8' },
+    'views': { name: t('profile.category.storyViews'), icon: '👁️', color: '#14b8a6', borderColor: '#2dd4bf' },
+    'games': { name: t('profile.category.games'), icon: '🎮', color: '#9333ea', borderColor: '#a855f7' },
+    'level': { name: t('profile.category.levelProgress'), icon: '⭐', color: '#f59e0b', borderColor: '#fbbf24' },
+    'rewards': { name: t('profile.category.rewardsUnlocked'), icon: '🎁', color: '#ec4899', borderColor: '#f472b6' },
   };
 
   return (
     <div className="profile-page-container">
       {/* Page Header */}
       <div className="flex items-center justify-between mb-6 px-4">
-        <h1 className="profile-page-header mb-0">Profile</h1>
+        <h1 className="profile-page-header mb-0">{t('profile.title')}</h1>
         <button
           onClick={() => navigate('/settings')}
           className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
@@ -205,7 +207,7 @@ const ProfilePage = () => {
           />
         </div>
         <h2 className="profile-user-title">{user?.name || profile.name}</h2>
-        <p className="profile-level-info">Level {userLevel.level} • {userLevel.currentXP.toLocaleString()} XP</p>
+        <p className="profile-level-info">{t('profile.level')} {userLevel.level} • {userLevel.currentXP.toLocaleString()} XP</p>
         
         {/* Progress Bar */}
         <div className="profile-progress-container">
@@ -215,7 +217,7 @@ const ProfilePage = () => {
           ></div>
         </div>
         <p className="profile-progress-text">
-          {userLevel.nextLevelXP - userLevel.currentLevelProgress} XP until Level {userLevel.level + 1}
+          {userLevel.nextLevelXP - userLevel.currentLevelProgress} XP {t('profile.xpUntilLevel')} {userLevel.level + 1}
         </p>
       </div>
 
@@ -224,25 +226,25 @@ const ProfilePage = () => {
         <div className="profile-stat-card">
           <BookOpenIcon className="profile-stat-icon" />
           <div className="profile-stat-value">{displayStats.storiesCreated}</div>
-          <div className="profile-stat-label">Stories Created</div>
+          <div className="profile-stat-label">{t('profile.storiesCreated')}</div>
         </div>
         
         <div className="profile-stat-card">
           <UserGroupIcon className="profile-stat-icon" />
           <div className="profile-stat-value">{displayStats.collaborationCount}</div>
-          <div className="profile-stat-label">Collaborations</div>
+          <div className="profile-stat-label">{t('profile.collaborations')}</div>
         </div>
         
         <div className="profile-stat-card">
           <HeartIcon className="profile-stat-icon" />
           <div className="profile-stat-value">{displayStats.totalLikes}</div>
-          <div className="profile-stat-label">Total Likes</div>
+          <div className="profile-stat-label">{t('profile.totalLikes')}</div>
         </div>
         
         <div className="profile-stat-card">
           <CalendarIcon className="profile-stat-icon" />
           <div className="profile-stat-value">{displayStats.daysActive}</div>
-          <div className="profile-stat-label">Days Active</div>
+          <div className="profile-stat-label">{t('profile.daysActive')}</div>
         </div>
       </div>
 
@@ -319,11 +321,11 @@ const ProfilePage = () => {
         </div>
       )}
 
-      {/* Achievement Categories Section */}
+      {/* {t('profile.achievementCategories')} Section */}
       <div className="profile-achievements-header">
         <span className="profile-achievements-emoji">🏆</span>
         <h2 className="profile-achievements-title">
-          Achievement Categories
+          {t('profile.achievementCategories')}
           <span style={{ 
             marginLeft: '12px', 
             fontSize: '14px', 
@@ -339,7 +341,7 @@ const ProfilePage = () => {
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '40px', color: '#9ca3af' }}>
-          Loading achievements...
+          {t('profile.loadingAchievements')}
         </div>
       ) : (
         <>
