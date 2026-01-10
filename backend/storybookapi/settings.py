@@ -215,6 +215,12 @@ GOOGLE_AI_API_KEY = os.getenv('GOOGLE_AI_API_KEY')
 # OCR.space API Configuration
 OCR_SPACE_API_KEY = os.getenv('OCR_SPACE_API_KEY')
 
+# Pollinations AI API Configuration
+POLLINATIONS_API_KEY = os.getenv('POLLINATIONS_API_KEY')
+
+# Replicate API Configuration
+REPLICATE_API_TOKEN = os.getenv('REPLICATE_API_TOKEN')
+
 # SendGrid Email Configuration
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 FROM_EMAIL = os.getenv('FROM_EMAIL', 'noreply@pixeltales.com')

@@ -38,7 +38,7 @@ interface StoryFormData {
 const AIStoryModal = ({ isOpen, onClose }: AIStoryModalProps) => {
   const navigate = useNavigate();
   const { isDarkMode } = useThemeStore();
-  const { createStory, updateStory, addPage, updatePage, syncStoryToBackend } = useStoryStore();
+  const { createStory, updateStory, addPage, updatePage, syncStoryToBackend, getStory } = useStoryStore();
   const { language, t } = useI18nStore();
   const { playSound, playSuccess, playError } = useSoundEffects();
   const [formData, setFormData] = useState<StoryFormData>({
@@ -125,12 +125,20 @@ const AIStoryModal = ({ isOpen, onClose }: AIStoryModalProps) => {
   };
 
   const handleGenerate = async () => {
-    if (!formData.storyIdea.trim()) return;
+    console.log('🚀 handleGenerate CALLED - START OF FUNCTION');
+    console.log('🚀 formData:', formData);
     
+    if (!formData.storyIdea.trim()) {
+      console.log('❌ Story idea is empty, returning early');
+      return;
+    }
+    
+    console.log('✅ Story idea validation passed, starting generation...');
     setIsGenerating(true);
     setGenerationProgress(0);
     
     try {
+      console.log('🎯 INSIDE TRY BLOCK - About to generate story');
       console.log('Generating story with:', formData);
       
       // Stage 1: Writing the story
@@ -242,13 +250,42 @@ Each page should have text and an imagePrompt for illustration generation.
         }
         
         // Validate that pages have imagePrompt field
+        console.log('========================================');
+        console.log('📋 GEMINI RESPONSE STRUCTURE VALIDATION');
+        console.log('========================================');
+        console.log('🔍 Full storyData keys:', Object.keys(storyData));
+        console.log('🔍 storyData.pages exists:', !!storyData.pages);
+        console.log('🔍 storyData.pages is array:', Array.isArray(storyData.pages));
+        
         if (storyData.pages && Array.isArray(storyData.pages)) {
           const pagesWithPrompts = storyData.pages.filter((p: any) => p.imagePrompt);
-          console.log(`Story has ${storyData.pages.length} pages, ${pagesWithPrompts.length} have imagePrompt`);
+          console.log(`📊 Story has ${storyData.pages.length} pages, ${pagesWithPrompts.length} have imagePrompt`);
+          
+          // Log ALL pages structure in detail
+          storyData.pages.forEach((page: any, i: number) => {
+            console.log(`\n📄 Page ${i + 1} details:`);
+            console.log(`   Keys: [${Object.keys(page).join(', ')}]`);
+            console.log(`   Has imagePrompt: ${!!page.imagePrompt}`);
+            console.log(`   Has text: ${!!page.text}`);
+            if (page.imagePrompt) {
+              console.log(`   imagePrompt (first 100 chars): ${page.imagePrompt.substring(0, 100)}...`);
+            }
+            if (page.text) {
+              console.log(`   text (first 80 chars): ${page.text.substring(0, 80)}...`);
+            }
+          });
+          
           if (pagesWithPrompts.length > 0) {
-            console.log('Sample imagePrompt from first page:', storyData.pages[0].imagePrompt?.substring(0, 150) + '...');
+            console.log('\n✅ GOOD: Pages have imagePrompt field');
+          } else {
+            console.error('\n❌ PROBLEM: NO PAGES HAVE imagePrompt FIELD!');
+            console.error('📊 This means Gemini did not generate the imagePrompt field.');
+            console.error('📊 Full first page object:', JSON.stringify(storyData.pages[0], null, 2));
           }
+        } else {
+          console.error('❌ PROBLEM: storyData.pages is missing or not an array!');
         }
+        console.log('========================================');
       } catch (parseError: any) {
         console.error('Failed to parse story JSON:', parseError);
         console.error('Error message:', parseError.message);
@@ -334,8 +371,7 @@ Each page should have text and an imagePrompt for illustration generation.
         
         console.log('🎨 Generating cover with description:', coverDescription);
         
-        // generateCoverIllustration already adds title overlay
-        // No need to add it again here
+        // Generate cover illustration (no title overlay, just the image)
         coverUrl = await generateCoverIllustration(
           storyData.title || 'AI Generated Story',
           coverDescription,  // Use AI-generated description
@@ -344,7 +380,7 @@ Each page should have text and an imagePrompt for illustration generation.
           storyData.colorScheme
         );
         
-        console.log('✅ Cover illustration generated (includes title overlay)');
+        console.log('✅ Cover illustration generated');
         
         // Save cover to story
         if (coverUrl) {
@@ -359,13 +395,19 @@ Each page should have text and an imagePrompt for illustration generation.
       }
       
       // Stage 3: Generate page illustrations using Gemini's detailed image prompts
-      setGenerationStage('🎨 Drawing page illustrations...');
+      // NEW STRATEGY: Generate URLs immediately, let images load in the story viewer
+      setGenerationStage('🎨 Preparing illustrations (will load in viewer)...');
       setGenerationProgress(60);
       
-      console.log('Generating page illustrations with detailed prompts from Gemini');
-      console.log('Character description:', storyData.characterDescription);
-      console.log('Color scheme:', storyData.colorScheme);
-      console.log('Using Gemini-generated image prompts for each page');
+      console.log('========================================');
+      console.log('🎨 STARTING PAGE ILLUSTRATIONS GENERATION');
+      console.log('========================================');
+      console.log('📊 Story data structure:', Object.keys(storyData));
+      console.log('📊 Pages array exists:', !!storyData.pages);
+      console.log('📊 Pages array length:', storyData.pages?.length || 0);
+      console.log('📊 Character description:', storyData.characterDescription);
+      console.log('📊 Color scheme:', storyData.colorScheme);
+      console.log('========================================');
       
       // Import the new function that uses Gemini's detailed prompts directly
       const { generateStoryIllustrationsFromPrompts } = await import('../../services/imageGenerationService');
@@ -373,10 +415,40 @@ Each page should have text and an imagePrompt for illustration generation.
       // Use Gemini's detailed imagePrompt for each page
       let imageUrls: (string | null)[] = [];
       try {
+        // DEBUG: Log the pages being sent to generation
+        console.log('📄 Pages to generate images for:', storyData.pages?.length || 0);
+        if (storyData.pages && storyData.pages.length > 0) {
+          console.log('📄 First page structure:', Object.keys(storyData.pages[0]));
+          console.log('📄 First page has imagePrompt:', !!storyData.pages[0].imagePrompt);
+          if (storyData.pages[0].imagePrompt) {
+            console.log('📄 First page imagePrompt preview:', storyData.pages[0].imagePrompt.substring(0, 100) + '...');
+          } else {
+            console.error('❌ PAGES MISSING imagePrompt FIELD!');
+            console.error('📄 First page data:', JSON.stringify(storyData.pages[0], null, 2));
+          }
+          
+          // Log ALL pages structure
+          console.log('📄 ALL PAGES STRUCTURE:');
+          storyData.pages.forEach((page: any, idx: number) => {
+            console.log(`   Page ${idx + 1}: keys = [${Object.keys(page).join(', ')}], hasImagePrompt = ${!!page.imagePrompt}`);
+          });
+        }
+        
+        console.log('🔥 CALLING generateStoryIllustrationsFromPrompts NOW...');
         imageUrls = await generateStoryIllustrationsFromPrompts(
           storyData.pages || [],
-          storyData.characterDescription // Pass character description for seed consistency
+          storyData.characterDescription, // Pass character description for seed consistency
+          (current, total, message) => {
+            // Update progress during image generation
+            const baseProgress = 60; // Start at 60%
+            const progressRange = 30; // 60% to 90%
+            const currentProgress = baseProgress + (current / total) * progressRange;
+            setGenerationProgress(Math.round(currentProgress));
+            setGenerationStage(`🎨 ${message}`);
+          }
         );
+        console.log('🔥 generateStoryIllustrationsFromPrompts COMPLETED');
+        console.log('🔥 Returned URLs:', imageUrls);
         
         console.log('Generated page image URLs:', imageUrls);
         
@@ -395,6 +467,7 @@ Each page should have text and an imagePrompt for illustration generation.
       setImageGenerationWarnings(warnings);
       
       // Add pages from the generated story with illustrations
+      console.log('📝 Adding pages to story...');
       if (storyData.pages && Array.isArray(storyData.pages)) {
         // Remove the default empty page
         const defaultPage = newStory.pages[0];
@@ -404,6 +477,12 @@ Each page should have text and an imagePrompt for illustration generation.
           const pageText = pageData.text || '';
           const imageUrl = imageUrls[index];
           
+          console.log(`📄 Adding page ${index + 1}:`, {
+            hasText: !!pageText,
+            hasImage: !!imageUrl,
+            imageUrlPreview: imageUrl?.substring(0, 100) + '...'
+          });
+          
           if (index === 0) {
             // Update the first page instead of creating new
             updatePage(newStory.id, defaultPage.id, {
@@ -411,6 +490,7 @@ Each page should have text and an imagePrompt for illustration generation.
               canvasData: imageUrl || undefined, // Save image as canvas data
               order: index
             });
+            console.log(`✅ Updated page 1 with text and image`);
           } else {
             // Add new pages with image
             const newPage = addPage(newStory.id, pageText);
@@ -418,9 +498,12 @@ Each page should have text and an imagePrompt for illustration generation.
               updatePage(newStory.id, newPage.id, {
                 canvasData: imageUrl
               });
+              console.log(`✅ Added page ${index + 1} with text and image`);
             }
           }
         });
+        
+        console.log('✅ All pages added to story');
       }
       
       // Stage 4: Organizing pages
@@ -435,21 +518,19 @@ Each page should have text and an imagePrompt for illustration generation.
         isDraft: false // Mark as complete work
       });
       
-      // CRITICAL: Immediately sync AI-generated story to backend
-      // Don't wait for the debounce timer - sync now to prevent data loss
-      setGenerationStage('💾 Saving to cloud...');
+      // Sync complete story to backend (with all images)
+      setGenerationStage('?? Saving to cloud...');
       setGenerationProgress(90);
       
+      let backendStoryId = newStory.id; // Default to local ID
       try {
-        await syncStoryToBackend(newStory.id);
-        console.log('✅ AI story synced to backend immediately');
-      } catch (error) {
-        console.warn('⚠️ Failed to sync AI story to backend:', error);
-        // Don't fail the generation - story is still safe in localStorage
+        backendStoryId = await syncStoryToBackend(newStory.id);
+        console.log('? AI story synced to backend with ID:', backendStoryId);
+      } catch (syncError) {
+        console.error('?? Failed to sync AI story to backend:', syncError);
+        // Story is still safe in localStorage, user can sync later
+        warnings.push('Story saved locally but could not sync to cloud');
       }
-      
-      // Small delay to show the stage
-      await new Promise(resolve => setTimeout(resolve, 500));
       
       setGenerationProgress(100);
       
@@ -468,12 +549,12 @@ Each page should have text and an imagePrompt for illustration generation.
       // Show warning modal if there were image generation failures
       if (warnings.length > 0) {
         setShowWarningModal(true);
-        // Store the story ID to navigate after modal closes
-        (window as any).pendingStoryNavigation = newStory.id;
+        // Store the backend story ID to navigate after modal closes
+        (window as any).pendingStoryNavigation = backendStoryId;
       } else {
-        // Close modal and navigate to the story
+        // Close modal and navigate to the story using backend ID
         handleClose();
-        navigate(`/story/${newStory.id}`);
+        navigate(`/story/${backendStoryId}`);
       }
       
     } catch (error) {
@@ -744,7 +825,10 @@ Each page should have text and an imagePrompt for illustration generation.
                 Cancel
               </button>
               <button 
-                onClick={handleGenerate}
+                onClick={() => {
+                  console.log('🖱️ GENERATE BUTTON CLICKED!');
+                  handleGenerate();
+                }}
                 disabled={!canGenerate() || isGenerating}
                 className="modal-button-primary"
               >
@@ -768,3 +852,4 @@ Each page should have text and an imagePrompt for illustration generation.
 };
 
 export default AIStoryModal;
+

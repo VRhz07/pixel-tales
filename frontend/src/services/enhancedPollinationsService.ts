@@ -1,4 +1,6 @@
 // Enhanced Pollinations service with extreme scene-based prompt engineering
+import { apiConfigService } from './apiConfig.service';
+import apiService from './api';
 
 interface EnhancedImageParams {
   prompt: string;
@@ -215,16 +217,44 @@ export const generateEnhancedPollinationsImage = async (params: EnhancedImagePar
 
   const prompts = [scenePrompt, environmentPrompt, actionPrompt, storybookPrompt];
 
-  // Try each strategy with different seeds
+  // Try each strategy with different seeds using backend proxy
   for (let i = 0; i < prompts.length; i++) {
     try {
-      const encodedPrompt = encodeURIComponent(prompts[i]);
       const seed = Math.floor(Math.random() * 1000000);
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&enhance=true`;
       
       console.log(`🎨 Trying enhanced Pollinations strategy ${i + 1}:`, prompts[i].substring(0, 80) + '...');
       
-      return imageUrl;
+      // Use backend proxy with API key
+      try {
+        const response = await apiService.post('/ai/pollinations/generate-image/', {
+          prompt: prompts[i],
+          width,
+          height,
+          model: 'flux-schnell', // Flux Schnell model (fast and free)
+          seed,
+          nologo: true,
+          enhance: true
+        });
+
+        // apiService.post returns data directly, not full response object
+        if (response && response.success && response.imageUrl) {
+          console.log('✅ Image generated successfully via backend proxy');
+          
+          // If URL is relative, prepend the API base URL
+          let finalUrl = response.imageUrl;
+          if (finalUrl.startsWith('/api/')) {
+            const apiBaseUrl = apiConfigService.getApiUrl();
+            const baseWithoutApi = apiBaseUrl.replace(/\/api\/?$/, '');
+            finalUrl = baseWithoutApi + finalUrl;
+          }
+          
+          return finalUrl;
+        }
+      } catch (backendError) {
+        console.error('Backend proxy failed for strategy', i + 1, ':', backendError);
+        // Don't use fallback - continue to next strategy
+        continue;
+      }
     } catch (error) {
       console.warn(`Strategy ${i + 1} failed:`, error);
     }
@@ -235,7 +265,36 @@ export const generateEnhancedPollinationsImage = async (params: EnhancedImagePar
   const encodedPrompt = encodeURIComponent(ultimatePrompt);
   const seed = Date.now(); // Use timestamp as seed
   
-  return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&enhance=true`;
+  // Use backend proxy for authenticated API access - final attempt
+  try {
+    const response = await apiService.post('/ai/pollinations/generate-image/', {
+      prompt: ultimatePrompt,  // Fixed: was 'enhancedPrompt' (undefined)
+      width,
+      height,
+      model: 'flux-schnell', // Flux Schnell model (fast and free)
+      seed,
+      nologo: true,
+      enhance: true
+    });
+
+    // apiService.post returns data directly
+    if (response && response.success && response.imageUrl) {
+      // If URL is relative, prepend the API base URL
+      let finalUrl = response.imageUrl;
+      if (finalUrl.startsWith('/api/')) {
+        const apiBaseUrl = apiConfigService.getApiUrl();
+        const baseWithoutApi = apiBaseUrl.replace(/\/api\/?$/, '');
+        finalUrl = baseWithoutApi + finalUrl;
+      }
+      return finalUrl;
+    } else {
+      throw new Error('Backend returned unsuccessful response');
+    }
+  } catch (error) {
+    console.error('❌ All strategies failed, backend proxy not working:', error);
+    // Return error placeholder or throw error
+    throw new Error('Failed to generate image - backend proxy not responding');
+  }
 };
 
 // Generate multiple variations for user to choose from
@@ -262,11 +321,37 @@ export const generateImageVariations = async (
     ];
     
     const variedPrompt = `${basePrompt}. ${variationKeywords[i] || 'unique composition'}`;
-    const encodedPrompt = encodeURIComponent(variedPrompt);
     const seed = Math.floor(Math.random() * 1000000) + i * 1000;
     
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${params.width || 512}&height=${params.height || 512}&seed=${seed}&enhance=true`;
-    variations.push(imageUrl);
+    // Try backend proxy first
+    try {
+      const response = await apiService.post('/ai/pollinations/generate-image/', {
+        prompt: variedPrompt,
+        width: params.width || 512,
+        height: params.height || 512,
+        model: 'flux-schnell', // Flux Schnell model (fast and free)
+        seed,
+        nologo: true,
+        enhance: true
+      });
+
+      // apiService.post returns data directly
+      if (response && response.success && response.imageUrl) {
+        // If URL is relative, prepend the API base URL
+        let finalUrl = response.imageUrl;
+        if (finalUrl.startsWith('/api/')) {
+          const apiBaseUrl = apiConfigService.getApiUrl();
+          const baseWithoutApi = apiBaseUrl.replace(/\/api\/?$/, '');
+          finalUrl = baseWithoutApi + finalUrl;
+        }
+        variations.push(finalUrl);
+        continue;
+      }
+    } catch (error) {
+      console.error('Backend proxy failed for variation:', error);
+      // Skip this variation if backend fails
+      variations.push(null);
+    }
   }
   
   return variations;

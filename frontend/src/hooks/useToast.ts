@@ -98,6 +98,25 @@ export const useToast = () => {
     });
   }, [showToast]);
 
+  const showXPGain = useCallback((xpGained: number, action?: string) => {
+    // XP popup will be implemented in the future
+    console.log('XP Gain:', xpGained, action);
+  }, []);
+
+  const showLevelUp = useCallback((
+    newLevel: number,
+    unlockedItems?: Array<{
+      type: 'avatar' | 'border';
+      name: string;
+      emoji?: string;
+      gradient?: string;
+    }>,
+    totalXP?: number
+  ) => {
+    // Level up modal will be implemented in the future
+    console.log('Level Up:', newLevel, unlockedItems, totalXP);
+  }, []);
+
   return {
     toasts,
     showToast,
@@ -108,6 +127,8 @@ export const useToast = () => {
     showInviteToast,
     showSuccessToast,
     showErrorToast,
-    showInfoToast
+    showInfoToast,
+    showXPGain,
+    showLevelUp
   };
 };

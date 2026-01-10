@@ -93,16 +93,30 @@ const StoryReaderPage: React.FC = () => {
       
       setIsLoading(true);
       
-      // First, try to fetch from backend if user is authenticated
-      // This ensures we get the backend ID for published stories
-      let backendFetchSucceeded = false;
+      // First, try to load from localStorage
+      // This handles unpublished/draft stories that haven't been synced yet
+      const localStory = getStory(storyId);
+      if (localStory && !localStory.isPublished) {
+        console.log('📖 Loaded UNPUBLISHED story from local store:', localStory.title);
+        setStory(localStory);
+        setStoryAuthor(user?.username || 'You');
+        setIsOwnStory(true); // Local unpublished stories are always owned by current user
+        setIsSavedOffline(isStorySavedOffline(storyId));
+        setIsLoading(false);
+        return;
+      }
+      
+      // For published stories or if not in local store, fetch from backend
       if (user) {
         try {
-          console.log('🔍 Attempting to fetch story from backend:', storyId);
+          console.log('🔍 Fetching PUBLISHED story from backend:', storyId);
           const apiStory = await storyApiService.getStory(storyId);
+          console.log('📦 Raw API story:', apiStory);
+          console.log('📦 Canvas data from API:', apiStory.canvas_data);
           
           const convertedStory = storyApiService.convertFromApiFormat(apiStory);
-          console.log('✅ Loaded story from backend:', convertedStory.title);
+          console.log('✅ Converted story:', convertedStory);
+          console.log('✅ Pages with canvasData:', convertedStory.pages.filter(p => p.canvasData).length);
           
           setStory(convertedStory);
           const authorDisplay = apiStory.is_collaborative && apiStory.authors_names && apiStory.authors_names.length > 0
@@ -128,25 +142,21 @@ const StoryReaderPage: React.FC = () => {
           setIsSaved(apiStory.is_saved_by_user || false);
           setIsSavedOffline(isStorySavedOffline(storyId));
           
-          backendFetchSucceeded = true;
           setIsLoading(false);
           return;
-        } catch (error) {
-          console.log('⚠️ Backend fetch failed, trying local store:', error);
-        }
-      }
-      
-      // Fallback: try to get from local store if backend fetch failed or user not logged in
-      if (!backendFetchSucceeded) {
-        const localStory = getStory(storyId);
-        if (localStory) {
-          console.log('📖 Loaded story from local store:', localStory.title);
-          setStory(localStory);
-          setStoryAuthor(user?.username || 'You');
-          setIsOwnStory(true); // Local stories are always owned by current user
-          setIsSavedOffline(isStorySavedOffline(storyId));
-          setIsLoading(false);
-          return;
+        } catch (error: any) {
+          console.error('❌ Failed to load story from backend:', error);
+          
+          // If backend fails, try local store as final fallback
+          if (localStory) {
+            console.log('📖 Fallback to local store after backend error:', localStory.title);
+            setStory(localStory);
+            setStoryAuthor(user?.username || 'You');
+            setIsOwnStory(true);
+            setIsSavedOffline(isStorySavedOffline(storyId));
+            setIsLoading(false);
+            return;
+          }
         }
       }
       
@@ -711,19 +721,7 @@ const StoryReaderPage: React.FC = () => {
     });
     
     try {
-      // Import the image generation service
-      const { checkPollinationsHealth } = await import('../services/imageGenerationService');
-      
-      // Check if service is healthy
-      const isHealthy = await checkPollinationsHealth();
-      
-      if (!isHealthy) {
-        alert('⚠️ Image Generation Service Still Unavailable\n\nThe image service is still down. Please try again later.');
-        setFailedImages(prev => new Set([...prev, pageId]));
-        return;
-      }
-      
-      // Service is healthy, force reload the image by adding a cache-busting parameter
+      // Force reload the image by adding a cache-busting parameter
       const imageElement = document.querySelector(`img[data-page-id="${pageId}"]`) as HTMLImageElement;
       if (imageElement && imageElement.src) {
         const originalSrc = imageElement.src.split('?')[0]; // Remove existing query params
@@ -736,18 +734,21 @@ const StoryReaderPage: React.FC = () => {
         imageElement.src = newSrc;
         
         playButtonClick();
-        console.log(`🔄 Regenerating image for ${imageType} ${pageId}`);
+        console.log(`🔄 Retrying image load for ${imageType} ${pageId}`);
       }
     } catch (error) {
-      console.error('Failed to regenerate image:', error);
+      console.error('Failed to retry image:', error);
       setFailedImages(prev => new Set([...prev, pageId]));
-      alert('Failed to regenerate image. Please try again.');
+      alert('Failed to retry image. Please try again.');
     } finally {
-      setRegeneratingImages(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(pageId);
-        return newSet;
-      });
+      // Remove from regenerating state after a short delay
+      setTimeout(() => {
+        setRegeneratingImages(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(pageId);
+          return newSet;
+        });
+      }, 1000);
     }
   };
 
@@ -836,85 +837,6 @@ const StoryReaderPage: React.FC = () => {
                   </div>
                 )}
                 
-                {/* Regenerate Button - Show when image fails */}
-                {failedImages.has(page.id) && !regeneratingImages.has(page.id) && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 10,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    backgroundColor: isDarkMode ? 'rgba(42, 36, 53, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-                    padding: '1.5rem',
-                    borderRadius: '1rem',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                  }}>
-                    <span style={{ 
-                      color: isDarkMode ? '#e5e7eb' : '#374151',
-                      fontSize: '0.875rem',
-                      fontWeight: '500',
-                      textAlign: 'center'
-                    }}>
-                      ⚠️ Image failed to load
-                    </span>
-                    <button
-                      onClick={() => handleRegenerateImage(page.id, 'page')}
-                      style={{
-                        padding: '0.5rem 1rem',
-                        backgroundColor: '#8b5cf6',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '0.5rem',
-                        fontSize: '0.875rem',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        transition: 'background-color 0.2s'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7c3aed'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8b5cf6'}
-                    >
-                      🔄 Retry Loading
-                    </button>
-                  </div>
-                )}
-                
-                {/* Regenerating Spinner */}
-                {regeneratingImages.has(page.id) && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 10,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                  }}>
-                    <div style={{
-                      width: '40px',
-                      height: '40px',
-                      border: '4px solid rgba(139, 92, 246, 0.2)',
-                      borderTop: '4px solid #8b5cf6',
-                      borderRadius: '50%',
-                      animation: 'spin 1s linear infinite'
-                    }} />
-                    <span style={{ 
-                      color: isDarkMode ? '#a78bfa' : '#8b5cf6',
-                      fontSize: '0.875rem',
-                      fontWeight: '500'
-                    }}>
-                      Retrying...
-                    </span>
-                  </div>
-                )}
                 
                 <img
                   data-page-id={page.id}
@@ -922,26 +844,45 @@ const StoryReaderPage: React.FC = () => {
                   alt={`Page ${index + 1} illustration`}
                   className="story-reader-illustration"
                   style={{ 
-                    opacity: loadingImages.has(page.id) || failedImages.has(page.id) ? 0.3 : 1,
+                    opacity: loadingImages.has(page.id) ? 0.3 : 1,
                     transition: 'opacity 0.3s ease-in-out'
                   }}
                   onLoadStart={() => {
                     setLoadingImages(prev => new Set([...prev, page.id]));
                   }}
                   onError={(e) => {
-                    console.error(`❌ Failed to load image for page ${index + 1}`);
-                    console.error('Image URL:', canvasData.substring(0, 100) + '...');
-                    console.error('Error event:', e);
-                    setLoadingImages(prev => {
-                      const newSet = new Set(prev);
-                      newSet.delete(page.id);
-                      return newSet;
-                    });
-                    setFailedImages(prev => new Set([...prev, page.id]));
-                    // Don't hide the image - show regenerate button instead
+                    // Mark as failed to show retry button
+                    const newFailedPages = new Set(failedPageLoads);
+                    newFailedPages.add(index);
+                    setFailedPageLoads(newFailedPages);
                   }}
-                  onLoad={() => {
-                    console.log(`✅ Successfully loaded image for page ${index + 1}`);
+                  onLoad={async (e) => {
+                    // Check if this is a real image or a placeholder
+                    const img = e.currentTarget as HTMLImageElement;
+                    
+                    // Only check for Pollinations URLs (backend proxy or direct)
+                    if (canvasData && (canvasData.includes('pollinations') || canvasData.includes('/fetch-image'))) {
+                      try {
+                        const response = await fetch(canvasData, { cache: 'no-cache' });
+                        const blob = await response.blob();
+                        const sizeKB = blob.size / 1024;
+                        
+                        console.log(`📊 Page ${index + 1}: Image size: ${sizeKB.toFixed(1)}KB`);
+                        
+                        // Pollinations placeholders are LARGE (1-2MB), real images are smaller (50-100KB)
+                        if (sizeKB > 500) {
+                          console.log(`⏳ Page ${index + 1}: Large placeholder detected (${sizeKB.toFixed(1)}KB), keeping loading state`);
+                          // Keep in loading state - image is still generating
+                          return;
+                        }
+                        
+                        console.log(`✅ Page ${index + 1}: Real image loaded (${sizeKB.toFixed(1)}KB)`);
+                      } catch (err) {
+                        console.log(`⚠️ Page ${index + 1}: Could not check image size, marking as loaded`);
+                      }
+                    }
+                    
+                    // Real image loaded - remove from loading states
                     setLoadingImages(prev => {
                       const newSet = new Set(prev);
                       newSet.delete(page.id);
@@ -1049,85 +990,6 @@ const StoryReaderPage: React.FC = () => {
                     </div>
                   )}
                   
-                  {/* Regenerate Button - Horizontal Mode */}
-                  {page && failedImages.has(page.id) && !regeneratingImages.has(page.id) && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      zIndex: 10,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '1rem',
-                      backgroundColor: isDarkMode ? 'rgba(42, 36, 53, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-                      padding: '1.5rem',
-                      borderRadius: '1rem',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                    }}>
-                      <span style={{ 
-                        color: isDarkMode ? '#e5e7eb' : '#374151',
-                        fontSize: '0.875rem',
-                        fontWeight: '500',
-                        textAlign: 'center'
-                      }}>
-                        ⚠️ Image failed to load
-                      </span>
-                      <button
-                        onClick={() => handleRegenerateImage(page.id, 'page')}
-                        style={{
-                          padding: '0.5rem 1rem',
-                          backgroundColor: '#8b5cf6',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '0.5rem',
-                          fontSize: '0.875rem',
-                          fontWeight: '600',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.5rem',
-                          transition: 'background-color 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7c3aed'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8b5cf6'}
-                      >
-                        🔄 Retry Loading
-                      </button>
-                    </div>
-                  )}
-                  
-                  {/* Regenerating Spinner - Horizontal Mode */}
-                  {page && regeneratingImages.has(page.id) && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      zIndex: 10,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '0.5rem'
-                    }}>
-                      <div style={{
-                        width: '50px',
-                        height: '50px',
-                        border: '5px solid rgba(139, 92, 246, 0.2)',
-                        borderTop: '5px solid #8b5cf6',
-                        borderRadius: '50%',
-                        animation: 'spin 1s linear infinite'
-                      }} />
-                      <span style={{ 
-                        color: isDarkMode ? '#a78bfa' : '#8b5cf6',
-                        fontSize: '1rem',
-                        fontWeight: '500'
-                      }}>
-                        Retrying...
-                      </span>
-                    </div>
-                  )}
                   
                   <img
                     data-page-id={page?.id}
@@ -1135,7 +997,7 @@ const StoryReaderPage: React.FC = () => {
                     alt={`Page ${currentPage + 1} illustration`}
                     className="story-reader-horizontal-illustration"
                     style={{ 
-                      opacity: page && (loadingImages.has(page.id) || failedImages.has(page.id)) ? 0.3 : 1,
+                      opacity: page && loadingImages.has(page.id) ? 0.3 : 1,
                       transition: 'opacity 0.3s ease-in-out'
                     }}
                     onLoadStart={() => {
@@ -1144,38 +1006,55 @@ const StoryReaderPage: React.FC = () => {
                       }
                     }}
                     onError={(e) => {
-                      console.error(`❌ Failed to load image for page ${currentPage + 1}`);
-                      console.error('Image URL:', canvasData.substring(0, 100) + '...');
-                      console.error('Error event:', e);
-                      if (page) {
-                        setLoadingImages(prev => {
-                          const newSet = new Set(prev);
-                          newSet.delete(page.id);
-                          return newSet;
-                        });
-                        setFailedImages(prev => new Set([...prev, page.id]));
-                      }
-                      // Don't hide - show regenerate button instead
+                      // Mark as failed to show retry button
+                      const newFailedPages = new Set(failedPageLoads);
+                      newFailedPages.add(currentPage);
+                      setFailedPageLoads(newFailedPages);
                     }}
-                    onLoad={() => {
-                      console.log(`✅ Successfully loaded image for page ${currentPage + 1}`);
-                      if (page) {
-                        setLoadingImages(prev => {
-                          const newSet = new Set(prev);
-                          newSet.delete(page.id);
-                          return newSet;
-                        });
-                        setFailedImages(prev => {
-                          const newSet = new Set(prev);
-                          newSet.delete(page.id);
-                          return newSet;
-                        });
-                        setRegeneratingImages(prev => {
-                          const newSet = new Set(prev);
-                          newSet.delete(page.id);
-                          return newSet;
-                        });
+                    onLoad={async (e) => {
+                      if (!page) return;
+                      
+                      // Check if this is a real image or a placeholder
+                      const img = e.currentTarget as HTMLImageElement;
+                      
+                      // Only check for Pollinations URLs (backend proxy or direct)
+                      if (canvasData && (canvasData.includes('pollinations') || canvasData.includes('/fetch-image'))) {
+                        try {
+                          const response = await fetch(canvasData, { cache: 'no-cache' });
+                          const blob = await response.blob();
+                          const sizeKB = blob.size / 1024;
+                          
+                          console.log(`📊 Page ${currentPage + 1}: Image size: ${sizeKB.toFixed(1)}KB`);
+                          
+                          // Pollinations placeholders are LARGE (1-2MB), real images are smaller (50-100KB)
+                          if (sizeKB > 500) {
+                            console.log(`⏳ Page ${currentPage + 1}: Large placeholder detected (${sizeKB.toFixed(1)}KB), keeping loading state`);
+                            // Keep in loading state - image is still generating
+                            return;
+                          }
+                          
+                          console.log(`✅ Page ${currentPage + 1}: Real image loaded (${sizeKB.toFixed(1)}KB)`);
+                        } catch (err) {
+                          console.log(`⚠️ Page ${currentPage + 1}: Could not check image size, marking as loaded`);
+                        }
                       }
+                      
+                      // Real image loaded - remove from loading states
+                      setLoadingImages(prev => {
+                        const newSet = new Set(prev);
+                        newSet.delete(page.id);
+                        return newSet;
+                      });
+                      setFailedImages(prev => {
+                        const newSet = new Set(prev);
+                        newSet.delete(page.id);
+                        return newSet;
+                      });
+                      setRegeneratingImages(prev => {
+                        const newSet = new Set(prev);
+                        newSet.delete(page.id);
+                        return newSet;
+                      });
                     }}
                   />
                 </div>
@@ -1474,10 +1353,62 @@ const StoryReaderPage: React.FC = () => {
                   return newSet;
                 });
                 setFailedImages(prev => new Set([...prev, 'cover']));
-                // Don't hide - show regenerate button instead
+                
+                // Auto-retry after 10 seconds for Pollinations images
+                if (story.coverImage && story.coverImage.includes('pollinations')) {
+                  console.log(`⏳ Will auto-retry cover in 10 seconds...`);
+                  setTimeout(() => {
+                    const img = e.currentTarget as HTMLImageElement;
+                    if (img && img.parentElement && story.coverImage) {
+                      console.log(`🔄 Auto-retrying cover...`);
+                      img.src = story.coverImage + '&retry=' + Date.now();
+                    }
+                  }, 10000);
+                }
               }}
-              onLoad={() => {
-                console.log('✅ Successfully loaded cover image');
+              onLoad={async (e) => {
+                console.log('✅ Cover image loaded, checking if it\'s real or placeholder...');
+                
+                const img = e.currentTarget as HTMLImageElement;
+                
+                // For Pollinations images, check if it's a placeholder by fetching size
+                if (story.coverImage && story.coverImage.includes('pollinations')) {
+                  try {
+                    const response = await fetch(story.coverImage, { cache: 'no-cache' });
+                    const blob = await response.blob();
+                    const sizeKB = blob.size / 1024;
+                    
+                    console.log(`📊 Cover: Loaded image size: ${sizeKB.toFixed(1)}KB (${img.naturalWidth}×${img.naturalHeight})`);
+                    
+                    // Real images are 50-100KB, placeholders are much larger (~1.3MB)
+                    if (sizeKB > 200) {
+                      console.warn(`⚠️ Cover: Placeholder detected (${sizeKB.toFixed(1)}KB), will retry...`);
+                      setFailedImages(prev => new Set([...prev, 'cover']));
+                      
+                      // Retry after 10 seconds
+                      setTimeout(() => {
+                        if (img && img.parentElement && story.coverImage) {
+                          console.log(`🔄 Auto-retrying cover...`);
+                          img.src = story.coverImage + '&retry=' + Date.now();
+                        }
+                      }, 10000);
+                      return;
+                    }
+                  } catch (err) {
+                    console.error(`❌ Failed to check cover image size:`, err);
+                    // If we can't check size, retry anyway to be safe
+                    setFailedImages(prev => new Set([...prev, 'cover']));
+                    setTimeout(() => {
+                      if (img && img.parentElement && story.coverImage) {
+                        console.log(`🔄 Retrying cover (size check failed)...`);
+                        img.src = story.coverImage + '&retry=' + Date.now();
+                      }
+                    }, 10000);
+                    return;
+                  }
+                }
+                
+                console.log('✅ Cover: Real image loaded successfully');
                 setLoadingImages(prev => {
                   const newSet = new Set(prev);
                   newSet.delete('cover');

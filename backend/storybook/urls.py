@@ -192,8 +192,12 @@ urlpatterns = [
     # AI Service Proxy Endpoints (Secure - API keys stay on backend)
     path('ai/gemini/generate-story/', ai_proxy_views.generate_story_with_gemini, name='generate_story_with_gemini'),
     path('ai/gemini/generate-character/', ai_proxy_views.generate_character_with_gemini, name='generate_character_with_gemini'),
+    path('ai/gemini/generate-image/', ai_proxy_views.generate_image_with_gemini, name='generate_image_with_gemini'),
     path('ai/gemini/analyze-image/', ai_proxy_views.analyze_image_with_gemini, name='analyze_image_with_gemini'),
     path('ai/ocr/process/', ai_proxy_views.ocr_image, name='ocr_image'),
+    path('ai/pollinations/generate-image/', ai_proxy_views.generate_image_with_pollinations, name='generate_image_with_pollinations'),
+    path('ai/replicate/generate-image/', ai_proxy_views.generate_image_with_replicate, name='generate_image_with_replicate'),
+    path('ai/pollinations/fetch-image/', ai_proxy_views.fetch_pollinations_image, name='fetch_pollinations_image'),
     path('ai/status/', ai_proxy_views.check_ai_service_status, name='check_ai_service_status'),
     
     # Text-to-Speech Endpoints

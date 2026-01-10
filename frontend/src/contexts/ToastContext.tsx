@@ -13,6 +13,13 @@ interface ToastContextType {
   showSuccessToast: (title: string, message: string) => string;
   showErrorToast: (title: string, message: string) => string;
   showInfoToast: (title: string, message: string) => string;
+  showXPGain: (xpGained: number, action?: string) => void;
+  showLevelUp: (newLevel: number, unlockedItems?: Array<{
+    type: 'avatar' | 'border';
+    name: string;
+    emoji?: string;
+    gradient?: string;
+  }>, totalXP?: number) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -23,6 +30,8 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   return (
     <ToastContext.Provider value={toastMethods}>
       {children}
+      
+      {/* XP Gain Popup and Level Up Modal will be added in the future */}
     </ToastContext.Provider>
   );
 };

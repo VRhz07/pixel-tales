@@ -60,7 +60,7 @@ function AppContent() {
   const [currentInviteNotification, setCurrentInviteNotification] = useState<CollaborationInvite | null>(null);
   const [showWaitingScreen, setShowWaitingScreen] = useState(false);
   const [waitingScreenData, setWaitingScreenData] = useState<{sessionId: string, storyTitle: string, inviterName: string} | null>(null);
-  const { toasts, removeToast, showOnlineToast, showOfflineToast, showInviteToast } = useToastContext();
+  const { toasts, removeToast, showOnlineToast, showOfflineToast, showInviteToast, showXPGain, showLevelUp } = useToastContext();
   const [notificationReconnectAttempt, setNotificationReconnectAttempt] = useState(0);
   
   // Handle Android back button in Capacitor
@@ -325,6 +325,8 @@ function AppContent() {
       notificationWebSocket.disconnect();
     };
   }, [isAuthenticated]);
+
+  // XP system event listeners will be added in the future
 
   // Handle accepting collaboration invitation from notification modal
   const handleAcceptInviteFromNotification = async () => {

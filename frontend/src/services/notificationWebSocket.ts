@@ -219,6 +219,33 @@ class NotificationWebSocketService {
         }
         break;
 
+      case 'xp_gained':
+        console.log('🔔 XP gained:', message.xp_amount);
+        // Dispatch custom event for XP gain
+        window.dispatchEvent(new CustomEvent('xp-gained', {
+          detail: {
+            xp_amount: message.xp_amount,
+            action: message.action,
+            total_xp: message.total_xp,
+            level: message.level,
+            current_level_xp: message.current_level_xp,
+            next_level_xp: message.next_level_xp
+          }
+        }));
+        break;
+
+      case 'level_up':
+        console.log('🔔 Level up!:', message.new_level);
+        // Dispatch custom event for level up
+        window.dispatchEvent(new CustomEvent('level-up', {
+          detail: {
+            new_level: message.new_level,
+            total_xp: message.total_xp,
+            unlocked_items: message.unlocked_items
+          }
+        }));
+        break;
+
       case 'collaboration_session_started':
         console.log('🔔 Collaboration session started:', message.session_id);
         // Dispatch custom event for the app to listen to

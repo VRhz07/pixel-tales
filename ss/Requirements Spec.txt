@@ -1,0 +1,98 @@
+                           📱 Minimum System Requirements
+
+                                  Android Version
+
+ • Minimum SDK: Android 6.0 (API Level 23) - Marshmallow
+ • Target SDK: Android 14 (API Level 35)
+ • Compile SDK: Android 14 (API Level 35)
+
+                               Hardware Requirements
+
+ • RAM: 2GB minimum (for basic functionality)
+ • Storage: 100-150MB for app installation
+ • Additional Storage: 200MB+ recommended for offline content (stories, games,
+   images)
+ • Display: 720x1280 pixels minimum resolution
+ • Touch Screen: Required, with minimum 44px touch targets (follows iOS/Android
+   guidelines)
+ • Network: Internet connection required for:
+    • AI story generation
+    • Voice input (Speech-to-Text)
+    • Real-time collaboration
+    • Image generation
+    • Social features
+
+                                 Required Features
+
+ • TTS Engine installed (Google TTS recommended)
+ • Camera (for Photo Story feature)
+ • Microphone (for voice input)
+ • Network connectivity (WiFi or mobile data)
+
+────────────────────────────────────────────────────────────────────────────────────
+
+                           ⚡ Recommended Specifications
+
+                              For Optimal Performance
+
+ • Android Version: Android 12+ (API Level 31+)
+ • RAM: 4GB or more
+ • Storage: 500MB+ free space
+ • Processor: Quad-core 1.5GHz or better
+ • Display: 1080x1920 pixels or higher
+ • Network: Stable WiFi connection (3G/4G minimum, 4G/5G recommended)
+
+                                For Best Experience
+
+ • RAM: 6GB+ (especially for collaborative features and canvas drawing)
+ • Storage: 1GB+ free space (for extensive offline content)
+ • Network: High-speed WiFi or 5G (for real-time collaboration and AI features)
+
+────────────────────────────────────────────────────────────────────────────────────
+
+                             🔧 Technical Dependencies
+
+                                    Build Tools
+
+ • Gradle: 8.7.2
+ • Java: Version 21 (both source and target compatibility)
+ • Android Gradle Plugin: 8.7.2
+
+                                   Key Libraries
+
+ • Capacitor: 7.4.4
+ • AndroidX AppCompat: 1.7.0
+ • AndroidX Media: 1.6.0
+ • Material Design: 1.9.0
+
+────────────────────────────────────────────────────────────────────────────────────
+
+                          💡 Feature-Specific Requirements
+
+                                   Canvas Drawing
+
+ • Minimum 2.2rem touch targets on small screens
+ • WebView with hardware acceleration support
+
+                              Real-time Collaboration
+
+ • WebSocket support
+ • Stable network connection (minimum 1 Mbps)
+ • 512MB+ available RAM during active sessions
+
+                                   Text-to-Speech
+
+ • TTS engine installed (Google TTS recommended)
+ • Audio playback capability
+ • Background audio support for media notifications
+
+                                    Voice Input
+
+ • Chrome 25+ or compatible WebView
+ • HTTPS connection or localhost (for Speech Recognition API)
+ • Microphone permission granted
+
+                                  Offline Content
+
+ • 200MB-1GB storage for cached stories and games
+ • Local database support (IndexedDB/SQLite)

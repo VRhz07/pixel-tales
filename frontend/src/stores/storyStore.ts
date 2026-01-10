@@ -54,6 +54,7 @@ interface UserLibrary {
   stories: Story[];
   characters: Character[];
   offlineStories: Story[]; // Stories saved for offline reading
+  deletedStoryIds: number[]; // Backend IDs of stories that have been deleted
 }
 
 // Debounce timers for syncing (to prevent duplicate story creation)
@@ -119,7 +120,7 @@ interface StoryState {
   // API Sync Operations
   syncStoriesToBackend: () => Promise<void>;
   loadStoriesFromBackend: () => Promise<void>;
-  syncStoryToBackend: (id: string) => Promise<void>;
+  syncStoryToBackend: (id: string) => Promise<string>; // Returns backend ID
   
   // Statistics
   getStats: () => {
@@ -369,7 +370,8 @@ export const useStoryStore = create<StoryState>()(
               [userId]: {
                 stories: [],
                 characters: [],
-                offlineStories: []
+                offlineStories: [],
+                deletedStoryIds: []
               }
             }
           }));
@@ -436,6 +438,17 @@ export const useStoryStore = create<StoryState>()(
       },
 
       updateStory: (id: string, updates: Partial<Story>) => {
+        // Debug: Log what's being updated
+        if (updates.pages) {
+          console.log(`📝 updateStory called for ${id}:`, {
+            updatingPages: true,
+            pageCount: updates.pages.length,
+            pagesWithImages: updates.pages.filter(p => p.canvasData).length,
+            page1HasImage: !!updates.pages[0]?.canvasData,
+            page1ImagePreview: updates.pages[0]?.canvasData?.substring(0, 50)
+          });
+        }
+        
         set((state) => {
           if (!state.currentUserId) return state;
           
@@ -476,7 +489,12 @@ export const useStoryStore = create<StoryState>()(
         const updatedStory = get().userLibraries[get().currentUserId!]?.stories.find(s => s.id === id);
         const hasContent = updatedStory?.pages.some(page => page.text.trim().length > 0);
         
-        if (hasContent) {
+        // Skip auto-sync for AI stories that are still generating (don't have images yet)
+        const isAiStoryGenerating = updatedStory?.creationType === 'ai_assisted' && 
+          updatedStory.pages.length > 0 && 
+          !updatedStory.pages[0]?.canvasData; // First page doesn't have image yet
+        
+        if (hasContent && !isAiStoryGenerating) {
           // Clear existing timer for this story
           if (syncTimers[id]) {
             clearTimeout(syncTimers[id]);
@@ -512,12 +530,19 @@ export const useStoryStore = create<StoryState>()(
           const currentLibrary = state.userLibraries[state.currentUserId];
           if (!currentLibrary) return state;
           
+          // Track deleted story backend ID to prevent it from reappearing
+          const deletedIds = currentLibrary.deletedStoryIds || [];
+          const updatedDeletedIds = story?.backendId 
+            ? [...deletedIds, story.backendId]
+            : deletedIds;
+          
           return {
             userLibraries: {
               ...state.userLibraries,
               [state.currentUserId]: {
                 ...currentLibrary,
-                stories: currentLibrary.stories.filter(story => story.id !== id)
+                stories: currentLibrary.stories.filter(story => story.id !== id),
+                deletedStoryIds: updatedDeletedIds
               }
             },
             currentStory: state.currentStory?.id === id ? null : state.currentStory,
@@ -530,7 +555,7 @@ export const useStoryStore = create<StoryState>()(
           storyApiService.deleteStory(story.backendId.toString()).catch(err => {
             // 404 is expected if story was already deleted
             if (err?.status === 404) {
-              console.log('✅ Story was already deleted from backend');
+              console.log('✅ Story was already deleted from backend (or never synced)');
             } else {
               console.warn('❌ Failed to delete story from backend:', err);
             }
@@ -628,13 +653,39 @@ export const useStoryStore = create<StoryState>()(
 
       updatePage: (storyId: string, pageId: string, updates: Partial<StoryPage>) => {
         const story = get().getStory(storyId);
-        if (!story) return;
+        if (!story) {
+          console.error('❌ updatePage: Story not found:', storyId);
+          return;
+        }
+
+        console.log(`📝 updatePage called: storyId=${storyId}, pageId=${pageId}`, {
+          hasCanvasData: !!updates.canvasData,
+          canvasDataPreview: updates.canvasData?.substring(0, 50),
+          otherUpdates: Object.keys(updates).filter(k => k !== 'canvasData')
+        });
 
         const updatedPages = story.pages.map(page =>
           page.id === pageId ? { ...page, ...updates } : page
         );
+        
+        console.log(`✅ Updated pages:`, {
+          totalPages: updatedPages.length,
+          pagesWithImages: updatedPages.filter(p => p.canvasData).length
+        });
 
         get().updateStory(storyId, { pages: updatedPages });
+        
+        // Verify the update actually stuck
+        setTimeout(() => {
+          const verifyStory = get().getStory(storyId);
+          console.log(`🔍 Verification after updatePage:`, {
+            storyId,
+            pageId,
+            pagesInStore: verifyStory?.pages.length,
+            pagesWithImages: verifyStory?.pages.filter(p => p.canvasData).length,
+            targetPageHasImage: !!verifyStory?.pages.find(p => p.id === pageId)?.canvasData
+          });
+        }, 100);
       },
 
       deletePage: (storyId: string, pageId: string) => {
@@ -914,7 +965,12 @@ export const useStoryStore = create<StoryState>()(
       },
 
       publishStory: (id: string) => {
+        // Update story to published and trigger sync
         get().updateStory(id, { isPublished: true });
+        
+        // DO NOT reload from backend - this would strip the images!
+        // The story is already in localStorage with all images intact
+        // When viewing published stories from backend, they will fetch fresh with images
       },
 
       unpublishStory: (id: string) => {
@@ -1120,49 +1176,83 @@ export const useStoryStore = create<StoryState>()(
           
           const backendStories = apiStories.map(apiStory => storyApiService.convertFromApiFormat(apiStory));
           console.log('✅ Converted stories:', backendStories);
+          
+          // Get list of deleted story IDs to exclude
+          const deletedIds = state.userLibraries[state.currentUserId!]?.deletedStoryIds || [];
+          console.log('🗑️ Deleted story IDs to exclude:', deletedIds);
 
-          // CRITICAL: Sanitize backend stories to remove large images
-          // This prevents localStorage quota exceeded errors
-          const sanitizedBackendStories = backendStories.map(story => ({
-            ...story,
-            coverImage: undefined, // Remove cover images
-            pages: story.pages.map(page => ({
-              ...page,
-              canvasData: undefined, // Remove canvas images
-              canvasDrawingState: undefined, // Remove drawing state
-            }))
-          }));
+          // Filter out stories that were deleted by the user
+          const filteredStories = backendStories.filter(story => 
+            !deletedIds.includes(story.backendId!)
+          );
+          
+          if (filteredStories.length < backendStories.length) {
+            console.log(`🗑️ Filtered out ${backendStories.length - filteredStories.length} deleted stories`);
+          }
 
           // Get existing localStorage stories
           const localStories = state.userLibraries[state.currentUserId!]?.stories || [];
           
-          // Find stories that exist in localStorage but not in backend (unsaved drafts)
-          const localOnlyStories = localStories.filter(localStory => 
-            !localStory.backendId && // No backend ID
-            !sanitizedBackendStories.some(backendStory => backendStory.id === localStory.id) // Not in backend
-          );
+          // CRITICAL FIX: Preserve local images when merging with backend
+          // Instead of removing images, we merge backend text with local images
+          console.log('🖼️ Preserving local images during backend sync...');
           
-          console.log(`📝 Found ${localOnlyStories.length} local-only stories (unsaved drafts)`);
-          
-          // Merge backend stories with local stories, preserving local draft state
-          const mergedStories = sanitizedBackendStories.map(backendStory => {
+          const mergedStories = filteredStories.map(backendStory => {
             // Find matching local story by backend ID
             const localStory = localStories.find(ls => ls.backendId === backendStory.backendId);
             
             if (localStory) {
-              // If local story is marked as draft, preserve that state
-              if (localStory.isDraft && !backendStory.isDraft) {
-                console.log(`📝 Preserving draft state for story ${backendStory.id}`);
-                return {
-                  ...backendStory,
-                  isDraft: true,
-                  isPublished: false
-                };
-              }
+              console.log(`🔄 Merging story ${backendStory.title}:`, {
+                hasLocalCover: !!localStory.coverImage,
+                localPagesWithImages: localStory.pages.filter(p => p.canvasData).length,
+                backendPages: backendStory.pages.length
+              });
+              
+              // Merge backend data with local images
+              return {
+                ...backendStory, // Use backend text and metadata
+                coverImage: localStory.coverImage, // Preserve local cover image
+                coverImageOperations: localStory.coverImageOperations,
+                coverImageDrawingState: localStory.coverImageDrawingState,
+                isDraft: localStory.isDraft || backendStory.isDraft, // Preserve draft state
+                pages: backendStory.pages.map((backendPage, index) => {
+                  // Find matching local page by order or text similarity
+                  const localPage = localStory.pages.find(lp => lp.order === backendPage.order) ||
+                                   localStory.pages[index];
+                  
+                  if (localPage?.canvasData) {
+                    console.log(`  ✅ Preserved image for page ${index + 1}`);
+                  }
+                  
+                  return {
+                    ...backendPage, // Use backend text
+                    canvasData: localPage?.canvasData, // Preserve local canvas image
+                    canvasOperations: localPage?.canvasOperations,
+                    canvasDrawingState: localPage?.canvasDrawingState,
+                  };
+                })
+              };
             }
             
-            return backendStory;
+            // No local story found - return backend story without images
+            return {
+              ...backendStory,
+              coverImage: undefined,
+              pages: backendStory.pages.map(page => ({
+                ...page,
+                canvasData: undefined,
+                canvasDrawingState: undefined,
+              }))
+            };
           });
+          
+          // Find stories that exist in localStorage but not in backend (unsaved drafts)
+          const localOnlyStories = localStories.filter(localStory => 
+            !localStory.backendId && // No backend ID
+            !mergedStories.some(backendStory => backendStory.id === localStory.id) // Not in backend
+          );
+          
+          console.log(`📝 Found ${localOnlyStories.length} local-only stories (unsaved drafts)`);
           
           // Add local-only stories
           mergedStories.push(...localOnlyStories);
@@ -1201,17 +1291,17 @@ export const useStoryStore = create<StoryState>()(
         }
       },
 
-      syncStoryToBackend: async (id: string) => {
+      syncStoryToBackend: async (id: string): Promise<string> => {
         const state = get();
         if (!state.currentUserId) {
           console.warn('Cannot sync: No user logged in');
-          return;
+          throw new Error('No user logged in');
         }
 
         const story = state.userLibraries[state.currentUserId]?.stories.find(s => s.id === id);
         if (!story) {
           console.warn(`Story ${id} not found`);
-          return;
+          throw new Error(`Story ${id} not found`);
         }
 
         try {
@@ -1226,6 +1316,7 @@ export const useStoryStore = create<StoryState>()(
             try {
               await storyApiService.updateStory(story.backendId.toString(), apiData);
               console.log(`✅ Updated story ${story.backendId} on backend`);
+              return story.backendId.toString();
             } catch (updateError: any) {
               if (updateError?.status === 404) {
                 // Backend story was deleted, create new one
@@ -1243,6 +1334,7 @@ export const useStoryStore = create<StoryState>()(
                   }
                 }));
                 console.log(`✅ Created story ${response.story.id} on backend (old ID was deleted)`);
+                return response.story.id.toString();
               } else {
                 throw updateError;
               }
@@ -1263,6 +1355,7 @@ export const useStoryStore = create<StoryState>()(
               }
             }));
             console.log(`✅ Created story ${response.story.id} on backend`);
+            return response.story.id.toString();
           }
         } catch (error: any) {
           console.error(`❌ Error syncing story ${id} to backend:`, error);
@@ -1275,12 +1368,25 @@ export const useStoryStore = create<StoryState>()(
     }),
     {
       name: 'story-store',
-      version: 4, // Incremented to clear old data and prevent storing large images
+      version: 5, // Incremented - disabled partialize to fix image stripping bug
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => {
-        // CRITICAL FIX: Don't store base64 images in localStorage
-        // This prevents "QuotaExceededError" when creating AI stories
-        // Images should be stored on backend, not in localStorage
+      // DISABLED: partialize was stripping images even from drafts
+      // Testing without it to see if images persist correctly
+      /* partialize: (state) => {
+        // Save state to localStorage
+        // For published stories, we can remove images since they're on backend
+        // For unpublished/draft stories, KEEP images so they don't get lost!
+        
+        // DEBUG: Check what state we're receiving
+        const allStories = Object.values(state.userLibraries).flatMap(lib => lib.stories);
+        const eggbert = allStories.find(s => s.title?.includes('Eggbert'));
+        if (eggbert) {
+          console.log('🔍 partialize INPUT - Eggbert state:', {
+            title: eggbert.title,
+            pagesWithImages: eggbert.pages.filter(p => p.canvasData).length,
+            hasCoverImage: !!eggbert.coverImage
+          });
+        }
         
         const sanitizedLibraries: Record<string, UserLibrary> = {};
         
@@ -1288,16 +1394,36 @@ export const useStoryStore = create<StoryState>()(
           const library = state.userLibraries[userId];
           
           sanitizedLibraries[userId] = {
-            stories: library.stories.map(story => ({
-              ...story,
-              // Remove large base64 images to prevent quota errors
-              coverImage: undefined, // Images stored on backend
-              pages: story.pages.map(page => ({
-                ...page,
-                canvasData: undefined, // Remove base64 canvas images
-                canvasDrawingState: undefined, // Remove large drawing state
-              }))
-            })),
+            stories: library.stories.map(story => {
+              // Check image count before processing
+              const pagesWithImages = story.pages.filter(p => p.canvasData).length;
+              
+              // DEBUG: Log the first page to see what's in canvasData
+              if (story.pages[0]?.canvasData) {
+                console.log(`🔍 DEBUG story "${story.title}" page 1 canvasData:`, story.pages[0].canvasData.substring(0, 100));
+              } else {
+                console.log(`🔍 DEBUG story "${story.title}" page 1 has NO canvasData`);
+              }
+              
+              // ONLY strip images from PUBLISHED stories (backend has them)
+              // KEEP images for drafts/unpublished stories (only in localStorage)
+              if (story.isPublished && story.backendId) {
+                console.log(`🗜️ Stripping images from published story "${story.title}" (${pagesWithImages} images)`);
+                return {
+                  ...story,
+                  coverImage: undefined, // Backend has it
+                  pages: story.pages.map(page => ({
+                    ...page,
+                    canvasData: undefined, // Backend has it
+                    canvasDrawingState: undefined,
+                  }))
+                };
+              }
+              
+              // For drafts/unpublished: KEEP ALL IMAGES
+              console.log(`✅ Keeping images for draft "${story.title}" (${pagesWithImages} images, isPublished: ${story.isPublished}, backendId: ${story.backendId})`);
+              return story;
+            }),
             characters: library.characters.map(char => ({
               ...char,
               imageData: undefined // Remove character images
@@ -1347,7 +1473,7 @@ export const useStoryStore = create<StoryState>()(
             });
           }
         };
-      },
+      }, */
       // Handle storage migrations
       migrate: (persistedState: any, version: number) => {
         if (version < 2) {
@@ -1361,3 +1487,4 @@ export const useStoryStore = create<StoryState>()(
     }
   )
 );
+

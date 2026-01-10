@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Flux Model - Pollinations AI</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            display: none;
+        }
+        .result.show {
+            display: block;
+        }
+        .result img {
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 15px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .info {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .success {
+            color: #4ade80;
+            font-weight: 600;
+        }
+        .error {
+            color: #f87171;
+            font-weight: 600;
+        }
+        .url-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Test Flux Model</h1>
+        <p class="subtitle">Test Pollinations AI with Flux model (No Rate Limits)</p>
+        
+        <div class="info">
+            ℹ️ <strong>Note:</strong> This test requires your backend to be running with POLLINATIONS_API_KEY configured.
+            The Flux model provides unlimited image generation without rate limits.
+        </div>
+
+        <div class="input-group">
+            <label>📝 Image Prompt</label>
+            <textarea id="prompt" placeholder="Enter your image description here...
+Example: A cheerful cartoon dragon flying over a magical forest, children's book illustration style">A cheerful cartoon dragon flying over a magical forest, children's book illustration style, bright colors, wide scene view</textarea>
+        </div>
+
+        <div class="input-group">
+            <label>🔧 API Base URL</label>
+            <input type="text" id="apiUrl" value="http://localhost:8000" placeholder="http://localhost:8000">
+        </div>
+
+        <button id="generateBtn" onclick="generateImage()">
+            ✨ Generate Image with Flux Model
+        </button>
+
+        <div id="result" class="result">
+            <h3>Result:</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        async function generateImage() {
+            const prompt = document.getElementById('prompt').value.trim();
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('resultContent');
+            const generateBtn = document.getElementById('generateBtn');
+
+            if (!prompt) {
+                alert('Please enter a prompt!');
+                return;
+            }
+
+            if (!apiUrl) {
+                alert('Please enter API URL!');
+                return;
+            }
+
+            // Show loading
+            generateBtn.disabled = true;
+            generateBtn.textContent = '⏳ Generating...';
+            resultDiv.classList.add('show');
+            resultContent.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Generating your image with Flux model...</p>
+                    <p style="font-size: 14px; opacity: 0.8;">This may take 10-30 seconds</p>
+                </div>
+            `;
+
+            try {
+                console.log('🎨 Starting image generation...');
+                console.log('Prompt:', prompt);
+                console.log('API URL:', apiUrl);
+
+                // First, get the auth token (you'll need to be logged in)
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    throw new Error('Not authenticated. Please log in first.');
+                }
+
+                const startTime = Date.now();
+
+                // Call the backend API
+                const response = await fetch(`${apiUrl}/api/ai/pollinations/generate-image/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        width: 512,
+                        height: 512,
+                        model: 'flux',
+                        seed: Math.floor(Math.random() * 1000000),
+                        nologo: true,
+                        enhance: true
+                    })
+                });
+
+                const data = await response.json();
+                const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+
+                console.log('Response:', data);
+
+                if (data.success && data.imageUrl) {
+                    // Build full URL
+                    let fullUrl = data.imageUrl;
+                    if (fullUrl.startsWith('/api/')) {
+                        const baseWithoutApi = apiUrl.replace(/\/api\/?$/, '');
+                        fullUrl = baseWithoutApi + fullUrl;
+                    }
+
+                    console.log('✅ Image generated successfully!');
+                    console.log('Image URL:', fullUrl);
+
+                    resultContent.innerHTML = `
+                        <p class="success">✅ Image generated successfully in ${duration}s!</p>
+                        <p><strong>Model:</strong> Flux (No rate limits)</p>
+                        <p><strong>Prompt:</strong> ${prompt}</p>
+                        <div class="url-display">
+                            <strong>Image URL:</strong><br>
+                            ${fullUrl}
+                        </div>
+                        <img src="${fullUrl}" alt="Generated image" onload="console.log('✅ Image loaded successfully')" onerror="console.error('❌ Failed to load image'); this.parentElement.innerHTML += '<p class=error>❌ Failed to load image. Check console for details.</p>'">
+                    `;
+                } else {
+                    throw new Error(data.error || 'Failed to generate image');
+                }
+
+            } catch (error) {
+                console.error('❌ Error:', error);
+                resultContent.innerHTML = `
+                    <p class="error">❌ Error: ${error.message}</p>
+                    <p style="font-size: 14px; margin-top: 10px;">
+                        Please check:
+                        <ul style="text-align: left; margin-top: 10px;">
+                            <li>Backend is running at the specified URL</li>
+                            <li>You are logged in (check localStorage for authToken)</li>
+                            <li>POLLINATIONS_API_KEY is configured in backend</li>
+                            <li>Check browser console for more details</li>
+                        </ul>
+                    </p>
+                `;
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = '✨ Generate Image with Flux Model';
+            }
+        }
+
+        // Allow Enter key in textarea to submit
+        document.getElementById('prompt').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                generateImage();
+            }
+        });
+
+        // Check if user is authenticated
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                document.querySelector('.info').innerHTML = `
+                    ⚠️ <strong>Warning:</strong> No authentication token found. 
+                    Please log in to your app first, then come back to this page.
+                `;
+                document.querySelector('.info').style.background = 'rgba(248, 113, 113, 0.3)';
+            }
+        });
+    </script>
+</body>
+</html>

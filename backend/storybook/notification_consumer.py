@@ -185,6 +185,27 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             'story_title': event['story_title']
         }))
     
+    async def xp_gained(self, event):
+        """Send XP gain notification to client"""
+        await self.send(text_data=json.dumps({
+            'type': 'xp_gained',
+            'xp_amount': event['xp_amount'],
+            'action': event['action'],
+            'total_xp': event['total_xp'],
+            'level': event['level'],
+            'current_level_xp': event['current_level_xp'],
+            'next_level_xp': event['next_level_xp']
+        }))
+    
+    async def level_up(self, event):
+        """Send level up notification to client"""
+        await self.send(text_data=json.dumps({
+            'type': 'level_up',
+            'new_level': event['new_level'],
+            'total_xp': event['total_xp'],
+            'unlocked_items': event['unlocked_items']
+        }))
+    
     # Database operations
     @database_sync_to_async
     def set_user_online(self, is_online):

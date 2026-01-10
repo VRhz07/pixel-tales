@@ -1,5 +1,62 @@
-// Image Generation Service using Pollinations.ai (Free, no API key needed)
+// Image Generation Service using Pollinations.ai with backend proxy for API key authentication
+import { apiConfigService } from './apiConfig.service';
+import apiService from './api';
 // Alternative: Can be switched to Hugging Face or other services
+
+/**
+ * Wait for Pollinations to actually generate the image
+ * Polls the URL to check if image is ready (not a placeholder)
+ */
+const waitForImageGeneration = async (
+  imageUrl: string, 
+  pageNumber: number,
+  onProgress?: (current: number, total: number, message: string) => void,
+  totalPages?: number
+): Promise<boolean> => {
+  const maxAttempts = 60; // Try for up to 60 seconds (60 attempts x 1 second)
+  const delayMs = 1000; // Check every 1 second
+  
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      // Update progress
+      if (onProgress && totalPages) {
+        const progressMessage = `Waiting for page ${pageNumber} image (${attempt}/${maxAttempts})...`;
+        onProgress(pageNumber, totalPages, progressMessage);
+      }
+      
+      // Fetch the image to check size
+      const response = await fetch(imageUrl, { cache: 'no-cache' });
+      if (!response.ok) {
+        console.log(`⏳ Page ${pageNumber}: Attempt ${attempt}/${maxAttempts} - Not ready yet (${response.status})`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        continue;
+      }
+      
+      const blob = await response.blob();
+      const sizeKB = blob.size / 1024;
+      
+      console.log(`📊 Page ${pageNumber}: Attempt ${attempt}/${maxAttempts} - Image size: ${sizeKB.toFixed(1)}KB`);
+      
+      // Pollinations placeholders are LARGE (1-2MB), real images are smaller (50-100KB)
+      // Accept images that are reasonably sized (< 500KB)
+      if (sizeKB < 500 && sizeKB > 10) {
+        console.log(`✅ Page ${pageNumber}: Real image ready! Size: ${sizeKB.toFixed(1)}KB (attempt ${attempt}/${maxAttempts})`);
+        return true;
+      }
+      
+      console.log(`⏳ Page ${pageNumber}: Large placeholder detected (${sizeKB.toFixed(1)}KB), waiting...`);
+      
+    } catch (error) {
+      console.log(`⏳ Page ${pageNumber}: Attempt ${attempt}/${maxAttempts} - Error checking image:`, error);
+    }
+    
+    // Wait before next attempt
+    await new Promise(resolve => setTimeout(resolve, delayMs));
+  }
+  
+  console.warn(`⚠️ Page ${pageNumber}: Timeout after ${maxAttempts} attempts - image may not be ready`);
+  return false;
+};
 
 export interface ImageGenerationParams {
   prompt: string;
@@ -73,41 +130,62 @@ const getMoodColorTones = (mood?: string): string => {
 }
 
 /**
- * Check if Pollinations AI service is healthy and operational
- * @returns true if service is up, false if down
+ * Check if Pollinations AI service is healthy and operational via backend proxy
+ * Since we use backend proxy with Flux model (no rate limits), we always return true
+ * The backend will handle any actual service issues
+ * @returns true (always, since backend proxy handles availability)
  */
 export const checkPollinationsHealth = async (): Promise<boolean> => {
+  // IMPORTANT: We no longer check direct Pollinations URL because:
+  // 1. Direct URLs are blocked (403 Forbidden) - we must use backend proxy
+  // 2. Backend proxy uses SDXL Turbo model with API key
+  // 3. Backend will handle any actual service issues gracefully
+  
+  console.log('✅ Using backend proxy with SDXL Turbo model (API key credits)');
+  
+  // Always return true - let backend handle any issues
+  // This prevents false negatives from direct URL checks
+  return true;
+};
+
+/**
+ * Generate an image using Replicate API (Free credits available)
+ * @param params Image generation parameters
+ * @returns URL of the generated image or null if generation fails
+ */
+export const generateImageWithReplicate = async (params: ImageGenerationParams): Promise<string | null> => {
+  const { prompt, width = 1024, height = 1024, seed } = params;
+  
   try {
-    // Test with a simple image request
-    const testPrompt = 'test';
-    const testUrl = `https://image.pollinations.ai/prompt/${testPrompt}?width=64&height=64&nologo=true`;
-    
-    console.log('🔍 Checking Pollinations AI service health...');
-    
-    // Use fetch with a timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-    
-    const response = await fetch(testUrl, {
-      method: 'HEAD',
-      signal: controller.signal,
-      cache: 'no-cache'
+    console.log('🎨 Generating image with Replicate (FLUX model)...');
+    const response = await apiService.post('/ai/replicate/generate-image/', {
+      prompt: prompt,
+      width,
+      height,
+      model: 'flux-schnell', // Fast and free model
+      seed: seed || Math.floor(Math.random() * 1000000),
     });
-    
-    clearTimeout(timeoutId);
-    
-    const isHealthy = response.ok && response.status === 200;
-    
-    if (isHealthy) {
-      console.log('✅ Pollinations AI service is healthy');
-    } else {
-      console.warn(`⚠️ Pollinations AI returned status: ${response.status}`);
+
+    if (!response) {
+      console.error('❌ Backend returned invalid response (no data)');
+      return null;
     }
-    
-    return isHealthy;
-  } catch (error) {
-    console.error('❌ Pollinations AI service health check failed:', error);
-    return false;
+
+    if (response.success && response.imageUrl) {
+      console.log('✅ Image generated via Replicate backend proxy');
+      console.log('🔗 Image URL:', response.imageUrl);
+      return response.imageUrl;
+    } else {
+      console.error('❌ Backend returned unsuccessful response:', response);
+      return null;
+    }
+  } catch (error: any) {
+    console.error('❌ Replicate image generation failed:', error);
+    if (error.response) {
+      console.error('Response status:', error.response.status);
+      console.error('Response data:', error.response.data);
+    }
+    return null;
   }
 };
 
@@ -120,22 +198,46 @@ export const generateImage = async (params: ImageGenerationParams): Promise<stri
   const { prompt, width = 512, height = 512, seed } = params;
   
   try {
-    // Encode the prompt for URL
-    const encodedPrompt = encodeURIComponent(prompt);
-    
-    // Pollinations.ai URL format with nologo and enhanced parameters
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}${seed ? `&seed=${seed}` : ''}&nologo=true&enhance=true`;
-    
-    console.log('🎨 Generated image URL:', imageUrl.substring(0, 100) + '...');
-    
-    // Don't test with HEAD request as it may cause CORS issues
-    // Pollinations.ai generates images on-demand, so the URL is always valid
-    // The actual image will be generated when the browser requests it
-    
-    // Return the URL immediately - Pollinations generates on-demand
-    return imageUrl;
-  } catch (error) {
-    console.error('Error generating image URL:', error);
+    console.log('🎨 Generating image with Pollinations (Flux Schnell model)...');
+    const response = await apiService.post('/ai/pollinations/generate-image/', {
+      prompt: prompt,
+      width,
+      height,
+      model: 'flux-schnell', // Flux Schnell model (fast and free)
+      seed: seed || Math.floor(Math.random() * 1000000),
+      nologo: true,
+      enhance: true
+    });
+
+    if (!response) {
+      console.error('❌ Backend returned invalid response (no data)');
+      return null;
+    }
+
+    if (response.success && response.imageUrl) {
+      console.log('✅ Image URL generated via Pollinations backend proxy');
+      
+      // If URL is relative (starts with /api/), prepend the API base URL
+      let finalUrl = response.imageUrl;
+      if (finalUrl.startsWith('/api/')) {
+        const apiBaseUrl = apiConfigService.getApiUrl();
+        // Remove /api suffix from base URL if present, then add the full path
+        const baseWithoutApi = apiBaseUrl.replace(/\/api\/?$/, '');
+        finalUrl = baseWithoutApi + finalUrl;
+      }
+      
+      console.log('🔗 Full Image URL:', finalUrl);
+      return finalUrl;
+    } else {
+      console.error('❌ Backend returned unsuccessful response:', response);
+      return null;
+    }
+  } catch (error: any) {
+    console.error('❌ Pollinations image generation failed:', error);
+    if (error.response) {
+      console.error('Response status:', error.response.status);
+      console.error('Response data:', error.response.data);
+    }
     return null;
   }
 };
@@ -295,16 +397,33 @@ export const generateStoryIllustrations = async (
     
     // Use similar seeds for consistency but with slight variation
     const baseSeed = characterDescription ? characterDescription.length * 100 : 1000;
-    const imageUrl = await generateImage({
+    
+    // Try Replicate first, fallback to Pollinations
+    let imageUrl = await generateImageWithReplicate({
       prompt: enhancedPrompt,
-      width: 512,
-      height: 512,
+      width: 1024,
+      height: 1024,
       seed: baseSeed + (index * 10), // Small increments for consistency
       pageNumber,
       totalPages,
       mood: page.mood,
       narrativePurpose: page.narrativePurpose
     });
+    
+    // Fallback to Pollinations if Replicate fails
+    if (!imageUrl) {
+      console.log('⚠️ Replicate failed, falling back to Pollinations...');
+      imageUrl = await generateImage({
+        prompt: enhancedPrompt,
+        width: 512,
+        height: 512,
+        seed: baseSeed + (index * 10),
+        pageNumber,
+        totalPages,
+        mood: page.mood,
+        narrativePurpose: page.narrativePurpose
+      });
+    }
     
     return imageUrl;
   });
@@ -319,49 +438,246 @@ export const generateStoryIllustrations = async (
  * @param characterDescription Consistent character appearance description (for seed generation)
  * @returns Array of image URLs
  */
+/**
+ * Convert an image URL to a data URL for persistence
+ * This avoids rate limits on subsequent fetches from Pollinations
+ */
+const convertImageToDataUrl = (url: string): Promise<string | null> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous'; // Enable CORS
+    
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          console.error('Failed to get canvas context');
+          resolve(null);
+          return;
+        }
+        
+        ctx.drawImage(img, 0, 0);
+        const dataUrl = canvas.toDataURL('image/png');
+        resolve(dataUrl);
+      } catch (error) {
+        console.error('Error converting image to data URL:', error);
+        resolve(null);
+      }
+    };
+    
+    img.onerror = () => {
+      console.error('Failed to load image for data URL conversion');
+      resolve(null);
+    };
+    
+    img.src = url;
+  });
+};
+
+/**
+ * Wait for an image URL to be fully loaded/rendered AND verify it's not a placeholder
+ * Pollinations generates images asynchronously, so we need to wait
+ * Also checks file size to ensure it's not the "rate limit" placeholder
+ */
+const waitForImageToLoad = (url: string, maxRetries = 10, delayMs = 3000): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    let retries = 0;
+    
+    const checkImage = async () => {
+      try {
+        // Fetch the image to check its size
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const sizeKB = blob.size / 1024;
+        
+        console.log(`📏 Image size: ${sizeKB.toFixed(1)}KB`);
+        
+        // Rate limit placeholder is typically small (< 100KB)
+        // Real generated images are larger (> 500KB)
+        if (sizeKB < 100) {
+          retries++;
+          if (retries >= maxRetries) {
+            console.warn(`⚠️ Image still showing placeholder after ${maxRetries} retries (${sizeKB.toFixed(1)}KB), continuing anyway...`);
+            resolve();
+          } else {
+            console.log(`⏳ Image is placeholder (${sizeKB.toFixed(1)}KB), retrying in ${delayMs}ms... (attempt ${retries}/${maxRetries})`);
+            setTimeout(checkImage, delayMs);
+          }
+        } else {
+          console.log(`✅ Real image loaded successfully (${sizeKB.toFixed(1)}KB) after ${retries + 1} attempts`);
+          resolve();
+        }
+      } catch (error) {
+        retries++;
+        if (retries >= maxRetries) {
+          console.warn(`⚠️ Failed to check image after ${maxRetries} retries, continuing anyway...`);
+          resolve();
+        } else {
+          console.log(`⏳ Error checking image, retrying in ${delayMs}ms... (attempt ${retries}/${maxRetries})`);
+          setTimeout(checkImage, delayMs);
+        }
+      }
+    };
+    
+    checkImage();
+  });
+};
+
+/**
+ * Wait for Pollinations to actually generate an image (can take 2-3 minutes!)
+ * Checks if the image is a real generated image vs placeholder
+ */
+const waitForPollinationsImage = async (
+  url: string, 
+  pageNumber: number,
+  maxRetries: number = 40, // 40 retries = ~3.3 minutes with 5s delay
+  delayMs: number = 5000    // 5 seconds between retries
+): Promise<boolean> => {
+  console.log(`⏳ Page ${pageNumber}: Waiting for Pollinations to generate image...`);
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      // Fetch the image to check if it's ready
+      // Use GET instead of HEAD since backend doesn't support HEAD
+      const response = await fetch(url, { 
+        method: 'GET',
+        cache: 'no-cache' // Don't cache placeholder images
+      });
+      
+      if (response.ok) {
+        // Get the actual blob size (more accurate than content-length header)
+        const blob = await response.blob();
+        const sizeKB = blob.size / 1024;
+        
+        // Real images are typically > 200KB
+        // Placeholders/errors are usually < 100KB
+        if (sizeKB > 200) {
+          console.log(`✅ Page ${pageNumber}: Image ready! (${sizeKB.toFixed(1)}KB) after ${attempt} attempts`);
+          return true;
+        } else {
+          console.log(`⏳ Page ${pageNumber}: Still generating... (${sizeKB.toFixed(1)}KB) [Attempt ${attempt}/${maxRetries}]`);
+        }
+      }
+    } catch (error) {
+      console.log(`⏳ Page ${pageNumber}: Checking... [Attempt ${attempt}/${maxRetries}]`);
+    }
+    
+    // Wait before next retry
+    if (attempt < maxRetries) {
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+  }
+  
+  console.warn(`⚠️ Page ${pageNumber}: Image not ready after ${maxRetries} attempts (~${(maxRetries * delayMs / 60000).toFixed(1)} minutes)`);
+  return false;
+};
+
 export const generateStoryIllustrationsFromPrompts = async (
   pages: Array<{ 
-    imagePrompt: string;
+    imagePrompt?: string;
+    text?: string;
     pageNumber?: number;
   }>,
-  characterDescription?: string
+  characterDescription?: string,
+  onProgress?: (current: number, total: number, message: string) => void
 ): Promise<(string | null)[]> => {
-  const imagePromises = pages.map(async (page, index) => {
+  console.log('🎨 generateStoryIllustrationsFromPrompts called with:', {
+    pageCount: pages.length,
+    characterDescription: characterDescription?.substring(0, 50) + '...',
+    pagesStructure: pages.map((p, i) => ({
+      index: i,
+      hasImagePrompt: !!p.imagePrompt,
+      hasText: !!p.text,
+      imagePromptPreview: p.imagePrompt?.substring(0, 80) + '...',
+      keys: Object.keys(p)
+    }))
+  });
+  
+  const results: (string | null)[] = [];
+  
+  // Process pages sequentially to avoid overwhelming Pollinations
+  for (let index = 0; index < pages.length; index++) {
+    const page = pages[index];
+    
     if (!page.imagePrompt) {
-      console.warn(`Page ${index + 1} missing imagePrompt, skipping...`);
-      return null;
+      console.error(`❌ Page ${index + 1} missing imagePrompt field!`);
+      console.error(`   Available keys:`, Object.keys(page));
+      results.push(null);
+      continue;
     }
     
     try {
-      // Use the detailed prompt from Gemini directly
-      // Gemini has already included all necessary details: character, environment, lighting, composition, etc.
-      const prompt = page.imagePrompt;
+      console.log(`🖼️ Page ${index + 1}/${pages.length}: Starting image generation...`);
+      if (onProgress) {
+        onProgress(index + 1, pages.length, `Generating image for page ${index + 1}...`);
+      }
       
-      // Use similar seeds for consistency but with slight variation
-      const baseSeed = characterDescription ? characterDescription.length * 100 : 1000;
-      const imageUrl = await generateImage({
-        prompt: prompt,
-        width: 512,
-        height: 512,
-        seed: baseSeed + (index * 10), // Small increments for consistency
+      // Generate unique seed
+      const uniqueSeed = Date.now() + (index * 10000);
+      
+      // Try Replicate first, fallback to Pollinations
+      let imageUrl = await generateImageWithReplicate({
+        prompt: page.imagePrompt,
+        width: 1024,
+        height: 1024,
+        seed: uniqueSeed,
         pageNumber: page.pageNumber || (index + 1),
         totalPages: pages.length
       });
       
-      if (imageUrl) {
-        console.log(`✅ Generated image for page ${index + 1}`);
-      } else {
-        console.warn(`⚠️ Failed to generate image for page ${index + 1}`);
+      // Fallback to Pollinations if Replicate fails
+      if (!imageUrl) {
+        console.log(`⚠️ Page ${index + 1}: Replicate failed, falling back to Pollinations...`);
+        imageUrl = await generateImage({
+          prompt: page.imagePrompt,
+          width: 512,
+          height: 512,
+          seed: uniqueSeed,
+          pageNumber: page.pageNumber || (index + 1),
+          totalPages: pages.length
+        });
       }
       
-      return imageUrl;
+      if (!imageUrl) {
+        console.error(`❌ Page ${index + 1}: Failed to get image URL`);
+        results.push(null);
+        continue;
+      }
+      
+      console.log(`📝 Page ${index + 1}: URL received: ${imageUrl.substring(0, 100)}...`);
+      
+      // Poll the URL to wait for real image (not placeholder)
+      console.log(`⏳ Page ${index + 1}: Waiting for real image to be generated...`);
+      
+      const isImageReady = await waitForImageGeneration(imageUrl, index + 1, onProgress, pages.length);
+      
+      if (!isImageReady) {
+        console.warn(`⚠️ Page ${index + 1}: Image generation timed out after 60 seconds`);
+        console.warn(`⚠️ Saving URL anyway - image may still be generating in background`);
+      } else {
+        console.log(`✅ Page ${index + 1}: Real image verified and ready!`);
+      }
+      
+      results.push(imageUrl);
+      
+      // Delay between pages to avoid Replicate rate limits (6 req/min = 10 sec between)
+      if (index < pages.length - 1) {
+        console.log(`? Waiting 12 seconds before next image to avoid rate limit...`);
+        await new Promise(resolve => setTimeout(resolve, 12000)); // 12 second pause
+      }
+      
     } catch (error) {
-      console.error(`❌ Error generating image for page ${index + 1}:`, error);
-      return null;
+      console.error(`❌ Page ${index + 1}: Error during generation:`, error);
+      results.push(null);
     }
-  });
+  }
   
-  return Promise.all(imagePromises);
+  console.log(`🎉 Image generation complete! ${results.filter(r => r !== null).length}/${pages.length} images ready`);
+  return results;
 };
 
 /**
@@ -570,31 +886,35 @@ export const generateCoverIllustration = async (
   // Use consistent seed based on title for reproducibility
   const titleSeed = storyTitle.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   
-  const baseImageUrl = await generateImage({
+  // Try Replicate first for higher quality cover
+  let baseImageUrl = await generateImageWithReplicate({
     prompt: coverPrompt,
-    width: 512,
-    height: 683, // Slightly taller aspect ratio for book covers (3:4 ratio)
+    width: 1024,
+    height: 1365, // 3:4 ratio for book covers (1024 * 1.333)
     seed: titleSeed * 100
   });
+  
+  // Fallback to Pollinations if Replicate fails
+  if (!baseImageUrl) {
+    console.log('⚠️ Replicate failed for cover, falling back to Pollinations...');
+    baseImageUrl = await generateImage({
+      prompt: coverPrompt,
+      width: 512,
+      height: 683, // Slightly taller aspect ratio for book covers (3:4 ratio)
+      seed: titleSeed * 100
+    });
+  }
   
   if (!baseImageUrl) {
     console.error('❌ Failed to generate base cover illustration');
     return null;
   }
   
-  console.log('✅ Base cover illustration generated, adding title overlay...');
+  console.log('✅ Cover illustration generated');
   
-  try {
-    // Add title overlay to the cover
-    const coverWithTitle = await addTitleOverlayToCover(baseImageUrl, storyTitle);
-    
-    console.log('✅ Cover with title overlay created');
-    
-    return coverWithTitle;
-  } catch (error) {
-    console.error('Failed to add title overlay, returning base image:', error);
-    return baseImageUrl;
-  }
+  // Return the base image URL directly (no title overlay)
+  // Let the browser load it naturally like page images
+  return baseImageUrl;
 };
 
 // Alternative: Hugging Face API (requires free API key)
@@ -621,3 +941,5 @@ export const generateImageHuggingFace = async (
 
   return await response.blob();
 };
+
+

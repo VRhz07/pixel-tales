@@ -185,6 +185,10 @@ const PublicLibraryPage = () => {
   const [publishedStories, setPublishedStories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [recommendedStories, setRecommendedStories] = useState<any[]>([]);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
 
   // Load published stories from backend
   useEffect(() => {
@@ -365,6 +369,27 @@ const PublicLibraryPage = () => {
   };
 
   const allPublishedStories = getAllPublishedStories();
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedLanguage, selectedGenre]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(allPublishedStories.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedStories = allPublishedStories.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleItemsPerPageChange = (value: number) => {
+    setItemsPerPage(value);
+    setCurrentPage(1);
+  };
 
   const handleStoryClick = (storyId: string) => {
     navigate(`/story/${storyId}`, { state: { from: '/library' } });
@@ -655,6 +680,60 @@ const PublicLibraryPage = () => {
             </div>
           </div>
 
+          {/* Pagination Header */}
+          {allPublishedStories.length > itemsPerPage && (
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px',
+              padding: '16px 20px',
+              background: 'linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #fae8ff 100%)',
+              borderRadius: '12px',
+              border: '2px solid #a855f7',
+              boxShadow: '0 4px 12px rgba(168, 85, 247, 0.15)',
+              flexWrap: 'wrap',
+              gap: '10px'
+            }}>
+              <div style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#6b21a8'
+              }}>
+                Showing {startIndex + 1}-{Math.min(endIndex, allPublishedStories.length)} of {allPublishedStories.length} stories
+              </div>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <label style={{
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#6b21a8'
+                }}>Items per page:</label>
+                <select 
+                  value={itemsPerPage} 
+                  onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                  style={{
+                    padding: '8px 12px',
+                    border: '2px solid #a855f7',
+                    borderRadius: '8px',
+                    background: 'white',
+                    color: '#2d3748',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value={12}>12</option>
+                  <option value={24}>24</option>
+                  <option value={48}>48</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
+            </div>
+          )}
+
           {/* Large Story Cards Grid - Always show below categories */}
           <div style={{ 
             display: 'grid', 
@@ -662,7 +741,7 @@ const PublicLibraryPage = () => {
             gap: '16px',
             marginBottom: '32px'
           }}>
-            {allPublishedStories.slice(0, 8).map((story) => (
+            {paginatedStories.map((story) => (
               <div
                 key={story.id}
                 onClick={() => handleStoryClick(story.id)}
@@ -734,6 +813,103 @@ const PublicLibraryPage = () => {
               </div>
             ))}
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '10px',
+              marginTop: '30px',
+              marginBottom: '32px',
+              padding: '20px',
+              background: 'linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #fae8ff 100%)',
+              borderRadius: '12px',
+              border: '2px solid #a855f7',
+              boxShadow: '0 4px 12px rgba(168, 85, 247, 0.15)',
+              flexWrap: 'wrap'
+            }}>
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                style={{
+                  padding: '10px 20px',
+                  border: '2px solid #a855f7',
+                  borderRadius: '8px',
+                  background: 'white',
+                  color: '#6b21a8',
+                  fontWeight: '700',
+                  cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.3s ease',
+                  fontSize: '14px',
+                  opacity: currentPage === 1 ? 0.4 : 1
+                }}
+              >
+                ← Previous
+              </button>
+
+              <div style={{
+                display: 'flex',
+                gap: '6px',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                justifyContent: 'center'
+              }}>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    return Math.abs(page - currentPage) <= 2 || page === 1 || page === totalPages;
+                  })
+                  .map((page, index, array) => (
+                    <React.Fragment key={page}>
+                      {index > 0 && array[index - 1] !== page - 1 && (
+                        <span style={{ color: '#6b21a8', fontWeight: '700', padding: '0 4px' }}>...</span>
+                      )}
+                      <button
+                        onClick={() => handlePageChange(page)}
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          border: '2px solid #a855f7',
+                          borderRadius: '8px',
+                          background: currentPage === page ? '#a855f7' : 'white',
+                          color: currentPage === page ? 'white' : '#6b21a8',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '14px',
+                          boxShadow: currentPage === page ? '0 4px 12px rgba(168, 85, 247, 0.4)' : 'none'
+                        }}
+                      >
+                        {page}
+                      </button>
+                    </React.Fragment>
+                  ))}
+              </div>
+
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                style={{
+                  padding: '10px 20px',
+                  border: '2px solid #a855f7',
+                  borderRadius: '8px',
+                  background: 'white',
+                  color: '#6b21a8',
+                  fontWeight: '700',
+                  cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.3s ease',
+                  fontSize: '14px',
+                  opacity: currentPage === totalPages ? 0.4 : 1
+                }}
+              >
+                Next →
+              </button>
+            </div>
+          )}
 
           {/* Recent Stories Carousel */}
           <div className="library-carousel-section" style={{ display: 'none' }}>
@@ -833,6 +1009,60 @@ const PublicLibraryPage = () => {
           <h2 className="library-section-title">
             Search Results ({allPublishedStories.length})
           </h2>
+
+          {/* Pagination Header for Filtered Results */}
+          {allPublishedStories.length > itemsPerPage && (
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px',
+              padding: '16px 20px',
+              background: 'linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #fae8ff 100%)',
+              borderRadius: '12px',
+              border: '2px solid #a855f7',
+              boxShadow: '0 4px 12px rgba(168, 85, 247, 0.15)',
+              flexWrap: 'wrap',
+              gap: '10px'
+            }}>
+              <div style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#6b21a8'
+              }}>
+                Showing {startIndex + 1}-{Math.min(endIndex, allPublishedStories.length)} of {allPublishedStories.length} stories
+              </div>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <label style={{
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#6b21a8'
+                }}>Items per page:</label>
+                <select 
+                  value={itemsPerPage} 
+                  onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                  style={{
+                    padding: '8px 12px',
+                    border: '2px solid #a855f7',
+                    borderRadius: '8px',
+                    background: 'white',
+                    color: '#2d3748',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value={12}>12</option>
+                  <option value={24}>24</option>
+                  <option value={48}>48</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
+            </div>
+          )}
           
           {allPublishedStories.length === 0 ? (
             <div className="library-empty-state">
@@ -843,8 +1073,9 @@ const PublicLibraryPage = () => {
               </p>
             </div>
           ) : (
-            <div className="library-stories-grid">
-              {allPublishedStories.map((story) => (
+            <>
+              <div className="library-stories-grid">
+                {paginatedStories.map((story) => (
                 <div 
                   key={story.id} 
                   className="library-story-card"
@@ -881,6 +1112,103 @@ const PublicLibraryPage = () => {
                 </div>
               ))}
             </div>
+
+            {/* Pagination Controls for Filtered Results */}
+            {totalPages > 1 && (
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '10px',
+                marginTop: '30px',
+                padding: '20px',
+                background: 'linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #fae8ff 100%)',
+                borderRadius: '12px',
+                border: '2px solid #a855f7',
+                boxShadow: '0 4px 12px rgba(168, 85, 247, 0.15)',
+                flexWrap: 'wrap'
+              }}>
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  style={{
+                    padding: '10px 20px',
+                    border: '2px solid #a855f7',
+                    borderRadius: '8px',
+                    background: 'white',
+                    color: '#6b21a8',
+                    fontWeight: '700',
+                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.3s ease',
+                    fontSize: '14px',
+                    opacity: currentPage === 1 ? 0.4 : 1
+                  }}
+                >
+                  ← Previous
+                </button>
+
+                <div style={{
+                  display: 'flex',
+                  gap: '6px',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  justifyContent: 'center'
+                }}>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(page => {
+                      return Math.abs(page - currentPage) <= 2 || page === 1 || page === totalPages;
+                    })
+                    .map((page, index, array) => (
+                      <React.Fragment key={page}>
+                        {index > 0 && array[index - 1] !== page - 1 && (
+                          <span style={{ color: '#6b21a8', fontWeight: '700', padding: '0 4px' }}>...</span>
+                        )}
+                        <button
+                          onClick={() => handlePageChange(page)}
+                          style={{
+                            width: '40px',
+                            height: '40px',
+                            border: '2px solid #a855f7',
+                            borderRadius: '8px',
+                            background: currentPage === page ? '#a855f7' : 'white',
+                            color: currentPage === page ? 'white' : '#6b21a8',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '14px',
+                            boxShadow: currentPage === page ? '0 4px 12px rgba(168, 85, 247, 0.4)' : 'none'
+                          }}
+                        >
+                          {page}
+                        </button>
+                      </React.Fragment>
+                    ))}
+                </div>
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  style={{
+                    padding: '10px 20px',
+                    border: '2px solid #a855f7',
+                    borderRadius: '8px',
+                    background: 'white',
+                    color: '#6b21a8',
+                    fontWeight: '700',
+                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.3s ease',
+                    fontSize: '14px',
+                    opacity: currentPage === totalPages ? 0.4 : 1
+                  }}
+                >
+                  Next →
+                </button>
+              </div>
+            )}
+            </>
           )}
         </div>
       )}

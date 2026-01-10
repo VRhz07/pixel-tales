@@ -57,7 +57,11 @@ class XPService:
             # Add XP to profile
             result = profile.add_experience(xp_amount)
             
-            # Create notification if requested and user leveled up
+            # Send real-time XP notification via WebSocket
+            if create_notification and result and xp_amount > 0:
+                cls._send_xp_notification(user, xp_amount, action, result)
+            
+            # Create notification if user leveled up
             if create_notification and result and result.get('leveled_up'):
                 new_level = result['level']
                 
@@ -65,12 +69,77 @@ class XPService:
                 new_unlocks = RewardService.check_new_unlocks(old_level, new_level)
                 
                 cls._create_level_up_notification(user, new_level, new_unlocks)
+                cls._send_level_up_notification(user, new_level, new_unlocks, result)
             
             return result
             
         except Exception as e:
             print(f"Error awarding XP: {str(e)}")
             return None
+    
+    @classmethod
+    def _send_xp_notification(cls, user, xp_amount, action, result):
+        """Send real-time XP gain notification via WebSocket"""
+        try:
+            from channels.layers import get_channel_layer
+            from asgiref.sync import async_to_sync
+            
+            channel_layer = get_channel_layer()
+            if channel_layer:
+                async_to_sync(channel_layer.group_send)(
+                    f'notifications_{user.id}',
+                    {
+                        'type': 'xp_gained',
+                        'xp_amount': xp_amount,
+                        'action': action,
+                        'total_xp': result.get('total_xp', 0),
+                        'level': result.get('level', 1),
+                        'current_level_xp': result.get('current_level_xp', 0),
+                        'next_level_xp': result.get('next_level_xp', 500),
+                    }
+                )
+        except Exception as e:
+            print(f"Error sending XP notification: {str(e)}")
+    
+    @classmethod
+    def _send_level_up_notification(cls, user, new_level, new_unlocks, result):
+        """Send real-time level up notification via WebSocket"""
+        try:
+            from channels.layers import get_channel_layer
+            from asgiref.sync import async_to_sync
+            
+            channel_layer = get_channel_layer()
+            if channel_layer:
+                # Prepare unlocked items for frontend
+                unlocked_items = []
+                if new_unlocks:
+                    if new_unlocks.get('avatars'):
+                        for avatar in new_unlocks['avatars']:
+                            unlocked_items.append({
+                                'type': 'avatar',
+                                'name': avatar.get('name', 'New Avatar'),
+                                'emoji': avatar.get('emoji', '🎭'),
+                            })
+                    if new_unlocks.get('borders'):
+                        for border in new_unlocks['borders']:
+                            unlocked_items.append({
+                                'type': 'border',
+                                'name': border.get('name', 'New Border'),
+                                'emoji': '🖼️',
+                                'gradient': border.get('gradient'),
+                            })
+                
+                async_to_sync(channel_layer.group_send)(
+                    f'notifications_{user.id}',
+                    {
+                        'type': 'level_up',
+                        'new_level': new_level,
+                        'total_xp': result.get('total_xp', 0),
+                        'unlocked_items': unlocked_items,
+                    }
+                )
+        except Exception as e:
+            print(f"Error sending level up notification: {str(e)}")
     
     @classmethod
     def _create_level_up_notification(cls, user, new_level, new_unlocks=None):
