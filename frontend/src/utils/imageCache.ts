@@ -8,7 +8,7 @@
  * @param url - The image URL (HTTP or data URL)
  * @returns Promise<string> - The data URL or original URL if conversion fails
  */
-export async function convertImageToDataUrl(url: string): Promise<string> {
+export async function convertImageToDataUrl(url: string, maxWidth = 800, quality = 0.8): Promise<string> {
   // Already a data URL - return as-is
   if (!url || url.startsWith('data:')) {
     return url;
@@ -20,7 +20,7 @@ export async function convertImageToDataUrl(url: string): Promise<string> {
   }
 
   try {
-    console.log('🔄 Converting image to data URL:', url.substring(0, 50) + '...');
+    console.log('🔄 Converting and compressing image:', url.substring(0, 50) + '...');
     
     // Fetch the image
     const response = await fetch(url, {
@@ -35,19 +35,53 @@ export async function convertImageToDataUrl(url: string): Promise<string> {
     // Convert to blob
     const blob = await response.blob();
     
-    // Convert blob to data URL
+    // Create image element to compress
+    const img = new Image();
+    const imgUrl = URL.createObjectURL(blob);
+    
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const dataUrl = reader.result as string;
-        console.log('✅ Image converted to data URL, size:', Math.round(dataUrl.length / 1024), 'KB');
+      img.onload = () => {
+        URL.revokeObjectURL(imgUrl);
+        
+        // Calculate new dimensions while maintaining aspect ratio
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+        
+        // Create canvas and compress
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          reject(new Error('Failed to get canvas context'));
+          return;
+        }
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convert to compressed data URL (JPEG for smaller size)
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        
+        const originalSize = Math.round(blob.size / 1024);
+        const compressedSize = Math.round(dataUrl.length / 1024);
+        const savings = Math.round((1 - compressedSize / originalSize) * 100);
+        
+        console.log(`✅ Image compressed: ${originalSize}KB → ${compressedSize}KB (${savings}% smaller)`);
         resolve(dataUrl);
       };
-      reader.onerror = () => {
-        console.error('❌ FileReader error');
-        reject(new Error('Failed to read blob'));
+      
+      img.onerror = () => {
+        URL.revokeObjectURL(imgUrl);
+        reject(new Error('Failed to load image'));
       };
-      reader.readAsDataURL(blob);
+      
+      img.src = imgUrl;
     });
   } catch (error) {
     console.warn('⚠️ Failed to convert image to data URL:', error);

@@ -149,17 +149,42 @@ const AIStoryModal = ({ isOpen, onClose }: AIStoryModalProps) => {
       // Import the Gemini proxy service (secure - API key stays on backend)
       const { generateStoryWithGemini } = await import('../../services/geminiProxyService');
       
-      // Build comprehensive prompt
+      // Build comprehensive prompt with structured image generation
       const selectedGenreNames = formData.selectedGenres.map(id => genres.find(g => g.id === id)?.name || id).join(', ');
+      const artStyle = formData.selectedArtStyle || 'cartoon';
       const fullPrompt = `
 Generate a ${selectedGenreNames} story for children aged 6-8 with ${formData.pageCount} pages.
-Art Style: ${formData.selectedArtStyle || 'cartoon'}
+Art Style: ${artStyle}
 Language: ${formData.storyLanguage === 'tl' ? 'Tagalog' : 'English'}
 
 Story Idea: ${formData.storyIdea}
 
-Please create a complete story with title, description, and pages in JSON format.
-Each page should have text and an imagePrompt for illustration generation.
+CRITICAL: For consistent illustrations across all pages, you MUST:
+1. Create a detailed "characterDescription" field with the main character's EXACT appearance (age, hair color, clothing, distinctive features)
+2. Create a "colorScheme" field with 3-5 main colors for the story's visual theme
+3. In EVERY page's "imagePrompt", START with the EXACT same character description
+
+Return ONLY valid JSON in this exact format:
+{
+  "title": "Story Title",
+  "description": "Brief story summary (2-3 sentences)",
+  "characterDescription": "DETAILED character appearance: age, hair, clothing, distinctive features",
+  "colorScheme": "warm sunset tones with orange, pink, soft yellow",
+  "pages": [
+    {
+      "text": "Page text here",
+      "imagePrompt": "${artStyle} illustration: [USE EXACT characterDescription HERE]. Scene: [what's happening on this page]. Style: ${artStyle}, [use colorScheme colors]"
+    }
+  ]
+}
+
+EXAMPLE of good characterDescription:
+"A 7-year-old girl with curly brown hair in two pigtails, bright green eyes, wearing a red and white striped t-shirt, blue denim overalls, and white sneakers"
+
+EXAMPLE of good imagePrompt format:
+"${artStyle} illustration: A 7-year-old girl with curly brown hair in two pigtails, bright green eyes, wearing a red and white striped t-shirt, blue denim overalls, and white sneakers. Scene: She discovers a magical door in her backyard garden. Style: ${artStyle}, warm sunset tones with orange and pink sky."
+
+Make sure EVERY page's imagePrompt starts with the EXACT SAME character description!
       `.trim();
       
       // Call Gemini API via secure backend proxy

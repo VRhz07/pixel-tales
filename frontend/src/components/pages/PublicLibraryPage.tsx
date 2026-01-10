@@ -11,6 +11,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { storyApiService } from '../../services/storyApiService';
 import { useAuthStore } from '../../stores/authStore';
+import { useThemeStore } from '../../stores/themeStore';
 import CustomDropdown, { DropdownOption } from '../common/CustomDropdown';
 
 
@@ -153,6 +154,7 @@ const mockPublicStories = {
 const PublicLibraryPage = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const isDarkMode = useThemeStore((state) => state.isDarkMode);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('');
   const [selectedGenre, setSelectedGenre] = useState<string>('');
@@ -688,7 +690,7 @@ const PublicLibraryPage = () => {
               alignItems: 'center',
               marginBottom: '20px',
               padding: '16px 20px',
-              background: 'linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #fae8ff 100%)',
+              background: isDarkMode ? 'linear-gradient(135deg, rgba(30, 27, 75, 0.6) 0%, rgba(31, 41, 55, 0.6) 50%, rgba(55, 48, 107, 0.6) 100%)' : 'linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #fae8ff 100%)',
               borderRadius: '12px',
               border: '2px solid #a855f7',
               boxShadow: '0 4px 12px rgba(168, 85, 247, 0.15)',
@@ -824,7 +826,7 @@ const PublicLibraryPage = () => {
               marginTop: '30px',
               marginBottom: '32px',
               padding: '20px',
-              background: 'linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #fae8ff 100%)',
+              background: isDarkMode ? 'linear-gradient(135deg, rgba(30, 27, 75, 0.6) 0%, rgba(31, 41, 55, 0.6) 50%, rgba(55, 48, 107, 0.6) 100%)' : 'linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #fae8ff 100%)',
               borderRadius: '12px',
               border: '2px solid #a855f7',
               boxShadow: '0 4px 12px rgba(168, 85, 247, 0.15)',
@@ -837,8 +839,8 @@ const PublicLibraryPage = () => {
                   padding: '10px 20px',
                   border: '2px solid #a855f7',
                   borderRadius: '8px',
-                  background: 'white',
-                  color: '#6b21a8',
+                  background: isDarkMode ? '#374151' : 'white',
+                  color: isDarkMode ? '#e9d5ff' : '#6b21a8',
                   fontWeight: '700',
                   cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
                   transition: 'all 0.3s ease',
@@ -863,7 +865,7 @@ const PublicLibraryPage = () => {
                   .map((page, index, array) => (
                     <React.Fragment key={page}>
                       {index > 0 && array[index - 1] !== page - 1 && (
-                        <span style={{ color: '#6b21a8', fontWeight: '700', padding: '0 4px' }}>...</span>
+                        <span style={{ color: isDarkMode ? '#e9d5ff' : '#6b21a8', fontWeight: '700', padding: '0 4px' }}>...</span>
                       )}
                       <button
                         onClick={() => handlePageChange(page)}
@@ -872,8 +874,8 @@ const PublicLibraryPage = () => {
                           height: '40px',
                           border: '2px solid #a855f7',
                           borderRadius: '8px',
-                          background: currentPage === page ? '#a855f7' : 'white',
-                          color: currentPage === page ? 'white' : '#6b21a8',
+                          background: currentPage === page ? '#a855f7' : (isDarkMode ? '#374151' : 'white'),
+                          color: currentPage === page ? 'white' : (isDarkMode ? '#e9d5ff' : '#6b21a8'),
                           fontWeight: '700',
                           cursor: 'pointer',
                           transition: 'all 0.3s ease',
@@ -897,8 +899,8 @@ const PublicLibraryPage = () => {
                   padding: '10px 20px',
                   border: '2px solid #a855f7',
                   borderRadius: '8px',
-                  background: 'white',
-                  color: '#6b21a8',
+                  background: isDarkMode ? '#374151' : 'white',
+                  color: isDarkMode ? '#e9d5ff' : '#6b21a8',
                   fontWeight: '700',
                   cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
                   transition: 'all 0.3s ease',
@@ -1018,7 +1020,7 @@ const PublicLibraryPage = () => {
               alignItems: 'center',
               marginBottom: '20px',
               padding: '16px 20px',
-              background: 'linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #fae8ff 100%)',
+              background: isDarkMode ? 'linear-gradient(135deg, rgba(30, 27, 75, 0.6) 0%, rgba(31, 41, 55, 0.6) 50%, rgba(55, 48, 107, 0.6) 100%)' : 'linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #fae8ff 100%)',
               borderRadius: '12px',
               border: '2px solid #a855f7',
               boxShadow: '0 4px 12px rgba(168, 85, 247, 0.15)',
@@ -1122,7 +1124,7 @@ const PublicLibraryPage = () => {
                 gap: '10px',
                 marginTop: '30px',
                 padding: '20px',
-                background: 'linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #fae8ff 100%)',
+                background: isDarkMode ? 'linear-gradient(135deg, rgba(30, 27, 75, 0.6) 0%, rgba(31, 41, 55, 0.6) 50%, rgba(55, 48, 107, 0.6) 100%)' : 'linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #fae8ff 100%)',
                 borderRadius: '12px',
                 border: '2px solid #a855f7',
                 boxShadow: '0 4px 12px rgba(168, 85, 247, 0.15)',
@@ -1135,8 +1137,8 @@ const PublicLibraryPage = () => {
                     padding: '10px 20px',
                     border: '2px solid #a855f7',
                     borderRadius: '8px',
-                    background: 'white',
-                    color: '#6b21a8',
+                    background: isDarkMode ? '#374151' : 'white',
+                    color: isDarkMode ? '#e9d5ff' : '#6b21a8',
                     fontWeight: '700',
                     cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
                     transition: 'all 0.3s ease',
@@ -1161,7 +1163,7 @@ const PublicLibraryPage = () => {
                     .map((page, index, array) => (
                       <React.Fragment key={page}>
                         {index > 0 && array[index - 1] !== page - 1 && (
-                          <span style={{ color: '#6b21a8', fontWeight: '700', padding: '0 4px' }}>...</span>
+                          <span style={{ color: isDarkMode ? '#e9d5ff' : '#6b21a8', fontWeight: '700', padding: '0 4px' }}>...</span>
                         )}
                         <button
                           onClick={() => handlePageChange(page)}
@@ -1170,8 +1172,8 @@ const PublicLibraryPage = () => {
                             height: '40px',
                             border: '2px solid #a855f7',
                             borderRadius: '8px',
-                            background: currentPage === page ? '#a855f7' : 'white',
-                            color: currentPage === page ? 'white' : '#6b21a8',
+                            background: currentPage === page ? '#a855f7' : (isDarkMode ? '#374151' : 'white'),
+                            color: currentPage === page ? 'white' : (isDarkMode ? '#e9d5ff' : '#6b21a8'),
                             fontWeight: '700',
                             cursor: 'pointer',
                             transition: 'all 0.3s ease',
@@ -1195,8 +1197,8 @@ const PublicLibraryPage = () => {
                     padding: '10px 20px',
                     border: '2px solid #a855f7',
                     borderRadius: '8px',
-                    background: 'white',
-                    color: '#6b21a8',
+                    background: isDarkMode ? '#374151' : 'white',
+                    color: isDarkMode ? '#e9d5ff' : '#6b21a8',
                     fontWeight: '700',
                     cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
                     transition: 'all 0.3s ease',
