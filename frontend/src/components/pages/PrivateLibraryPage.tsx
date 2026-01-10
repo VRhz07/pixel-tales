@@ -93,6 +93,15 @@ const PrivateLibraryPage = () => {
     }
   }, [user]);
 
+  // Load stories from backend into localStorage (for thumbnails and offline access)
+  const loadStoriesFromBackend = useStoryStore((state) => state.loadStoriesFromBackend);
+  React.useEffect(() => {
+    if (user && currentUserId) {
+      console.log('📥 Loading stories from backend into localStorage...');
+      loadStoriesFromBackend();
+    }
+  }, [user, currentUserId, loadStoriesFromBackend]);
+
   // Use real offline stories from store
   const offlineStories = rawOfflineStories.map(story => ({
     ...story,

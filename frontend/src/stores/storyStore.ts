@@ -390,7 +390,7 @@ export const useStoryStore = create<StoryState>()(
       createStory: (title: string) => {
         const state = get();
         if (!state.currentUserId) {
-          console.error('❌ Cannot create story: No user logged in');
+          console.error('âŒ Cannot create story: No user logged in');
           throw new Error('No user logged in');
         }
         
@@ -440,7 +440,7 @@ export const useStoryStore = create<StoryState>()(
       updateStory: (id: string, updates: Partial<Story>) => {
         // Debug: Log what's being updated
         if (updates.pages) {
-          console.log(`📝 updateStory called for ${id}:`, {
+          console.log(`ðŸ“ updateStory called for ${id}:`, {
             updatingPages: true,
             pageCount: updates.pages.length,
             pagesWithImages: updates.pages.filter(p => p.canvasData).length,
@@ -555,13 +555,13 @@ export const useStoryStore = create<StoryState>()(
           storyApiService.deleteStory(story.backendId.toString()).catch(err => {
             // 404 is expected if story was already deleted
             if (err?.status === 404) {
-              console.log('✅ Story was already deleted from backend (or never synced)');
+              console.log('âœ… Story was already deleted from backend (or never synced)');
             } else {
-              console.warn('❌ Failed to delete story from backend:', err);
+              console.warn('âŒ Failed to delete story from backend:', err);
             }
           });
         } else {
-          console.log('ℹ️ Story has no backend ID, skipping backend deletion');
+          console.log('â„¹ï¸ Story has no backend ID, skipping backend deletion');
         }
       },
 
@@ -654,11 +654,11 @@ export const useStoryStore = create<StoryState>()(
       updatePage: (storyId: string, pageId: string, updates: Partial<StoryPage>) => {
         const story = get().getStory(storyId);
         if (!story) {
-          console.error('❌ updatePage: Story not found:', storyId);
+          console.error('âŒ updatePage: Story not found:', storyId);
           return;
         }
 
-        console.log(`📝 updatePage called: storyId=${storyId}, pageId=${pageId}`, {
+        console.log(`ðŸ“ updatePage called: storyId=${storyId}, pageId=${pageId}`, {
           hasCanvasData: !!updates.canvasData,
           canvasDataPreview: updates.canvasData?.substring(0, 50),
           otherUpdates: Object.keys(updates).filter(k => k !== 'canvasData')
@@ -668,7 +668,7 @@ export const useStoryStore = create<StoryState>()(
           page.id === pageId ? { ...page, ...updates } : page
         );
         
-        console.log(`✅ Updated pages:`, {
+        console.log(`âœ… Updated pages:`, {
           totalPages: updatedPages.length,
           pagesWithImages: updatedPages.filter(p => p.canvasData).length
         });
@@ -678,7 +678,7 @@ export const useStoryStore = create<StoryState>()(
         // Verify the update actually stuck
         setTimeout(() => {
           const verifyStory = get().getStory(storyId);
-          console.log(`🔍 Verification after updatePage:`, {
+          console.log(`ðŸ” Verification after updatePage:`, {
             storyId,
             pageId,
             pagesInStore: verifyStory?.pages.length,
@@ -1019,7 +1019,7 @@ export const useStoryStore = create<StoryState>()(
       saveStoryOffline: (story: Story) => {
         const state = get();
         if (!state.currentUserId) {
-          console.error('❌ Cannot save offline: No user logged in');
+          console.error('âŒ Cannot save offline: No user logged in');
           return;
         }
         
@@ -1034,7 +1034,7 @@ export const useStoryStore = create<StoryState>()(
           (s.backendId && story.backendId && s.backendId === story.backendId)
         );
         if (isAlreadySaved) {
-          console.log('ℹ️ Story already saved offline');
+          console.log('â„¹ï¸ Story already saved offline');
           return;
         }
         
@@ -1049,7 +1049,7 @@ export const useStoryStore = create<StoryState>()(
           }
         }));
         
-        console.log('✅ Story saved offline:', story.title);
+        console.log('âœ… Story saved offline:', story.title);
       },
       
       removeOfflineStory: (storyId: string) => {
@@ -1076,7 +1076,7 @@ export const useStoryStore = create<StoryState>()(
           }
         }));
         
-        console.log('✅ Removed offline story:', storyId);
+        console.log('âœ… Removed offline story:', storyId);
       },
       
       isStorySavedOffline: (storyId: string) => {
@@ -1170,16 +1170,16 @@ export const useStoryStore = create<StoryState>()(
         set({ isLoading: true, error: null });
 
         try {
-          console.log('📥 Fetching stories from backend...');
+          console.log('ðŸ“¥ Fetching stories from backend...');
           const apiStories = await storyApiService.getUserStories();
-          console.log('📦 Raw API response:', apiStories);
+          console.log('ðŸ“¦ Raw API response:', apiStories);
           
           const backendStories = apiStories.map(apiStory => storyApiService.convertFromApiFormat(apiStory));
-          console.log('✅ Converted stories:', backendStories);
+          console.log('âœ… Converted stories:', backendStories);
           
           // Get list of deleted story IDs to exclude
           const deletedIds = state.userLibraries[state.currentUserId!]?.deletedStoryIds || [];
-          console.log('🗑️ Deleted story IDs to exclude:', deletedIds);
+          console.log('ðŸ—‘ï¸ Deleted story IDs to exclude:', deletedIds);
 
           // Filter out stories that were deleted by the user
           const filteredStories = backendStories.filter(story => 
@@ -1187,7 +1187,7 @@ export const useStoryStore = create<StoryState>()(
           );
           
           if (filteredStories.length < backendStories.length) {
-            console.log(`🗑️ Filtered out ${backendStories.length - filteredStories.length} deleted stories`);
+            console.log(`ðŸ—‘ï¸ Filtered out ${backendStories.length - filteredStories.length} deleted stories`);
           }
 
           // Get existing localStorage stories
@@ -1195,14 +1195,14 @@ export const useStoryStore = create<StoryState>()(
           
           // CRITICAL FIX: Preserve local images when merging with backend
           // Instead of removing images, we merge backend text with local images
-          console.log('🖼️ Preserving local images during backend sync...');
+          console.log('ðŸ–¼ï¸ Preserving local images during backend sync...');
           
           const mergedStories = filteredStories.map(backendStory => {
             // Find matching local story by backend ID
             const localStory = localStories.find(ls => ls.backendId === backendStory.backendId);
             
             if (localStory) {
-              console.log(`🔄 Merging story ${backendStory.title}:`, {
+              console.log(`ðŸ”„ Merging story ${backendStory.title}:`, {
                 hasLocalCover: !!localStory.coverImage,
                 localPagesWithImages: localStory.pages.filter(p => p.canvasData).length,
                 backendPages: backendStory.pages.length
@@ -1211,7 +1211,7 @@ export const useStoryStore = create<StoryState>()(
               // Merge backend data with local images
               return {
                 ...backendStory, // Use backend text and metadata
-                coverImage: localStory.coverImage, // Preserve local cover image
+                coverImage: localStory.coverImage || backendStory.coverImage, // Use local if available, otherwise backend
                 coverImageOperations: localStory.coverImageOperations,
                 coverImageDrawingState: localStory.coverImageDrawingState,
                 isDraft: localStory.isDraft || backendStory.isDraft, // Preserve draft state
@@ -1221,12 +1221,12 @@ export const useStoryStore = create<StoryState>()(
                                    localStory.pages[index];
                   
                   if (localPage?.canvasData) {
-                    console.log(`  ✅ Preserved image for page ${index + 1}`);
+                    console.log(`  âœ… Preserved image for page ${index + 1}`);
                   }
                   
                   return {
                     ...backendPage, // Use backend text
-                    canvasData: localPage?.canvasData, // Preserve local canvas image
+                    canvasData: localPage?.canvasData || backendPage.canvasData, // Use local if available, otherwise backend
                     canvasOperations: localPage?.canvasOperations,
                     canvasDrawingState: localPage?.canvasDrawingState,
                   };
@@ -1234,16 +1234,12 @@ export const useStoryStore = create<StoryState>()(
               };
             }
             
-            // No local story found - return backend story without images
-            return {
-              ...backendStory,
-              coverImage: undefined,
-              pages: backendStory.pages.map(page => ({
-                ...page,
-                canvasData: undefined,
-                canvasDrawingState: undefined,
-              }))
-            };
+            // No local story found - use backend story as-is (includes images from backend)
+            console.log('Using backend story', backendStory.title, 'as-is (no local copy)', {
+              hasCoverImage: !!backendStory.coverImage,
+              pagesWithImages: backendStory.pages.filter(p => p.canvasData).length
+            });
+            return backendStory;
           });
           
           // Find stories that exist in localStorage but not in backend (unsaved drafts)
@@ -1252,7 +1248,7 @@ export const useStoryStore = create<StoryState>()(
             !mergedStories.some(backendStory => backendStory.id === localStory.id) // Not in backend
           );
           
-          console.log(`📝 Found ${localOnlyStories.length} local-only stories (unsaved drafts)`);
+          console.log(`ðŸ“ Found ${localOnlyStories.length} local-only stories (unsaved drafts)`);
           
           // Add local-only stories
           mergedStories.push(...localOnlyStories);
@@ -1268,11 +1264,11 @@ export const useStoryStore = create<StoryState>()(
             isLoading: false
           }));
 
-          console.log(`✅ Loaded ${backendStories.length} stories from backend + ${localOnlyStories.length} local drafts`);
+          console.log(`âœ… Loaded ${backendStories.length} stories from backend + ${localOnlyStories.length} local drafts`);
           
           // Sync local-only stories to backend in the background
           if (localOnlyStories.length > 0) {
-            console.log('🔄 Syncing local-only stories to backend...');
+            console.log('ðŸ”„ Syncing local-only stories to backend...');
             localOnlyStories.forEach(story => {
               // Only sync stories with content
               const hasContent = story.pages.some(page => page.text.trim().length > 0);
@@ -1281,12 +1277,12 @@ export const useStoryStore = create<StoryState>()(
                   console.warn(`Failed to sync local story ${story.id}:`, err);
                 });
               } else {
-                console.log(`⏭️ Skipping empty story ${story.id} (no content to sync)`);
+                console.log(`â­ï¸ Skipping empty story ${story.id} (no content to sync)`);
               }
             });
           }
         } catch (error) {
-          console.error('❌ Error loading stories from backend:', error);
+          console.error('âŒ Error loading stories from backend:', error);
           set({ error: 'Failed to load stories from backend', isLoading: false });
         }
       },
@@ -1315,7 +1311,7 @@ export const useStoryStore = create<StoryState>()(
           if (story.backendId) {
             try {
               await storyApiService.updateStory(story.backendId.toString(), apiData);
-              console.log(`✅ Updated story ${story.backendId} on backend`);
+              console.log(`âœ… Updated story ${story.backendId} on backend`);
               return story.backendId.toString();
             } catch (updateError: any) {
               if (updateError?.status === 404) {
@@ -1333,7 +1329,7 @@ export const useStoryStore = create<StoryState>()(
                     }
                   }
                 }));
-                console.log(`✅ Created story ${response.story.id} on backend (old ID was deleted)`);
+                console.log(`âœ… Created story ${response.story.id} on backend (old ID was deleted)`);
                 return response.story.id.toString();
               } else {
                 throw updateError;
@@ -1354,14 +1350,14 @@ export const useStoryStore = create<StoryState>()(
                 }
               }
             }));
-            console.log(`✅ Created story ${response.story.id} on backend`);
+            console.log(`âœ… Created story ${response.story.id} on backend`);
             return response.story.id.toString();
           }
         } catch (error: any) {
-          console.error(`❌ Error syncing story ${id} to backend:`, error);
-          console.error('📋 Error details:', error?.details);
-          console.error('📋 Error message:', error?.message);
-          console.error('📋 Full error object:', JSON.stringify(error, null, 2));
+          console.error(`âŒ Error syncing story ${id} to backend:`, error);
+          console.error('ðŸ“‹ Error details:', error?.details);
+          console.error('ðŸ“‹ Error message:', error?.message);
+          console.error('ðŸ“‹ Full error object:', JSON.stringify(error, null, 2));
           throw error;
         }
       }
@@ -1381,7 +1377,7 @@ export const useStoryStore = create<StoryState>()(
         const allStories = Object.values(state.userLibraries).flatMap(lib => lib.stories);
         const eggbert = allStories.find(s => s.title?.includes('Eggbert'));
         if (eggbert) {
-          console.log('🔍 partialize INPUT - Eggbert state:', {
+          console.log('ðŸ” partialize INPUT - Eggbert state:', {
             title: eggbert.title,
             pagesWithImages: eggbert.pages.filter(p => p.canvasData).length,
             hasCoverImage: !!eggbert.coverImage
@@ -1400,15 +1396,15 @@ export const useStoryStore = create<StoryState>()(
               
               // DEBUG: Log the first page to see what's in canvasData
               if (story.pages[0]?.canvasData) {
-                console.log(`🔍 DEBUG story "${story.title}" page 1 canvasData:`, story.pages[0].canvasData.substring(0, 100));
+                console.log(`ðŸ” DEBUG story "${story.title}" page 1 canvasData:`, story.pages[0].canvasData.substring(0, 100));
               } else {
-                console.log(`🔍 DEBUG story "${story.title}" page 1 has NO canvasData`);
+                console.log(`ðŸ” DEBUG story "${story.title}" page 1 has NO canvasData`);
               }
               
               // ONLY strip images from PUBLISHED stories (backend has them)
               // KEEP images for drafts/unpublished stories (only in localStorage)
               if (story.isPublished && story.backendId) {
-                console.log(`🗜️ Stripping images from published story "${story.title}" (${pagesWithImages} images)`);
+                console.log(`ðŸ—œï¸ Stripping images from published story "${story.title}" (${pagesWithImages} images)`);
                 return {
                   ...story,
                   coverImage: undefined, // Backend has it
@@ -1421,7 +1417,7 @@ export const useStoryStore = create<StoryState>()(
               }
               
               // For drafts/unpublished: KEEP ALL IMAGES
-              console.log(`✅ Keeping images for draft "${story.title}" (${pagesWithImages} images, isPublished: ${story.isPublished}, backendId: ${story.backendId})`);
+              console.log(`âœ… Keeping images for draft "${story.title}" (${pagesWithImages} images, isPublished: ${story.isPublished}, backendId: ${story.backendId})`);
               return story;
             }),
             characters: library.characters.map(char => ({
