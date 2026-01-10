@@ -14,7 +14,7 @@ interface Story {
   createdDate: string;
   likes?: number;
   views?: number;
-  icon: string;
+  coverImage?: string; // ✅ Added cover image field
 }
 
 const mockStories: Story[] = [
@@ -27,7 +27,6 @@ const mockStories: Story[] = [
     createdDate: '1/15/2024',
     likes: 24,
     views: 156,
-    icon: '📚'
   },
   {
     id: '2',
@@ -37,7 +36,6 @@ const mockStories: Story[] = [
     pages: 12,
     createdDate: '1/20/2024',
     views: 0,
-    icon: '📖'
   },
   {
     id: '3',
@@ -48,7 +46,6 @@ const mockStories: Story[] = [
     createdDate: '1/25/2024',
     likes: 18,
     views: 89,
-    icon: '📚'
   },
   {
     id: '4',
@@ -58,7 +55,6 @@ const mockStories: Story[] = [
     pages: 10,
     createdDate: '1/28/2024',
     views: 12,
-    icon: '📖'
   },
   {
     id: '5',
@@ -69,7 +65,6 @@ const mockStories: Story[] = [
     createdDate: '2/1/2024',
     likes: 31,
     views: 203,
-    icon: '📚'
   },
   {
     id: '6',
@@ -79,7 +74,6 @@ const mockStories: Story[] = [
     pages: 15,
     createdDate: '2/5/2024',
     views: 0,
-    icon: '📖'
   },
   {
     id: '7',
@@ -90,7 +84,6 @@ const mockStories: Story[] = [
     createdDate: '2/8/2024',
     likes: 27,
     views: 134,
-    icon: '📚'
   },
   {
     id: '8',
@@ -100,7 +93,6 @@ const mockStories: Story[] = [
     pages: 7,
     createdDate: '2/12/2024',
     views: 0,
-    icon: '📖'
   }
 ];
 
@@ -136,7 +128,7 @@ const YourWorksPage: React.FC = () => {
       createdDate: new Date(story.createdAt).toLocaleDateString(),
       likes: 0,
       views: 0,
-      icon: story.isPublished ? '📚' : '📖'
+      coverImage: story.coverImage || story.cover_image, // ✅ Support both camelCase and snake_case
     }));
     
     return stories.filter((story: any) => {
@@ -296,8 +288,55 @@ const YourWorksPage: React.FC = () => {
             {/* Card Header */}
             <div className="your-works-card-header">
               <div className="your-works-card-left-content">
-                <div className="your-works-story-icon">
-                  {story.icon}
+                {/* ✅ FIXED: Display actual cover image instead of emoji */}
+                <div className="your-works-story-icon" style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  backgroundColor: '#f3f4f6',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {story.coverImage ? (
+                    <img 
+                      src={story.coverImage} 
+                      alt={story.title}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                      }}
+                      onError={(e) => {
+                        // Fallback to gradient placeholder if image fails to load
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.style.display = 'none';
+                        if (target.parentElement) {
+                          target.parentElement.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                          target.parentElement.style.color = 'white';
+                          target.parentElement.style.fontSize = '32px';
+                          target.parentElement.style.fontWeight = '700';
+                          target.parentElement.textContent = story.title.charAt(0).toUpperCase();
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      color: 'white',
+                      fontSize: '32px',
+                      fontWeight: '700'
+                    }}>
+                      {story.title.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                 </div>
                 <div className="your-works-story-info">
                   <div className="your-works-story-title-row">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { 
   ArrowLeftIcon, 
@@ -31,6 +31,7 @@ import pdfExportService from '../services/pdfExportService';
 import { useSoundEffects } from '../hooks/useSoundEffects';
 import api from '../services/api';
 import gamesCacheService from '../services/gamesCache.service';
+import { convertStoryImagesToDataUrls } from '../utils/imageCache';
 import './StoryReaderPage.css';
 
 type ReadingMode = 'verticalScroll' | 'leftToRight';
@@ -558,8 +559,16 @@ const StoryReaderPage: React.FC = () => {
       gamesCacheService.clearStoryGamesCache(idToUse);
       console.log('✅ Cleared cached games for story');
     } else {
-      // Save to offline storage
-      saveStoryOffline(story);
+      // Save to offline storage with image conversion
+      try {
+        console.log('🖼️ Preparing story for offline storage...');
+        const storyWithDataUrls = await convertStoryImagesToDataUrls(story);
+        saveStoryOffline(storyWithDataUrls);
+      } catch (error) {
+        console.error('❌ Failed to convert images:', error);
+        // Fallback: save without conversion
+        saveStoryOffline(story);
+      }
       setIsSavedOffline(true);
       playSuccess();
       console.log('✅ Saved story for offline reading');
@@ -852,9 +861,9 @@ const StoryReaderPage: React.FC = () => {
                   }}
                   onError={(e) => {
                     // Mark as failed to show retry button
-                    const newFailedPages = new Set(failedPageLoads);
+                    const newFailedPages = new Set(failedImages);
                     newFailedPages.add(index);
-                    setFailedPageLoads(newFailedPages);
+                    setfailedImages(newFailedPages);
                   }}
                   onLoad={async (e) => {
                     // Check if this is a real image or a placeholder
@@ -1007,9 +1016,9 @@ const StoryReaderPage: React.FC = () => {
                     }}
                     onError={(e) => {
                       // Mark as failed to show retry button
-                      const newFailedPages = new Set(failedPageLoads);
+                      const newFailedPages = new Set(failedImages);
                       newFailedPages.add(currentPage);
-                      setFailedPageLoads(newFailedPages);
+                      setfailedImages(newFailedPages);
                     }}
                     onLoad={async (e) => {
                       if (!page) return;
