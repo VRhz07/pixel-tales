@@ -99,22 +99,29 @@ function AppContent() {
           });
           
           // Determine where to navigate based on account state
-          if (accountState.activeAccountType === 'parent' || userType === 'parent' || userType === 'teacher') {
-            // Was in parent view or is parent/teacher account
+          if (accountState.activeAccountType === 'teacher' || userType === 'teacher') {
+            // Teacher account
             const hasParentSession = storage.getItemSync('parent_session');
             if (hasParentSession) {
-              // Parent/Teacher was viewing a child account
-              console.log('🚀 Parent/Teacher was viewing as child, redirecting to home (child view)...');
+              // Teacher was viewing a child account
+              console.log('🚀 Teacher was viewing as child, redirecting to home (child view)...');
               navigate('/home', { replace: true });
             } else {
-              // Parent or Teacher in their own account
-              if (userType === 'teacher') {
-                console.log('🚀 Teacher account, redirecting to teacher dashboard...');
-                navigate('/teacher-dashboard', { replace: true });
-              } else {
-                console.log('🚀 Parent account, redirecting to parent dashboard...');
-                navigate('/parent-dashboard', { replace: true });
-              }
+              // Teacher in their own account
+              console.log('🚀 Teacher account, redirecting to teacher dashboard...');
+              navigate('/teacher-dashboard', { replace: true });
+            }
+          } else if (accountState.activeAccountType === 'parent' || userType === 'parent') {
+            // Parent account
+            const hasParentSession = storage.getItemSync('parent_session');
+            if (hasParentSession) {
+              // Parent was viewing a child account
+              console.log('🚀 Parent was viewing as child, redirecting to home (child view)...');
+              navigate('/home', { replace: true });
+            } else {
+              // Parent in their own account
+              console.log('🚀 Parent account, redirecting to parent dashboard...');
+              navigate('/parent-dashboard', { replace: true });
             }
           } else {
             // Regular child account

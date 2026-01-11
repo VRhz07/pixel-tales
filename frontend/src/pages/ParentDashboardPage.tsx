@@ -29,6 +29,7 @@ import StoryViewModal from '../components/parent/StoryViewModal';
 import ParentBottomNav from '../components/navigation/ParentBottomNav';
 import { useAccountSwitchStore } from '../stores/accountSwitchStore';
 import { storage } from '../utils/storage';
+import '../styles/dashboard-common.css';
 import './ParentDashboardPage.css';
 
 interface StatCardProps {

@@ -61,7 +61,7 @@ class StorySerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'author', 'author_name', 'author_username', 'authors_names',
             'content', 'canvas_data', 'summary', 'category', 'genres', 'language', 'cover_image',
-            'is_published', 'date_created', 'date_updated', 'views',
+            'creation_type', 'is_published', 'date_created', 'date_updated', 'views',
             'total_ratings', 'average_rating', 'is_owner',
             'likes_count', 'comments_count', 'is_liked_by_user', 'is_collaborative'
         ]
@@ -309,7 +309,7 @@ class StoryListSerializer(serializers.ModelSerializer):
         model = Story
         fields = [
             'id', 'title', 'author_name', 'summary', 'category', 'genres', 'language',
-            'cover_image', 'is_published', 'date_created', 'date_updated', 'views',
+            'cover_image', 'creation_type', 'is_published', 'date_created', 'date_updated', 'views',
             'average_rating', 'likes_count', 'comments_count', 'is_liked_by_user',
             'content', 'canvas_data'
         ]

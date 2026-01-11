@@ -31,11 +31,11 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 /**
  * Fetch active profanity words from the backend
  */
-async function fetchProfanityWords() {
+async function fetchProfanityWords(forceRefresh = false) {
   const now = Date.now();
   
-  // Return cached data if still valid
-  if (now - lastFetchTime < CACHE_DURATION) {
+  // Return cached data if still valid and not forcing refresh
+  if (!forceRefresh && now - lastFetchTime < CACHE_DURATION) {
     return;
   }
   
@@ -50,6 +50,15 @@ async function fetchProfanityWords() {
     console.warn('⚠️ Failed to fetch profanity words, using defaults:', error);
     // Continue using default list
   }
+}
+
+/**
+ * Force refresh profanity words from backend
+ * Call this after admin adds/deletes words
+ */
+export async function refreshProfanityWords() {
+  console.log('🔄 Force refreshing profanity words from backend...');
+  await fetchProfanityWords(true);
 }
 
 // Initialize profanity list on module load
@@ -80,11 +89,27 @@ function createProfanityPattern(word: string): RegExp {
  * Detects if text contains profanity
  * Automatically refreshes word list if needed
  */
-export function containsProfanity(text: string): boolean {
+export async function containsProfanity(text: string): Promise<boolean> {
   if (!text) return false;
   
   // Refresh profanity words if cache expired
-  fetchProfanityWords();
+  await fetchProfanityWords();
+  
+  const lowerText = text.toLowerCase();
+  
+  // Check for exact matches and variations
+  return ALL_PROFANITY.some(word => {
+    const pattern = createProfanityPattern(word);
+    return pattern.test(lowerText);
+  });
+}
+
+/**
+ * Synchronous version of containsProfanity for immediate checks
+ * Uses cached profanity list without fetching
+ */
+export function containsProfanitySync(text: string): boolean {
+  if (!text) return false;
   
   const lowerText = text.toLowerCase();
   

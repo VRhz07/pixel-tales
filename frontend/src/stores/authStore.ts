@@ -66,8 +66,10 @@ export const useAuthStore = create<AuthState>()(
             
             // Set correct account type based on actual user type
             const userType = response.user.user_type;
-            if (userType === 'parent' || userType === 'teacher') {
+            if (userType === 'parent') {
               accountSwitchStore.setActiveAccount('parent');
+            } else if (userType === 'teacher') {
+              accountSwitchStore.setActiveAccount('teacher');
             }
             // Don't set 'child' for actual child logins - they shouldn't have account switching
           });
@@ -387,8 +389,10 @@ export const useAuthStore = create<AuthState>()(
             // Set account type based on actual user type
             const userType = storedUser.user_type;
             import('../stores/accountSwitchStore').then(({ useAccountSwitchStore }) => {
-              if (userType === 'parent' || userType === 'teacher') {
+              if (userType === 'parent') {
                 useAccountSwitchStore.getState().setActiveAccount('parent');
+              } else if (userType === 'teacher') {
+                useAccountSwitchStore.getState().setActiveAccount('teacher');
               } else if (userType === 'child') {
                 const childId = storedUser.id ? parseInt(storedUser.id) : undefined;
                 useAccountSwitchStore.getState().setActiveAccount('child', childId, storedUser.name);

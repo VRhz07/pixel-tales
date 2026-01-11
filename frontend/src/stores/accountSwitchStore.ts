@@ -4,7 +4,7 @@ import { storage } from '../utils/storage';
 
 interface AccountSwitchState {
   // Current active account type
-  activeAccountType: 'parent' | 'child' | null;
+  activeAccountType: 'parent' | 'teacher' | 'child' | null;
   
   // Active child ID if viewing as child
   activeChildId: number | null;
@@ -13,7 +13,7 @@ interface AccountSwitchState {
   activeChildName: string | null;
   
   // Actions
-  setActiveAccount: (type: 'parent' | 'child', childId?: number, childName?: string) => void;
+  setActiveAccount: (type: 'parent' | 'teacher' | 'child', childId?: number, childName?: string) => void;
   clearActiveAccount: () => void;
   isViewingAsChild: () => boolean;
 }
@@ -25,7 +25,7 @@ export const useAccountSwitchStore = create<AccountSwitchState>()(
       activeChildId: null,
       activeChildName: null,
 
-      setActiveAccount: (type: 'parent' | 'child', childId?: number, childName?: string) => {
+      setActiveAccount: (type: 'parent' | 'teacher' | 'child', childId?: number, childName?: string) => {
         // SECURITY FIX: Additional validation
         if (type === 'child') {
           // When setting child mode, verify parent_session exists

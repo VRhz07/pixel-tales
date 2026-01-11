@@ -75,3 +75,33 @@ def JWTAuthMiddlewareStack(inner):
     """
     return JWTAuthMiddleware(inner)
 
+
+# HTTP Middleware for tracking user activity
+from django.utils import timezone
+from django.utils.deprecation import MiddlewareMixin
+from .models import UserProfile
+
+
+class UpdateLastSeenMiddleware(MiddlewareMixin):
+    """
+    Middleware to update user's last_seen timestamp on every request.
+    Only updates if more than 1 minute has passed to reduce database writes.
+    """
+    
+    def process_request(self, request):
+        """Update last_seen timestamp for authenticated users"""
+        if request.user.is_authenticated:
+            try:
+                profile = request.user.profile
+                now = timezone.now()
+                
+                # Only update if last update was more than 1 minute ago (to reduce DB writes)
+                if not profile.last_seen or (now - profile.last_seen).total_seconds() > 60:
+                    UserProfile.objects.filter(id=profile.id).update(
+                        last_seen=now,
+                        is_online=True
+                    )
+            except (UserProfile.DoesNotExist, AttributeError):
+                pass
+        return None
+
