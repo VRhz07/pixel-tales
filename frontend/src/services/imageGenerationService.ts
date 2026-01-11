@@ -1,6 +1,7 @@
 // Image Generation Service using Pollinations.ai with backend proxy for API key authentication
 import { apiConfigService } from './apiConfig.service';
 import apiService from './api';
+import { getVariedCompositionGuidelines, resetCompositionMemory, getEnvironmentSuggestions } from './imageVariety';
 // Alternative: Can be switched to Hugging Face or other services
 
 /**
@@ -280,7 +281,7 @@ export const createIllustrationPrompt = (
   // Add composition guidelines based on page position
   let compositionText = '';
   if (pageNumber && totalPages) {
-    compositionText = getCompositionGuidelines(pageNumber, totalPages, mood) + '. ';
+    compositionText = getVariedCompositionGuidelines(pageNumber, totalPages, mood) + '. ';
   }
   
   // Add color tone based on mood
@@ -869,8 +870,8 @@ export const generateCoverIllustration = async (
   // IMPORTANT: Include story description prominently so cover relates to story
   const storyContext = `Story is about: ${storyDescription}. `;
   
-  // Cover composition guidelines - WIDE SHOT for better cover look
-  const coverComposition = 'BOOK COVER COMPOSITION, WIDE ESTABLISHING SHOT showing the main story setting and atmosphere based on the story description, main character visible in the scene doing something related to the story, inviting composition perfect for a children\'s book cover, balanced layout, environmental elements that reflect the story theme and plot';
+  // Cover composition - use variety system for dynamic covers
+  const coverComposition = getVariedCompositionGuidelines(1, 1, 'inviting') + ', BOOK COVER COMPOSITION showing the main story setting and atmosphere, main character visible doing something related to the story, inviting composition perfect for a children\'s book cover, balanced layout, environmental elements that reflect the story theme, NO TEXT, NO TITLE, NO WORDS on the cover';
   
   // Enhanced cover prompt with comprehensive anatomy quality requirements
   const coverNegativePrompts = [
@@ -881,7 +882,7 @@ export const generateCoverIllustration = async (
     'mutation', 'gross proportions', 'malformed', 'ugly', 'bad quality', 'text', 'words', 'title'
   ].join(', ');
   
-  const coverPrompt = `${styleText}, ${storyContext}${characterText}${colorText}${coverComposition}. COVER MUST VISUALLY REPRESENT THE STORY: ${storyDescription}. The illustration should clearly show elements from the story description. CRITICAL QUALITY: correct anatomy, proper proportions, accurate limb count, well-drawn hands and feet, symmetrical body, professional character design. Professional children\'s book cover illustration that captures the essence of the story, eye-catching design, inviting and appealing to children, masterpiece quality, best quality, high resolution cover art, marketable book cover, detailed background that matches story theme and setting world, safe for children, NO TEXT, NO TITLE, NO WORDS on the image - just the illustration. NEGATIVE PROMPTS TO AVOID: ${coverNegativePrompts}`;
+  const coverPrompt = `${styleText}, ${storyContext}${characterText}${colorText}${coverComposition}. COVER MUST VISUALLY REPRESENT THE STORY: ${storyDescription}. The illustration should clearly show elements from the story description. CRITICAL QUALITY: correct anatomy, proper proportions, accurate limb count, well-drawn hands and feet, symmetrical body, professional character design. Professional children's book cover illustration that captures the essence of the story, eye-catching design, inviting atmosphere. NO TEXT, NO TITLE, NO WORDS - illustration only`;
   
   // Use consistent seed based on title for reproducibility
   const titleSeed = storyTitle.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);

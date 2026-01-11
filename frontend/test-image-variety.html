@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Variety System Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .composition-example {
+            background: #f0f0f0;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+        .page-number {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 18px;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        h1 { color: #333; }
+        h2 { color: #667eea; }
+    </style>
+</head>
+<body>
+    <h1>🎨 Image Variety System Test</h1>
+    
+    <div class="test-section">
+        <h2>✅ Installation Complete</h2>
+        <p>The image variety system has been successfully integrated with the following features:</p>
+        <ul>
+            <li><strong>12 Camera Angles:</strong> Wide, medium, close-up, low angle, high angle, over-shoulder, side profile, back view, dutch angle, diagonal, rule of thirds</li>
+            <li><strong>10 Character Positions:</strong> Various positions in frame to create visual diversity</li>
+            <li><strong>15 Environments:</strong> Forest, meadow, mountains, indoor, magical garden, beach, urban, countryside, nighttime, rainy, snowy, autumn, spring, desert, mystical fog</li>
+            <li><strong>12 Lighting Conditions:</strong> Golden hour, midday, overcast, dramatic, backlit, moonlight, candlelight, dappled, stormy, magical, sunrise, twilight</li>
+            <li><strong>10 Atmospheric Effects:</strong> Light rays, mist, dust particles, leaves, rain, snow, sparkles, wind, clouds, clear air</li>
+            <li><strong>12 Character Actions:</strong> Walking, running, standing, sitting, reaching, looking up, examining, outstretched arms, contemplating, jumping, dancing, climbing</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 How It Works</h2>
+        <p>The system generates <span class="highlight">unique compositions for each page</span> by:</p>
+        <ol>
+            <li>Randomly selecting different camera angles, positions, and environments</li>
+            <li>Tracking previous selections to avoid repetition</li>
+            <li>Adding mood-specific modifiers based on the scene</li>
+            <li>Varying pacing based on story position (intro, rising action, climax, resolution)</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>🎬 Example: 5-Page Story Variety</h2>
+        
+        <div class="composition-example">
+            <div class="page-number">Page 1 - Introduction</div>
+            <p><strong>Composition:</strong> WIDE ESTABLISHING SHOT, character in environment context, magical garden with fantastical elements, GOLDEN HOUR lighting with warm sunset glow, environmental storytelling</p>
+        </div>
+
+        <div class="composition-example">
+            <div class="page-number">Page 2 - Rising Action</div>
+            <p><strong>Composition:</strong> LOW ANGLE looking up at character, character off-center to the left, character running or in motion, lush forest background with dappled sunlight, SOFT OVERCAST lighting with even illumination, light rays piercing through atmosphere, rising action building momentum</p>
+        </div>
+
+        <div class="composition-example">
+            <div class="page-number">Page 3 - Development</div>
+            <p><strong>Composition:</strong> OVER-THE-SHOULDER perspective, character in upper right corner, character sitting or resting, cozy indoor room with warm lighting, CANDLELIGHT or warm interior glow, falling leaves or petals, story development character depth</p>
+        </div>
+
+        <div class="composition-example">
+            <div class="page-number">Page 4 - Climax</div>
+            <p><strong>Composition:</strong> HIGH ANGLE bird's eye view, character centered in frame, character with arms outstretched, mountainous landscape with distant peaks, DRAMATIC side lighting strong contrast, stormy dark clouds with rim lighting, approaching climax heightened intensity</p>
+        </div>
+
+        <div class="composition-example">
+            <div class="page-number">Page 5 - Resolution</div>
+            <p><strong>Composition:</strong> RESOLUTION SHOT, character in peaceful environment, open meadow with wildflowers, character small in the distance, satisfying environmental closure, warm and peaceful atmosphere</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🚀 Testing Instructions</h2>
+        <ol>
+            <li>Go to your story creation page</li>
+            <li>Generate a new AI story (5+ pages recommended)</li>
+            <li>Observe that each page now has:
+                <ul>
+                    <li>Different camera angle</li>
+                    <li>Different character position in frame</li>
+                    <li>Different environment/setting</li>
+                    <li>Different lighting conditions</li>
+                    <li>Different atmospheric effects</li>
+                </ul>
+            </li>
+            <li>Pages should look visually distinct from each other</li>
+            <li>No two consecutive pages should have the same composition style</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>⚙️ Technical Details</h2>
+        <p><strong>Files Modified:</strong></p>
+        <ul>
+            <li><code>frontend/src/services/imageVariety.ts</code> - New variety system (created)</li>
+            <li><code>frontend/src/services/imageGenerationService.ts</code> - Integrated variety system</li>
+            <li><code>frontend/src/services/geminiService.ts</code> - Enhanced AI instructions for variety</li>
+        </ul>
+        <p><strong>Key Features:</strong></p>
+        <ul>
+            <li>Memory system prevents consecutive repetition</li>
+            <li>Mood-aware composition adjustments</li>
+            <li>Story pacing integration (intro → climax → resolution)</li>
+            <li>Environment-specific scene suggestions</li>
+        </ul>
+    </div>
+</body>
+</html>

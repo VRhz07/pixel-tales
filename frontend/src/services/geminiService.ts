@@ -165,12 +165,15 @@ CRITICAL STORYBOOK GUIDELINES:
    - Background changes should reflect time passage or mood shifts
    - Keep the same art style and level of detail across all pages
 
-3. COMPOSITION & CINEMATOGRAPHY (CRITICAL):
-   - VARY camera angles based on story pacing:
-     * Opening pages: Wide establishing shots
-     * Action scenes: Dynamic angles (diagonal, low angle, bird's eye)
-     * Emotional scenes: Close-ups on faces
-     * Climax: Dramatic angles with strong lighting
+   - VARY camera angles, environments, and compositions DRAMATICALLY on EVERY page:
+     * Use DIFFERENT camera angles: wide shot, medium shot, low angle, high angle, over-shoulder, side profile, back view, dutch angle
+     * Change character POSITION in frame: left, right, center, foreground, background, rule of thirds
+     * Vary ENVIRONMENTS completely: forest, meadow, indoor, outdoor, mountain, beach, city, magical settings
+     * Different LIGHTING each page: golden hour, midday, overcast, dramatic side light, backlit, moonlight, candlelight
+     * Add ATMOSPHERIC effects: mist, rain, snow, sparkles, wind, dust particles, light rays
+     * Change CHARACTER ACTIONS: walking, running, sitting, reaching, looking up, examining, jumping, dancing
+     * NEVER repeat the same composition, angle, or environment on consecutive pages
+     * Each page should look distinctly different from the previous one
      * Ending: Calm, balanced composition
    
    - LIGHTING must match mood:
@@ -223,7 +226,7 @@ Respond with ONLY this JSON format:
       "narrativePurpose": "introduction/problem/action/climax/resolution",
       "mood": "happy/sad/exciting/calm/dramatic",
       "illustrationDescription": "Brief human-readable description of the scene",
-      "imagePrompt": "DETAILED TEXT-TO-IMAGE PROMPT: [Art style] illustration of [EXACT character description with all details: colors, clothing, accessories, features] [specific action/pose] in [detailed environment with specific elements, colors, lighting, atmosphere]. [Camera angle and composition]. [Mood and color palette]. Professional children's book illustration, high quality, vibrant colors, detailed background, atmospheric lighting, safe for children.",
+      "imagePrompt": "DETAILED TEXT-TO-IMAGE PROMPT: [Art style] illustration of [EXACT character description with all details: colors, clothing, accessories, features] [UNIQUE specific action/pose - VARY THIS] in [COMPLETELY DIFFERENT detailed environment from previous page with specific elements, colors, lighting, atmosphere]. [VARIED camera angle: wide/medium/close-up/low angle/high angle/side profile/back view]. [DIFFERENT character position: left/right/center/foreground/background]. [UNIQUE lighting: golden hour/midday/overcast/dramatic/backlit/moonlight]. [Atmospheric effects: mist/rain/sparkles/wind/light rays]. [Mood and color palette]. Professional children's book illustration, high quality, vibrant colors, detailed background, atmospheric lighting, safe for children. CRITICAL: Make this page visually DISTINCT from previous pages.",
       "text": "The story text for this page (${pageCount <= 5 ? '1-2' : pageCount <= 10 ? '2-3' : '3-4'} sentences)"
     }
   ]
@@ -264,9 +267,14 @@ FINAL CHECKLIST - Verify before responding:
 ✓ EXACT characterDescription used in EVERY page's imagePrompt
 ✓ FOR MULTI-CHARACTER SCENES: Each character described separately with spatial positioning
 ✓ Specific environmental details in each imagePrompt (trees, rocks, weather, lighting)
-✓ Camera angles, lighting, and environments vary based on narrative purpose
-✓ Mood matches colors and composition
-✓ Each imagePrompt is unique with different poses, angles, environments
+? Camera angles DRAMATICALLY DIFFERENT on each page (no repetition)
+? Environments COMPLETELY VARIED across pages (forest?beach?mountain?indoor?etc)
+? Character positions and actions UNIQUE per page (standing?running?sitting?reaching?etc)
+? Lighting conditions CHANGE each page (golden hour?midday?overcast?dramatic?backlit?etc)
+? Atmospheric effects VARY (mist?rain?sparkles?light rays?clear?etc)
+? Mood matches colors and composition
+? Each imagePrompt creates a VISUALLY DISTINCT scene from previous pages
+? NO consecutive pages should have similar angles, environments, or compositions
 ✓ Multi-character scenes emphasize SEPARATION and DISTINCT IDENTITIES
 ✓ Positioning words used: "on the left", "on the right", "in the foreground", "in the background", "separated by"
 ✓ Story has exactly ${pageCount} pages
