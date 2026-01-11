@@ -273,6 +273,13 @@ class AdminService {
     const response = await adminApi.delete(`/admin/relationships/${parentId}/${childId}/remove/`);
     return response.data;
   }
+  /**
+   * Get system health status
+   */
+  async getSystemHealth(): Promise<any> {
+    const response = await adminApi.get('/admin/system/health/');
+    return response.data;
+  }
 }
 
 export default new AdminService();

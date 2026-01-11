@@ -186,6 +186,17 @@ urlpatterns = [
     path('admin/profanity/stats/', admin_profanity.get_profanity_stats, name='get_profanity_stats'),
     path('admin/profanity/import/', admin_profanity.import_profanity_words_from_file, name='import_profanity_words_from_file'),
     
+    # Admin endpoints - System Health & Monitoring
+    path('admin/system/health/', admin_features.get_system_health, name='admin_system_health'),    #   # TODO: Implement admin_system module
+    
+    # Admin endpoints - Database Backups    #   # TODO: Implement admin_system module    #   # TODO: Implement admin_system module    #   # TODO: Implement admin_system module
+    
+    # Admin endpoints - Mobile App Settings    #   # TODO: Implement admin_system module    #   # TODO: Implement admin_system module
+    
+    # Admin endpoints - AI/OCR Services Configuration    #   # TODO: Implement admin_system module    #   # TODO: Implement admin_system module    #   # TODO: Implement admin_system module
+    
+    # Admin endpoints - Security & Audit Logs    #   # TODO: Implement admin_security module    #   # TODO: Implement admin_security module    #   # TODO: Implement admin_security module    #   # TODO: Implement admin_security module    #   # TODO: Implement admin_security module
+    
     # Public endpoint for frontend profanity filter
     path('profanity/active/', admin_profanity.get_active_profanity_words, name='get_active_profanity_words'),
     
@@ -240,6 +251,8 @@ urlpatterns = [
     path('teacher/dashboard-stats/', teacher_views.teacher_dashboard_stats, name='teacher-dashboard-stats'),
     path('teacher/available-students/', teacher_views.available_students, name='teacher-available-students'),
     path('teacher/all-students/', teacher_views.teacher_students, name='teacher-all-students'),
+    path('teacher/reports/', teacher_views.teacher_reports, name='teacher-reports'),
+    path('teacher/students/<int:student_id>/stories/', teacher_views.student_stories, name='teacher-student-stories'),
     
     # Notification Preferences endpoints
     path('notifications/preferences/', notification_views.get_notification_preferences, name='get_notification_preferences'),
