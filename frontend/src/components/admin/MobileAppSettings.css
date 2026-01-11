@@ -1,0 +1,338 @@
+.mobile-settings-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.mobile-settings-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 16px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(139, 92, 246, 0.2);
+  border-top-color: #8b5cf6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.mobile-settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 20px;
+}
+
+.mobile-settings-header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mobile-settings-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.mobile-settings-icon-wrapper svg {
+  width: 28px;
+  height: 28px;
+}
+
+.mobile-settings-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.mobile-settings-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 4px 0 0 0;
+}
+
+.save-settings-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.save-settings-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+.save-settings-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.settings-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.settings-alert svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.settings-alert-error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 2px solid rgba(239, 68, 68, 0.3);
+}
+
+.settings-alert-success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 2px solid rgba(16, 185, 129, 0.3);
+}
+
+.settings-section {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+  border: 2px solid var(--border-color);
+}
+
+.settings-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.settings-section-header svg {
+  width: 24px;
+  height: 24px;
+  color: #8b5cf6;
+}
+
+.settings-section-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.settings-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-input-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.settings-input-group input,
+.settings-input-group textarea {
+  padding: 12px 16px;
+  background: var(--section-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--text-primary);
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.settings-input-group input:focus,
+.settings-input-group textarea:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.settings-input-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.input-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.settings-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settings-toggle-item,
+.maintenance-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--section-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.settings-toggle-item:hover,
+.maintenance-toggle:hover {
+  border-color: #8b5cf6;
+}
+
+.toggle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toggle-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.toggle-status {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.toggle-status.enabled {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.toggle-status.disabled {
+  background: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
+
+.toggle-button {
+  width: 56px;
+  height: 32px;
+  background: #cbd5e1;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.toggle-button svg {
+  width: 24px;
+  height: 24px;
+  color: white;
+  transition: all 0.3s;
+}
+
+.toggle-button:not(.active) svg {
+  margin-left: 0;
+}
+
+.toggle-button.active {
+  background: #10b981;
+  justify-content: flex-end;
+}
+
+.toggle-button:hover {
+  opacity: 0.9;
+}
+
+/* Dark mode variables */
+[data-theme="dark"] {
+  --card-bg: #1e293b;
+  --section-bg: #0f172a;
+  --border-color: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+}
+
+/* Light mode variables */
+[data-theme="light"] {
+  --card-bg: #ffffff;
+  --section-bg: #f8fafc;
+  --border-color: #e2e8f0;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+}
+
+@media (max-width: 768px) {
+  .mobile-settings-container {
+    padding: 16px;
+  }
+  
+  .mobile-settings-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .save-settings-button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .settings-toggle-item,
+  .maintenance-toggle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .toggle-button {
+    align-self: flex-end;
+  }
+}

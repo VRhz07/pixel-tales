@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Activity, BarChart3, Users, RefreshCw, Shield, AlertTriangle, LogOut, TrendingUp, BookOpen, Heart, Moon, Sun, MessageSquareWarning, Archive } from 'lucide-react';
+import { Activity, BarChart3, Users, RefreshCw, Shield, AlertTriangle, LogOut, TrendingUp, BookOpen, Heart, Moon, Sun, MessageSquareWarning, Archive, Smartphone, Zap, Database, Server } from 'lucide-react';
 import adminAuthService from '../services/adminAuth.service';
 import adminService, { AdminStats, UserListItem, UserDetail } from '../services/admin.service';
 import { useThemeStore } from '../stores/themeStore';
@@ -12,14 +12,20 @@ import AddRelationshipModal from '../components/admin/AddRelationshipModal';
 import EmptyState from '../components/admin/EmptyState';
 import AdminLoginPage from '../components/admin/AdminLoginPage';
 import ProfanityManagement from '../components/admin/ProfanityManagement';
+import SystemHealthDashboard from '../components/admin/SystemHealthDashboard';
+import BackupManagement from '../components/admin/BackupManagement';
+import MobileAppSettings from '../components/admin/MobileAppSettings';
+import AIServicesConfig from '../components/admin/AIServicesConfig';
+import SecurityAuditLogs from '../components/admin/SecurityAuditLogs';
 import Logo from '../components/common/Logo';
+import '../styles/dashboard-common.css';
 import '../components/admin/ProfanityManagement.css';
 import './AdminDashboardPage.css';
 
 export default function AdminDashboardPage() {
   const [adminUser, setAdminUser] = useState<any>(null);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'archived' | 'profanity'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'archived' | 'profanity' | 'system' | 'backups' | 'mobile' | 'ai-services' | 'security'>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<UserListItem[]>([]);
@@ -96,6 +102,20 @@ export default function AdminDashboardPage() {
     };
     checkAdminAuth();
   }, []);
+
+  // Auto-refresh stats every 30 seconds for real-time analytics
+  useEffect(() => {
+    if (isAdminAuthenticated && activeTab === 'dashboard') {
+      const statsInterval = setInterval(() => {
+        console.log('🔄 Auto-refreshing dashboard stats...');
+        loadDashboardStats();
+      }, 30000); // 30 seconds
+      
+      return () => {
+        clearInterval(statsInterval);
+      };
+    }
+  }, [isAdminAuthenticated, activeTab]);
 
   useEffect(() => {
     if (isAdminAuthenticated && activeTab === 'users') {
@@ -455,6 +475,26 @@ export default function AdminDashboardPage() {
         {activeTab === 'profanity' && (
           <ProfanityManagement />
         )}
+
+        {activeTab === 'system' && (
+          <SystemHealthDashboard />
+        )}
+
+        {activeTab === 'backups' && (
+          <BackupManagement />
+        )}
+
+        {activeTab === 'mobile' && (
+          <MobileAppSettings />
+        )}
+
+        {activeTab === 'ai-services' && (
+          <AIServicesConfig />
+        )}
+
+        {activeTab === 'security' && (
+          <SecurityAuditLogs />
+        )}
         
         {loading && (
           <div className="admin-loading">
@@ -494,6 +534,41 @@ export default function AdminDashboardPage() {
           >
             <MessageSquareWarning />
             <span>Profanity</span>
+          </button>
+          <button
+            className={`admin-nav-item ${activeTab === 'system' ? 'active' : ''}`}
+            onClick={() => setActiveTab('system')}
+          >
+            <Server />
+            <span>System</span>
+          </button>
+          <button
+            className={`admin-nav-item ${activeTab === 'backups' ? 'active' : ''}`}
+            onClick={() => setActiveTab('backups')}
+          >
+            <Database />
+            <span>Backups</span>
+          </button>
+          <button
+            className={`admin-nav-item ${activeTab === 'mobile' ? 'active' : ''}`}
+            onClick={() => setActiveTab('mobile')}
+          >
+            <Smartphone />
+            <span>Mobile</span>
+          </button>
+          <button
+            className={`admin-nav-item ${activeTab === 'ai-services' ? 'active' : ''}`}
+            onClick={() => setActiveTab('ai-services')}
+          >
+            <Zap />
+            <span>AI Services</span>
+          </button>
+          <button
+            className={`admin-nav-item ${activeTab === 'security' ? 'active' : ''}`}
+            onClick={() => setActiveTab('security')}
+          >
+            <Shield />
+            <span>Security</span>
           </button>
         </div>
       </nav>

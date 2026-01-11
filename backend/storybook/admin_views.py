@@ -29,6 +29,9 @@ def admin_dashboard_stats(request):
     now = timezone.now()
     last_7_days = now - timedelta(days=7)
     last_30_days = now - timedelta(days=30)
+    last_24_hours = now - timedelta(hours=24)
+    last_1_day = now - timedelta(days=1)
+    yesterday = now - timedelta(days=1)
     
     # User statistics
     total_users = User.objects.count()
@@ -90,6 +93,94 @@ def admin_dashboard_stats(request):
         like_count=Count('likes')
     ).order_by('-like_count')[:10].values('id', 'title', 'author__username', 'like_count')
     
+    # ===== HIGH PRIORITY ANALYTICS =====
+    
+    # 1. Real-time Active Users (users active in last 15 minutes)
+    fifteen_minutes_ago = now - timedelta(minutes=15)
+    active_users_now = UserProfile.objects.filter(
+        last_seen__gte=fifteen_minutes_ago
+    ).count()
+    
+    # 2. DAU/WAU/MAU (Daily/Weekly/Monthly Active Users)
+    # DAU - users who logged in within last 24 hours
+    dau = User.objects.filter(last_login__gte=last_24_hours).count()
+    
+    # WAU - users who logged in within last 7 days
+    wau = User.objects.filter(last_login__gte=last_7_days).count()
+    
+    # MAU - users who logged in within last 30 days
+    mau = User.objects.filter(last_login__gte=last_30_days).count()
+    
+    # 3. User Retention Rates
+    # Day 1 retention - users who signed up yesterday and came back today
+    users_signed_yesterday = User.objects.filter(
+        date_joined__gte=yesterday.replace(hour=0, minute=0, second=0),
+        date_joined__lt=now.replace(hour=0, minute=0, second=0)
+    )
+    users_signed_yesterday_count = users_signed_yesterday.count()
+    users_returned_day1 = users_signed_yesterday.filter(last_login__gte=now.replace(hour=0, minute=0, second=0)).count()
+    retention_day1 = (users_returned_day1 / users_signed_yesterday_count * 100) if users_signed_yesterday_count > 0 else 0
+    
+    # Day 7 retention - users who signed up 7 days ago and came back since then
+    users_signed_7_days_ago = User.objects.filter(
+        date_joined__gte=(now - timedelta(days=8)).replace(hour=0, minute=0, second=0),
+        date_joined__lt=(now - timedelta(days=7)).replace(hour=0, minute=0, second=0)
+    )
+    users_signed_7_days_count = users_signed_7_days_ago.count()
+    users_returned_day7 = users_signed_7_days_ago.filter(last_login__gte=(now - timedelta(days=7))).count()
+    retention_day7 = (users_returned_day7 / users_signed_7_days_count * 100) if users_signed_7_days_count > 0 else 0
+    
+    # Day 30 retention
+    users_signed_30_days_ago = User.objects.filter(
+        date_joined__gte=(now - timedelta(days=31)).replace(hour=0, minute=0, second=0),
+        date_joined__lt=(now - timedelta(days=30)).replace(hour=0, minute=0, second=0)
+    )
+    users_signed_30_days_count = users_signed_30_days_ago.count()
+    users_returned_day30 = users_signed_30_days_ago.filter(last_login__gte=(now - timedelta(days=30))).count()
+    retention_day30 = (users_returned_day30 / users_signed_30_days_count * 100) if users_signed_30_days_count > 0 else 0
+    
+    # 4. Feature Usage Breakdown (last 7 days)
+    # AI story generation usage
+    ai_stories_last_7_days = Story.objects.filter(
+        creation_type='ai_assisted',
+        date_created__gte=last_7_days
+    ).count()
+    
+    # Manual story creation usage
+    manual_stories_last_7_days = Story.objects.filter(
+        creation_type='manual',
+        date_created__gte=last_7_days
+    ).count()
+    
+    # Photo Story / OCR usage (stories created from photos)
+    photo_story_usage_last_7_days = Story.objects.filter(
+        creation_type='photo',
+        date_created__gte=last_7_days
+    ).count()
+    
+    # Collaborative stories usage
+    collaborative_stories_last_7_days = Story.objects.filter(
+        is_collaborative=True,
+        date_created__gte=last_7_days
+    ).count()
+    
+    # Game plays (game attempts in last 7 days)
+    from .models import GameAttempt
+    game_plays_last_7_days = GameAttempt.objects.filter(
+        started_at__gte=last_7_days
+    ).count()
+    
+    # 5. Story Views - Top 10 most viewed stories
+    top_viewed_stories = Story.objects.filter(
+        is_published=True
+    ).order_by('-views')[:10].values('id', 'title', 'author__username', 'views')
+    
+    # Total views across all stories
+    total_story_views = Story.objects.aggregate(Sum('views'))['views__sum'] or 0
+    
+    # Average views per story
+    avg_views_per_story = total_story_views / total_stories if total_stories > 0 else 0
+    
     return Response({
         'success': True,
         'stats': {
@@ -140,6 +231,31 @@ def admin_dashboard_stats(request):
             },
             'top_authors': list(top_authors),
             'popular_stories': list(popular_stories),
+            
+            # NEW: High Priority Analytics
+            'active_users': {
+                'now': active_users_now,  # Real-time active users (last 15 min)
+                'daily': dau,  # Daily Active Users (last 24h)
+                'weekly': wau,  # Weekly Active Users (last 7d)
+                'monthly': mau,  # Monthly Active Users (last 30d)
+            },
+            'retention': {
+                'day_1': round(retention_day1, 2),  # % of users who return after 1 day
+                'day_7': round(retention_day7, 2),  # % of users who return after 7 days
+                'day_30': round(retention_day30, 2),  # % of users who return after 30 days
+            },
+            'feature_usage': {
+                'ai_stories_last_7_days': ai_stories_last_7_days,
+                'manual_stories_last_7_days': manual_stories_last_7_days,
+                'photo_story_usage_last_7_days': photo_story_usage_last_7_days,
+                'collaborative_stories_last_7_days': collaborative_stories_last_7_days,
+                'game_plays_last_7_days': game_plays_last_7_days,
+            },
+            'story_views': {
+                'total': total_story_views,
+                'average_per_story': round(avg_views_per_story, 2),
+                'top_viewed_stories': list(top_viewed_stories),
+            },
         }
     })
 

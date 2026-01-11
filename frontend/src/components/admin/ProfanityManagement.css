@@ -2,6 +2,7 @@
 
 .profanity-management {
   padding: 2rem;
+  padding-bottom: 8rem;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -339,34 +340,50 @@
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  padding: 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  padding: 1.25rem;
+  background: rgba(139, 92, 246, 0.05);
+  border-radius: 8px;
+  margin-top: 1rem;
+  margin-bottom: 5rem;
 }
 
 .pagination button {
-  padding: 0.5rem 1rem;
-  background: white;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  padding: 0.625rem 1.25rem;
+  background: #8b5cf6;
+  color: white;
+  border: 2px solid #8b5cf6;
+  border-radius: 8px;
   font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  min-width: 100px;
 }
 
 .pagination button:hover:not(:disabled) {
-  background: #f9fafb;
-  border-color: #8b5cf6;
-  color: #8b5cf6;
+  background: #7c3aed;
+  border-color: #7c3aed;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
 .pagination button:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
+  background: #9ca3af;
+  border-color: #9ca3af;
 }
 
 .pagination span {
   font-size: 0.875rem;
-  color: #6b7280;
+  font-weight: 600;
+  color: #374151;
+  padding: 0.5rem 1rem;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  min-width: 120px;
+  text-align: center;
 }
 
 /* Buttons */
@@ -634,19 +651,31 @@
   background: #4b5563;
 }
 
+.profanity-management.dark .pagination {
+  background: rgba(139, 92, 246, 0.15);
+}
+
 .profanity-management.dark .pagination button {
-  background: #1f2937;
-  border-color: #374151;
-  color: #e5e7eb;
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+  color: white;
 }
 
 .profanity-management.dark .pagination button:hover:not(:disabled) {
-  background: #374151;
-  border-color: #8b5cf6;
+  background: #7c3aed;
+  border-color: #7c3aed;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.profanity-management.dark .pagination button:disabled {
+  background: #4b5563;
+  border-color: #4b5563;
 }
 
 .profanity-management.dark .pagination span {
-  color: #9ca3af;
+  color: #e5e7eb;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Dark Mode - Modals */
@@ -722,12 +751,14 @@
   border-color: #374151;
 }
 
-/* Mobile Responsive Adjustments */
+/* Mobile Responsive Adjustments - Keep Desktop Order */
 @media (max-width: 768px) {
   .profanity-management {
     padding: 1rem;
+    padding-bottom: 8rem;
   }
 
+  /* Header with buttons on top (natural order) */
   .profanity-header {
     flex-direction: column;
     align-items: flex-start;
@@ -741,14 +772,24 @@
   .profanity-header-actions {
     width: 100%;
     justify-content: stretch;
+    flex-wrap: wrap;
+    gap: 0.75rem;
   }
 
   .profanity-header-actions button {
     flex: 1;
+    min-width: 140px;
   }
 
+  /* Stats Cards - better spacing */
+  .profanity-stats {
+    margin-top: 1rem;
+  }
+
+  /* Filters - stack vertically */
   .profanity-filters {
     flex-direction: column;
+    gap: 0.75rem;
   }
 
   .search-box {
@@ -760,8 +801,10 @@
     width: 100%;
   }
 
+  /* Words List */
   .profanity-list {
     overflow-x: auto;
+    margin-top: 1rem;
   }
 
   .profanity-list table {

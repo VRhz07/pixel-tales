@@ -44,48 +44,201 @@ export default function DashboardStats({ stats }: { stats: AdminStats }) {
   return (
     <div className="dashboard-stats-container">
 
-      {/* Stats Grid - Redesigned to match User Type Distribution */}
-      <div className="stats-grid">
-        <div className="stats-content-item">
-          <div className="stats-content-icon">👥</div>
-          <div className="stats-content-details">
-            <div className="stats-content-label">Total Users</div>
-            <div className="stats-content-value">{stats.users.total.toLocaleString()}</div>
-            <div className="stats-content-badge positive">
-              +{stats.users.last_7_days} this week
+      {/* Real-Time Active Users */}
+      <div className="stats-section">
+        <div className="stats-section-header">
+          <div className="stats-section-icon">
+            <Users />
+          </div>
+          <div className="stats-section-title-wrapper">
+            <h3 className="stats-section-title">Active Users</h3>
+            <p className="stats-section-subtitle">Real-time engagement metrics</p>
+          </div>
+        </div>
+        <div className="stats-content-grid">
+          <div className="stats-content-item">
+            <div className="stats-content-icon">🟢</div>
+            <div className="stats-content-details">
+              <div className="stats-content-label">Online Now</div>
+              <div className="stats-content-value">{stats.active_users?.now?.toLocaleString() || '0'}</div>
+              <div className="stats-content-badge positive">
+                Last 15 minutes
+              </div>
+            </div>
+          </div>
+          <div className="stats-content-item">
+            <div className="stats-content-icon">📅</div>
+            <div className="stats-content-details">
+              <div className="stats-content-label">Daily Active Users</div>
+              <div className="stats-content-value">{stats.active_users?.daily?.toLocaleString() || '0'}</div>
+              <div className="stats-content-badge">
+                {stats.users.total > 0 && stats.active_users?.daily ? ((stats.active_users?.daily / stats.users.total) * 100).toFixed(1) : '0.0'}% of total
+              </div>
+            </div>
+          </div>
+          <div className="stats-content-item">
+            <div className="stats-content-icon">📊</div>
+            <div className="stats-content-details">
+              <div className="stats-content-label">Weekly Active Users</div>
+              <div className="stats-content-value">{stats.active_users?.weekly.toLocaleString()}</div>
+              <div className="stats-content-badge">
+                {stats.users.total > 0 ? ((stats.active_users?.weekly / stats.users.total) * 100).toFixed(1) : '0.0'}% of total
+              </div>
+            </div>
+          </div>
+          <div className="stats-content-item">
+            <div className="stats-content-icon">📈</div>
+            <div className="stats-content-details">
+              <div className="stats-content-label">Monthly Active Users</div>
+              <div className="stats-content-value">{stats.active_users?.monthly.toLocaleString()}</div>
+              <div className="stats-content-badge">
+                {stats.users.total > 0 ? ((stats.active_users?.monthly / stats.users.total) * 100).toFixed(1) : '0.0'}% of total
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="stats-content-item">
-          <div className="stats-content-icon">📚</div>
-          <div className="stats-content-details">
-            <div className="stats-content-label">Total Stories</div>
-            <div className="stats-content-value">{stats.stories.total.toLocaleString()}</div>
-            <div className="stats-content-badge">
-              {stats.stories.published} published
+      {/* User Retention */}
+      <div className="stats-section">
+        <div className="stats-section-header">
+          <div className="stats-section-icon">
+            <TrendingUp />
+          </div>
+          <div className="stats-section-title-wrapper">
+            <h3 className="stats-section-title">User Retention</h3>
+            <p className="stats-section-subtitle">Users coming back over time</p>
+          </div>
+        </div>
+        <div className="stats-content-grid">
+          <div className="stats-content-item">
+            <div className="stats-content-icon">1️⃣</div>
+            <div className="stats-content-details">
+              <div className="stats-content-label">Day 1 Retention</div>
+              <div className="stats-content-value">{(stats.retention?.day_1 || 0).toFixed(1)}%</div>
+              <div className="stats-content-badge">
+                Users returning after 1 day
+              </div>
+            </div>
+          </div>
+          <div className="stats-content-item">
+            <div className="stats-content-icon">7️⃣</div>
+            <div className="stats-content-details">
+              <div className="stats-content-label">Day 7 Retention</div>
+              <div className="stats-content-value">{(stats.retention?.day_7 || 0).toFixed(1)}%</div>
+              <div className="stats-content-badge">
+                Users returning after 7 days
+              </div>
+            </div>
+          </div>
+          <div className="stats-content-item">
+            <div className="stats-content-icon">3️⃣0️⃣</div>
+            <div className="stats-content-details">
+              <div className="stats-content-label">Day 30 Retention</div>
+              <div className="stats-content-value">{(stats.retention?.day_30 || 0).toFixed(1)}%</div>
+              <div className="stats-content-badge">
+                Users returning after 30 days
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="stats-content-item">
-          <div className="stats-content-icon">📈</div>
-          <div className="stats-content-details">
-            <div className="stats-content-label">Engagement</div>
-            <div className="stats-content-value">{stats.engagement.total_likes.toLocaleString()}</div>
-            <div className="stats-content-badge">
-              {stats.engagement.total_comments} comments
+      {/* Feature Usage */}
+      <div className="stats-section">
+        <div className="stats-section-header">
+          <div className="stats-section-icon">
+            <BookOpen />
+          </div>
+          <div className="stats-section-title-wrapper">
+            <h3 className="stats-section-title">Feature Usage</h3>
+            <p className="stats-section-subtitle">Last 7 days activity</p>
+          </div>
+        </div>
+        <div className="stats-content-grid">
+          <div className="stats-content-item">
+            <div className="stats-content-icon">🤖</div>
+            <div className="stats-content-details">
+              <div className="stats-content-label">AI Story Generation</div>
+              <div className="stats-content-value">{(stats.feature_usage?.ai_stories_last_7_days || 0).toLocaleString()}</div>
+              <div className="stats-content-badge">
+                stories created
+              </div>
+            </div>
+          </div>
+          <div className="stats-content-item">
+            <div className="stats-content-icon">✍️</div>
+            <div className="stats-content-details">
+              <div className="stats-content-label">Manual Creation</div>
+              <div className="stats-content-value">{(stats.feature_usage?.manual_stories_last_7_days || 0).toLocaleString()}</div>
+              <div className="stats-content-badge">
+                stories created
+              </div>
+            </div>
+          </div>
+          <div className="stats-content-item">
+            <div className="stats-content-icon">📸</div>
+            <div className="stats-content-details">
+              <div className="stats-content-label">Photo Story (OCR)</div>
+              <div className="stats-content-value">{(stats.feature_usage?.photo_story_usage_last_7_days || 0).toLocaleString()}</div>
+              <div className="stats-content-badge">
+                stories from photos
+              </div>
+            </div>
+          </div>
+          <div className="stats-content-item">
+            <div className="stats-content-icon">👥</div>
+            <div className="stats-content-details">
+              <div className="stats-content-label">Collaboration</div>
+              <div className="stats-content-value">{(stats.feature_usage?.collaborative_stories_last_7_days || 0).toLocaleString()}</div>
+              <div className="stats-content-badge">
+                collaborative stories
+              </div>
+            </div>
+          </div>
+          <div className="stats-content-item">
+            <div className="stats-content-icon">🎮</div>
+            <div className="stats-content-details">
+              <div className="stats-content-label">Games Played</div>
+              <div className="stats-content-value">{(stats.feature_usage?.game_plays_last_7_days || 0).toLocaleString()}</div>
+              <div className="stats-content-badge">
+                game attempts
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="stats-content-item">
-          <div className="stats-content-icon">⚠️</div>
-          <div className="stats-content-details">
-            <div className="stats-content-label">Flagged Content</div>
-            <div className="stats-content-value">{(stats.moderation.flagged_stories + stats.moderation.flagged_comments).toLocaleString()}</div>
-            <div className="stats-content-badge">
-              {stats.moderation.flagged_users} users
+      {/* Story Views */}
+      <div className="stats-section">
+        <div className="stats-section-header">
+          <div className="stats-section-icon">
+            <Heart />
+          </div>
+          <div className="stats-section-title-wrapper">
+            <h3 className="stats-section-title">Story Views</h3>
+            <p className="stats-section-subtitle">Content engagement</p>
+          </div>
+        </div>
+        <div className="stats-content-grid">
+          <div className="stats-content-item">
+            <div className="stats-content-icon">👁️</div>
+            <div className="stats-content-details">
+              <div className="stats-content-label">Total Views</div>
+              <div className="stats-content-value">{(stats.story_views?.total || 0).toLocaleString()}</div>
+              <div className="stats-content-badge">
+                across all stories
+              </div>
+            </div>
+          </div>
+          <div className="stats-content-item">
+            <div className="stats-content-icon">📊</div>
+            <div className="stats-content-details">
+              <div className="stats-content-label">Average Views</div>
+              <div className="stats-content-value">{(stats.story_views?.average_per_story || 0).toFixed(1)}</div>
+              <div className="stats-content-badge">
+                per story
+              </div>
             </div>
           </div>
         </div>

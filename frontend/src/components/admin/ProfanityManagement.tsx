@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Search, Trash2, Edit2, Filter, AlertCircle, Check, X, Upload, Download } from 'lucide-react';
 import profanityService, { ProfanityWord, ProfanityStats } from '../../services/profanity.service';
 import { useThemeStore } from '../../stores/themeStore';
+import { refreshProfanityWords } from '../../utils/profanityFilter';
 
 interface ProfanityManagementProps {
   onClose?: () => void;
@@ -48,7 +49,7 @@ export default function ProfanityManagement({ onClose }: ProfanityManagementProp
         language: languageFilter === 'all' ? undefined : languageFilter,
         severity: severityFilter === 'all' ? undefined : severityFilter,
         page: currentPage,
-        page_size: 50,
+        page_size: 10,
       });
       setWords(wordsData);
       setTotalPages(pagination.total_pages);
@@ -78,6 +79,10 @@ export default function ProfanityManagement({ onClose }: ProfanityManagementProp
       }
       
       await profanityService.addProfanityWord(formData);
+      
+      // Refresh profanity filter in child apps
+      await refreshProfanityWords();
+      
       setShowAddModal(false);
       setFormData({ word: '', language: 'en', severity: 'moderate', is_active: true });
       loadWords();
@@ -92,6 +97,10 @@ export default function ProfanityManagement({ onClose }: ProfanityManagementProp
       if (!editingWord) return;
       
       await profanityService.updateProfanityWord(editingWord.id, formData);
+      
+      // Refresh profanity filter in child apps
+      await refreshProfanityWords();
+      
       setEditingWord(null);
       setFormData({ word: '', language: 'en', severity: 'moderate', is_active: true });
       loadWords();
@@ -106,6 +115,10 @@ export default function ProfanityManagement({ onClose }: ProfanityManagementProp
     
     try {
       await profanityService.deleteProfanityWord(wordId);
+      
+      // Refresh profanity filter in child apps
+      await refreshProfanityWords();
+      
       loadWords();
       loadStats();
     } catch (err: any) {
@@ -136,6 +149,9 @@ export default function ProfanityManagement({ onClose }: ProfanityManagementProp
         severity: bulkSeverity,
       });
       
+      // Refresh profanity filter in child apps
+      await refreshProfanityWords();
+      
       alert(`Bulk add completed!\nAdded: ${result.added_count}\nSkipped: ${result.skipped_count}`);
       setShowBulkModal(false);
       setBulkWords('');
@@ -154,6 +170,9 @@ export default function ProfanityManagement({ onClose }: ProfanityManagementProp
     try {
       setLoading(true);
       const result = await profanityService.importProfanityWordsFromFile();
+      // Refresh profanity filter in child apps
+      await refreshProfanityWords();
+      
       alert(
         `Import completed successfully!\n\n` +
         `✅ Added: ${result.added} new words\n` +
@@ -190,10 +209,6 @@ export default function ProfanityManagement({ onClose }: ProfanityManagementProp
           <p>Manage inappropriate words filtered in the app</p>
         </div>
         <div className="profanity-header-actions">
-          <button onClick={handleImportFromFile} className="btn-secondary" title="Import words from repository">
-            <Download size={18} />
-            Import from File
-          </button>
           <button onClick={() => setShowBulkModal(true)} className="btn-secondary">
             <Upload size={18} />
             Bulk Add

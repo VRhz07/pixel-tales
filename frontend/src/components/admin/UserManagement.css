@@ -2,6 +2,7 @@
 
 .user-management-container {
   width: 100%;
+  padding-bottom: 2rem;
 }
 
 /* User Table */
@@ -15,7 +16,7 @@
 }
 
 .dark .user-table-wrapper {
-  background: #2d2550;
+  background: #1a1830;
   border-color: transparent;
   box-shadow: none;
 }
@@ -31,8 +32,8 @@
 }
 
 .dark .user-table-header {
-  background: #1e1b3d;
-  border-bottom-color: transparent;
+  background: #0f0e1a;
+  border-bottom-color: rgba(109, 40, 217, 0.1);
 }
 
 .user-table-header th {
@@ -69,7 +70,7 @@
 }
 
 .dark .user-table-body tr {
-  border-bottom-color: rgba(255, 255, 255, 0.05);
+  border-bottom-color: rgba(109, 40, 217, 0.08);
 }
 
 .user-table-body tr:hover {
@@ -77,7 +78,7 @@
 }
 
 .dark .user-table-body tr:hover {
-  background: #1e1b3d;
+  background: rgba(109, 40, 217, 0.15);
 }
 
 .user-table-body tr:last-child {
@@ -177,14 +178,14 @@
 
 .user-type-badge.parent {
   background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
-  color: #7c3aed;
-  border: 1px solid #c4b5fd;
+  color: #6d28d9;
+  border: 1px solid #a78bfa;
 }
 
 .dark .user-type-badge.parent {
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.25) 0%, rgba(124, 58, 237, 0.15) 100%);
-  color: #c4b5fd;
-  border: 1px solid rgba(196, 181, 253, 0.3);
+  background: rgba(109, 40, 217, 0.3);
+  color: #a78bfa;
+  border: 1px solid rgba(167, 139, 250, 0.3);
 }
 
 .user-type-badge.teacher {
@@ -255,7 +256,7 @@
 }
 
 .dark .user-action-btn {
-  background: #334155;
+  background: rgba(51, 65, 85, 0.5);
   color: #9CA3AF;
 }
 
@@ -265,12 +266,12 @@
 
 .user-action-btn.view:hover {
   background: #ede9fe;
-  color: #8b5cf6;
+  color: #7c3aed;
 }
 
 .dark .user-action-btn.view:hover {
-  background: rgba(139, 92, 246, 0.2);
-  color: #c4b5fd;
+  background: rgba(109, 40, 217, 0.3);
+  color: #a78bfa;
 }
 
 .user-action-btn.delete:hover {
@@ -294,6 +295,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
+  padding-bottom: 6rem;
   border-top: 1px solid #e5e7eb;
   background: #f9fafb;
   transition: all 0.3s ease;
@@ -306,12 +308,19 @@
 
 .pagination-info {
   font-size: 14px;
-  color: #6b7280;
-  transition: color 0.3s ease;
+  font-weight: 600;
+  color: #374151;
+  padding: 8px 16px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
 }
 
 .dark .pagination-info {
-  color: #9CA3AF;
+  color: #e5e7eb;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .pagination-buttons {
@@ -320,11 +329,11 @@
 }
 
 .pagination-btn {
-  padding: 8px 16px;
-  border: 2px solid #e5e7eb;
+  padding: 10px 20px;
+  border: 2px solid #8b5cf6;
   border-radius: 8px;
-  background: white;
-  color: #6b7280;
+  background: #8b5cf6;
+  color: white;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -332,29 +341,38 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  min-width: 100px;
 }
 
 .dark .pagination-btn {
-  background: #334155;
-  border-color: #475569;
-  color: #9CA3AF;
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+  color: white;
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: #f9fafb;
-  border-color: #8b5cf6;
-  color: #8b5cf6;
+  background: #7c3aed;
+  border-color: #7c3aed;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
 .dark .pagination-btn:hover:not(:disabled) {
-  background: #475569;
-  border-color: #8B5CF6;
-  color: #A78BFA;
+  background: #7c3aed;
+  border-color: #7c3aed;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
 }
 
 .pagination-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
+  background: #9ca3af;
+  border-color: #9ca3af;
+}
+
+.dark .pagination-btn:disabled {
+  background: #4b5563;
+  border-color: #4b5563;
 }
 
 .pagination-btn svg {
@@ -408,6 +426,7 @@
     flex-direction: column;
     gap: 12px;
     align-items: stretch;
+    padding-bottom: 6rem;
   }
 
   .pagination-buttons {
