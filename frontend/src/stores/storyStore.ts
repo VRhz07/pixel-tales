@@ -3,6 +3,8 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { useAuthStore } from './authStore';
 import { storyApiService } from '../services/storyApiService';
 import { createHybridStorage } from '../utils/hybridStorage';
+import { storyFilesystemService, StoryMetadata } from '../services/storyFilesystemService';
+import { Capacitor } from '@capacitor/core';
 
 export interface StoryPage {
   id: string;
@@ -56,6 +58,8 @@ interface UserLibrary {
   characters: Character[];
   offlineStories: Story[]; // Stories saved for offline reading
   deletedStoryIds: number[]; // Backend IDs of stories that have been deleted
+  storyMetadata: StoryMetadata[]; // Lightweight metadata for lazy loading (mobile only)
+  useLazyLoading: boolean; // Flag to enable lazy loading on mobile
 }
 
 // Debounce timers for syncing (to prevent duplicate story creation)
@@ -140,6 +144,13 @@ interface StoryState {
   saveStoryOffline: (story: Story) => void;
   removeOfflineStory: (storyId: string) => void;
   isStorySavedOffline: (storyId: string) => boolean;
+  
+  // Lazy loading operations (mobile optimization)
+  loadStoryById: (id: string) => Promise<Story | null>;
+  enableLazyLoading: () => Promise<void>;
+  refreshMetadata: () => Promise<void>;
+  getMetadata: () => StoryMetadata[];
+  isLazyLoadingEnabled: () => boolean;
   
   // Demo data management
   initializeDemoData: () => void;
@@ -391,7 +402,7 @@ export const useStoryStore = create<StoryState>()(
       createStory: (title: string) => {
         const state = get();
         if (!state.currentUserId) {
-          console.error('âŒ Cannot create story: No user logged in');
+          console.error('❌ Cannot create story: No user logged in');
           throw new Error('No user logged in');
         }
         
@@ -418,7 +429,14 @@ export const useStoryStore = create<StoryState>()(
         };
 
         set((state) => {
-          const currentLibrary = state.userLibraries[state.currentUserId!] || { stories: [], characters: [], offlineStories: [] };
+          const currentLibrary = state.userLibraries[state.currentUserId!] || { 
+            stories: [], 
+            characters: [], 
+            offlineStories: [],
+            deletedStoryIds: [],
+            storyMetadata: [],
+            useLazyLoading: false
+          };
           return {
             userLibraries: {
               ...state.userLibraries,
@@ -431,6 +449,14 @@ export const useStoryStore = create<StoryState>()(
             currentPageIndex: 0
           };
         });
+        
+        // If lazy loading is enabled, save to filesystem immediately
+        const currentLibrary = state.userLibraries[state.currentUserId];
+        if (currentLibrary?.useLazyLoading && Capacitor.isNativePlatform()) {
+          storyFilesystemService.saveStory(newStory, state.currentUserId).catch(err => {
+            console.error('Failed to save new story to filesystem:', err);
+          });
+        }
 
         // Don't auto-sync empty stories - wait until they have content
         // Stories will sync when first page is added/updated
@@ -441,7 +467,7 @@ export const useStoryStore = create<StoryState>()(
       updateStory: (id: string, updates: Partial<Story>) => {
         // Debug: Log what's being updated
         if (updates.pages) {
-          console.log(`ðŸ“ updateStory called for ${id}:`, {
+          console.log(`📝 updateStory called for ${id}:`, {
             updatingPages: true,
             pageCount: updates.pages.length,
             pagesWithImages: updates.pages.filter(p => p.canvasData).length,
@@ -449,6 +475,9 @@ export const useStoryStore = create<StoryState>()(
             page1ImagePreview: updates.pages[0]?.canvasData?.substring(0, 50)
           });
         }
+        
+        const state = get();
+        let updatedStory: Story | undefined;
         
         set((state) => {
           if (!state.currentUserId) return state;
@@ -469,8 +498,10 @@ export const useStoryStore = create<StoryState>()(
               : story
           );
           
+          updatedStory = updatedStories.find(s => s.id === id);
+          
           const updatedCurrentStory = state.currentStory?.id === id 
-            ? updatedStories.find(s => s.id === id) || null
+            ? updatedStory || null
             : state.currentStory;
 
           return {
@@ -484,6 +515,16 @@ export const useStoryStore = create<StoryState>()(
             currentStory: updatedCurrentStory
           };
         });
+        
+        // If lazy loading is enabled, save to filesystem
+        if (state.currentUserId && updatedStory) {
+          const currentLibrary = state.userLibraries[state.currentUserId];
+          if (currentLibrary?.useLazyLoading && Capacitor.isNativePlatform()) {
+            storyFilesystemService.saveStory(updatedStory, state.currentUserId).catch(err => {
+              console.error('Failed to save story to filesystem:', err);
+            });
+          }
+        }
 
         // Auto-sync to backend after update (only if story has content)
         // Debounced to prevent creating duplicate stories during AI generation
@@ -550,19 +591,29 @@ export const useStoryStore = create<StoryState>()(
             currentPageIndex: state.currentStory?.id === id ? 0 : state.currentPageIndex
           };
         });
+        
+        // Delete from filesystem if lazy loading is enabled
+        if (state.currentUserId) {
+          const currentLibrary = state.userLibraries[state.currentUserId];
+          if (currentLibrary?.useLazyLoading && Capacitor.isNativePlatform()) {
+            storyFilesystemService.deleteStory(id, state.currentUserId).catch(err => {
+              console.error('Failed to delete story from filesystem:', err);
+            });
+          }
+        }
 
         // Auto-sync deletion to backend
         if (story?.backendId) {
           storyApiService.deleteStory(story.backendId.toString()).catch(err => {
             // 404 is expected if story was already deleted
             if (err?.status === 404) {
-              console.log('âœ… Story was already deleted from backend (or never synced)');
+              console.log('✅ Story was already deleted from backend (or never synced)');
             } else {
-              console.warn('âŒ Failed to delete story from backend:', err);
+              console.warn('❌ Failed to delete story from backend:', err);
             }
           });
         } else {
-          console.log('â„¹ï¸ Story has no backend ID, skipping backend deletion');
+          console.log('ℹ️ Story has no backend ID, skipping backend deletion');
         }
       },
 
@@ -1093,6 +1144,165 @@ export const useStoryStore = create<StoryState>()(
           (s.backendId && s.backendId.toString() === storyId) ||
           (s.id === storyId.toString())
         );
+      },
+      
+      // Lazy loading operations
+      loadStoryById: async (id: string) => {
+        const state = get();
+        if (!state.currentUserId) return null;
+        
+        const currentLibrary = state.userLibraries[state.currentUserId];
+        if (!currentLibrary) return null;
+        
+        // Check if story is already in memory
+        const inMemory = currentLibrary.stories.find(s => s.id === id);
+        if (inMemory) {
+          console.log('📖 Story already in memory:', inMemory.title);
+          return inMemory;
+        }
+        
+        // Check offline stories
+        const offline = currentLibrary.offlineStories.find(s => s.id === id);
+        if (offline) {
+          console.log('📖 Story found in offline storage:', offline.title);
+          return offline;
+        }
+        
+        // If lazy loading is enabled, try to load from filesystem
+        if (currentLibrary.useLazyLoading && Capacitor.isNativePlatform()) {
+          console.log('🔄 Loading story from filesystem:', id);
+          const story = await storyFilesystemService.loadStory(id, state.currentUserId);
+          return story;
+        }
+        
+        console.warn('⚠️ Story not found:', id);
+        return null;
+      },
+      
+      enableLazyLoading: async () => {
+        const state = get();
+        if (!state.currentUserId) {
+          console.warn('⚠️ Cannot enable lazy loading: No user logged in');
+          return;
+        }
+        
+        if (!Capacitor.isNativePlatform()) {
+          console.log('⏭️ Lazy loading only available on mobile, skipping');
+          return;
+        }
+        
+        console.log('🚀 Enabling lazy loading...');
+        
+        const currentLibrary = state.userLibraries[state.currentUserId] || {
+          stories: [],
+          characters: [],
+          offlineStories: [],
+          deletedStoryIds: [],
+          storyMetadata: [],
+          useLazyLoading: false
+        };
+        
+        // Initialize filesystem service
+        await storyFilesystemService.initialize();
+        
+        // Migrate existing stories to filesystem
+        const allStories = [...currentLibrary.stories, ...currentLibrary.offlineStories];
+        if (allStories.length > 0) {
+          console.log(`📦 Migrating ${allStories.length} stories to filesystem...`);
+          await storyFilesystemService.migrateStoriesToFilesystem(allStories, state.currentUserId);
+        }
+        
+        // Load metadata
+        const metadata = await storyFilesystemService.getAllMetadata(state.currentUserId);
+        console.log(`✅ Loaded ${metadata.length} story metadata entries`);
+        
+        // Update store: clear stories from memory, keep only metadata
+        set((state) => ({
+          userLibraries: {
+            ...state.userLibraries,
+            [state.currentUserId!]: {
+              ...currentLibrary,
+              stories: [], // Clear from memory
+              offlineStories: [], // Clear from memory
+              storyMetadata: metadata,
+              useLazyLoading: true
+            }
+          }
+        }));
+        
+        console.log('✅ Lazy loading enabled! Stories moved to filesystem.');
+        console.log(`💾 Memory saved: ~${(JSON.stringify(allStories).length / 1024 / 1024).toFixed(2)} MB`);
+      },
+      
+      refreshMetadata: async () => {
+        const state = get();
+        if (!state.currentUserId) return;
+        
+        const currentLibrary = state.userLibraries[state.currentUserId];
+        if (!currentLibrary || !currentLibrary.useLazyLoading) return;
+        
+        if (!Capacitor.isNativePlatform()) return;
+        
+        console.log('🔄 Refreshing story metadata...');
+        const metadata = await storyFilesystemService.getAllMetadata(state.currentUserId);
+        
+        set((state) => ({
+          userLibraries: {
+            ...state.userLibraries,
+            [state.currentUserId!]: {
+              ...currentLibrary,
+              storyMetadata: metadata
+            }
+          }
+        }));
+        
+        console.log(`✅ Refreshed ${metadata.length} story metadata entries`);
+      },
+      
+      getMetadata: () => {
+        const state = get();
+        if (!state.currentUserId) return [];
+        
+        const currentLibrary = state.userLibraries[state.currentUserId];
+        if (!currentLibrary) return [];
+        
+        // If lazy loading is enabled, return metadata
+        if (currentLibrary.useLazyLoading) {
+          return currentLibrary.storyMetadata || [];
+        }
+        
+        // Otherwise, convert stories to metadata format
+        const allStories = [...currentLibrary.stories, ...currentLibrary.offlineStories];
+        return allStories.map(story => ({
+          id: story.id,
+          backendId: story.backendId,
+          title: story.title,
+          author: story.author,
+          authors_names: story.authors_names,
+          is_collaborative: story.is_collaborative,
+          description: story.description,
+          genre: story.genre,
+          ageGroup: story.ageGroup,
+          illustrationStyle: story.illustrationStyle,
+          language: story.language,
+          creationType: story.creationType,
+          coverImageThumbnail: story.coverImage,
+          pageCount: story.pages.length,
+          wordCount: story.wordCount,
+          isPublished: story.isPublished,
+          isDraft: story.isDraft,
+          createdAt: story.createdAt,
+          lastModified: story.lastModified,
+          tags: story.tags
+        }));
+      },
+      
+      isLazyLoadingEnabled: () => {
+        const state = get();
+        if (!state.currentUserId) return false;
+        
+        const currentLibrary = state.userLibraries[state.currentUserId];
+        return currentLibrary?.useLazyLoading || false;
       },
 
       // Initialize demo data for John Doe
