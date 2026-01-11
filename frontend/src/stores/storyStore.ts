@@ -1282,6 +1282,21 @@ export const useStoryStore = create<StoryState>()(
               }
             });
           }
+          
+          // Force extraction of images to IndexedDB to prevent quota issues
+          // TEMPORARILY DISABLED - causes infinite loop
+          /* try {
+            const { hybridStorage } = await import('../utils/hybridStorage');
+            const sizeCheck = hybridStorage.checkStorageSize();
+            
+            if (sizeCheck.needsExtraction) {
+              console.log('🔄 State is large, forcing image extraction...');
+              await hybridStorage.forceExtractAllImages();
+              console.log('✅ Image extraction complete');
+            }
+          } catch (error) {
+            console.error('❌ Failed to extract images after backend load:', error);
+          } */
         } catch (error) {
           console.error('âŒ Error loading stories from backend:', error);
           set({ error: 'Failed to load stories from backend', isLoading: false });

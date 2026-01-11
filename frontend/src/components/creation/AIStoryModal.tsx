@@ -181,10 +181,29 @@ Return ONLY valid JSON in this exact format:
 EXAMPLE of good characterDescription:
 "A 7-year-old girl with curly brown hair in two pigtails, bright green eyes, wearing a red and white striped t-shirt, blue denim overalls, and white sneakers"
 
-EXAMPLE of good imagePrompt format:
-"${artStyle} illustration: A 7-year-old girl with curly brown hair in two pigtails, bright green eyes, wearing a red and white striped t-shirt, blue denim overalls, and white sneakers. Scene: She discovers a magical door in her backyard garden. Style: ${artStyle}, warm sunset tones with orange and pink sky."
+CRITICAL imagePrompt STRUCTURE - You MUST follow this EXACT format for EVERY page:
 
-Make sure EVERY page's imagePrompt starts with the EXACT SAME character description!
+"${artStyle} illustration of [EXACT characterDescription with all details]. [Specific action/pose - VARIED per page]. [Detailed environment with specific objects, plants, weather]. [Camera angle: Wide establishing shot/Medium shot/Close-up shot/Low angle/High angle]. [Character position: positioned in lower right leaving space for text/centered in frame/upper left]. [Detailed lighting: warm golden hour lighting filtering through trees casting long shadows/soft overcast lighting/dramatic side lighting]. [Atmospheric effects: morning mist with light rays/sparkles/rain]. [Color palette using colorScheme]. Professional children's book illustration, detailed, high quality, vibrant colors, safe for children."
+
+EXAMPLE 1 (establishing shot):
+"${artStyle} illustration of a 7-year-old girl with curly brown hair in two pigtails, bright green eyes, wearing a red and white striped t-shirt, blue denim overalls, and white sneakers, standing with arms raised excitedly in a sun-dappled backyard garden with tall oak trees, colorful wildflowers, a white picket fence, and a mysterious glowing door. Wide establishing shot with girl positioned in lower right, leaving space for text at top. Warm golden hour lighting filtering through tree canopy, casting long playful shadows across grass. Morning mist creating atmospheric depth with soft light rays. Warm tones with orange, pink, soft yellow sky. Professional children's book illustration, detailed, vibrant colors, safe for children."
+
+EXAMPLE 2 (close-up emotional):
+"${artStyle} illustration of a 7-year-old girl with curly brown hair in two pigtails, bright green eyes, wearing a red and white striped t-shirt, blue denim overalls, and white sneakers, sitting cross-legged with a curious expression examining a glowing magical key in her hands, surrounded by floating sparkles. Close-up shot focusing on girl's face and hands, positioned in upper right with negative space on left for text. Soft magical glow from key illuminating her face from below, creating wonder in her eyes. Sparkles and light particles floating in air. Warm magical tones with soft yellows and pinks. Professional children's book illustration, expressive character art, detailed, safe for children."
+
+EXAMPLE 3 (action scene):
+"${artStyle} illustration of a 7-year-old girl with curly brown hair in two pigtails, bright green eyes, wearing a red and white striped t-shirt, blue denim overalls, and white sneakers, running joyfully through a field of tall sunflowers with butterflies flying around her. Dynamic low angle shot capturing movement with girl in center frame, showing energy and motion. Bright afternoon sunlight creating strong shadows and highlighting the golden sunflowers. Blue butterflies adding pops of color. Vibrant warm colors with yellows, oranges, and blue sky. Professional children's book illustration, dynamic composition, detailed, safe for children."
+
+Make sure EVERY page's imagePrompt:
+1. Starts with EXACT SAME characterDescription
+2. Has DIFFERENT specific action/pose
+3. Has UNIQUE environment details
+4. Includes explicit camera angle
+5. Includes character position in frame
+6. Has detailed lighting description (not just color)
+7. Includes atmospheric effects
+8. Ends with quality keywords
+
       `.trim();
       
       // Call Gemini API via secure backend proxy

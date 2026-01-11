@@ -132,6 +132,23 @@ function AppContent() {
       }
       initializeTheme();
       
+      // Check storage on startup - TEMPORARILY DISABLED
+      // TODO: Fix the extraction loop issue before re-enabling
+      /* try {
+        const { hybridStorage } = await import('./utils/hybridStorage');
+        const sizeCheck = hybridStorage.checkStorageSize();
+        
+        console.log(`📊 App startup - localStorage size: ${sizeCheck.sizeMB.toFixed(2)} MB`);
+        
+        if (sizeCheck.needsExtraction) {
+          console.warn('⚠️ localStorage is too large, forcing extraction...');
+          await hybridStorage.forceExtractAllImages();
+          console.log('✅ Storage optimized on startup');
+        }
+      } catch (error) {
+        console.error('❌ Storage check failed:', error);
+      } */
+      
       // Set initializing to false immediately - don't wait for backend
       setIsInitializing(false);
       console.log('🚀 App ready!');

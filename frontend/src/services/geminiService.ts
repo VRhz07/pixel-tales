@@ -236,23 +236,33 @@ For each page, you MUST create TWO descriptions:
 
 1. **illustrationDescription**: A brief, human-readable description of what's happening in the scene (for reference)
 
-2. **imagePrompt**: A HIGHLY DETAILED text-to-image prompt optimized for AI image generation with ALL of these elements:
-   - Start with the art style (${artStyle} style illustration)
-   - Include the COMPLETE character description with EXACT colors, clothing, features from characterDescription
-   - FOR MULTI-CHARACTER SCENES: Describe EACH character separately with spatial positioning (left/right/center/foreground/background)
-   - Add separation keywords: "clearly separated", "distinct individuals", "each with complete anatomy", "visible space between"
-   - Describe the specific action, pose, and emotion
-   - Detail the environment: specific objects, plants, buildings, weather, time of day
-   - Specify lighting: golden hour, dramatic shadows, soft morning light, moonlight, etc.
-   - Include color palette and mood keywords
-   - Add composition notes: camera angle, focal point, character position
-   - End with quality and safety keywords
+2. **imagePrompt**: A HIGHLY DETAILED text-to-image prompt optimized for AI image generation. You MUST include ALL of these MANDATORY elements:
+   - MANDATORY: Start with the art style (${artStyle} style illustration)
+   - MANDATORY: Include the COMPLETE character description with EXACT colors, clothing, features from characterDescription
+   - MANDATORY: Describe specific action, pose, and emotion (must be VARIED per page - no repetition)
+   - MANDATORY: Detail the environment with specific objects, plants, buildings, weather, time of day
+   - MANDATORY: Specify camera angle explicitly (e.g., "Wide establishing shot", "Medium close-up", "Low angle shot", "High angle view", "Side profile view")
+   - MANDATORY: Specify character position in frame (e.g., "positioned in lower right leaving space for text", "centered in frame", "upper left corner")
+   - MANDATORY: Specify detailed lighting (e.g., "warm golden hour lighting filtering through canopy casting long shadows", not just "warm tones")
+   - RECOMMENDED: Include atmospheric effects (mist, rain, sparkles, light rays, dust particles)
+   - MANDATORY: Include color palette and mood keywords
+   - MANDATORY: End with quality keywords: "Professional children's book illustration, detailed, high quality, vibrant colors, safe for children"
+   - FOR MULTI-CHARACTER SCENES: Describe EACH character separately with spatial positioning and add separation keywords: "clearly separated", "distinct individuals", "each with complete anatomy", "visible space between"
 
 Example imagePrompt (single character):
 "Cartoon style illustration of a small fox with bright orange fur, white-tipped tail, wearing a dark green vest with shiny brass buttons and brown leather boots, standing with one paw raised curiously in a sun-dappled forest clearing surrounded by tall oak trees with golden leaves, moss-covered rocks, and wildflowers. Wide establishing shot with fox positioned in lower right, leaving space for text at top. Warm golden hour lighting filtering through canopy, casting long shadows. Warm autumn color palette with oranges, golds, and greens. Cheerful and inviting atmosphere. Professional children's book illustration, vibrant colors, detailed forest environment, atmospheric lighting, high quality, safe for children."
 
 Example imagePrompt (multiple characters):
 "Cartoon style illustration of TWO CLEARLY SEPARATED characters: On the LEFT side, a small fox with bright orange fur, white-tipped tail, wearing a dark green vest with brass buttons, standing upright. On the RIGHT side, a tall gray rabbit with long ears, wearing a blue jacket and red scarf, waving with one paw. The two characters are CLEARLY SEPARATED by a wooden garden fence between them, each character distinct and complete with their own anatomy. They are positioned 4 feet apart in a sunny meadow with yellow flowers. Medium wide shot showing both characters fully visible with clear space between them. Each character has complete, separate bodies with no overlapping or merging. Bright afternoon lighting, cheerful atmosphere. Professional children's book illustration, clear character boundaries, distinct individuals, vibrant colors, safe for children."
+
+Example imagePrompt (action scene with dynamic camera):
+"Watercolor illustration of a small fox with bright orange fur, white-tipped tail, wearing a dark green vest with brass buttons, leaping joyfully over a fallen moss-covered log in a misty morning forest with towering pine trees, ferns sprouting from the forest floor, and mushrooms clustered at tree bases. Dynamic low angle shot capturing fox mid-jump in center frame with front paws extended forward. Soft morning mist creating atmospheric depth with light rays piercing through trees from behind. Cool blue-green forest tones with warm orange fox accents. Professional children's book illustration, detailed watercolor style, atmospheric lighting, high quality, safe for children."
+
+Example imagePrompt (emotional close-up):
+"Cartoon illustration of a small fox with bright orange fur, white-tipped tail, wearing a dark green vest with brass buttons, sitting with head down and drooping ears under a large oak tree with colorful autumn leaves falling around. Close-up shot focusing on fox's sad expression, character positioned in upper right corner with negative space on left for text placement. Soft overcast lighting with gentle shadows creating a melancholy mood. Muted autumn colors with orange, brown, and gray tones. Professional children's book illustration, expressive character art, detailed emotional portrayal, high quality, safe for children."
+
+Example imagePrompt (dramatic climax scene):
+"Digital art illustration of a small fox with bright orange fur, white-tipped tail, wearing a torn dark green vest, standing bravely on a rocky cliff edge with stormy clouds and lightning flashing in the background, wind-blown trees bending dramatically. High angle bird's eye view shot with fox small in foreground against vast stormy sky. Dramatic side lighting from lightning bolts creating strong contrast and casting long shadows across rocks. Dark stormy colors with purple-gray clouds, flashes of bright white lightning, and warm orange fox standing out. Professional children's book illustration, cinematic composition, dramatic atmospheric lighting, high quality, safe for children."
 
 FINAL CHECKLIST - Verify before responding:
 ✓ Valid JSON syntax with no trailing commas

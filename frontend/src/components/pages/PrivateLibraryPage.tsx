@@ -414,11 +414,15 @@ const PrivateLibraryPage = () => {
         setIsModalLoading(true);
         try {
           const { removeOfflineStory } = useStoryStore.getState();
-          // Remove each offline story from localStorage
+          // Remove each offline story from both IndexedDB and store
           for (const story of offlineStories) {
+            await offlineStorageService.removeStory(story.id);
             removeOfflineStory(story.id);
-            console.log(`✅ Removed offline story ${story.id} from localStorage`);
+            console.log(`✅ Removed offline story ${story.id} from IndexedDB and store`);
           }
+          // Refresh the list
+          const updatedStories = await offlineStorageService.getAllStories();
+          setOfflineStoriesFromDB(updatedStories);
           console.log(`✅ Deleted all ${offlineStories.length} offline stories`);
           setIsModalLoading(false);
           closeModal();
@@ -975,9 +979,19 @@ const PrivateLibraryPage = () => {
                     </button>
                     <button 
                       className="library-action-button delete"
-                      onClick={(e) => {
+                      onClick={async (e) => {
                         e.stopPropagation();
-                        removeOfflineStory(story.id);
+                        // Remove from both IndexedDB and store
+                        try {
+                          await offlineStorageService.removeStory(story.id);
+                          removeOfflineStory(story.id);
+                          // Refresh the list
+                          const updatedStories = await offlineStorageService.getAllStories();
+                          setOfflineStoriesFromDB(updatedStories);
+                          console.log('✅ Removed offline story:', story.id);
+                        } catch (error) {
+                          console.error('❌ Failed to remove offline story:', error);
+                        }
                       }}
                       title="Remove from Offline"
                     >
