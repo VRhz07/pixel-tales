@@ -528,7 +528,6 @@ export const useStoryStore = create<StoryState>()(
 
         // Auto-sync to backend after update (only if story has content)
         // Debounced to prevent creating duplicate stories during AI generation
-        const updatedStory = get().userLibraries[get().currentUserId!]?.stories.find(s => s.id === id);
         const hasContent = updatedStory?.pages.some(page => page.text.trim().length > 0);
         
         // Skip auto-sync for AI stories that are still generating (don't have images yet)
