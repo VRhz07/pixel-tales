@@ -109,3 +109,6 @@ ios/.DS_Store
 
 # Temporary test files
 tmp_rovodev_*
+
+# Debug logs
+ss/logs.txt
