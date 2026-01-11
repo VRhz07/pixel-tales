@@ -70,6 +70,7 @@ export interface StoryApiResponse {
   likes_count?: number;
   comments_count?: number;
   saves_count?: number;
+  saved_count?: number; // Alternative field name used in some responses
   is_saved_by_user?: boolean;
   downloads_count?: number;
   is_liked_by_user?: boolean;
@@ -79,6 +80,9 @@ export interface StoryApiResponse {
     avatar?: string;
   };
   author_name?: string;
+  // Collaborative story fields
+  is_collaborative?: boolean;
+  authors_names?: string[];
 }
 
 class StoryApiService {

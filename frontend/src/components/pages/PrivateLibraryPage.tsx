@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStoryStore } from '../../stores/storyStore';
+import { offlineStorageService } from '../../services/offlineStorageService';
 import { useI18nStore } from '../../stores/i18nStore';
 import { useAuthStore } from '../../stores/authStore';
 import { storyApiService } from '../../services/storyApiService';
@@ -31,6 +32,7 @@ const PrivateLibraryPage = () => {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
   const [savedStories, setSavedStories] = useState<any[]>([]);
   const [isLoadingSaved, setIsLoadingSaved] = useState(false);
+  const [offlineStoriesFromDB, setOfflineStoriesFromDB] = useState<any[]>([]);
   
   // Get current user for author name
   const { user } = useAuthStore();
@@ -40,7 +42,19 @@ const PrivateLibraryPage = () => {
   const currentUserId = useStoryStore((state) => state.currentUserId);
   const userLibraries = useStoryStore((state) => state.userLibraries);
   const rawStories = currentUserId ? (userLibraries[currentUserId]?.stories || []) : [];
-  const rawOfflineStories = currentUserId ? (userLibraries[currentUserId]?.offlineStories || []) : [];
+  
+  // Load offline stories from IndexedDB on mount
+  React.useEffect(() => {
+    const loadOfflineStories = async () => {
+      try {
+        const stories = await offlineStorageService.getAllStories();
+        setOfflineStoriesFromDB(stories);
+      } catch (error) {
+        console.error('Failed to load offline stories:', error);
+      }
+    };
+    loadOfflineStories();
+  }, []);
   
   // Map stories and ensure they have author field
   const stories = rawStories.map(story => ({
@@ -103,7 +117,7 @@ const PrivateLibraryPage = () => {
   }, [user, currentUserId, loadStoriesFromBackend]);
 
   // Use real offline stories from store
-  const offlineStories = rawOfflineStories.map(story => ({
+  const offlineStories = offlineStoriesFromDB.map(story => ({
     ...story,
     author: story.is_collaborative && story.authors_names && story.authors_names.length > 0 
       ? story.authors_names.join(', ') 
@@ -126,7 +140,7 @@ const PrivateLibraryPage = () => {
       title: 'Save Story',
       message: `Save "${story?.title || 'this story'}"? It will be moved from Drafts to Your Works (not yet published to public library).`,
       confirmText: 'Save',
-      onConfirm: () => {
+      onConfirm: async () => {
         markAsSaved(storyId);
         console.log('Story saved:', storyId);
         closeModal();
@@ -243,7 +257,7 @@ const PrivateLibraryPage = () => {
       title: t('library.deleteTitle'),
       message: `Are you sure you want to permanently delete "${story?.title || 'this story'}"? This action cannot be undone.`,
       confirmText: 'Delete',
-      onConfirm: () => {
+      onConfirm: async () => {
         deleteStory(storyId);
         console.log('Story deleted:', storyId);
         closeModal();
@@ -446,7 +460,7 @@ const PrivateLibraryPage = () => {
     title: '',
     message: '',
     confirmText: 'Confirm',
-    onConfirm: () => {},
+    onConfirm: async () => {},
   });
   const [isModalLoading, setIsModalLoading] = useState(false);
 

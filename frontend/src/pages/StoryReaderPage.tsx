@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { 
   ArrowLeftIcon, 
@@ -31,6 +31,7 @@ import pdfExportService from '../services/pdfExportService';
 import { useSoundEffects } from '../hooks/useSoundEffects';
 import api from '../services/api';
 import gamesCacheService from '../services/gamesCache.service';
+import { offlineStorageService } from '../services/offlineStorageService';
 import { convertStoryImagesToDataUrls } from '../utils/imageCache';
 import './StoryReaderPage.css';
 
@@ -41,7 +42,7 @@ const StoryReaderPage: React.FC = () => {
   const location = useLocation();
   const { storyId } = useParams<{ storyId: string }>();
   const { isDarkMode } = useThemeStore();
-  const { getStory, getCanvasData, saveStoryOffline, removeOfflineStory, isStorySavedOffline } = useStoryStore();
+  const { getStory, getCanvasData } = useStoryStore();
   const { user } = useAuthStore();
   const { playSound, playPageTurn, playSuccess, playButtonClick } = useSoundEffects();
   const [readingMode, setReadingMode] = useState<ReadingMode>('verticalScroll');
@@ -98,11 +99,11 @@ const StoryReaderPage: React.FC = () => {
       // This handles unpublished/draft stories that haven't been synced yet
       const localStory = getStory(storyId);
       if (localStory && !localStory.isPublished) {
-        console.log('📖 Loaded UNPUBLISHED story from local store:', localStory.title);
+        console.log('?? Loaded UNPUBLISHED story from local store:', localStory.title);
         setStory(localStory);
         setStoryAuthor(user?.username || 'You');
         setIsOwnStory(true); // Local unpublished stories are always owned by current user
-        setIsSavedOffline(isStorySavedOffline(storyId));
+        offlineStorageService.isStorySaved(storyId).then(setIsSavedOffline);
         setIsLoading(false);
         return;
       }
@@ -110,14 +111,14 @@ const StoryReaderPage: React.FC = () => {
       // For published stories or if not in local store, fetch from backend
       if (user) {
         try {
-          console.log('🔍 Fetching PUBLISHED story from backend:', storyId);
+          console.log('?? Fetching PUBLISHED story from backend:', storyId);
           const apiStory = await storyApiService.getStory(storyId);
-          console.log('📦 Raw API story:', apiStory);
-          console.log('📦 Canvas data from API:', apiStory.canvas_data);
+          console.log('?? Raw API story:', apiStory);
+          console.log('?? Canvas data from API:', apiStory.canvas_data);
           
           const convertedStory = storyApiService.convertFromApiFormat(apiStory);
-          console.log('✅ Converted story:', convertedStory);
-          console.log('✅ Pages with canvasData:', convertedStory.pages.filter(p => p.canvasData).length);
+          console.log('? Converted story:', convertedStory);
+          console.log('? Pages with canvasData:', convertedStory.pages.filter(p => p.canvasData).length);
           
           setStory(convertedStory);
           const authorDisplay = apiStory.is_collaborative && apiStory.authors_names && apiStory.authors_names.length > 0
@@ -127,7 +128,7 @@ const StoryReaderPage: React.FC = () => {
           
           const storyIdToUse = apiStory.id?.toString() || storyId;
           setBackendStoryId(storyIdToUse);
-          console.log('📝 Backend story ID set:', storyIdToUse);
+          console.log('?? Backend story ID set:', storyIdToUse);
           
           // Check if current user is the author
           const authorId = apiStory.author?.id;
@@ -141,20 +142,20 @@ const StoryReaderPage: React.FC = () => {
           setViewCount(apiStory.views || 0);
           setIsLiked(apiStory.is_liked_by_user || false);
           setIsSaved(apiStory.is_saved_by_user || false);
-          setIsSavedOffline(isStorySavedOffline(storyId));
+          offlineStorageService.isStorySaved(storyId).then(setIsSavedOffline);
           
           setIsLoading(false);
           return;
         } catch (error: any) {
-          console.error('❌ Failed to load story from backend:', error);
+          console.error('? Failed to load story from backend:', error);
           
           // If backend fails, try local store as final fallback
           if (localStory) {
-            console.log('📖 Fallback to local store after backend error:', localStory.title);
+            console.log('?? Fallback to local store after backend error:', localStory.title);
             setStory(localStory);
             setStoryAuthor(user?.username || 'You');
             setIsOwnStory(true);
-            setIsSavedOffline(isStorySavedOffline(storyId));
+            offlineStorageService.isStorySaved(storyId).then(setIsSavedOffline);
             setIsLoading(false);
             return;
           }
@@ -163,10 +164,10 @@ const StoryReaderPage: React.FC = () => {
       
       // If not in local store, fetch from backend API
       try {
-        console.log('🔍 Fetching story from backend:', storyId);
+        console.log('?? Fetching story from backend:', storyId);
         const apiStory = await storyApiService.getStory(storyId);
-        console.log('📦 Raw API response:', apiStory);
-        console.log('📋 API story fields:', {
+        console.log('?? Raw API response:', apiStory);
+        console.log('?? API story fields:', {
           id: apiStory.id,
           title: apiStory.title,
           author_name: apiStory.author_name,
@@ -176,7 +177,7 @@ const StoryReaderPage: React.FC = () => {
         });
         
         const convertedStory = storyApiService.convertFromApiFormat(apiStory);
-        console.log('✅ Converted story:', {
+        console.log('? Converted story:', {
           id: convertedStory.id,
           title: convertedStory.title,
           pages: convertedStory.pages.length,
@@ -196,10 +197,10 @@ const StoryReaderPage: React.FC = () => {
         const authorId = apiStory.author?.id;
         const currentUserId = user?.id?.toString();
         setIsOwnStory(authorId === currentUserId);
-        console.log('🔐 Ownership check:', { authorId, currentUserId, isOwner: authorId === currentUserId });
+        console.log('?? Ownership check:', { authorId, currentUserId, isOwner: authorId === currentUserId });
         
         // Set interaction counts from API response
-        console.log('📊 Initial stats from API:', {
+        console.log('?? Initial stats from API:', {
           likes_count: apiStory.likes_count,
           comments_count: apiStory.comments_count,
           views: apiStory.views,
@@ -212,7 +213,7 @@ const StoryReaderPage: React.FC = () => {
         setSaveCount(apiStory.saves_count || 0);
         setIsLiked(apiStory.is_liked_by_user || false);
         setIsSaved(apiStory.is_saved_by_user || false);
-        setIsSavedOffline(isStorySavedOffline(storyId));
+        offlineStorageService.isStorySaved(storyId).then(setIsSavedOffline);
         
         // Fetch fresh interaction stats to ensure we have the latest counts
         // This will update the counts if they've changed since the story was loaded
@@ -220,7 +221,7 @@ const StoryReaderPage: React.FC = () => {
           fetchInteractionStats(storyIdToUse);
         }, 500);
       } catch (error) {
-        console.error('❌ Error loading story:', error);
+        console.error('? Error loading story:', error);
         setStory(null);
       } finally {
         setIsLoading(false);
@@ -233,14 +234,14 @@ const StoryReaderPage: React.FC = () => {
   // Fetch interaction statistics
   const fetchInteractionStats = async (id: string) => {
     if (!id) {
-      console.warn('⚠️ No story ID provided to fetchInteractionStats');
+      console.warn('?? No story ID provided to fetchInteractionStats');
       return;
     }
     
     try {
-      console.log('🔄 Fetching interaction stats for story:', id);
+      console.log('?? Fetching interaction stats for story:', id);
       const stats = await storyInteractionService.getInteractionStats(id);
-      console.log('✅ Fetched interaction stats:', stats);
+      console.log('? Fetched interaction stats:', stats);
       
       // Only update if we got valid stats
       if (stats) {
@@ -252,7 +253,7 @@ const StoryReaderPage: React.FC = () => {
         setIsSaved(stats.is_saved_by_user || false);
       }
     } catch (error) {
-      console.error('❌ Failed to fetch interaction stats:', error);
+      console.error('? Failed to fetch interaction stats:', error);
       // Don't reset counts on error - keep existing values
     }
   };
@@ -271,7 +272,7 @@ const StoryReaderPage: React.FC = () => {
 
   // Check games status when story loads
   useEffect(() => {
-    console.log('🎮 Checking games - backendStoryId:', backendStoryId, 'storyId:', storyId, 'user:', user?.username);
+    console.log('?? Checking games - backendStoryId:', backendStoryId, 'storyId:', storyId, 'user:', user?.username);
     
     // Check if we have cached games for offline play
     // Try multiple ID formats to find cached games
@@ -282,7 +283,7 @@ const StoryReaderPage: React.FC = () => {
       story?.id
     ].filter(Boolean); // Remove null/undefined values
     
-    console.log('🔍 Checking cache with IDs:', idsToCheck);
+    console.log('?? Checking cache with IDs:', idsToCheck);
     
     let foundGames = null;
     let foundId = null;
@@ -290,12 +291,12 @@ const StoryReaderPage: React.FC = () => {
     for (const id of idsToCheck) {
       const cachedGames = gamesCacheService.getCachedStoryGames(id!);
       if (cachedGames && cachedGames.length > 0) {
-        console.log('🎮 Found cached games with ID:', id, 'count:', cachedGames.length);
+        console.log('?? Found cached games with ID:', id, 'count:', cachedGames.length);
         foundGames = cachedGames;
         foundId = id;
         break;
       } else {
-        console.log('❌ No cached games found for ID:', id);
+        console.log('? No cached games found for ID:', id);
       }
     }
     
@@ -303,7 +304,7 @@ const StoryReaderPage: React.FC = () => {
       setHasGames(true);
       setGamesCount(foundGames.length);
     } else {
-      console.log('❌ No cached games found for any ID variant');
+      console.log('? No cached games found for any ID variant');
     }
     
     // Also check backend status if we have backend ID and user
@@ -346,7 +347,7 @@ const StoryReaderPage: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>📖</div>
+          <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>??</div>
           <p className="text-gray-600">Loading story...</p>
         </div>
       </div>
@@ -402,13 +403,13 @@ const StoryReaderPage: React.FC = () => {
     
     try {
       const response = await api.get(`/games/check/${backendStoryId}/`);
-      console.log('🎮 Games status:', response);
+      console.log('?? Games status:', response);
       setHasGames(response.has_games);
       setGamesCount(response.games_count);
       setIsStoryAuthor(response.is_author);
       setIsStoryPublished(response.is_published);
       setCanGenerateGames(response.can_generate && response.is_published);
-      console.log('🎮 Setting states - hasGames:', response.has_games, 'canGenerate:', response.can_generate && response.is_published, 'isAuthor:', response.is_author, 'isPublished:', response.is_published);
+      console.log('?? Setting states - hasGames:', response.has_games, 'canGenerate:', response.can_generate && response.is_published, 'isAuthor:', response.is_author, 'isPublished:', response.is_published);
     } catch (err) {
       console.error('Error checking games status:', err);
     }
@@ -428,14 +429,14 @@ const StoryReaderPage: React.FC = () => {
       setHasGames(true);
       setGamesCount(Object.keys(response.games).length);
       playSuccess();
-      alert(`✅ Games generated successfully! ${Object.keys(response.games).length} games created.`);
+      alert(`? Games generated successfully! ${Object.keys(response.games).length} games created.`);
       setShowViewControls(false);
     } catch (err: any) {
       console.error('Error generating games:', err);
       const errorMessage = err.response?.data?.error;
       
       if (errorMessage === 'Story must be published to generate games') {
-        alert('📚 Please publish your story first before generating games!\n\nGames can only be created for published stories.');
+        alert('?? Please publish your story first before generating games!\n\nGames can only be created for published stories.');
       } else {
         alert(errorMessage || 'Failed to generate games');
       }
@@ -467,9 +468,9 @@ const StoryReaderPage: React.FC = () => {
         template: 'classic',
         printOptimization: 'screen'
       });
-      console.log('✅ Story shared successfully');
+      console.log('? Story shared successfully');
     } catch (error) {
-      console.error('❌ Failed to share story:', error);
+      console.error('? Failed to share story:', error);
       alert('Failed to share story. Please try again.');
     }
   };
@@ -488,9 +489,9 @@ const StoryReaderPage: React.FC = () => {
         template: 'classic',
         printOptimization: 'screen'
       });
-      console.log('✅ Story downloaded to PDF successfully');
+      console.log('? Story downloaded to PDF successfully');
     } catch (error) {
-      console.error('❌ Failed to download story as PDF:', error);
+      console.error('? Failed to download story as PDF:', error);
       alert('Failed to download PDF. Please try again.');
     }
   };
@@ -549,36 +550,36 @@ const StoryReaderPage: React.FC = () => {
     
     if (isSavedOffline) {
       // Remove from offline storage
-      removeOfflineStory(storyId);
+      await offlineStorageService.removeStory(storyId);
       setIsSavedOffline(false);
       playButtonClick();
-      console.log('✅ Removed story from offline storage');
+      console.log('? Removed story from offline storage');
       
       // Also clear cached games for this story
       const idToUse = backendStoryId || storyId;
       gamesCacheService.clearStoryGamesCache(idToUse);
-      console.log('✅ Cleared cached games for story');
+      console.log('? Cleared cached games for story');
     } else {
       // Save to offline storage with image conversion
       try {
-        console.log('🖼️ Preparing story for offline storage...');
+        console.log('??? Preparing story for offline storage...');
         const storyWithDataUrls = await convertStoryImagesToDataUrls(story);
-        saveStoryOffline(storyWithDataUrls);
+        await offlineStorageService.saveStory(storyId, storyWithDataUrls);
       } catch (error) {
-        console.error('❌ Failed to convert images:', error);
+        console.error('? Failed to convert images:', error);
         // Fallback: save without conversion
-        saveStoryOffline(story);
+        await offlineStorageService.saveStory(storyId, story);
       }
       setIsSavedOffline(true);
       playSuccess();
-      console.log('✅ Saved story for offline reading');
+      console.log('? Saved story for offline reading');
       
       // Fetch and cache games for offline play
       try {
         const idToUse = backendStoryId || storyId;
-        console.log('🎮 Fetching games to cache for offline play...');
-        console.log('📝 Using ID for caching:', idToUse, 'backendStoryId:', backendStoryId, 'storyId:', storyId);
-        console.log('📖 Story object:', {
+        console.log('?? Fetching games to cache for offline play...');
+        console.log('?? Using ID for caching:', idToUse, 'backendStoryId:', backendStoryId, 'storyId:', storyId);
+        console.log('?? Story object:', {
           id: story?.id,
           backendId: story?.backendId,
           title: story?.title
@@ -588,7 +589,7 @@ const StoryReaderPage: React.FC = () => {
         if (response.games && response.games.length > 0) {
           // Cache with primary ID - service will handle all variants automatically
           gamesCacheService.cacheStoryGames(idToUse, response.games);
-          console.log(`✅ Cached ${response.games.length} games with all ID variants`);
+          console.log(`? Cached ${response.games.length} games with all ID variants`);
           
           // Fetch and cache each game's questions for offline play
           let cachedCount = 0;
@@ -596,24 +597,24 @@ const StoryReaderPage: React.FC = () => {
             try {
               // Use the preview endpoint to get questions without creating an attempt
               const gamePreview = await api.get(`/games/${game.id}/preview/`);
-              console.log(`📦 Game preview response for ${game.id}:`, gamePreview);
-              console.log(`📋 Questions in preview:`, gamePreview.questions);
+              console.log(`?? Game preview response for ${game.id}:`, gamePreview);
+              console.log(`?? Questions in preview:`, gamePreview.questions);
               
               // Cache the game preview data
               gamesCacheService.cacheGameData(game.id, gamePreview);
               cachedCount++;
-              console.log(`✅ Cached game ${game.id} (${game.game_type_display}) with ${gamePreview.questions?.length || 0} questions`);
+              console.log(`? Cached game ${game.id} (${game.game_type_display}) with ${gamePreview.questions?.length || 0} questions`);
             } catch (err) {
-              console.warn(`⚠️ Could not cache game ${game.id}:`, err);
+              console.warn(`?? Could not cache game ${game.id}:`, err);
             }
           }
           
-          console.log(`🎉 Story and ${cachedCount}/${response.games.length} games saved for offline play!`);
+          console.log(`?? Story and ${cachedCount}/${response.games.length} games saved for offline play!`);
         } else {
-          console.log('ℹ️ No games available for this story');
+          console.log('?? No games available for this story');
         }
       } catch (err) {
-        console.warn('⚠️ Could not cache games (will still work when online):', err);
+        console.warn('?? Could not cache games (will still work when online):', err);
         // Don't fail the offline save if games caching fails
       }
     }
@@ -743,7 +744,7 @@ const StoryReaderPage: React.FC = () => {
         imageElement.src = newSrc;
         
         playButtonClick();
-        console.log(`🔄 Retrying image load for ${imageType} ${pageId}`);
+        console.log(`?? Retrying image load for ${imageType} ${pageId}`);
       }
     } catch (error) {
       console.error('Failed to retry image:', error);
@@ -862,8 +863,8 @@ const StoryReaderPage: React.FC = () => {
                   onError={(e) => {
                     // Mark as failed to show retry button
                     const newFailedPages = new Set(failedImages);
-                    newFailedPages.add(index);
-                    setfailedImages(newFailedPages);
+                    newFailedPages.add(index.toString());
+                    setFailedImages(newFailedPages);
                   }}
                   onLoad={async (e) => {
                     // Check if this is a real image or a placeholder
@@ -876,18 +877,18 @@ const StoryReaderPage: React.FC = () => {
                         const blob = await response.blob();
                         const sizeKB = blob.size / 1024;
                         
-                        console.log(`📊 Page ${index + 1}: Image size: ${sizeKB.toFixed(1)}KB`);
+                        console.log(`?? Page ${index + 1}: Image size: ${sizeKB.toFixed(1)}KB`);
                         
                         // Pollinations placeholders are LARGE (1-2MB), real images are smaller (50-100KB)
                         if (sizeKB > 500) {
-                          console.log(`⏳ Page ${index + 1}: Large placeholder detected (${sizeKB.toFixed(1)}KB), keeping loading state`);
+                          console.log(`? Page ${index + 1}: Large placeholder detected (${sizeKB.toFixed(1)}KB), keeping loading state`);
                           // Keep in loading state - image is still generating
                           return;
                         }
                         
-                        console.log(`✅ Page ${index + 1}: Real image loaded (${sizeKB.toFixed(1)}KB)`);
+                        console.log(`? Page ${index + 1}: Real image loaded (${sizeKB.toFixed(1)}KB)`);
                       } catch (err) {
-                        console.log(`⚠️ Page ${index + 1}: Could not check image size, marking as loaded`);
+                        console.log(`?? Page ${index + 1}: Could not check image size, marking as loaded`);
                       }
                     }
                     
@@ -1017,8 +1018,8 @@ const StoryReaderPage: React.FC = () => {
                     onError={(e) => {
                       // Mark as failed to show retry button
                       const newFailedPages = new Set(failedImages);
-                      newFailedPages.add(currentPage);
-                      setfailedImages(newFailedPages);
+                      newFailedPages.add(currentPage.toString());
+                      setFailedImages(newFailedPages);
                     }}
                     onLoad={async (e) => {
                       if (!page) return;
@@ -1033,18 +1034,18 @@ const StoryReaderPage: React.FC = () => {
                           const blob = await response.blob();
                           const sizeKB = blob.size / 1024;
                           
-                          console.log(`📊 Page ${currentPage + 1}: Image size: ${sizeKB.toFixed(1)}KB`);
+                          console.log(`?? Page ${currentPage + 1}: Image size: ${sizeKB.toFixed(1)}KB`);
                           
                           // Pollinations placeholders are LARGE (1-2MB), real images are smaller (50-100KB)
                           if (sizeKB > 500) {
-                            console.log(`⏳ Page ${currentPage + 1}: Large placeholder detected (${sizeKB.toFixed(1)}KB), keeping loading state`);
+                            console.log(`? Page ${currentPage + 1}: Large placeholder detected (${sizeKB.toFixed(1)}KB), keeping loading state`);
                             // Keep in loading state - image is still generating
                             return;
                           }
                           
-                          console.log(`✅ Page ${currentPage + 1}: Real image loaded (${sizeKB.toFixed(1)}KB)`);
+                          console.log(`? Page ${currentPage + 1}: Real image loaded (${sizeKB.toFixed(1)}KB)`);
                         } catch (err) {
-                          console.log(`⚠️ Page ${currentPage + 1}: Could not check image size, marking as loaded`);
+                          console.log(`?? Page ${currentPage + 1}: Could not check image size, marking as loaded`);
                         }
                       }
                       
@@ -1284,7 +1285,7 @@ const StoryReaderPage: React.FC = () => {
                   fontWeight: '600',
                   textAlign: 'center'
                 }}>
-                  ⚠️ Cover image failed to load
+                  ?? Cover image failed to load
                 </span>
                 <button
                   onClick={() => handleRegenerateImage('cover', 'cover')}
@@ -1305,7 +1306,7 @@ const StoryReaderPage: React.FC = () => {
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7c3aed'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8b5cf6'}
                 >
-                  🔄 Retry Loading Cover
+                  ?? Retry Loading Cover
                 </button>
               </div>
             )}
@@ -1354,7 +1355,7 @@ const StoryReaderPage: React.FC = () => {
                 setLoadingImages(prev => new Set([...prev, 'cover']));
               }}
               onError={(e) => {
-                console.error('❌ Failed to load cover image');
+                console.error('? Failed to load cover image');
                 console.error('Cover URL:', story.coverImage?.substring(0, 100) + '...');
                 setLoadingImages(prev => {
                   const newSet = new Set(prev);
@@ -1365,18 +1366,18 @@ const StoryReaderPage: React.FC = () => {
                 
                 // Auto-retry after 10 seconds for Pollinations images
                 if (story.coverImage && story.coverImage.includes('pollinations')) {
-                  console.log(`⏳ Will auto-retry cover in 10 seconds...`);
+                  console.log(`? Will auto-retry cover in 10 seconds...`);
                   setTimeout(() => {
                     const img = e.currentTarget as HTMLImageElement;
                     if (img && img.parentElement && story.coverImage) {
-                      console.log(`🔄 Auto-retrying cover...`);
+                      console.log(`?? Auto-retrying cover...`);
                       img.src = story.coverImage + '&retry=' + Date.now();
                     }
                   }, 10000);
                 }
               }}
               onLoad={async (e) => {
-                console.log('✅ Cover image loaded, checking if it\'s real or placeholder...');
+                console.log('? Cover image loaded, checking if it\'s real or placeholder...');
                 
                 const img = e.currentTarget as HTMLImageElement;
                 
@@ -1387,29 +1388,29 @@ const StoryReaderPage: React.FC = () => {
                     const blob = await response.blob();
                     const sizeKB = blob.size / 1024;
                     
-                    console.log(`📊 Cover: Loaded image size: ${sizeKB.toFixed(1)}KB (${img.naturalWidth}×${img.naturalHeight})`);
+                    console.log(`?? Cover: Loaded image size: ${sizeKB.toFixed(1)}KB (${img.naturalWidth}�${img.naturalHeight})`);
                     
                     // Real images are 50-100KB, placeholders are much larger (~1.3MB)
                     if (sizeKB > 200) {
-                      console.warn(`⚠️ Cover: Placeholder detected (${sizeKB.toFixed(1)}KB), will retry...`);
+                      console.warn(`?? Cover: Placeholder detected (${sizeKB.toFixed(1)}KB), will retry...`);
                       setFailedImages(prev => new Set([...prev, 'cover']));
                       
                       // Retry after 10 seconds
                       setTimeout(() => {
                         if (img && img.parentElement && story.coverImage) {
-                          console.log(`🔄 Auto-retrying cover...`);
+                          console.log(`?? Auto-retrying cover...`);
                           img.src = story.coverImage + '&retry=' + Date.now();
                         }
                       }, 10000);
                       return;
                     }
                   } catch (err) {
-                    console.error(`❌ Failed to check cover image size:`, err);
+                    console.error(`? Failed to check cover image size:`, err);
                     // If we can't check size, retry anyway to be safe
                     setFailedImages(prev => new Set([...prev, 'cover']));
                     setTimeout(() => {
                       if (img && img.parentElement && story.coverImage) {
-                        console.log(`🔄 Retrying cover (size check failed)...`);
+                        console.log(`?? Retrying cover (size check failed)...`);
                         img.src = story.coverImage + '&retry=' + Date.now();
                       }
                     }, 10000);
@@ -1417,7 +1418,7 @@ const StoryReaderPage: React.FC = () => {
                   }
                 }
                 
-                console.log('✅ Cover: Real image loaded successfully');
+                console.log('? Cover: Real image loaded successfully');
                 setLoadingImages(prev => {
                   const newSet = new Set(prev);
                   newSet.delete('cover');
@@ -1584,7 +1585,7 @@ const StoryReaderPage: React.FC = () => {
                   color: '#92400e',
                   textAlign: 'center'
                 }}>
-                  📚 Publish your story to generate games!
+                  ?? Publish your story to generate games!
                 </div>
               ) : null}
             </div>
@@ -1652,7 +1653,7 @@ const StoryReaderPage: React.FC = () => {
                   padding: '0.25rem'
                 }}
               >
-                ×
+                �
               </button>
             </div>
 
