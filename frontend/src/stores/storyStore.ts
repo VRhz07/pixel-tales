@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { useAuthStore } from './authStore';
 import { storyApiService } from '../services/storyApiService';
+import { createHybridStorage } from '../utils/hybridStorage';
 
 export interface StoryPage {
   id: string;
@@ -1365,7 +1366,7 @@ export const useStoryStore = create<StoryState>()(
     {
       name: 'story-store',
       version: 5, // Incremented - disabled partialize to fix image stripping bug
-      storage: createJSONStorage(() => localStorage),
+      storage: createHybridStorage(),
       // DISABLED: partialize was stripping images even from drafts
       // Testing without it to see if images persist correctly
       /* partialize: (state) => {
