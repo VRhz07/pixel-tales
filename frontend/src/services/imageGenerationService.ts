@@ -369,67 +369,87 @@ export const generateStoryIllustrations = async (
   colorScheme?: string
 ): Promise<string[]> => {
   const totalPages = pages.length;
+  const results: (string | null)[] = [];
   
-  const imagePromises = pages.map(async (page, index) => {
+  // Process pages sequentially to avoid Replicate rate limits
+  for (let index = 0; index < pages.length; index++) {
+    const page = pages[index];
+    
     if (!page.illustrationDescription) {
-      return null;
+      results.push(null);
+      continue;
     }
     
-    const pageNumber = index + 1;
-    
-    // Use character description for consistency across all pages
-    // Include page position, mood, and narrative purpose for better composition
-    let enhancedDescription = page.illustrationDescription;
-    
-    // Add color scheme context if provided
-    if (colorScheme && !enhancedDescription.toLowerCase().includes('color')) {
-      enhancedDescription += `. Overall story color palette: ${colorScheme}`;
-    }
-    
-    const enhancedPrompt = createIllustrationPrompt(
-      enhancedDescription,
-      artStyle,
-      characterDescription,
-      pageNumber,
-      totalPages,
-      page.mood,
-      page.narrativePurpose
-    );
-    
-    // Use similar seeds for consistency but with slight variation
-    const baseSeed = characterDescription ? characterDescription.length * 100 : 1000;
-    
-    // Try Replicate first, fallback to Pollinations
-    let imageUrl = await generateImageWithReplicate({
-      prompt: enhancedPrompt,
-      width: 1024,
-      height: 1024,
-      seed: baseSeed + (index * 10), // Small increments for consistency
-      pageNumber,
-      totalPages,
-      mood: page.mood,
-      narrativePurpose: page.narrativePurpose
-    });
-    
-    // Fallback to Pollinations if Replicate fails
-    if (!imageUrl) {
-      console.log('⚠️ Replicate failed, falling back to Pollinations...');
-      imageUrl = await generateImage({
+    try {
+      const pageNumber = index + 1;
+      
+      // Use character description for consistency across all pages
+      // Include page position, mood, and narrative purpose for better composition
+      let enhancedDescription = page.illustrationDescription;
+      
+      // Add color scheme context if provided
+      if (colorScheme && !enhancedDescription.toLowerCase().includes('color')) {
+        enhancedDescription += `. Overall story color palette: ${colorScheme}`;
+      }
+      
+      const enhancedPrompt = createIllustrationPrompt(
+        enhancedDescription,
+        artStyle,
+        characterDescription,
+        pageNumber,
+        totalPages,
+        page.mood,
+        page.narrativePurpose
+      );
+      
+      // Use similar seeds for consistency but with slight variation
+      const baseSeed = characterDescription ? characterDescription.length * 100 : 1000;
+      
+      console.log(`🖼️ Page ${pageNumber}/${totalPages}: Starting image generation...`);
+      
+      // Try Replicate first, fallback to Pollinations
+      let imageUrl = await generateImageWithReplicate({
         prompt: enhancedPrompt,
-        width: 512,
-        height: 512,
-        seed: baseSeed + (index * 10),
+        width: 1024,
+        height: 1024,
+        seed: baseSeed + (index * 10), // Small increments for consistency
         pageNumber,
         totalPages,
         mood: page.mood,
         narrativePurpose: page.narrativePurpose
       });
+      
+      // Fallback to Pollinations if Replicate fails
+      if (!imageUrl) {
+        console.log(`⚠️ Page ${pageNumber}: Replicate failed, falling back to Pollinations...`);
+        imageUrl = await generateImage({
+          prompt: enhancedPrompt,
+          width: 512,
+          height: 512,
+          seed: baseSeed + (index * 10),
+          pageNumber,
+          totalPages,
+          mood: page.mood,
+          narrativePurpose: page.narrativePurpose
+        });
+      }
+      
+      results.push(imageUrl);
+      
+      // Delay between pages to avoid Replicate rate limits (6 req/min = 10 sec between)
+      if (index < pages.length - 1) {
+        console.log(`⏳ Waiting 12 seconds before next image to avoid rate limit...`);
+        await new Promise(resolve => setTimeout(resolve, 12000)); // 12 second pause
+      }
+      
+    } catch (error) {
+      console.error(`❌ Page ${index + 1}: Error during generation:`, error);
+      results.push(null);
     }
-    
-    return imageUrl;
-  });
+  }
   
-  return Promise.all(imagePromises).then(urls => urls.filter(url => url !== null) as string[]);
+  console.log(`🎉 Image generation complete! ${results.filter(r => r !== null).length}/${totalPages} images ready`);
+  return results.filter(url => url !== null) as string[];
 };
 
 /**

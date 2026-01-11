@@ -84,6 +84,29 @@ function AppContent() {
         const isAuth = await checkAuth();
         console.log('🚀 Authentication check complete, isAuth:', isAuth);
         
+        // Auto-enable lazy loading on mobile if authenticated
+        if (isAuth) {
+          try {
+            const { Capacitor } = await import('@capacitor/core');
+            if (Capacitor.isNativePlatform()) {
+              const { useStoryStore } = await import('./stores/storyStore');
+              const storyStore = useStoryStore.getState();
+              
+              // Only enable if not already enabled
+              if (!storyStore.isLazyLoadingEnabled()) {
+                console.log('📱 Mobile device detected, enabling lazy loading...');
+                await storyStore.enableLazyLoading();
+                console.log('✅ Lazy loading enabled successfully!');
+              } else {
+                console.log('✅ Lazy loading already enabled');
+              }
+            }
+          } catch (error) {
+            console.error('❌ Failed to enable lazy loading:', error);
+            // Don't block app initialization if lazy loading fails
+          }
+        }
+        
         // If authenticated and on auth page or root, redirect based on account state
         if (isAuth && (location.pathname === '/auth' || location.pathname === '/')) {
           // Check if user was viewing as parent or child
