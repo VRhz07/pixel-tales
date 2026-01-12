@@ -355,6 +355,10 @@ EXAMPLE of good imagePrompt:
         const baseImageUrl = coverImageUrls[0];
         console.log('✅ Base cover illustration generated');
         
+        // Wait 12 seconds before generating page images to avoid rate limit
+        console.log('⏳ Waiting 12 seconds before generating page images...');
+        await new Promise(resolve => setTimeout(resolve, 12000));
+        
         // Create a canvas to add the title text overlay
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -518,60 +522,75 @@ EXAMPLE of good imagePrompt:
         console.log('✅ Detected default empty page - will replace it with first story page');
       }
       
-      for (let i = 0; i < totalPages; i++) {
-        const page = storyData.pages[i];
-        const progress = 35 + ((i + 1) / totalPages) * 60;
-        setGenerationProgress(progress);
-        setGenerationStage(`Creating illustration ${i + 1} of ${totalPages}...`);
-
-        try {
-          // Check if imagePrompt exists
-          if (!page.imagePrompt) {
-            console.error(`❌ No image prompt for page ${i + 1}. Page data:`, page);
-            throw new Error(`Missing imagePrompt for page ${i + 1}`);
+      // Generate ALL images at once with proper sequential processing and 12-second delays
+      setGenerationStage(`Generating all ${totalPages} illustrations with rate limit protection...`);
+      console.log(`🎨 Generating illustrations for all ${totalPages} pages with 12-second delays...`);
+      
+      try {
+        const imageUrls = await generateStoryIllustrationsFromPrompts(
+          storyData.pages.map((page, index) => ({
+            imagePrompt: page.imagePrompt,
+            pageNumber: index + 1
+          })),
+          storyData.characterDescription,
+          (current, total, message) => {
+            const progress = 35 + (current / total) * 60;
+            setGenerationProgress(progress);
+            setGenerationStage(message);
           }
+        );
+        
+        console.log(`✅ All images generated: ${imageUrls.length}/${totalPages}`);
+        
+        // Now save each page with its corresponding image
+        for (let i = 0; i < totalPages; i++) {
+          const page = storyData.pages[i];
+          const imageUrl = imageUrls[i];
           
-          console.log(`🎨 Generating illustration for page ${i + 1}/${totalPages}...`);
-          console.log(`   Prompt: ${page.imagePrompt.substring(0, 100)}...`);
-          
-          const imageUrls = await generateStoryIllustrationsFromPrompts(
-            [{ imagePrompt: page.imagePrompt, pageNumber: i + 1 }],
-            storyData.characterDescription
-          );
-          
-          const imageUrl = imageUrls[0];
-          
-          if (!imageUrl) {
-            console.error(`❌ No image URL returned for page ${i + 1}`);
-            throw new Error('Image generation returned null');
-          }
-          
-          console.log(`✅ Generated image for page ${i + 1}: ${imageUrl.substring(0, 60)}...`);
-          
-          // For the first page, update the existing empty page instead of adding new one
-          if (i === 0 && hasEmptyFirstPage && currentStory) {
-            console.log(`📝 Replacing empty page with Page ${i + 1} content`);
-            updatePage(newStory.id, currentStory.pages[0].id, {
-              text: page.text,
-              canvasData: imageUrl,
-              order: 0
-            });
+          if (imageUrl) {
+            console.log(`✅ Saving page ${i + 1} with image: ${imageUrl.substring(0, 60)}...`);
+            
+            // For the first page, update the existing empty page instead of adding new one
+            if (i === 0 && hasEmptyFirstPage && currentStory) {
+              console.log(`📝 Replacing empty page with Page ${i + 1} content`);
+              updatePage(newStory.id, currentStory.pages[0].id, {
+                text: page.text,
+                canvasData: imageUrl,
+                order: 0
+              });
+            } else {
+              // For subsequent pages, add new pages
+              console.log(`➕ Adding Page ${i + 1}`);
+              const newPage = addPage(newStory.id, page.text);
+              updatePage(newStory.id, newPage.id, {
+                canvasData: imageUrl,
+                order: i
+              });
+            }
           } else {
-            // For subsequent pages, add new pages
-            console.log(`➕ Adding Page ${i + 1}`);
-            const newPage = addPage(newStory.id, page.text);
-            updatePage(newStory.id, newPage.id, {
-              canvasData: imageUrl,
-              order: i
-            });
+            console.warn(`⚠️ No image for page ${i + 1}, adding text only`);
+            
+            if (i === 0 && hasEmptyFirstPage && currentStory) {
+              updatePage(newStory.id, currentStory.pages[0].id, {
+                text: page.text,
+                order: 0
+              });
+            } else {
+              const newPage = addPage(newStory.id, page.text);
+              updatePage(newStory.id, newPage.id, {
+                order: i
+              });
+            }
           }
+        }
+        
+      } catch (error) {
+        console.error(`❌ Error generating illustrations:`, error);
+        
+        // If image generation fails, add all pages with text only
+        for (let i = 0; i < totalPages; i++) {
+          const page = storyData.pages[i];
           
-          console.log(`✅ Page ${i + 1} saved successfully with image`);
-        } catch (error) {
-          console.error(`❌ Error generating illustration for page ${i + 1}:`, error);
-          console.error(`   Error details:`, error);
-          
-          // Same logic for error case - add page with text only
           if (i === 0 && hasEmptyFirstPage && currentStory) {
             console.log(`📝 Adding page ${i + 1} with text only (no image)`);
             updatePage(newStory.id, currentStory.pages[0].id, {

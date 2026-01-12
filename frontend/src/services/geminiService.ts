@@ -593,11 +593,24 @@ Respond with ONLY this JSON format:
       "narrativePurpose": "introduction/problem/action/climax/resolution",
       "mood": "happy/sad/exciting/calm/dramatic",
       "illustrationDescription": "Brief description of the scene",
-      "imagePrompt": "DETAILED text-to-image prompt with character description, action, environment, lighting, and art style",
+      "imagePrompt": "DETAILED TEXT-TO-IMAGE PROMPT: [Art style] illustration of [EXACT character description with all details from photo] [specific action/pose] in [detailed environment]. [Camera angle]. [Character position in frame]. [Detailed lighting]. Professional children's book illustration, detailed, high quality, vibrant colors, safe for children.",
       "text": "The story text for this page (1-3 sentences)"
     }
   ]
 }
+
+CRITICAL: Each page's imagePrompt MUST include ALL these elements:
+1. Art style at the start (${artStyle} style illustration)
+2. COMPLETE character description from photo with exact colors and features
+3. Specific action and pose
+4. Detailed environment with specific elements
+5. Camera angle explicitly stated (Wide shot/Medium close-up/Low angle/High angle/Side view)
+6. Character position in frame (lower right/centered/upper left/leaving space for text)
+7. Detailed lighting (e.g., "warm golden hour lighting filtering through trees casting long shadows" not just "good lighting")
+8. Quality keywords at the end: "Professional children's book illustration, detailed, high quality, vibrant colors, safe for children"
+
+Example for multi-character scene based on photo:
+"Watercolor illustration of a noble wild mustang with rich bay coat and flowing black mane standing on the LEFT side, and a small frightened deer with soft brown fur and white spots on the RIGHT side trapped under a fallen log, clearly separated by the log between them. Wide establishing shot in a forest clearing with both characters visible, mustang positioned in lower left, deer in lower right. Warm dappled sunlight filtering through dense canopy creating patches of light and shadow across the forest floor. Professional children's book illustration, detailed, high quality, vibrant colors, safe for children."
 
 IMPORTANT: The first page's imagePrompt should closely recreate the photo's composition and subjects, then subsequent pages continue the story with consistent characters and style.`;
 

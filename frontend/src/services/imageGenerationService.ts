@@ -420,6 +420,8 @@ export const generateStoryIllustrations = async (
       });
       
       // Fallback to Pollinations if Replicate fails
+      // TEMPORARILY DISABLED: Pollinations is making generation slower
+      /*
       if (!imageUrl) {
         console.log(`⚠️ Page ${pageNumber}: Replicate failed, falling back to Pollinations...`);
         imageUrl = await generateImage({
@@ -432,6 +434,11 @@ export const generateStoryIllustrations = async (
           mood: page.mood,
           narrativePurpose: page.narrativePurpose
         });
+      }
+      */
+      
+      if (!imageUrl) {
+        console.warn(`⚠️ Page ${pageNumber}: Replicate failed, skipping fallback for now`);
       }
       
       results.push(imageUrl);
@@ -651,6 +658,8 @@ export const generateStoryIllustrationsFromPrompts = async (
       });
       
       // Fallback to Pollinations if Replicate fails
+      // TEMPORARILY DISABLED: Pollinations is making generation slower
+      /*
       if (!imageUrl) {
         console.log(`⚠️ Page ${index + 1}: Replicate failed, falling back to Pollinations...`);
         imageUrl = await generateImage({
@@ -662,9 +671,10 @@ export const generateStoryIllustrationsFromPrompts = async (
           totalPages: pages.length
         });
       }
+      */
       
       if (!imageUrl) {
-        console.error(`❌ Page ${index + 1}: Failed to get image URL`);
+        console.error(`❌ Page ${index + 1}: Replicate failed, no fallback enabled`);
         results.push(null);
         continue;
       }
