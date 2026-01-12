@@ -306,6 +306,15 @@ function AppContent() {
           setCurrentInviteNotification(invite);
         } else {
           console.log('🔔 Skipping modal on disruptive page:', location.pathname);
+          // Show toast notification instead when on disruptive pages
+          showInviteToast(
+            invite.inviter_name,
+            invite.story_title,
+            () => {
+              // Navigate to social page when user clicks on the toast
+              navigate('/social');
+            }
+          );
         }
         
         // Show toast notification
