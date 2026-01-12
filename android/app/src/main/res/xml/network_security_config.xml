@@ -7,7 +7,15 @@
         </trust-anchors>
     </base-config>
     
-    <!-- Specifically allow local IP addresses for development -->
+    <!-- Production backend - DigitalOcean (HTTPS only) -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">ondigitalocean.app</domain>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+    
+    <!-- Local development IP addresses (HTTP allowed) -->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">localhost</domain>
         <domain includeSubdomains="true">10.0.2.2</domain>
