@@ -1,0 +1,29 @@
+name: pixel-tales-admin
+region: nyc
+
+static_sites:
+  - name: admin-dashboard
+    github:
+      repo: VRhz07/pixel-tales
+      branch: main
+      deploy_on_push: true
+    
+    source_dir: /frontend
+    
+    build_command: npm install && npm run build:admin
+    
+    output_dir: /frontend/dist-admin
+    
+    routes:
+      - path: /
+    
+    envs:
+      - key: VITE_API_BASE_URL
+        value: https://pixel-tales-yu7cx.ondigitalocean.app/api
+        scope: BUILD_TIME
+      
+      - key: VITE_ADMIN_ONLY
+        value: "true"
+        scope: BUILD_TIME
+    
+    catchall_document: index.html
