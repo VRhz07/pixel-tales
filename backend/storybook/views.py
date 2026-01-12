@@ -2645,9 +2645,20 @@ def get_parent_children(request):
 def get_teacher_students(request):
     """Get all students associated with teacher account"""
     try:
+        import traceback
+        
+        # Check if user has a profile
+        if not hasattr(request.user, 'profile'):
+            print(f"❌ User {request.user.id} ({request.user.username}) has no profile")
+            return Response({
+                'error': 'User profile not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
         user_profile = request.user.profile
+        print(f"✅ User {request.user.id} profile found, user_type: {user_profile.user_type}")
         
         if user_profile.user_type != 'teacher':
+            print(f"❌ User {request.user.id} is not a teacher, type: {user_profile.user_type}")
             return Response({
                 'error': 'Only teacher accounts can access this endpoint'
             }, status=status.HTTP_403_FORBIDDEN)
@@ -2682,14 +2693,19 @@ def get_teacher_students(request):
                 'date_added': rel.date_created.isoformat() if rel.date_created else None
             })
         
+        print(f"✅ Returning {len(students_data)} students for teacher {request.user.id}")
         return Response({
             'success': True,
             'students': students_data
         })
         
     except Exception as e:
+        import traceback
+        print(f"❌ Error in get_teacher_students: {str(e)}")
+        print(traceback.format_exc())
         return Response({
-            'error': str(e)
+            'error': str(e),
+            'details': 'Internal server error'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -3403,6 +3419,33 @@ def get_child_analytics(request, child_id):
         # Genre diversity
         genre_diversity = min((len(category_counts) / 5) * 100, 100)
         
+        # Calculate peak reading time from story read timestamps
+        from django.db.models import Count
+        from django.db.models.functions import ExtractHour
+        
+        peak_reading_time = 'Not enough data'
+        story_reads_with_time = StoryRead.objects.filter(user=child).select_related('story')
+        
+        if story_reads_with_time.exists():
+            # Group by hour and count reads
+            hour_counts = story_reads_with_time.annotate(
+                hour=ExtractHour('date_read')
+            ).values('hour').annotate(
+                count=Count('id')
+            ).order_by('-count')
+            
+            if hour_counts:
+                peak_hour = hour_counts[0]['hour']
+                # Convert to 12-hour format
+                if peak_hour == 0:
+                    peak_reading_time = '12:00 AM'
+                elif peak_hour < 12:
+                    peak_reading_time = f'{peak_hour}:00 AM'
+                elif peak_hour == 12:
+                    peak_reading_time = '12:00 PM'
+                else:
+                    peak_reading_time = f'{peak_hour - 12}:00 PM'
+        
         return Response({
             'success': True,
             'analytics': {
@@ -3412,7 +3455,7 @@ def get_child_analytics(request, child_id):
                 'categories': categories,
                 'favorite_genre': favorite_genre,
                 'favorite_genre_percentage': round(favorite_genre_pct, 1),
-                'peak_reading_time': '7:00 PM',  # Could be calculated from activity timestamps
+                'peak_reading_time': peak_reading_time,
                 'average_rating': round(avg_rating, 1),
                 'strengths': {
                     'reading_consistency': round(reading_consistency, 0),

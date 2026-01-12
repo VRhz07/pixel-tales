@@ -267,19 +267,26 @@
   --stats-card-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
   margin-bottom: 24px;
-  max-width: 520px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
-@media (min-width: 920px) {
-  .parent-stats-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    max-width: 980px;
-  }
+.dark .parent-stats-grid {
+  /* Grid styles only, no background needed */
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  min-height: 90px;
 }
 
 /* Children Grid - Student & Class Cards */
@@ -610,91 +617,14 @@
   color: rgba(255, 255, 255, 0.95);
 }
 
-.stat-card {
-  background: linear-gradient(145deg, 
-    rgba(248, 250, 252, 0.95) 0%, 
-    rgba(241, 245, 249, 0.9) 100%);
-  border: none;
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.04),
-    0 20px 25px -5px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+/* Duplicate stat-card definition removed - using the one above */
 
-  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 16px;
-  position: relative;
-  overflow: hidden;
-  min-height: 100px;
-}
-
-/* Icon-specific card backgrounds for better contrast */
-.stat-card:has([style*="61, 186, 184"]) {
-  background: linear-gradient(145deg, 
-    rgba(240, 253, 252, 0.9) 0%, 
-    rgba(204, 251, 241, 0.7) 100%);
-}
-
-.stat-card:has([style*="255, 154, 92"]) {
-  background: linear-gradient(145deg, 
-    rgba(255, 251, 235, 0.9) 0%, 
-    rgba(254, 215, 170, 0.7) 100%);
-}
-
-.stat-card:has([style*="95, 217, 158"]) {
-  background: linear-gradient(145deg, 
-    rgba(240, 253, 244, 0.9) 0%, 
-    rgba(187, 247, 208, 0.7) 100%);
-}
-
-.stat-card:has([style*="255, 217, 61"]) {
-  background: linear-gradient(145deg, 
-    rgba(254, 252, 232, 0.9) 0%, 
-    rgba(254, 240, 138, 0.7) 100%);
-}
-
-.stat-card:has([style*="139, 92, 246"]) {
-  background: linear-gradient(145deg, 
-    rgba(245, 243, 255, 0.9) 0%, 
-    rgba(221, 214, 254, 0.7) 100%);
-}
-
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, 
-    rgba(139, 92, 246, 0.7) 0%, 
-    rgba(61, 186, 184, 0.7) 50%, 
-    rgba(255, 154, 92, 0.7) 100%);
-  opacity: 1;
-  border-radius: 20px 20px 0 0;
-}
-
-.stat-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.06), transparent 70%);
-  opacity: 1;
-  pointer-events: none;
-  border-radius: 20px;
-}
+/* Simplified stat cards - removed decorative gradients */
 
 .dark .stat-card {
-  background: linear-gradient(145deg, #1e1b2e 0%, #151020 100%);
-  border: none;
-  box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.4),
-    0 20px 25px -5px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(139, 92, 246, 0.1);
+  background: #1a1830;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* Mobile-first: Use active state for touch interactions */
@@ -702,48 +632,14 @@
   transform: translateY(-2px) scale(0.98);
 }
 
-/* Desktop hover effects */
-@media (hover: hover) {
-  .stat-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 
-      0 10px 15px -3px rgba(0, 0, 0, 0.12),
-      0 25px 50px -12px rgba(139, 92, 246, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  }
-}
-
-/* Mobile-first: Active state for touch */
-.stat-card:active::before {
-  background: linear-gradient(90deg, 
-    rgba(139, 92, 246, 1) 0%, 
-    rgba(61, 186, 184, 1) 50%, 
-    rgba(255, 154, 92, 1) 100%);
-}
-
-.stat-card:active::after {
-  background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.12), transparent 60%);
-}
-
-/* Desktop hover effects */
-@media (hover: hover) {
-  .stat-card:hover::before {
-    background: linear-gradient(90deg, 
-      rgba(139, 92, 246, 1) 0%, 
-      rgba(61, 186, 184, 1) 50%, 
-      rgba(255, 154, 92, 1) 100%);
-  }
-
-  .stat-card:hover::after {
-    background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.12), transparent 60%);
-  }
+/* Simplified hover effects */
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .dark .stat-card:hover {
-  box-shadow: 
-    0 10px 15px -3px rgba(0, 0, 0, 0.5),
-    0 25px 50px -12px rgba(139, 92, 246, 0.25),
-    inset 0 1px 0 rgba(139, 92, 246, 0.15);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
 }
 
 .stat-card:focus-within {
@@ -760,22 +656,15 @@
 }
 
 .stat-card-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  font-size: 20px;
+  font-size: 18px;
   position: relative;
-  background: rgba(255, 255, 255, 0.95) !important;
-  border: 1px solid rgba(255, 255, 255, 0.6) !important;
-  box-shadow: 
-    0 8px 16px rgba(0, 0, 0, 0.06),
-    0 4px 6px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
 }
 
 /* Override inline background styles for better contrast */
@@ -911,8 +800,8 @@
 }
 
 .stat-card-icon svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   stroke-width: 2;
 }
 
@@ -925,14 +814,14 @@
 }
 
 .stat-card-label {
-  color: rgba(51, 65, 85, 0.9);
-  font-size: 13px;
-  font-weight: 700;
+  color: rgba(51, 65, 85, 0.7);
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
   margin: 0;
   line-height: 1.2;
-  letter-spacing: 0.08em;
-  transition: all 250ms ease;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
 }
 
 .dark .stat-card-label {
@@ -958,18 +847,16 @@ color: rgba(139, 92, 246, 0.9);
 
 .stat-card-value {
   color: #0f172a;
-  font-size: 32px;
-  font-weight: 900;
+  font-size: 24px;
+  font-weight: 700;
   line-height: 1;
-  margin: 8px 0 4px 0;
-  transition: all 250ms ease;
-  letter-spacing: -0.03em;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  margin: 4px 0 2px 0;
+  transition: all 0.2s ease;
+  letter-spacing: -0.02em;
 }
 
 .dark .stat-card-value {
   color: #ffffff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* Mobile-first: Active state */
@@ -990,21 +877,19 @@ color: rgba(139, 92, 246, 0.9);
 }
 
 .stat-card-change {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 600;
   margin: 0;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 12px;
   width: fit-content;
   border: 1px solid transparent;
   background: linear-gradient(135deg, rgba(241, 245, 249, 0.9), rgba(226, 232, 240, 0.8));
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  transition: all 250ms ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
 }
 
 .stat-card-change.positive {
@@ -1063,6 +948,266 @@ color: rgba(139, 92, 246, 0.9);
     inset 0 1px 0 rgba(139, 92, 246, 0.1);
 }
 
+/* ========== Engagement Insights ========== */
+.engagement-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.engagement-card {
+  border-radius: 10px;
+  padding: 16px;
+  color: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+}
+
+.engagement-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.engagement-card-teal {
+  background: linear-gradient(135deg, #3DBAB8 0%, #2da3a0 100%);
+}
+
+.engagement-card-orange {
+  background: linear-gradient(135deg, #FF9A5C 0%, #ff8142 100%);
+}
+
+.engagement-card-green {
+  background: linear-gradient(135deg, #5FD99E 0%, #4BC788 100%);
+}
+
+.engagement-card-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 8px;
+  opacity: 0.9;
+  flex-shrink: 0;
+  background: transparent !important;
+}
+
+.engagement-card-label {
+  font-size: 11px;
+  margin-bottom: 6px;
+  opacity: 0.9;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  background: transparent !important;
+}
+
+.engagement-card-value {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 4px 0;
+  line-height: 1.2;
+  background: transparent !important;
+}
+
+.engagement-card-description {
+  font-size: 11px;
+  margin-top: 4px;
+  opacity: 0.85;
+  line-height: 1.3;
+  background: transparent !important;
+}
+
+.dark .engagement-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark .engagement-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Ensure engagement cards keep their gradient backgrounds in dark mode */
+.dark .engagement-card-teal {
+  background: linear-gradient(135deg, #3DBAB8 0%, #2da3a0 100%) !important;
+}
+
+.dark .engagement-card-orange {
+  background: linear-gradient(135deg, #FF9A5C 0%, #ff8142 100%) !important;
+}
+
+.dark .engagement-card-green {
+  background: linear-gradient(135deg, #5FD99E 0%, #4BC788 100%) !important;
+}
+
+/* Ensure text remains white and readable */
+.dark .engagement-card {
+  color: white !important;
+}
+
+.dark .engagement-card-icon {
+  background: transparent !important;
+}
+
+.dark .engagement-card-label,
+.dark .engagement-card-value,
+.dark .engagement-card-description {
+  color: white !important;
+  opacity: 1 !important;
+  background: transparent !important;
+}
+
+.dark .engagement-card-label {
+  opacity: 0.95 !important;
+  background: transparent !important;
+}
+
+.dark .engagement-card-description {
+  opacity: 0.9 !important;
+  background: transparent !important;
+}
+
+/* Responsive engagement insights */
+@media (max-width: 1024px) {
+  .engagement-insights-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  
+  .engagement-card {
+    padding: 14px;
+    min-height: 100px;
+  }
+  
+  .engagement-card-icon {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .engagement-card-value {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .engagement-insights-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .engagement-card {
+    padding: 14px;
+    min-height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .engagement-card-icon {
+    width: 20px;
+    height: 20px;
+    margin-bottom: 0;
+  }
+  
+  .engagement-card-label {
+    font-size: 10px;
+    margin-bottom: 3px;
+  }
+  
+  .engagement-card-value {
+    font-size: 16px;
+    margin: 3px 0;
+  }
+  
+  .engagement-card-description {
+    font-size: 10px;
+  }
+}
+
+/* ========== Pie Chart ========== */
+.parent-pie-chart-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 20px;
+}
+
+.parent-pie-chart {
+  width: 250px;
+  height: 250px;
+  flex-shrink: 0;
+}
+
+.pie-slice {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.pie-slice:hover {
+  opacity: 0.8;
+  filter: brightness(1.1);
+}
+
+.pie-chart-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  flex: 1;
+  color: #334155;
+  font-weight: 500;
+}
+
+.dark .legend-label {
+  color: #e2e8f0;
+}
+
+.legend-value {
+  color: #64748b;
+  font-weight: 600;
+  min-width: 40px;
+  text-align: right;
+}
+
+.dark .legend-value {
+  color: #94a3b8;
+}
+
+/* Responsive Pie Chart */
+@media (max-width: 768px) {
+  .parent-pie-chart-container {
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .parent-pie-chart {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .pie-chart-legend {
+    width: 100%;
+  }
+}
+
 /* ========== Content Grid ========== */
 .parent-content-grid {
   display: grid;
@@ -1119,7 +1264,7 @@ color: rgba(139, 92, 246, 0.9);
 
 /* ========== Sections ========== */
 .parent-section {
-  background: #FFFFFF;
+  background: #FFFFFF !important;
   border-radius: 20px;
   padding: 28px;
   border: 1px solid #E8ECEF;
@@ -1148,7 +1293,7 @@ color: rgba(139, 92, 246, 0.9);
 }
 
 .dark .parent-section {
-  background: linear-gradient(135deg, rgba(21, 16, 32, 0.8) 0%, rgba(13, 10, 20, 0.8) 100%);
+  background: linear-gradient(135deg, rgba(21, 16, 32, 0.8) 0%, rgba(13, 10, 20, 0.8) 100%) !important;
   border: 1px solid rgba(139, 92, 246, 0.15);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
@@ -1169,6 +1314,7 @@ color: rgba(139, 92, 246, 0.9);
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  background: transparent !important;
 }
 
 .parent-section-title {
@@ -1182,10 +1328,12 @@ color: rgba(139, 92, 246, 0.9);
   display: flex;
   align-items: center;
   gap: 8px;
+  background: transparent !important;
 }
 
 .dark .parent-section-title {
   color: #f1f5f9;
+  background: transparent !important;
 }
 
 /* ========== Activity Cards ========== */
@@ -1641,7 +1789,8 @@ color: rgba(139, 92, 246, 0.9);
   }
 
   .parent-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    flex-wrap: wrap;
+    gap: 24px;
   }
 
   .parent-content-grid {
@@ -1690,13 +1839,13 @@ color: rgba(139, 92, 246, 0.9);
   }
 
   .parent-stats-grid {
-    gap: 10px;
-    max-width: 520px;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
   }
 
   .stat-card {
-    padding: 18px;
-    min-height: 95px;
+    min-height: 80px;
+    padding: 12px;
   }
 
   .stat-card-value {
@@ -1758,8 +1907,26 @@ color: rgba(139, 92, 246, 0.9);
   }
 
   .parent-stats-grid {
-    grid-template-columns: 1fr;
-    max-width: 520px;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  
+  .stat-card {
+    min-height: 75px;
+    padding: 10px;
+  }
+  
+  .stat-card-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .stat-card-value {
+    font-size: 20px;
+  }
+  
+  .stat-card-label {
+    font-size: 10px;
   }
 
   .activity-card {

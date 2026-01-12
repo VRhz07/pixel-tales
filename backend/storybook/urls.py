@@ -177,6 +177,14 @@ urlpatterns = [
     path('admin/announcement/', admin_features.send_announcement, name='send_announcement'),
     path('admin/export/', admin_features.export_data, name='export_data'),
     
+    # Admin endpoints - AI Services
+    path('admin/ai-services/', admin_views.get_ai_services_config, name='admin_ai_services'),
+    path('admin/ai-services/<str:service_name>/', admin_views.update_ai_service, name='admin_update_ai_service'),
+    
+    # Admin endpoints - Security & Audit
+    path('admin/audit-logs/', admin_views.get_security_audit_logs, name='admin_audit_logs'),
+    path('admin/audit-logs/export/', admin_views.export_audit_logs, name='admin_export_audit_logs'),
+    
     # Admin endpoints - Profanity Management
     path('admin/profanity/', admin_profanity.get_profanity_words, name='get_profanity_words'),
     path('admin/profanity/add/', admin_profanity.add_profanity_word, name='add_profanity_word'),

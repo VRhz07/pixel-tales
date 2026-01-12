@@ -6,14 +6,12 @@ import { useThemeStore } from '../stores/themeStore';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import DashboardStats from '../components/admin/DashboardStats';
 import UserManagement from '../components/admin/UserManagement';
-import ArchivedUserManagement from '../components/admin/ArchivedUserManagement';
 import UserViewEditModal from '../components/admin/UserViewEditModal';
 import AddRelationshipModal from '../components/admin/AddRelationshipModal';
 import EmptyState from '../components/admin/EmptyState';
 import AdminLoginPage from '../components/admin/AdminLoginPage';
 import ProfanityManagement from '../components/admin/ProfanityManagement';
 import SystemHealthDashboard from '../components/admin/SystemHealthDashboard';
-import BackupManagement from '../components/admin/BackupManagement';
 import MobileAppSettings from '../components/admin/MobileAppSettings';
 import AIServicesConfig from '../components/admin/AIServicesConfig';
 import SecurityAuditLogs from '../components/admin/SecurityAuditLogs';
@@ -25,7 +23,7 @@ import './AdminDashboardPage.css';
 export default function AdminDashboardPage() {
   const [adminUser, setAdminUser] = useState<any>(null);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'archived' | 'profanity' | 'system' | 'backups' | 'mobile' | 'ai-services' | 'security'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'profanity' | 'system' | 'ai-services' | 'security'>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<UserListItem[]>([]);
@@ -43,14 +41,17 @@ export default function AdminDashboardPage() {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [userTypeFilter, setUserTypeFilter] = useState<'all' | 'child' | 'parent' | 'teacher'>('all');
+  const [statusFilter, setStatusFilter] = useState<'active' | 'archived'>('active');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   
+  // Reset to page 1 when status filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter]);
+  
   // Archived users state
   const [archivedUsers, setArchivedUsers] = useState<any[]>([]);
-  const [archivedSearchQuery, setArchivedSearchQuery] = useState('');
-  const [archivedCurrentPage, setArchivedCurrentPage] = useState(1);
-  const [archivedTotalPages, setArchivedTotalPages] = useState(1);
   const [archiveReason, setArchiveReason] = useState('');
   const [userToArchive, setUserToArchive] = useState<{ id: number; username: string } | null>(null);
   
@@ -119,15 +120,13 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     if (isAdminAuthenticated && activeTab === 'users') {
-      loadUsers();
+      if (statusFilter === 'active') {
+        loadUsers();
+      } else {
+        loadArchivedUsers();
+      }
     }
-  }, [isAdminAuthenticated, activeTab, searchQuery, userTypeFilter, currentPage]);
-
-  useEffect(() => {
-    if (isAdminAuthenticated && activeTab === 'archived') {
-      loadArchivedUsers();
-    }
-  }, [isAdminAuthenticated, activeTab, archivedSearchQuery, archivedCurrentPage]);
+  }, [isAdminAuthenticated, activeTab, searchQuery, userTypeFilter, statusFilter, currentPage]);
 
   const loadDashboardStats = async () => {
     try {
@@ -196,13 +195,13 @@ export default function AdminDashboardPage() {
       setLoading(true);
       console.log('🔄 Loading archived users...');
       const { users: archivedData, pagination } = await adminService.getArchivedUsers(
-        archivedCurrentPage,
+        currentPage,
         20,
-        archivedSearchQuery || undefined
+        searchQuery || undefined
       );
       console.log('✅ Archived users loaded:', archivedData.length, 'users');
       setArchivedUsers(archivedData);
-      setArchivedTotalPages(pagination.total_pages);
+      setTotalPages(pagination.total_pages);
       setError(null);
     } catch (err: any) {
       console.error('❌ Error loading archived users:', err);
@@ -435,22 +434,24 @@ export default function AdminDashboardPage() {
         
         {activeTab === 'users' && (
           <>
-            {!loading && users.length > 0 && (
-              <UserManagement
-                users={users}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                userTypeFilter={userTypeFilter}
-                setUserTypeFilter={setUserTypeFilter}
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-                totalPages={totalPages}
-                onViewUser={handleViewUser}
-                onDeleteUser={handleDeleteUser}
-                onAddRelationship={() => setShowAddRelationship(true)}
-              />
-            )}
-            {!loading && users.length === 0 && !error && (
+            <UserManagement
+              users={users}
+              archivedUsers={archivedUsers}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              userTypeFilter={userTypeFilter}
+              setUserTypeFilter={setUserTypeFilter}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              totalPages={totalPages}
+              onViewUser={handleViewUser}
+              onDeleteUser={handleDeleteUser}
+              onRestoreUser={handleRestoreUser}
+              onAddRelationship={() => setShowAddRelationship(true)}
+            />
+            {!loading && statusFilter === 'active' && users.length === 0 && !error && (
               <EmptyState 
                 type="no-users" 
                 message={searchQuery ? 'No users match your search criteria.' : 'No users found in the system.'}
@@ -460,32 +461,12 @@ export default function AdminDashboardPage() {
           </>
         )}
 
-        {activeTab === 'archived' && (
-          <ArchivedUserManagement
-            users={archivedUsers}
-            searchQuery={archivedSearchQuery}
-            setSearchQuery={setArchivedSearchQuery}
-            currentPage={archivedCurrentPage}
-            setCurrentPage={setArchivedCurrentPage}
-            totalPages={archivedTotalPages}
-            onRestoreUser={handleRestoreUser}
-          />
-        )}
-
         {activeTab === 'profanity' && (
           <ProfanityManagement />
         )}
 
         {activeTab === 'system' && (
           <SystemHealthDashboard />
-        )}
-
-        {activeTab === 'backups' && (
-          <BackupManagement />
-        )}
-
-        {activeTab === 'mobile' && (
-          <MobileAppSettings />
         )}
 
         {activeTab === 'ai-services' && (
@@ -522,13 +503,6 @@ export default function AdminDashboardPage() {
             <span>Users</span>
           </button>
           <button
-            className={`admin-nav-item ${activeTab === 'archived' ? 'active' : ''}`}
-            onClick={() => setActiveTab('archived')}
-          >
-            <Archive />
-            <span>Archived</span>
-          </button>
-          <button
             className={`admin-nav-item ${activeTab === 'profanity' ? 'active' : ''}`}
             onClick={() => setActiveTab('profanity')}
           >
@@ -541,34 +515,6 @@ export default function AdminDashboardPage() {
           >
             <Server />
             <span>System</span>
-          </button>
-          <button
-            className={`admin-nav-item ${activeTab === 'backups' ? 'active' : ''}`}
-            onClick={() => setActiveTab('backups')}
-          >
-            <Database />
-            <span>Backups</span>
-          </button>
-          <button
-            className={`admin-nav-item ${activeTab === 'mobile' ? 'active' : ''}`}
-            onClick={() => setActiveTab('mobile')}
-          >
-            <Smartphone />
-            <span>Mobile</span>
-          </button>
-          <button
-            className={`admin-nav-item ${activeTab === 'ai-services' ? 'active' : ''}`}
-            onClick={() => setActiveTab('ai-services')}
-          >
-            <Zap />
-            <span>AI Services</span>
-          </button>
-          <button
-            className={`admin-nav-item ${activeTab === 'security' ? 'active' : ''}`}
-            onClick={() => setActiveTab('security')}
-          >
-            <Shield />
-            <span>Security</span>
           </button>
         </div>
       </nav>

@@ -90,6 +90,7 @@ const TeacherDashboardPage: React.FC = () => {
   const [selectedClass, setSelectedClass] = useState<TeacherClass | null>(null);
   const [availableStudents, setAvailableStudents] = useState<Student[]>([]);
   const [allStudents, setAllStudents] = useState<Student[]>([]);
+  const [studentSearchQuery, setStudentSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -292,6 +293,7 @@ const TeacherDashboardPage: React.FC = () => {
       if (response.ok) {
         setShowAddStudentModal(false);
         setSelectedClass(null);
+        setStudentSearchQuery(''); // Clear search query
         loadDashboardData();
       }
     } catch (error) {
@@ -349,7 +351,7 @@ const TeacherDashboardPage: React.FC = () => {
   }
 
   return (
-    <div className="teacher-dashboard">
+    <div className={`teacher-dashboard ${isDarkMode ? 'dark' : ''}`}>
       {/* Header */}
       <div className="teacher-top-bar">
         <div className="teacher-top-bar-content">
@@ -661,11 +663,6 @@ const TeacherDashboardPage: React.FC = () => {
                         <span className="stat-value">{student.stories_count}</span>
                         <span className="stat-label">Stories</span>
                       </div>
-                      <div className="stat-item">
-                        <ChartBarIcon className="stat-icon" />
-                        <span className="stat-value">Lvl {student.level}</span>
-                        <span className="stat-label">Level</span>
-                      </div>
                     </div>
                   </div>
                 ))}
@@ -694,8 +691,9 @@ const TeacherDashboardPage: React.FC = () => {
 
       {/* Add Class Modal */}
       {showAddClassModal && (
-        <div className="modal-overlay" onClick={() => setShowAddClassModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className={isDarkMode ? 'dark' : ''}>
+          <div className="modal-overlay" onClick={() => setShowAddClassModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="modal-title">Create New Class</h3>
               <button
@@ -781,13 +779,15 @@ const TeacherDashboardPage: React.FC = () => {
               </button>
             </div>
           </div>
+          </div>
         </div>
       )}
 
       {/* Add Student Modal */}
       {showAddStudentModal && selectedClass && (
-        <div className="modal-overlay" onClick={() => setShowAddStudentModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className={isDarkMode ? 'dark' : ''}>
+          <div className="modal-overlay" onClick={() => setShowAddStudentModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="modal-title">Add Student to {selectedClass.name}</h3>
               <button
@@ -799,20 +799,37 @@ const TeacherDashboardPage: React.FC = () => {
             </div>
 
             <div className="modal-body">
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label className="form-label">Search Students</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Search by name..."
+                  value={studentSearchQuery}
+                  onChange={(e) => setStudentSearchQuery(e.target.value)}
+                  style={{ width: '100%' }}
+                />
+              </div>
+
               <div className="students-list">
                 {availableStudents.length === 0 ? (
                   <p className="text-center text-gray-500 py-8">
                     No available students. All students are already in your classes.
                   </p>
                 ) : (
-                  availableStudents.map((student) => (
+                  availableStudents
+                    .filter(student => 
+                      studentSearchQuery === '' || 
+                      student.display_name.toLowerCase().includes(studentSearchQuery.toLowerCase())
+                    )
+                    .map((student) => (
                     <div key={student.id} className="student-item">
                       <div className="student-info">
                         <span className="text-2xl mr-3">{student.avatar_emoji}</span>
                         <div>
                           <p className="font-medium">{student.display_name}</p>
                           <p className="text-sm text-gray-500">
-                            Level {student.level} • {student.stories_count} stories
+                            {student.stories_count} stories
                           </p>
                         </div>
                       </div>
@@ -836,6 +853,7 @@ const TeacherDashboardPage: React.FC = () => {
                 Close
               </button>
             </div>
+          </div>
           </div>
         </div>
       )}
@@ -928,7 +946,7 @@ const TeacherDashboardPage: React.FC = () => {
                     fontSize: '16px', 
                     color: isDarkMode ? '#9ca3af' : '#6b7280'
                   }}>
-                    Level {viewingStudent.level} • {viewingStudent.experience_points} XP
+                    {viewingStudent.stories_count} {viewingStudent.stories_count === 1 ? 'story' : 'stories'} created
                   </p>
                 </div>
               </div>

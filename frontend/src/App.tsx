@@ -111,20 +111,20 @@ function AppContent() {
         if (isAuth && (location.pathname === '/auth' || location.pathname === '/')) {
           // Check if user was viewing as parent or child
           const { useAccountSwitchStore } = await import('./stores/accountSwitchStore');
-          const accountState = useAccountSwitchStore.getState();
           const { useAuthStore } = await import('./stores/authStore');
           const userType = useAuthStore.getState().user?.user_type;
           
+          // Always use userType from auth store as the source of truth
+          const hasParentSession = storage.getItemSync('parent_session');
+          
           console.log('🔐 Account state:', {
-            activeAccountType: accountState.activeAccountType,
             userType: userType,
-            hasParentSession: !!storage.getItemSync('parent_session')
+            hasParentSession: !!hasParentSession
           });
           
-          // Determine where to navigate based on account state
-          if (accountState.activeAccountType === 'teacher' || userType === 'teacher') {
+          // Determine where to navigate based on user type
+          if (userType === 'teacher') {
             // Teacher account
-            const hasParentSession = storage.getItemSync('parent_session');
             if (hasParentSession) {
               // Teacher was viewing a child account
               console.log('🚀 Teacher was viewing as child, redirecting to home (child view)...');
@@ -134,9 +134,8 @@ function AppContent() {
               console.log('🚀 Teacher account, redirecting to teacher dashboard...');
               navigate('/teacher-dashboard', { replace: true });
             }
-          } else if (accountState.activeAccountType === 'parent' || userType === 'parent') {
+          } else if (userType === 'parent') {
             // Parent account
-            const hasParentSession = storage.getItemSync('parent_session');
             if (hasParentSession) {
               // Parent was viewing a child account
               console.log('🚀 Parent was viewing as child, redirecting to home (child view)...');
@@ -664,14 +663,14 @@ function AppContent() {
           </ParentRoute>
         } />
         <Route path="/teacher-dashboard" element={
-          <ParentRoute>
+          <ProtectedRoute>
             <TeacherDashboardPage />
-          </ParentRoute>
+          </ProtectedRoute>
         } />
         <Route path="/teacher-settings" element={
-          <ParentRoute>
+          <ProtectedRoute>
             <TeacherSettingsPage />
-          </ParentRoute>
+          </ProtectedRoute>
         } />
         <Route path="/terms" element={<TermsOfServicePage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />

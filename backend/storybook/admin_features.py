@@ -506,14 +506,14 @@ def get_system_health(request):
     
     # Determine status
     if health_score >= 80:
-        status = 'healthy'
+        health_status = 'healthy'
     elif health_score >= 60:
-        status = 'warning'
+        health_status = 'warning'
     else:
-        status = 'critical'
+        health_status = 'critical'
     
     health_data = {
-        'status': status,
+        'status': health_status,
         'health_score': health_score,
         'timestamp': now.isoformat(),
         'server': {
@@ -549,35 +549,96 @@ def export_data(request):
     
     export_type = request.GET.get('type', 'users')  # 'users', 'stories', 'analytics'
     
-    # This would typically generate CSV or JSON files
-    # For now, return structured data
+    try:
+        if export_type == 'users':
+            users = User.objects.all().select_related('userprofile')
+            data = [{
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'date_joined': user.date_joined.isoformat() if user.date_joined else None,
+                'last_login': user.last_login.isoformat() if user.last_login else None,
+                'user_type': user.userprofile.user_type if hasattr(user, 'userprofile') else 'unknown',
+                'display_name': user.userprofile.display_name if hasattr(user, 'userprofile') else user.username,
+                'is_active': user.is_active,
+            } for user in users]
+        
+        elif export_type == 'stories':
+            stories = Story.objects.all().select_related('author').annotate(
+                total_likes=Count('like'),
+                total_comments=Count('comment'),
+                total_views=Count('storyread')
+            )
+            data = [{
+                'id': story.id,
+                'title': story.title,
+                'author': story.author.username if story.author else 'Unknown',
+                'author_id': story.author.id if story.author else None,
+                'is_published': story.is_published,
+                'date_created': story.date_created.isoformat() if story.date_created else None,
+                'date_updated': story.date_updated.isoformat() if story.date_updated else None,
+                'total_likes': story.total_likes,
+                'total_comments': story.total_comments,
+                'total_views': story.total_views,
+                'language': story.language if hasattr(story, 'language') else 'en',
+            } for story in stories]
+        
+        elif export_type == 'analytics':
+            # Platform-wide statistics
+            now = timezone.now()
+            last_7_days = now - timedelta(days=7)
+            last_30_days = now - timedelta(days=30)
+            
+            data = {
+                'export_date': now.isoformat(),
+                'users': {
+                    'total': User.objects.count(),
+                    'active': User.objects.filter(is_active=True).count(),
+                    'last_7_days': User.objects.filter(date_joined__gte=last_7_days).count(),
+                    'last_30_days': User.objects.filter(date_joined__gte=last_30_days).count(),
+                    'by_type': {
+                        'child': UserProfile.objects.filter(user_type='child').count(),
+                        'parent': UserProfile.objects.filter(user_type='parent').count(),
+                        'teacher': UserProfile.objects.filter(user_type='teacher').count(),
+                    }
+                },
+                'stories': {
+                    'total': Story.objects.count(),
+                    'published': Story.objects.filter(is_published=True).count(),
+                    'drafts': Story.objects.filter(is_published=False).count(),
+                    'last_7_days': Story.objects.filter(date_created__gte=last_7_days).count(),
+                    'last_30_days': Story.objects.filter(date_created__gte=last_30_days).count(),
+                },
+                'engagement': {
+                    'total_likes': Like.objects.count(),
+                    'total_comments': Comment.objects.count(),
+                    'total_saves': SavedStory.objects.count(),
+                    'total_reads': StoryRead.objects.count(),
+                    'likes_last_7_days': Like.objects.filter(date_created__gte=last_7_days).count(),
+                    'comments_last_7_days': Comment.objects.filter(date_created__gte=last_7_days).count(),
+                },
+                'social': {
+                    'total_friendships': Friendship.objects.filter(status='accepted').count(),
+                    'total_messages': Message.objects.count(),
+                }
+            }
+        
+        else:
+            data = []
+        
+        return Response({
+            'success': True,
+            'export_type': export_type,
+            'count': len(data) if isinstance(data, list) else 1,
+            'data': data
+        })
     
-    if export_type == 'users':
-        users = User.objects.all().select_related('userprofile')
-        data = [{
-            'id': user.id,
-            'username': user.username,
-            'email': user.email,
-            'date_joined': user.date_joined,
-            'user_type': user.userprofile.user_type if hasattr(user, 'userprofile') else 'unknown',
-        } for user in users]
-    
-    elif export_type == 'stories':
-        stories = Story.objects.all().select_related('author')
-        data = [{
-            'id': story.id,
-            'title': story.title,
-            'author': story.author.username,
-            'is_published': story.is_published,
-            'date_created': story.date_created,
-        } for story in stories]
-    
-    else:
-        data = []
-    
-    return Response({
-        'success': True,
-        'export_type': export_type,
-        'count': len(data),
-        'data': data
-    })
+    except Exception as e:
+        import traceback
+        print(f"❌ Export error: {str(e)}")
+        print(traceback.format_exc())
+        return Response({
+            'success': False,
+            'error': str(e),
+            'message': 'Failed to export data. Check server logs for details.'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

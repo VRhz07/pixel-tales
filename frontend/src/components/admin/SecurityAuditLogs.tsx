@@ -51,29 +51,69 @@ export default function SecurityAuditLogs() {
       setLoading(true);
       setError(null);
       
-      const [logsRes, summaryRes, suspiciousRes] = await Promise.all([
-        fetch('/api/admin/security/audit-logs/', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` },
-        }),
-        fetch('/api/admin/security/audit-summary/', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` },
-        }),
-        fetch('/api/admin/security/suspicious-activity/', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('admin_token')}` },
-        }),
-      ]);
+      // Fetch audit logs from our new endpoint
+      const logsRes = await fetch('http://localhost:8000/api/admin/audit-logs/', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+      });
       
-      if (!logsRes.ok || !summaryRes.ok || !suspiciousRes.ok) {
+      if (!logsRes.ok) {
         throw new Error('Failed to load security data');
       }
       
       const logsData = await logsRes.json();
-      const summaryData = await summaryRes.json();
-      const suspiciousData = await suspiciousRes.json();
       
-      setLogs(logsData.logs || []);
-      setSummary(summaryData.summary);
-      setSuspicious(suspiciousData.suspicious_patterns || []);
+      if (logsData.success) {
+        // Transform the data to match the expected format
+        const transformedLogs = logsData.logs.map((log: any) => ({
+          timestamp: log.timestamp,
+          admin_username: log.user,
+          admin_id: log.id,
+          action_type: log.action,
+          details: log.details,
+          target_user: log.resource,
+          target_model: log.resource,
+          target_id: log.id,
+        }));
+        
+        setLogs(transformedLogs);
+        
+        // Generate summary from logs
+        const actionTypes: Record<string, number> = {};
+        const adminActivity: Record<string, number> = {};
+        let last24hCount = 0;
+        const now = new Date();
+        
+        transformedLogs.forEach((log: any) => {
+          // Count action types
+          actionTypes[log.action_type] = (actionTypes[log.action_type] || 0) + 1;
+          
+          // Count admin activity
+          adminActivity[log.admin_username] = (adminActivity[log.admin_username] || 0) + 1;
+          
+          // Count last 24h
+          const logTime = new Date(log.timestamp);
+          if ((now.getTime() - logTime.getTime()) < 24 * 60 * 60 * 1000) {
+            last24hCount++;
+          }
+        });
+        
+        const mostActiveAdmin = Object.entries(adminActivity).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+        const mostCommonAction = Object.entries(actionTypes).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+        
+        setSummary({
+          total_actions: transformedLogs.length,
+          actions_last_24h: last24hCount,
+          action_types: actionTypes,
+          admin_activity: adminActivity,
+          most_active_admin: mostActiveAdmin,
+          most_common_action: mostCommonAction,
+        });
+        
+        // For now, no suspicious activity (can be enhanced later)
+        setSuspicious([]);
+      } else {
+        throw new Error(logsData.error || 'Failed to load logs');
+      }
     } catch (err: any) {
       setError(err.message);
       console.error('Error loading security data:', err);

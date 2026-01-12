@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Activity, Database, Cpu, HardDrive, Clock, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
+import { Activity, Database, Cpu, HardDrive, Clock, AlertTriangle, CheckCircle, RefreshCw, Download, Users, FileText, BarChart3 } from 'lucide-react';
 import { useThemeStore } from '../../stores/themeStore';
 import adminService from '../../services/admin.service';
 import './SystemHealthDashboard.css';
+import './BackupManagement.css';
 
 interface SystemHealth {
   status: 'healthy' | 'warning' | 'critical';
@@ -30,11 +31,7 @@ interface SystemHealth {
   };
 }
 
-interface SystemHealthDashboardProps {
-  onRefresh?: () => void;
-}
-
-export default function SystemHealthDashboard({ onRefresh }: SystemHealthDashboardProps) {
+export default function SystemHealthDashboard() {
   const [healthData, setHealthData] = useState<SystemHealth | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,255 +45,205 @@ export default function SystemHealthDashboard({ onRefresh }: SystemHealthDashboa
       setHealthData(data);
     } catch (err: any) {
       setError(err.message);
-      console.error('Error loading system health:', err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    // Load immediately
     loadHealthData();
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(loadHealthData, 30000);
-    return () => clearInterval(interval);
+    
+    // Then poll every 30 seconds for real-time updates
+    const pollInterval = setInterval(() => {
+      loadHealthData();
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(pollInterval);
   }, []);
 
+
   const formatBytes = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+    if (bytes === 0) return '0 Bytes';
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + ' ' + sizes[i];
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy':
-        return '#10b981';
-      case 'warning':
-        return '#f59e0b';
-      case 'critical':
-        return '#ef4444';
-      default:
-        return '#6b7280';
+      case 'healthy': return '#10b981';
+      case 'warning': return '#f59e0b';
+      case 'critical': return '#ef4444';
+      default: return '#6b7280';
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'healthy':
-        return <CheckCircle className="status-icon" />;
-      case 'warning':
-        return <AlertTriangle className="status-icon" />;
-      case 'critical':
-        return <AlertTriangle className="status-icon" />;
-      default:
-        return <Activity className="status-icon" />;
-    }
-  };
-
-  const getMetricStatus = (percent: number) => {
-    if (percent < 70) return 'healthy';
-    if (percent < 85) return 'warning';
-    return 'critical';
-  };
-
-  if (loading && !healthData) {
-    return (
-      <div className="system-health-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading system health...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="system-health-error">
-        <AlertTriangle />
-        <p>{error}</p>
-        <button onClick={loadHealthData} className="retry-button">
-          Retry
-        </button>
-      </div>
-    );
-  }
-
-  if (!healthData) return null;
 
   return (
     <div className="system-health-container">
-      {/* Overall Status Card */}
-      <div className="health-overview-card" style={{ borderColor: getStatusColor(healthData.status) }}>
-        <div className="health-overview-header">
-          <div className="health-status-badge" style={{ backgroundColor: getStatusColor(healthData.status) }}>
-            {getStatusIcon(healthData.status)}
-            <span>{healthData.status.toUpperCase()}</span>
-          </div>
-          <button onClick={loadHealthData} className="refresh-button" disabled={loading}>
-            <RefreshCw className={loading ? 'spinning' : ''} />
-            <span>Refresh</span>
-          </button>
+      {/* Error Message */}
+      {error && (
+        <div className="backup-alert backup-alert-error">
+          <AlertTriangle />
+          <span>{error}</span>
         </div>
-        
-        <div className="health-score-display">
-          <div className="health-score-circle" style={{ 
-            background: `conic-gradient(${getStatusColor(healthData.status)} ${healthData.health_score}%, ${theme === 'dark' ? '#374151' : '#e5e7eb'} 0)` 
-          }}>
-            <div className="health-score-inner">
-              <span className="health-score-value">{healthData.health_score}</span>
-              <span className="health-score-label">Health Score</span>
-            </div>
-          </div>
-        </div>
+      )}
 
-        <div className="health-timestamp">
-          <Clock size={14} />
-          <span>Last updated: {new Date(healthData.timestamp).toLocaleString()}</span>
-        </div>
+      {/* System Health Content */}
+      <div className="system-header">
+            <div className="system-header-content">
+              <div className="system-icon-wrapper">
+                <Activity />
+              </div>
+              <div>
+                <h2 className="system-title">System Health Monitor</h2>
+                <p className="system-subtitle">Real-time server and application metrics</p>
+              </div>
+            </div>
+            <button onClick={loadHealthData} className="refresh-button" disabled={loading}>
+              <RefreshCw className={loading ? 'spinning' : ''} />
+              <span>Refresh</span>
+            </button>
       </div>
 
-      {/* Server Resources */}
-      <div className="health-section">
-        <div className="health-section-header">
-          <Cpu />
-          <h3>Server Resources</h3>
-        </div>
-        
-        <div className="health-metrics-grid">
-          {/* CPU Usage */}
-          <div className="health-metric-card">
-            <div className="metric-header">
-              <span className="metric-label">CPU Usage</span>
-              <span className={`metric-status ${getMetricStatus(healthData.server.cpu_usage)}`}>
-                {healthData.server.cpu_usage.toFixed(1)}%
-              </span>
+      {loading && !healthData && (
+            <div className="loading-state">
+              <div className="spinner"></div>
+              <p>Loading system health data...</p>
             </div>
-            <div className="metric-progress-bar">
-              <div 
-                className={`metric-progress-fill ${getMetricStatus(healthData.server.cpu_usage)}`}
-                style={{ width: `${healthData.server.cpu_usage}%` }}
-              />
-            </div>
-          </div>
+      )}
 
-          {/* Memory Usage */}
-          <div className="health-metric-card">
-            <div className="metric-header">
-              <span className="metric-label">Memory Usage</span>
-              <span className={`metric-status ${getMetricStatus(healthData.server.memory_percent)}`}>
-                {healthData.server.memory_percent.toFixed(1)}%
-              </span>
-            </div>
-            <div className="metric-progress-bar">
-              <div 
-                className={`metric-progress-fill ${getMetricStatus(healthData.server.memory_percent)}`}
-                style={{ width: `${healthData.server.memory_percent}%` }}
-              />
-            </div>
-            <div className="metric-details">
-              {formatBytes(healthData.server.memory_used)} / {formatBytes(healthData.server.memory_total)}
-            </div>
-          </div>
+      {healthData && (
+            <>
+              {/* Health Score Card */}
+              <div className="health-score-card">
+                <div className="health-score-content">
+                  <div className="health-score-circle" style={{ 
+                    border: `8px solid ${getStatusColor(healthData.status)}`,
+                    boxShadow: `0 0 0 4px ${getStatusColor(healthData.status)}20`
+                  }}>
+                    <div className="health-score-inner">
+                      <span className="health-score-value">{healthData.health_score}</span>
+                      <span className="health-score-label">Score</span>
+                    </div>
+                  </div>
+                  <div className="health-status-info">
+                    <h3 style={{ color: getStatusColor(healthData.status) }}>
+                      {healthData.status.toUpperCase()}
+                    </h3>
+                    <p>System is {healthData.status === 'healthy' ? 'running smoothly' : 'experiencing issues'}</p>
+                    <p className="health-timestamp">
+                      <Clock size={14} />
+                      Last checked: {new Date(healthData.timestamp).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-          {/* Disk Usage */}
-          <div className="health-metric-card">
-            <div className="metric-header">
-              <span className="metric-label">Disk Usage</span>
-              <span className={`metric-status ${getMetricStatus(healthData.server.disk_percent)}`}>
-                {healthData.server.disk_percent.toFixed(1)}%
-              </span>
-            </div>
-            <div className="metric-progress-bar">
-              <div 
-                className={`metric-progress-fill ${getMetricStatus(healthData.server.disk_percent)}`}
-                style={{ width: `${healthData.server.disk_percent}%` }}
-              />
-            </div>
-            <div className="metric-details">
-              {formatBytes(healthData.server.disk_used)} / {formatBytes(healthData.server.disk_total)}
-            </div>
-          </div>
-        </div>
-      </div>
+              {/* Metrics Grid */}
+              <div className="metrics-grid">
+                {/* CPU */}
+                <div className="metric-card">
+                  <div className="metric-header">
+                    <Cpu className="metric-icon" style={{ color: '#3b82f6' }} />
+                    <h4>CPU Usage</h4>
+                  </div>
+                  <div className="metric-value">{healthData.server.cpu_usage.toFixed(1)}%</div>
+                  <div className="metric-bar">
+                    <div 
+                      className="metric-bar-fill" 
+                      style={{ 
+                        width: `${healthData.server.cpu_usage}%`,
+                        backgroundColor: healthData.server.cpu_usage > 70 ? '#ef4444' : '#3b82f6'
+                      }}
+                    />
+                  </div>
+                </div>
 
-      {/* Database Metrics */}
-      <div className="health-section">
-        <div className="health-section-header">
-          <Database />
-          <h3>Database Performance</h3>
-        </div>
-        
-        <div className="health-metrics-grid">
-          <div className="health-info-card">
-            <div className="info-icon">💾</div>
-            <div className="info-content">
-              <span className="info-label">Database Size</span>
-              <span className="info-value">{healthData.database.size}</span>
-            </div>
-          </div>
+                {/* Memory */}
+                <div className="metric-card">
+                  <div className="metric-header">
+                    <HardDrive className="metric-icon" style={{ color: '#8b5cf6' }} />
+                    <h4>Memory</h4>
+                  </div>
+                  <div className="metric-value">{healthData.server.memory_percent.toFixed(1)}%</div>
+                  <div className="metric-bar">
+                    <div 
+                      className="metric-bar-fill" 
+                      style={{ 
+                        width: `${healthData.server.memory_percent}%`,
+                        backgroundColor: healthData.server.memory_percent > 70 ? '#ef4444' : '#8b5cf6'
+                      }}
+                    />
+                  </div>
+                  <p className="metric-detail">
+                    {formatBytes(healthData.server.memory_used)} / {formatBytes(healthData.server.memory_total)}
+                  </p>
+                </div>
 
-          <div className="health-info-card">
-            <div className="info-icon">🔌</div>
-            <div className="info-content">
-              <span className="info-label">Active Connections</span>
-              <span className="info-value">{healthData.database.active_connections}</span>
-            </div>
-          </div>
+                {/* Disk */}
+                <div className="metric-card">
+                  <div className="metric-header">
+                    <Database className="metric-icon" style={{ color: '#10b981' }} />
+                    <h4>Disk Usage</h4>
+                  </div>
+                  <div className="metric-value">{healthData.server.disk_percent.toFixed(1)}%</div>
+                  <div className="metric-bar">
+                    <div 
+                      className="metric-bar-fill" 
+                      style={{ 
+                        width: `${healthData.server.disk_percent}%`,
+                        backgroundColor: healthData.server.disk_percent > 70 ? '#ef4444' : '#10b981'
+                      }}
+                    />
+                  </div>
+                  <p className="metric-detail">
+                    {formatBytes(healthData.server.disk_used)} / {formatBytes(healthData.server.disk_total)}
+                  </p>
+                </div>
+              </div>
 
-          <div className="health-info-card">
-            <div className="info-icon">⚡</div>
-            <div className="info-content">
-              <span className="info-label">Query Response Time</span>
-              <span className={`info-value ${healthData.database.query_response_time_ms > 100 ? 'warning' : 'success'}`}>
-                {healthData.database.query_response_time_ms.toFixed(2)} ms
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+              {/* Application Info */}
+              <div className="info-grid">
+                <div className="info-card">
+                  <h4>Database</h4>
+                  <div className="info-item">
+                    <span>Size:</span>
+                    <strong>{healthData.database.size}</strong>
+                  </div>
+                  <div className="info-item">
+                    <span>Active Connections:</span>
+                    <strong>{healthData.database.active_connections}</strong>
+                  </div>
+                  <div className="info-item">
+                    <span>Query Response:</span>
+                    <strong>{healthData.database.query_response_time_ms}ms</strong>
+                  </div>
+                </div>
 
-      {/* Application Info */}
-      <div className="health-section">
-        <div className="health-section-header">
-          <Activity />
-          <h3>Application Status</h3>
-        </div>
-        
-        <div className="health-metrics-grid">
-          <div className="health-info-card">
-            <div className="info-icon">👥</div>
-            <div className="info-content">
-              <span className="info-label">Total Users</span>
-              <span className="info-value">{healthData.application.total_users.toLocaleString()}</span>
-            </div>
+                <div className="info-card">
+                  <h4>Application</h4>
+                  <div className="info-item">
+                    <span>Total Users:</span>
+                    <strong>{healthData.application.total_users.toLocaleString()}</strong>
+                  </div>
+                  <div className="info-item">
+                    <span>Total Stories:</span>
+                    <strong>{healthData.application.total_stories.toLocaleString()}</strong>
+                  </div>
+                  <div className="info-item">
+                    <span>Django:</span>
+                    <strong>v{healthData.application.django_version}</strong>
+                  </div>
+                  <div className="info-item">
+                    <span>Python:</span>
+                    <strong>v{healthData.application.python_version}</strong>
+                  </div>
+                </div>
           </div>
-
-          <div className="health-info-card">
-            <div className="info-icon">📚</div>
-            <div className="info-content">
-              <span className="info-label">Total Stories</span>
-              <span className="info-value">{healthData.application.total_stories.toLocaleString()}</span>
-            </div>
-          </div>
-
-          <div className="health-info-card">
-            <div className="info-icon">🐍</div>
-            <div className="info-content">
-              <span className="info-label">Python Version</span>
-              <span className="info-value">{healthData.application.python_version}</span>
-            </div>
-          </div>
-
-          <div className="health-info-card">
-            <div className="info-icon">🎸</div>
-            <div className="info-content">
-              <span className="info-label">Django Version</span>
-              <span className="info-value">{healthData.application.django_version}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

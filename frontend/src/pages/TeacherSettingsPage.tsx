@@ -62,7 +62,11 @@ const TeacherSettingsPage: React.FC = () => {
 
   // Manage children state
   const [children, setChildren] = useState<Child[]>([]);
+  const [classes, setClasses] = useState<any[]>([]);
+  const [expandedClassId, setExpandedClassId] = useState<number | null>(null);
+  const [classStudents, setClassStudents] = useState<{ [key: number]: any[] }>({});
   const [loadingChildren, setLoadingChildren] = useState(false);
+  const [loadingClasses, setLoadingClasses] = useState(false);
   const [showAddChildModal, setShowAddChildModal] = useState(false);
   const [showEditChildModal, setShowEditChildModal] = useState(false);
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
@@ -272,10 +276,154 @@ const TeacherSettingsPage: React.FC = () => {
     setDeleteError('');
   };
 
-  // Load children when settings page loads
+  // Load children and classes when settings page loads
   useEffect(() => {
     loadChildren();
+    loadClasses();
   }, []);
+
+  const loadClasses = async () => {
+    try {
+      setLoadingClasses(true);
+      console.log('🔄 Loading classes...');
+      const token = localStorage.getItem('access_token'); // Use access_token like dashboard
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      
+      const response = await fetch(`${baseUrl}/teacher/classes/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      console.log('📡 Response status:', response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('📊 Classes data received:', data);
+        
+        // Handle both array and object responses (same as TeacherDashboardPage)
+        let allClasses = [];
+        if (Array.isArray(data)) {
+          allClasses = data;
+        } else if (data.results) {
+          // Paginated response
+          allClasses = data.results;
+        } else if (data.classes) {
+          // Object with classes property
+          allClasses = data.classes;
+        }
+        
+        console.log('📝 Number of classes:', allClasses.length);
+        console.log('📋 First class structure:', allClasses[0]);
+        console.log('👥 Students in first class:', allClasses[0]?.students);
+        setClasses(allClasses);
+      } else {
+        console.error('❌ Failed to load classes:', response.statusText);
+        setClasses([]);
+      }
+    } catch (error) {
+      console.error('❌ Error loading classes:', error);
+      setClasses([]);
+    } finally {
+      setLoadingClasses(false);
+    }
+  };
+
+  const handleToggleClass = async (classId: number) => {
+    if (expandedClassId === classId) {
+      // Collapse if already expanded
+      setExpandedClassId(null);
+    } else {
+      // Expand and load students
+      setExpandedClassId(classId);
+      await loadClassStudents(classId);
+    }
+  };
+
+  const loadClassStudents = async (classId: number) => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      
+      const response = await fetch(`${baseUrl}/teacher/classes/${classId}/students/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setClassStudents(prev => ({
+          ...prev,
+          [classId]: data.students || []
+        }));
+      }
+    } catch (error) {
+      console.error('Error loading class students:', error);
+    }
+  };
+
+  const handleRemoveStudentFromClass = async (classId: number, studentId: number) => {
+    if (!confirm('Are you sure you want to remove this student from the class?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('access_token');
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      
+      const response = await fetch(`${baseUrl}/teacher/classes/${classId}/students/${studentId}/`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        // Reload class students and class list
+        await loadClassStudents(classId);
+        await loadClasses();
+      } else {
+        alert('Failed to remove student from class');
+      }
+    } catch (error) {
+      console.error('Error removing student:', error);
+      alert('Failed to remove student from class');
+    }
+  };
+
+  const handleDeleteClass = async (classId: number, className: string) => {
+    if (!confirm(`Are you sure you want to delete the class "${className}"? This will remove all students from the class but won't delete their profiles.`)) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('access_token');
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      
+      const response = await fetch(`${baseUrl}/teacher/classes/${classId}/`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        // Close expanded class if it was open
+        if (expandedClassId === classId) {
+          setExpandedClassId(null);
+        }
+        // Reload classes list
+        await loadClasses();
+        alert('Class deleted successfully');
+      } else {
+        alert('Failed to delete class');
+      }
+    } catch (error) {
+      console.error('Error deleting class:', error);
+      alert('Failed to delete class');
+    }
+  };
 
   const loadChildren = async () => {
     try {
@@ -462,7 +610,7 @@ const TeacherSettingsPage: React.FC = () => {
                 onClick={() => setActiveSection('children')}
               >
                 <UserGroupIcon />
-                <span>Manage Students</span>
+                <span>Manage Classes</span>
               </button>
               <button
                 className={`parent-settings-nav-item ${activeSection === 'notifications' ? 'active' : ''}`}
@@ -482,88 +630,276 @@ const TeacherSettingsPage: React.FC = () => {
 
             {/* Content Area */}
             <div className="parent-settings-content">
-              {/* Manage Students Section */}
+              {/* Manage Classes Section */}
               {activeSection === 'children' && (
                 <div className="parent-settings-section">
                   <div className="section-header">
-                    <h2>Manage Students</h2>
+                    <h2>Manage Classes & Students</h2>
                     <p className="section-description">
-                      Add, edit, or remove student profiles from your account
+                      Organize your students into classes and manage their profiles
                     </p>
                   </div>
 
-                  {/* Add Student Button */}
-                  <div className="manage-children-actions">
-                    <button 
-                      className="btn-add-child-settings"
-                      onClick={handleOpenAddStudentModal}
-                    >
-                      <PlusIcon style={{ width: '20px', height: '20px' }} />
-                      <span>Add Existing Child Profile</span>
-                    </button>
+                  {/* Class Management Info */}
+                  <div style={{
+                    padding: '16px',
+                    background: theme === 'dark' ? 'rgba(139, 92, 246, 0.1)' : '#f3f4f6',
+                    borderRadius: '12px',
+                    marginBottom: '24px',
+                    border: `1px solid ${theme === 'dark' ? 'rgba(139, 92, 246, 0.2)' : '#e5e7eb'}`
+                  }}>
+                    <p style={{
+                      margin: 0,
+                      fontSize: '14px',
+                      color: theme === 'dark' ? '#d1d5db' : '#6b7280'
+                    }}>
+                      💡 <strong>Quick Tip:</strong> Go to your Teacher Dashboard to create classes, add students to classes, and view detailed analytics. This section shows all your students across all classes.
+                    </p>
                   </div>
 
-                  {/* Students List */}
-                  {loadingChildren ? (
-                    <div className="loading-children">
-                      <p>Loading students...</p>
-                    </div>
-                  ) : children.length === 0 ? (
-                    <div className="empty-children-state">
-                      <UserGroupIcon style={{ width: '64px', height: '64px', opacity: 0.3 }} />
-                      <h3>No Students Added Yet</h3>
-                      <p>Click the "Add Existing Child Profile" button above to add your first student</p>
-                    </div>
-                  ) : (
-                    <div className="children-management-grid">
-                      {children.map((child) => (
-                        <div key={child.id} className="child-management-card">
-                          <div className="child-card-header">
-                            <div className="child-avatar-large">
-                              {child.avatar || '👤'}
-                            </div>
-                            <div className="child-details">
-                              <h3>{child.name}</h3>
-                              <p className="child-username">@{child.username}</p>
-                              {child.email && <p className="child-email">{child.email}</p>}
-                            </div>
-                          </div>
+                  {/* Classes List */}
+                  <div style={{ marginBottom: '32px' }}>
+                    <h3 style={{ 
+                      fontSize: '18px', 
+                      fontWeight: '600',
+                      marginBottom: '16px',
+                      color: theme === 'dark' ? '#e2e8f0' : '#1f2937'
+                    }}>
+                      Your Classes
+                    </h3>
+                    {loadingClasses ? (
+                      <div className="loading-children">
+                        <p>Loading classes...</p>
+                      </div>
+                    ) : classes.length === 0 ? (
+                      <div style={{
+                        padding: '24px',
+                        textAlign: 'center',
+                        background: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f9fafb',
+                        borderRadius: '12px',
+                        border: `1px dashed ${theme === 'dark' ? 'rgba(139, 92, 246, 0.3)' : '#d1d5db'}`
+                      }}>
+                        <p style={{ margin: 0, color: theme === 'dark' ? '#9ca3af' : '#6b7280' }}>
+                          No classes created yet. Go to Teacher Dashboard to create your first class.
+                        </p>
+                      </div>
+                    ) : (
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '12px'
+                      }}>
+                        {classes.map((classItem) => {
+                          const isExpanded = expandedClassId === classItem.id;
+                          const students = classStudents[classItem.id] || [];
+                          
+                          return (
+                            <div key={classItem.id} style={{
+                              background: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'white',
+                              border: `1px solid ${theme === 'dark' ? 'rgba(139, 92, 246, 0.2)' : '#e5e7eb'}`,
+                              borderRadius: '12px',
+                              overflow: 'hidden',
+                              transition: 'all 0.2s ease'
+                            }}>
+                              {/* Class Header - Clickable */}
+                              <div style={{
+                                padding: '20px',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                gap: '16px'
+                              }}>
+                                <div 
+                                  onClick={() => handleToggleClass(classItem.id)}
+                                  style={{
+                                    flex: 1,
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    transition: 'opacity 0.2s ease'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.opacity = '0.8';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.opacity = '1';
+                                  }}
+                                >
+                                  <div style={{ flex: 1 }}>
+                                    <h4 style={{
+                                      margin: '0 0 4px 0',
+                                      fontSize: '16px',
+                                      fontWeight: '600',
+                                      color: theme === 'dark' ? '#e2e8f0' : '#1f2937'
+                                    }}>
+                                      {classItem.name}
+                                    </h4>
+                                    {classItem.description && (
+                                      <p style={{
+                                        margin: '0 0 8px 0',
+                                        fontSize: '14px',
+                                        color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                                        lineHeight: '1.4'
+                                      }}>
+                                        {classItem.description}
+                                      </p>
+                                    )}
+                                    <div style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '8px',
+                                      fontSize: '14px',
+                                      color: theme === 'dark' ? '#a78bfa' : '#7c3aed'
+                                    }}>
+                                      <UserGroupIcon style={{ width: '16px', height: '16px' }} />
+                                      <span>{classItem.student_count || 0} {classItem.student_count === 1 ? 'student' : 'students'}</span>
+                                    </div>
+                                  </div>
+                                  <div style={{
+                                    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                                    transition: 'transform 0.2s ease',
+                                    color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+                                  }}>
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                    </svg>
+                                  </div>
+                                </div>
+                                
+                                {/* Delete Class Button */}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteClass(classItem.id, classItem.name);
+                                  }}
+                                  style={{
+                                    padding: '8px 12px',
+                                    fontSize: '13px',
+                                    background: 'transparent',
+                                    border: `1px solid ${theme === 'dark' ? 'rgba(239, 68, 68, 0.3)' : '#fecaca'}`,
+                                    color: '#ef4444',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    flexShrink: 0
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+                                    e.currentTarget.style.borderColor = '#ef4444';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'transparent';
+                                    e.currentTarget.style.borderColor = theme === 'dark' ? 'rgba(239, 68, 68, 0.3)' : '#fecaca';
+                                  }}
+                                >
+                                  <TrashIcon style={{ width: '14px', height: '14px' }} />
+                                  <span>Delete</span>
+                                </button>
+                              </div>
 
-                          <div className="child-stats-row">
-                            <div className="child-stat">
-                              <span className="stat-value">{child.total_stories || 0}</span>
-                              <span className="stat-label">Stories</span>
+                              {/* Students List - Expandable */}
+                              {isExpanded && (
+                                <div style={{
+                                  padding: '0 20px 20px 20px',
+                                  borderTop: `1px solid ${theme === 'dark' ? 'rgba(139, 92, 246, 0.1)' : '#f3f4f6'}`
+                                }}>
+                                  {students.length === 0 ? (
+                                    <p style={{
+                                      margin: '16px 0 0 0',
+                                      padding: '16px',
+                                      textAlign: 'center',
+                                      fontSize: '14px',
+                                      color: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                                      background: theme === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#f9fafb',
+                                      borderRadius: '8px'
+                                    }}>
+                                      No students in this class yet
+                                    </p>
+                                  ) : (
+                                    <div style={{
+                                      marginTop: '16px',
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      gap: '8px'
+                                    }}>
+                                      {students.map((student: any) => (
+                                        <div key={student.id} style={{
+                                          padding: '12px',
+                                          background: theme === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#f9fafb',
+                                          borderRadius: '8px',
+                                          display: 'flex',
+                                          justifyContent: 'space-between',
+                                          alignItems: 'center'
+                                        }}>
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <div style={{
+                                              width: '32px',
+                                              height: '32px',
+                                              borderRadius: '50%',
+                                              background: theme === 'dark' ? 'rgba(139, 92, 246, 0.2)' : '#e0e7ff',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              fontSize: '16px'
+                                            }}>
+                                              {student.avatar_emoji || '👤'}
+                                            </div>
+                                            <div>
+                                              <p style={{
+                                                margin: 0,
+                                                fontSize: '14px',
+                                                fontWeight: '600',
+                                                color: theme === 'dark' ? '#e2e8f0' : '#1f2937'
+                                              }}>
+                                                {student.display_name}
+                                              </p>
+                                              <p style={{
+                                                margin: 0,
+                                                fontSize: '12px',
+                                                color: theme === 'dark' ? '#9ca3af' : '#6b7280'
+                                              }}>
+                                                {student.stories_count || 0} stories
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <button
+                                            onClick={() => handleRemoveStudentFromClass(classItem.id, student.id)}
+                                            style={{
+                                              padding: '6px 12px',
+                                              fontSize: '12px',
+                                              background: 'transparent',
+                                              border: `1px solid ${theme === 'dark' ? 'rgba(239, 68, 68, 0.3)' : '#fecaca'}`,
+                                              color: '#ef4444',
+                                              borderRadius: '6px',
+                                              cursor: 'pointer',
+                                              transition: 'all 0.2s ease'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                              e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                              e.currentTarget.style.background = 'transparent';
+                                            }}
+                                          >
+                                            Remove
+                                          </button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
-                            <div className="child-stat">
-                              <span className="stat-value">{child.achievements_count || 0}</span>
-                              <span className="stat-label">Achievements</span>
-                            </div>
-                            <div className="child-stat">
-                              <span className="stat-value">{child.total_reads || 0}</span>
-                              <span className="stat-label">Read</span>
-                            </div>
-                          </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
 
-                          <div className="child-actions">
-                            <button
-                              className="btn-edit-child"
-                              onClick={() => handleEditChild(child)}
-                            >
-                              <PencilIcon style={{ width: '16px', height: '16px' }} />
-                              <span>Edit</span>
-                            </button>
-                            <button
-                              className="btn-delete-child"
-                              onClick={() => handleDeleteChild(child)}
-                            >
-                              <TrashIcon style={{ width: '16px', height: '16px' }} />
-                              <span>Delete</span>
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               )}
 

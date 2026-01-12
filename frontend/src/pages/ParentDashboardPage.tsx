@@ -174,6 +174,16 @@ const ParentDashboardPage: React.FC = () => {
   const { language, t } = useI18nStore();
   const { counts, fetchNotificationCounts } = useNotificationStore();
   const { setActiveAccount, clearActiveAccount } = useAccountSwitchStore();
+  
+  // GUARD: Redirect teachers to teacher dashboard immediately
+  const userType = user?.profile?.user_type || user?.user_type;
+  useEffect(() => {
+    if (userType === 'teacher') {
+      console.log('⚠️ Teacher detected in ParentDashboardPage - redirecting to /teacher-dashboard');
+      navigate('/teacher-dashboard', { replace: true });
+    }
+  }, [userType, navigate]);
+  
   const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'activity'>('overview');
   const [activitySubTab, setActivitySubTab] = useState<'notifications' | 'library'>('notifications');
   const [children, setChildren] = useState<Child[]>([]);
@@ -331,10 +341,10 @@ const ParentDashboardPage: React.FC = () => {
       // Load immediately
       loadChildData(selectedChild.id);
       
-      // Then poll every 10 seconds for real-time updates
+      // Then poll every 5 seconds for real-time updates
       const pollInterval = setInterval(() => {
         loadChildData(selectedChild.id);
-      }, 10000); // 10 seconds
+      }, 5000); // 5 seconds for real-time feel
       
       return () => clearInterval(pollInterval);
     }
@@ -485,6 +495,21 @@ const ParentDashboardPage: React.FC = () => {
   useEffect(() => {
     if ((activeTab === 'analytics' || activeTab === 'overview') && selectedChild && !analytics) {
       loadAnalytics(selectedChild.id);
+    }
+  }, [activeTab, selectedChild]);
+
+  // Real-time polling for engagement insights when on overview tab
+  useEffect(() => {
+    if (activeTab === 'overview' && selectedChild) {
+      // Load immediately
+      loadAnalytics(selectedChild.id);
+      
+      // Then poll every 15 seconds for real-time updates
+      const pollInterval = setInterval(() => {
+        loadAnalytics(selectedChild.id);
+      }, 15000); // 15 seconds
+      
+      return () => clearInterval(pollInterval);
     }
   }, [activeTab, selectedChild]);
 
@@ -845,49 +870,30 @@ const ParentDashboardPage: React.FC = () => {
                     <div className="parent-section-header">
                       <h2 className="parent-section-title">💡 Engagement Insights</h2>
                     </div>
-                    <div style={{ 
-                      display: 'grid', 
-                      gridTemplateColumns: 'repeat(3, 1fr)', 
-                      gap: '16px' 
-                    }}>
-                      <div style={{
-                        background: 'linear-gradient(135deg, #3DBAB8 0%, #2da3a0 100%)',
-                        borderRadius: '12px',
-                        padding: '20px',
-                        color: 'white'
-                      }}>
-                        <HeartIcon style={{ width: '32px', height: '32px', marginBottom: '12px', opacity: 0.9 }} />
-                        <h4 style={{ fontSize: '14px', marginBottom: '8px', opacity: 0.9 }}>Favorite Genre</h4>
-                        <p style={{ fontSize: '20px', fontWeight: '700' }}>{analytics?.favorite_genre || 'N/A'}</p>
-                        <p style={{ fontSize: '12px', marginTop: '4px', opacity: 0.8 }}>
+                    <div className="engagement-insights-grid">
+                      <div className="engagement-card engagement-card-teal">
+                        <HeartIcon className="engagement-card-icon" />
+                        <h4 className="engagement-card-label">Favorite Genre</h4>
+                        <p className="engagement-card-value">{analytics?.favorite_genre || 'N/A'}</p>
+                        <p className="engagement-card-description">
                           {analytics?.favorite_genre_percentage ? `${analytics.favorite_genre_percentage}% of all reads` : 'No data yet'}
                         </p>
                       </div>
                       
-                      <div style={{
-                        background: 'linear-gradient(135deg, #FF9A5C 0%, #ff8142 100%)',
-                        borderRadius: '12px',
-                        padding: '20px',
-                        color: 'white'
-                      }}>
-                        <ClockIcon style={{ width: '32px', height: '32px', marginBottom: '12px', opacity: 0.9 }} />
-                        <h4 style={{ fontSize: '14px', marginBottom: '8px', opacity: 0.9 }}>Peak Reading Time</h4>
-                        <p style={{ fontSize: '20px', fontWeight: '700' }}>{analytics?.peak_reading_time || 'N/A'}</p>
-                        <p style={{ fontSize: '12px', marginTop: '4px', opacity: 0.8 }}>Best engagement</p>
+                      <div className="engagement-card engagement-card-orange">
+                        <ClockIcon className="engagement-card-icon" />
+                        <h4 className="engagement-card-label">Peak Reading Time</h4>
+                        <p className="engagement-card-value">{analytics?.peak_reading_time || 'N/A'}</p>
+                        <p className="engagement-card-description">Best engagement</p>
                       </div>
                       
-                      <div style={{
-                        background: 'linear-gradient(135deg, #5FD99E 0%, #4BC788 100%)',
-                        borderRadius: '12px',
-                        padding: '20px',
-                        color: 'white'
-                      }}>
-                        <StarIcon style={{ width: '32px', height: '32px', marginBottom: '12px', opacity: 0.9 }} />
-                        <h4 style={{ fontSize: '14px', marginBottom: '8px', opacity: 0.9 }}>Average Rating</h4>
-                        <p style={{ fontSize: '20px', fontWeight: '700' }}>
+                      <div className="engagement-card engagement-card-green">
+                        <StarIcon className="engagement-card-icon" />
+                        <h4 className="engagement-card-label">Average Rating</h4>
+                        <p className="engagement-card-value">
                           {analytics?.average_rating ? `${analytics.average_rating} / 5` : 'N/A'}
                         </p>
-                        <p style={{ fontSize: '12px', marginTop: '4px', opacity: 0.8 }}>
+                        <p className="engagement-card-description">
                           {analytics?.average_rating && analytics.average_rating >= 4 ? 'Great satisfaction!' : 'Keep improving!'}
                         </p>
                       </div>
@@ -1059,36 +1065,83 @@ const ParentDashboardPage: React.FC = () => {
                       </div>
                     </section>
 
-                    {/* Category Breakdown */}
+                    {/* Category Breakdown with Pie Chart */}
                     <section className="parent-section">
                       <div className="parent-section-header">
-                        <h2 className="parent-section-title">📊 Reading Categories</h2>
+                        <h2 className="parent-section-title">📊 Category Distribution</h2>
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        {(analytics?.categories && analytics.categories.length > 0 ? analytics.categories.slice(0, 4) : [
-                          { category: 'No data yet', count: 0, percentage: 0 }
-                        ]).map((cat, index) => {
-                          const colors = ['#3DBAB8', '#764ba2', '#FF9A5C', '#5FD99E'];
-                          const color = colors[index % colors.length];
-                          return (
-                          <div key={index} className="analytics-card category-card">
-                            <div className="category-header">
-                              <span className="category-name">
-                                {cat.category}
-                              </span>
-                              <span className="category-count" style={{ color: color }}>
-                                {cat.count} stories ({cat.percentage}%)
-                              </span>
-                            </div>
-                            <div className="category-progress-bar">
-                              <div className="category-progress-fill" style={{
-                                width: `${cat.percentage}%`,
-                                background: color
-                              }}></div>
-                            </div>
-                          </div>
-                        );
-                        })}
+                      
+                      {/* Pie Chart */}
+                      <div className="parent-pie-chart-container">
+                        <svg viewBox="0 0 200 200" className="parent-pie-chart">
+                          {(() => {
+                            const categories = analytics?.categories && analytics.categories.length > 0 
+                              ? analytics.categories.slice(0, 4) 
+                              : [{ category: 'No data', count: 1, percentage: 100 }];
+                            
+                            const colors = ['#3DBAB8', '#764ba2', '#FF9A5C', '#5FD99E'];
+                            let currentAngle = 0;
+                            
+                            return categories.map((cat, index) => {
+                              const percentage = cat.percentage;
+                              const angle = (percentage / 100) * 360;
+                              const startAngle = currentAngle;
+                              const endAngle = currentAngle + angle;
+                              currentAngle = endAngle;
+                              
+                              // Calculate path for pie slice
+                              const startRad = (startAngle - 90) * (Math.PI / 180);
+                              const endRad = (endAngle - 90) * (Math.PI / 180);
+                              const radius = 80;
+                              const centerX = 100;
+                              const centerY = 100;
+                              
+                              const x1 = centerX + radius * Math.cos(startRad);
+                              const y1 = centerY + radius * Math.sin(startRad);
+                              const x2 = centerX + radius * Math.cos(endRad);
+                              const y2 = centerY + radius * Math.sin(endRad);
+                              
+                              const largeArc = angle > 180 ? 1 : 0;
+                              
+                              const pathData = [
+                                `M ${centerX} ${centerY}`,
+                                `L ${x1} ${y1}`,
+                                `A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}`,
+                                'Z'
+                              ].join(' ');
+                              
+                              return (
+                                <path
+                                  key={index}
+                                  d={pathData}
+                                  fill={colors[index % colors.length]}
+                                  stroke="white"
+                                  strokeWidth="2"
+                                  className="pie-slice"
+                                >
+                                  <title>{`${cat.category}: ${cat.percentage}%`}</title>
+                                </path>
+                              );
+                            });
+                          })()}
+                        </svg>
+                        
+                        {/* Legend */}
+                        <div className="pie-chart-legend">
+                          {(analytics?.categories && analytics.categories.length > 0 ? analytics.categories.slice(0, 4) : [
+                            { category: 'No data yet', count: 0, percentage: 0 }
+                          ]).map((cat, index) => {
+                            const colors = ['#3DBAB8', '#764ba2', '#FF9A5C', '#5FD99E'];
+                            const color = colors[index % colors.length];
+                            return (
+                              <div key={index} className="legend-item">
+                                <div className="legend-color" style={{ backgroundColor: color }}></div>
+                                <span className="legend-label">{cat.category}</span>
+                                <span className="legend-value">{cat.percentage}%</span>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     </section>
                   </div>
