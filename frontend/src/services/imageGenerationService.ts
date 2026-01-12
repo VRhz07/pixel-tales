@@ -637,6 +637,11 @@ export const generateStoryIllustrationsFromPrompts = async (
       results.push(null);
       continue;
     }
+
+    if (index > 0) {
+      console.log(`⏳ Waiting 12 seconds before requesting page ${index + 1} to avoid rate limit...`);
+      await new Promise(resolve => setTimeout(resolve, 12000));
+    }
     
     try {
       console.log(`🖼️ Page ${index + 1}/${pages.length}: Starting image generation...`);
