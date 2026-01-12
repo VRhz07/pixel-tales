@@ -9,6 +9,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // This creates a separate build optimized for the admin dashboard only
 export default defineConfig({
   plugins: [react()],
+  // Set base path for assets when deployed to subdirectory
+  base: '/pixel-tales-frontend/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
