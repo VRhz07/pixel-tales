@@ -46,19 +46,17 @@ const DeveloperModeModal: React.FC<DeveloperModeModalProps> = ({ isOpen, onClose
 
   const handleSave = () => {
     try {
-      if (selectedPreset === 'production') {
-        apiConfigService.resetToDefault();
-      } else {
-        const urlToSave = selectedPreset === 'custom' ? customUrl : 
-          API_PRESETS.find(p => p.id === selectedPreset)?.url || customUrl;
-        
-        if (!urlToSave) {
-          alert('Please enter a valid URL');
-          return;
-        }
-        
-        apiConfigService.setApiUrl(urlToSave);
+      // Get the URL to save based on selected preset
+      const urlToSave = selectedPreset === 'custom' ? customUrl : 
+        API_PRESETS.find(p => p.id === selectedPreset)?.url || customUrl;
+      
+      if (!urlToSave) {
+        alert('Please enter a valid URL');
+        return;
       }
+      
+      // Always save the URL (even for production preset)
+      apiConfigService.setApiUrl(urlToSave);
       
       alert('API URL updated! Please restart the app for changes to take effect.');
       onClose();
