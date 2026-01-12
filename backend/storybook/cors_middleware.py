@@ -14,12 +14,17 @@ class CorsPreflightMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # If it's an OPTIONS request, return 200 OK with CORS headers
-        # The CorsMiddleware will add the proper CORS headers
+        # If it's an OPTIONS request, let it pass through to get CORS headers
+        # but don't require authentication
         if request.method == 'OPTIONS':
             from django.http import HttpResponse
             response = HttpResponse()
             response.status_code = 200
+            # Manually add CORS headers since we're returning early
+            response['Access-Control-Allow-Origin'] = '*'
+            response['Access-Control-Allow-Methods'] = 'DELETE, GET, OPTIONS, PATCH, POST, PUT'
+            response['Access-Control-Allow-Headers'] = 'accept, accept-encoding, authorization, content-type, dnt, origin, user-agent, x-csrftoken, x-requested-with'
+            response['Access-Control-Max-Age'] = '86400'
             return response
         
         response = self.get_response(request)
