@@ -296,8 +296,17 @@ function AppContent() {
           });
         }
         
-        // Show beautiful in-app notification modal
-        setCurrentInviteNotification(invite);
+        // Only show in-app notification modal if NOT on certain pages where it would be disruptive
+        // User can still see the invite in Social tab or via toast notification
+        const disruptivePages = ['/games', '/games/play/', '/story/', '/canvas-drawing', '/cover-canvas', '/create-story-manual'];
+        const isOnDisruptivePage = disruptivePages.some(path => location.pathname.startsWith(path));
+        
+        if (!isOnDisruptivePage) {
+          // Show beautiful in-app notification modal
+          setCurrentInviteNotification(invite);
+        } else {
+          console.log('🔔 Skipping modal on disruptive page:', location.pathname);
+        }
         
         // Show toast notification
         showInviteToast(
