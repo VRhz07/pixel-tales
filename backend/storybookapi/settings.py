@@ -97,9 +97,9 @@ elif DATABASE_URL:
     # PostgreSQL or other database URL
     db_config = dj_database_url.parse(DATABASE_URL, conn_max_age=0)
     
-    # ULTRA AGGRESSIVE memory optimization for Render free tier with WebSockets
-    db_config['CONN_MAX_AGE'] = 30  # 30 seconds only (minimal pooling)
-    db_config['CONN_HEALTH_CHECKS'] = True
+    # Close connections immediately to avoid exhausting DigitalOcean connection limit
+    db_config['CONN_MAX_AGE'] = 0  # Close connections immediately (no pooling)
+    db_config['CONN_HEALTH_CHECKS'] = False  # Disable health checks
     
     # Add PostgreSQL-specific optimizations
     if 'postgres' in DATABASE_URL:
@@ -107,8 +107,8 @@ elif DATABASE_URL:
             'connect_timeout': 10,
             'options': '-c statement_timeout=30000',
         }
-        # Minimal connection pooling
-        db_config['CONN_MAX_AGE'] = 30
+        # No connection pooling - close immediately
+        db_config['CONN_MAX_AGE'] = 0
     
     DATABASES = {
         'default': db_config
