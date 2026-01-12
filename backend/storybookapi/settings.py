@@ -217,6 +217,31 @@ else:
 
 CORS_ALLOW_CREDENTIALS = True
 
+# Explicit CORS settings to ensure headers are sent
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Preflight request cache (24 hours)
+CORS_PREFLIGHT_MAX_AGE = 86400
+
 # Google AI API
 GOOGLE_AI_API_KEY = os.getenv('GOOGLE_AI_API_KEY')
 
