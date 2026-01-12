@@ -201,11 +201,18 @@ CORS_ALLOWED_ORIGINS = [
     'http://26.163.247.72:3001',
     'https://pixeltales-admin.onrender.com',
     'https://pixeltales-backend.onrender.com',
-          
+    'https://pixel-tales-yu7cx.ondigitalocean.app',  # DigitalOcean production
+    'capacitor://localhost',  # Capacitor mobile app
+    'ionic://localhost',  # Ionic mobile app
+    'http://localhost',  # Mobile app without port
 ]
 
-# Allow all origins in development (for mobile testing)
+# Allow all origins in development OR for mobile app compatibility
 if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    # In production, allow all origins for mobile app (Capacitor uses dynamic origins)
+    # This is safe because authentication is handled via JWT tokens
     CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_CREDENTIALS = True
@@ -302,11 +309,20 @@ if RENDER:
     # CSRF settings for Render
     CSRF_TRUSTED_ORIGINS = [
         f'https://{RENDER_EXTERNAL_HOSTNAME}' if RENDER_EXTERNAL_HOSTNAME else '',
-        'https://pixeltales-admin.onrender.com','https://pixeltales-backend.onrender.com',
-
+        'https://pixeltales-admin.onrender.com',
+        'https://pixeltales-backend.onrender.com',
+        'https://pixel-tales-yu7cx.ondigitalocean.app',
     ]
     # Filter out empty strings
     CSRF_TRUSTED_ORIGINS = [origin for origin in CSRF_TRUSTED_ORIGINS if origin]
+
+# DigitalOcean specific settings
+DIGITALOCEAN = os.getenv('DIGITALOCEAN', 'False').lower() == 'true'
+if DIGITALOCEAN or not DEBUG:
+    # Ensure DigitalOcean URL is in CSRF trusted origins
+    if 'https://pixel-tales-yu7cx.ondigitalocean.app' not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS = getattr(locals(), 'CSRF_TRUSTED_ORIGINS', [])
+        CSRF_TRUSTED_ORIGINS.append('https://pixel-tales-yu7cx.ondigitalocean.app')
 
 # Logging Configuration
 # Memory-efficient logging for production

@@ -29,7 +29,7 @@ class ApiService {
     
     this.axiosInstance = axios.create({
       baseURL: baseURL,
-      timeout: 5000, // 5 seconds - faster offline detection
+      timeout: 30000, // 30 seconds - allow for slower mobile/production connections
       headers: {
         'Content-Type': 'application/json',
       },
@@ -159,8 +159,12 @@ class ApiService {
     }
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/refresh/`, {
+      // Use the current base URL, not the hardcoded one
+      const baseURL = this.axiosInstance.defaults.baseURL || API_BASE_URL;
+      const response = await axios.post(`${baseURL}/auth/refresh/`, {
         refresh_token: refreshToken,
+      }, {
+        timeout: 30000, // 30 seconds timeout for refresh
       });
 
       const { access_token, refresh_token: newRefreshToken } = response.data;
