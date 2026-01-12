@@ -517,6 +517,33 @@ const ManualStoryCreationPage: React.FC = () => {
     return () => clearInterval(syncInterval);
   }, [isCollaborating, currentSessionId]);
 
+  // Force immediate participant sync when collaboration starts (FIX #2)
+  useEffect(() => {
+    if (isCollaborating && currentSessionId && participants.length === 0) {
+      console.log('🔄 Force fetching participants on collaboration start');
+      collaborationService.getPresence(currentSessionId)
+        .then(data => {
+          console.log('✅ Force-fetched participants:', data.participants?.length);
+          setParticipants(data.participants || []);
+        })
+        .catch(err => console.error('❌ Failed to force-fetch participants:', err));
+    }
+  }, [isCollaborating, currentSessionId]);
+
+  // Safety timeout for lobby - auto-close after 30 seconds (FIX #3)
+  useEffect(() => {
+    if (showLobby && currentSessionId) {
+      const lobbyTimeout = setTimeout(() => {
+        console.warn('⚠️ Lobby timeout - force closing lobby');
+        setShowLobby(false);
+        setIsCollaborating(true);
+        showInfoToast('Session started! Loading...');
+      }, 30000); // 30 seconds
+
+      return () => clearTimeout(lobbyTimeout);
+    }
+  }, [showLobby, currentSessionId]);
+
   // WebSocket connection and event handlers for collaboration (stabilized)
   useEffect(() => {
 
