@@ -307,16 +307,36 @@ CACHES = {
     }
 }
 
-# Channels Configuration - ULTRA MINIMAL for free tier
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-        'CONFIG': {
-            'capacity': 50,  # REDUCED: Only 50 messages in memory
-            'expiry': 30,  # REDUCED: Messages expire after 30 seconds
+# Channels Configuration
+# Use Redis for production (multi-process support)
+# Use InMemory for local development
+REDIS_URL = os.getenv('REDIS_URL')
+
+if REDIS_URL and not DEBUG:
+    # Production: Use Redis for multi-process WebSocket support
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                "hosts": [REDIS_URL],
+                "capacity": 300,  # Messages per channel
+                "expiry": 60,  # Message expiry in seconds
+            },
         },
-    },
-}
+    }
+    print("✅ Using Redis for Channels (Production)")
+else:
+    # Local development: Use InMemory
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',
+            'CONFIG': {
+                'capacity': 50,  # Only 50 messages in memory
+                'expiry': 30,  # Messages expire after 30 seconds
+            },
+        },
+    }
+    print("⚠️ Using InMemory Channels (Development only - not for production)")
 
 # ASGI application timeout settings for memory efficiency
 ASGI_APPLICATION = 'storybookapi.asgi.application'
