@@ -448,9 +448,17 @@ Make sure EVERY page's imagePrompt:
         warnings.push('Cover image failed to generate');
       }
       
+      // CRITICAL: Wait 12 seconds after cover generation before generating page 1
+      // This prevents rate limiting issues with the image generation service
+      console.log('⏳ Waiting 12 seconds to prevent rate limiting...');
+      setGenerationStage('⏳ Waiting to prevent rate limits...');
+      setGenerationProgress(50);
+      await new Promise(resolve => setTimeout(resolve, 12000));
+      console.log('✅ Wait complete, proceeding with page illustrations');
+      
       // Stage 3: Generate page illustrations using Gemini's detailed image prompts
       // NEW STRATEGY: Generate URLs immediately, let images load in the story viewer
-      setGenerationStage('?? Preparing illustrations (will load in viewer)...');
+      setGenerationStage('🖼️ Preparing illustrations (will load in viewer)...');
       setGenerationProgress(60);
       
       console.log('========================================');
