@@ -4,7 +4,7 @@
  */
 
 const STORAGE_KEY = 'dev_api_url';
-const DEFAULT_API_URL = import.meta.env.VITE_API_BASE_URL || 'https://pixeltales-backend.onrender.com/api';
+const DEFAULT_API_URL = import.meta.env.VITE_API_BASE_URL || 'https://pixel-tales-yu7cx.ondigitalocean.app/api'; 
 
 export interface ApiPreset {
   id: string;
@@ -18,8 +18,8 @@ export const API_PRESETS: ApiPreset[] = [
   {
     id: 'production',
     name: 'Production Server',
-    url: 'https://pixeltales-backend.onrender.com/api',
-    description: 'Live production backend',
+    url: 'https://pixel-tales-yu7cx.ondigitalocean.app/api',
+    description: 'Live DigitalOcean backend',
     icon: '🌐'
   },
   {
