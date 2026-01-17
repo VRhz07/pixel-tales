@@ -167,10 +167,12 @@ export function censorProfanity(text: string): string {
  * Gets a warning message based on detected profanity
  */
 export function getProfanityWarning(text: string): string | null {
-  if (!containsProfanity(text)) return null;
+  if (!containsProfanitySync(text)) return null;
   
   const profaneWords = findProfanity(text);
   const count = profaneWords.length;
+  
+  if (count === 0) return null; // Don't show warning if no words found
   
   if (count === 1) {
     return 'Inappropriate language detected and censored';
@@ -186,9 +188,9 @@ export function validateAndCensor(text: string): {
   hasProfanity: boolean;
   warning: string | null;
 } {
-  const hasProfanity = containsProfanity(text);
+  const hasProfanity = containsProfanitySync(text);
   const censored = hasProfanity ? censorProfanity(text) : text;
-  const warning = getProfanityWarning(text);
+  const warning = hasProfanity ? getProfanityWarning(text) : null;
   
   return {
     censored,
