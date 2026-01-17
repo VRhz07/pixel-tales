@@ -101,6 +101,7 @@ const ManualStoryCreationPage: React.FC = () => {
   const [showLeaveConfirmModal, setShowLeaveConfirmModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   
+  
   // Real-time canvas activity tracking
   const [canvasActivity, setCanvasActivity] = useState<Map<string, { timestamp: number, user: string }>>(new Map());
   
@@ -530,15 +531,15 @@ const ManualStoryCreationPage: React.FC = () => {
     }
   }, [isCollaborating, currentSessionId]);
 
-  // Safety timeout for lobby - auto-close after 30 seconds (FIX #3)
+  // Safety timeout for lobby - auto-close after 10 seconds (IMPROVED)
   useEffect(() => {
     if (showLobby && currentSessionId) {
       const lobbyTimeout = setTimeout(() => {
-        console.warn('⚠️ Lobby timeout - force closing lobby');
+        console.warn('⚠️ Lobby timeout - force closing lobby and starting collaboration');
         setShowLobby(false);
         setIsCollaborating(true);
-        showInfoToast('Session started! Loading...');
-      }, 30000); // 30 seconds
+        showInfoToast('Starting collaboration...');
+      }, 10000); // 10 seconds (reduced from 30)
 
       return () => clearTimeout(lobbyTimeout);
     }
@@ -573,12 +574,22 @@ const ManualStoryCreationPage: React.FC = () => {
             setCurrentUserId(message.current_user_id);
           }
           
+      // CRITICAL FIX: Create story FIRST before processing any data
+      // This prevents "Loading story..." screen for participants joining via invite/notification
+      const draft = message.story_draft || {};
+      if (!currentStory && !hasCreatedStory.current) {
+        const newStory = createStory(draft.title || 'Collaborative Story');
+        setStoryTitle(newStory.title);
+        setCurrentStory(newStory);
+        hasCreatedStory.current = true;
+      }
+          
       // Load participants from init message or fetch them
           if (message.participants && Array.isArray(message.participants)) {
-            console.log('👥 Setting participants from init message:', message.participants.length);
+            console.log('📥 Setting participants from init message:', message.participants.length);
             setParticipants(message.participants);
           } else {
-            console.log('📡 Fetching participants via getPresence()');
+            console.log('🔍 Fetching participants via getPresence()');
             // Fetch participants separately if not in init message
             setTimeout(() => {
               if (currentSessionId) {
@@ -592,7 +603,6 @@ const ManualStoryCreationPage: React.FC = () => {
             }, 500);
           }
 
-          const draft = message.story_draft || {};
           const canvasData = message.canvas_data || {};
           
           if (draft.title) {
@@ -603,9 +613,12 @@ const ManualStoryCreationPage: React.FC = () => {
               updateStory(currentStory.id, { title: draft.title });
             } else {
               // If no story exists yet locally, create one with the server title
+              // This should rarely happen since we now create stories before connecting
+              console.log('⚠️ Creating story from init message (unexpected path)');
               const newStory = createStory(draft.title);
               setStoryTitle(newStory.title);
               setCurrentStory(newStory);
+              hasCreatedStory.current = true;
             }
           }
 
@@ -1824,7 +1837,6 @@ const ManualStoryCreationPage: React.FC = () => {
       }
       
       // Always create a fresh story for new collaboration session BEFORE setting isCollaborating
-      console.log('Creating fresh story for new collaboration session');
       const story = createStory(titleFromSession);
       setStoryTitle(story.title);
       setCurrentStory(story);
@@ -1841,15 +1853,14 @@ const ManualStoryCreationPage: React.FC = () => {
       // Set isCollaborating AFTER story is created
       setIsCollaborating(true);
       
-      // Broadcast session start to all participants waiting in lobby
-      const token = localStorage.getItem('access_token');
-      fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/${sessionId}/start/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }).catch(err => console.error('Failed to broadcast session start:', err));
+      // Broadcast session start via WebSocket (reliable method)
+      if (collaborationService.isConnected()) {
+        console.log('📡 Broadcasting session start via WebSocket');
+        collaborationService.sendMessage({
+          type: 'session_started',
+          session_id: sessionId
+        });
+      }
       
       console.log('✅ Host session started, now collaborating');
     } catch (err) {
@@ -1912,18 +1923,16 @@ const ManualStoryCreationPage: React.FC = () => {
         sessionAlreadyStarted
       });
       
+      // CRITICAL FIX: Always create story immediately for participants to prevent "Loading story..." screen
+      if (!currentStory && !hasCreatedStory.current) {
+        const newStory = createStory(sessionData.story_title || 'Collaborative Story');
+        setStoryTitle(newStory.title);
+        setCurrentStory(newStory);
+        hasCreatedStory.current = true;
+      }
+      
       if (sessionAlreadyStarted) {
-        console.log('✅ Session already started - bypassing lobby and joining directly');
-        
-        // Create story if needed
-        if (!currentStory && !hasCreatedStory.current) {
-      console.log('Creating new story for participant joining active session');
-          const newStory = createStory(sessionData.story_title || 'Collaborative Story');
-      setStoryTitle(newStory.title);
-          setCurrentStory(newStory);
-          hasCreatedStory.current = true;
-        }
-        
+        console.log('✅ Session already started - joining directly (no lobby)');
         // Go directly to collaboration page
         setShowLobby(false);
         setIsCollaborating(true);
@@ -1993,16 +2002,13 @@ const ManualStoryCreationPage: React.FC = () => {
     setShowLobby(false);
     setIsCollaborating(true);
     
-    // Broadcast session start to all participants
-    if (currentSessionId) {
-      const token = localStorage.getItem('access_token');
-      fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/${currentSessionId}/start/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }).catch(err => console.error('Failed to broadcast session start:', err));
+    // Broadcast session start via WebSocket (reliable method)
+    if (currentSessionId && collaborationService.isConnected()) {
+      console.log('📡 Broadcasting session start via WebSocket');
+      collaborationService.sendMessage({
+        type: 'session_started',
+        session_id: currentSessionId
+      });
     }
     
     console.log('✅ handleStartCollaboration complete');
@@ -2624,6 +2630,38 @@ const ManualStoryCreationPage: React.FC = () => {
     return () => clearInterval(interval);
   }, [hasUnsavedChanges, currentStory, storyTitle, updateStory]);
   
+  // APK FIX: Sync store story to component state in useEffect to avoid race condition
+  // This prevents setState during render which causes flash on slower devices (mobile APK)
+  // MUST be before any early returns to avoid "Rendered fewer hooks than expected" error
+  useEffect(() => {
+    const storeStory = useStoryStore.getState().currentStory;
+    
+    // If we have a story in the store but not in the hook, sync it
+    // This can happen when returning from canvas or on initial load
+    if (storeStory && !currentStory) {
+      console.log('📖 Syncing story from store to component state');
+      setCurrentStory(storeStory);
+      return; // Early return to prevent creating a new story
+    }
+    
+    // COLLABORATION FIX: If collaborating but no story exists, create one immediately
+    // This handles participants who exit lobby before story is created
+    // Only run this ONCE when collaboration starts (hasCreatedStory prevents re-runs)
+    // CRITICAL: Wait for user to be loaded before creating story (currentUserId must be set)
+    if (isCollaborating && !currentStory && !storeStory && !hasCreatedStory.current && currentUserId) {
+      console.log('⚠️ Participant left lobby: Creating story now... (userId:', currentUserId, ')');
+      try {
+        const newStory = createStory(storyTitle || 'Collaborative Story');
+        setStoryTitle(newStory.title);
+        setCurrentStory(newStory);
+        hasCreatedStory.current = true;
+      } catch (error) {
+        console.error('❌ Failed to create story:', error);
+        // Don't set hasCreatedStory to true on error, so it can retry
+      }
+    }
+  }, [currentStory, isCollaborating, currentUserId]);
+  
   // Show lobby even without a story (for participants joining collaboration)
   // But only if not already collaborating (host starts collaborating immediately)
   // NEVER show lobby once collaboration has started
@@ -2644,56 +2682,38 @@ const ManualStoryCreationPage: React.FC = () => {
       </div>
     );
   }
-
-  // Check the Zustand store directly instead of React state to avoid race conditions
-  // This is crucial because createStory() updates the store synchronously,
-  // but the React state (currentStory) updates asynchronously
-  const storeStory = useStoryStore.getState().currentStory;
   
-  // FIX: If we have a story in the store but not in the hook, sync it
-  // This can happen when returning from canvas or on initial load
-  if (storeStory && !currentStory) {
-    console.log('📖 Syncing story from store to component state');
-    setCurrentStory(storeStory);
-  }
-  
-  // If collaborating but no story in the store yet, create one immediately
-  // This handles the race condition where isCollaborating is set before currentStory
-  if (!storeStory && isCollaborating && !hasCreatedStory.current) {
-    console.log('⚠️ Race condition detected: isCollaborating is true but no story in store. Creating story now...');
-    const newStory = createStory(storyTitle || 'Collaborative Story');
-    setStoryTitle(newStory.title);
-    setCurrentStory(newStory);
-    hasCreatedStory.current = true;
-    // Don't return here - let the component render normally
-  }
-  
-  // If still no story after the above check, show a brief loading state
-  // Check both React state and store to be safe
-  if (!currentStory && !storeStory) {
-    return (
-      <div className="create-story-page">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading story...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  // If still no story, show a brief loading state
+  // CRITICAL FIX: In collaboration mode, force-create story if it doesn't exist
   if (!currentStory) {
-    return (
-      <div className="create-story-page">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading story...</p>
+    const storeState = useStoryStore.getState();
+    const storyInStore = storeState.currentStory;
+    
+    if (isCollaborating) {
+      // Try to restore from store first before creating emergency story
+      if (storyInStore) {
+        setCurrentStory(storyInStore);
+        // Don't return - let component re-render with restored story
+      } else {
+        // Immediately create story to prevent UI block
+        const emergencyStory = createStory(storyTitle || 'Collaborative Story');
+        setCurrentStory(emergencyStory);
+        hasCreatedStory.current = true;
+        // Don't return - let the component render with the new story
+      }
+    } else {
+      // Only show loading for non-collaboration mode
+      return (
+        <div className="create-story-page">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading story...</p>
+            </div>
           </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
 
   return (

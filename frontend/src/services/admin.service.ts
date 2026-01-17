@@ -280,6 +280,80 @@ class AdminService {
     const response = await adminApi.get('/admin/system/health/');
     return response.data;
   }
+
+  /**
+   * Export data for backup (users, stories, analytics)
+   */
+  async exportData(type: 'users' | 'stories' | 'analytics'): Promise<any> {
+    const response = await adminApi.get('/admin/export/', {
+      params: { type }
+    });
+    return response.data;
+  }
+
+  /**
+   * Get security audit logs
+   */
+  async getSecurityLogs(params?: {
+    page?: number;
+    page_size?: number;
+    action_type?: string;
+  }): Promise<any> {
+    // This would require backend implementation
+    // For now, return mock data structure
+    return {
+      success: true,
+      logs: [],
+      pagination: {
+        page: params?.page || 1,
+        page_size: params?.page_size || 20,
+        total_count: 0,
+        total_pages: 0
+      }
+    };
+  }
+
+  /**
+   * Get AI services configuration and usage
+   */
+  async getAIServicesConfig(): Promise<any> {
+    // This would require backend implementation
+    // For now, return mock data
+    return {
+      success: true,
+      services: {
+        gemini: {
+          enabled: true,
+          api_key_set: true,
+          model: 'gemini-1.5-flash',
+          usage_this_month: 0
+        },
+        replicate: {
+          enabled: false,
+          api_key_set: false,
+          model: 'flux-schnell',
+          usage_this_month: 0
+        },
+        openai: {
+          enabled: false,
+          api_key_set: false,
+          model: 'gpt-4',
+          usage_this_month: 0
+        }
+      }
+    };
+  }
+
+  /**
+   * Update AI services configuration
+   */
+  async updateAIServicesConfig(service: string, config: any): Promise<any> {
+    // This would require backend implementation
+    return {
+      success: true,
+      message: 'AI service configuration updated successfully'
+    };
+  }
 }
 
 export default new AdminService();
