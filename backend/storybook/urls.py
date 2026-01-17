@@ -216,6 +216,7 @@ urlpatterns = [
     path('ai/ocr/process/', ai_proxy_views.ocr_image, name='ocr_image'),
     path('ai/pollinations/generate-image/', ai_proxy_views.generate_image_with_pollinations, name='generate_image_with_pollinations'),
     path('ai/replicate/generate-image/', ai_proxy_views.generate_image_with_replicate, name='generate_image_with_replicate'),
+    path('ai/replicate/prediction-status/', ai_proxy_views.get_replicate_prediction_status, name='get_replicate_prediction_status'),
     path('ai/pollinations/fetch-image/', ai_proxy_views.fetch_pollinations_image, name='fetch_pollinations_image'),
     path('ai/status/', ai_proxy_views.check_ai_service_status, name='check_ai_service_status'),
     

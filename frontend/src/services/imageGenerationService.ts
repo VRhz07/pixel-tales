@@ -150,7 +150,53 @@ export const checkPollinationsHealth = async (): Promise<boolean> => {
 };
 
 /**
- * Generate an image using Replicate API (Free credits available)
+ * Poll prediction status until completion
+ * @param predictionId The prediction ID from Replicate
+ * @param maxAttempts Maximum number of polling attempts
+ * @param delayMs Delay between polling attempts
+ * @returns Image URL when ready, or null if failed/timeout
+ */
+const pollPredictionStatus = async (
+  predictionId: string,
+  maxAttempts: number = 30,
+  delayMs: number = 1000
+): Promise<string | null> => {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const response = await apiService.get(`/ai/replicate/prediction-status/?prediction_id=${predictionId}`);
+      
+      console.log(`📊 Prediction status (${attempt}/${maxAttempts}): ${response.status}`);
+      
+      if (response.status === 'succeeded' && response.imageUrl) {
+        console.log(`✅ Prediction succeeded! Image ready in ${attempt} attempts`);
+        return response.imageUrl;
+      } else if (response.status === 'failed') {
+        console.error(`❌ Prediction failed: ${response.error}`);
+        return null;
+      } else if (response.status === 'canceled') {
+        console.error(`❌ Prediction was canceled`);
+        return null;
+      }
+      
+      // Status is 'starting' or 'processing', continue polling
+      if (attempt < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+      
+    } catch (error) {
+      console.error(`❌ Error polling prediction status:`, error);
+      if (attempt < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+  
+  console.error(`❌ Prediction polling timeout after ${maxAttempts} attempts`);
+  return null;
+};
+
+/**
+ * Generate an image using Replicate API with async predictions (NON-BLOCKING)
  * @param params Image generation parameters
  * @returns URL of the generated image or null if generation fails
  */
@@ -158,13 +204,16 @@ export const generateImageWithReplicate = async (params: ImageGenerationParams):
   const { prompt, width = 1024, height = 1024, seed } = params;
   
   try {
-    console.log('🎨 Generating image with Replicate (FLUX model)...');
+    console.log('🎨 Creating Replicate prediction (async, non-blocking)...');
+    const startTime = Date.now();
+    
     const response = await apiService.post('/ai/replicate/generate-image/', {
       prompt: prompt,
       width,
       height,
       model: 'flux-schnell', // Fast and free model
       seed: seed || Math.floor(Math.random() * 1000000),
+      async: true, // Use async mode
     });
 
     if (!response) {
@@ -172,8 +221,28 @@ export const generateImageWithReplicate = async (params: ImageGenerationParams):
       return null;
     }
 
-    if (response.success && response.imageUrl) {
-      console.log('✅ Image generated via Replicate backend proxy');
+    if (response.success && response.async && response.prediction_id) {
+      const requestTime = Date.now() - startTime;
+      console.log(`✅ Prediction created in ${requestTime}ms (non-blocking)`);
+      console.log(`📋 Prediction ID: ${response.prediction_id}`);
+      console.log(`⏳ Polling for completion...`);
+      
+      // Poll for completion (typically completes in 500ms-2s)
+      const imageUrl = await pollPredictionStatus(response.prediction_id);
+      
+      if (imageUrl) {
+        const totalTime = Date.now() - startTime;
+        console.log(`✅ Image ready in ${totalTime}ms total`);
+        console.log(`🔗 Image URL: ${imageUrl}`);
+        return imageUrl;
+      } else {
+        console.error('❌ Failed to get image from prediction');
+        return null;
+      }
+      
+    } else if (response.success && response.imageUrl) {
+      // Fallback: sync mode response
+      console.log('✅ Image generated via Replicate (sync mode)');
       console.log('🔗 Image URL:', response.imageUrl);
       return response.imageUrl;
     } else {
@@ -445,8 +514,8 @@ export const generateStoryIllustrations = async (
       
       // Delay between pages to avoid Replicate rate limits (6 req/min = 10 sec between)
       if (index < pages.length - 1) {
-        console.log(`⏳ Waiting 12 seconds before next image to avoid rate limit...`);
-        await new Promise(resolve => setTimeout(resolve, 12000)); // 12 second pause
+        console.log(`⏳ Waiting 10 seconds before next image to respect rate limit (6 req/min)...`);
+        await new Promise(resolve => setTimeout(resolve, 10000)); // 10 second pause
       }
       
     } catch (error) {
@@ -639,8 +708,8 @@ export const generateStoryIllustrationsFromPrompts = async (
     }
 
     if (index > 0) {
-      console.log(`⏳ Waiting 12 seconds before requesting page ${index + 1} to avoid rate limit...`);
-      await new Promise(resolve => setTimeout(resolve, 12000));
+      console.log(`⏳ Waiting 10 seconds before requesting page ${index + 1} to respect rate limit...`);
+      await new Promise(resolve => setTimeout(resolve, 10000));
     }
     
     try {
@@ -700,11 +769,8 @@ export const generateStoryIllustrationsFromPrompts = async (
       
       results.push(imageUrl);
       
-      // Delay between pages to avoid Replicate rate limits (6 req/min = 10 sec between)
-      if (index < pages.length - 1) {
-        console.log(`? Waiting 12 seconds before next image to avoid rate limit...`);
-        await new Promise(resolve => setTimeout(resolve, 12000)); // 12 second pause
-      }
+      // No additional delay needed here since we already waited before the request
+      // The 10s delay before each request handles rate limiting
       
     } catch (error) {
       console.error(`❌ Page ${index + 1}: Error during generation:`, error);
