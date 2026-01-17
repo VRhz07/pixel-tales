@@ -282,6 +282,8 @@ body:has(.story-reader-page.dark) #root {
   border-radius: 1.25rem;
   position: relative;
   overflow: hidden;
+  font-weight: 700 !important; /* Bold for better readability - force override */
+  font-family: 'Fredoka', sans-serif !important; /* Ensure correct font is used */
 }
 
 /* Fade effect at top and bottom */
@@ -391,6 +393,8 @@ body:has(.story-reader-page.dark) #root {
   flex: 1;
   overflow-y: auto;
   min-height: 0; /* Allow text to shrink if needed */
+  font-weight: 700 !important; /* Bold for better readability - force override */
+  font-family: 'Fredoka', sans-serif !important; /* Ensure correct font is used */
 }
 
 .story-reader-horizontal-text.dark {

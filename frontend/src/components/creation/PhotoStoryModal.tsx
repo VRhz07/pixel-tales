@@ -273,25 +273,39 @@ Create a story with the following JSON format (no markdown, just pure JSON):
   "pages": [
     {
       "text": "Page text content",
-      "imagePrompt": "Detailed scene description. ALWAYS include: [characterDescription] in consistent appearance, action/pose, setting details, lighting, ${formData.selectedArtStyle} art style. CRITICAL: Correct human/animal anatomy, proper proportions, realistic poses, no extra limbs, fingers count correct."
+      "imagePrompt": "${formData.selectedArtStyle} illustration: [USE EXACT characterDescription HERE]. Scene: [what's happening]. Camera: [angle]. Position: [in frame]. Lighting: [detailed]. Style: ${formData.selectedArtStyle}"
     }
   ]
 }
 
-CRITICAL REQUIREMENTS:
-1. characterDescription MUST be extremely detailed (hair color/style, eye color, skin tone, clothing colors/style, body type, age, species for animals, distinctive markings)
-2. Every imagePrompt MUST reference the characterDescription to maintain consistency
-3. Every imagePrompt MUST include anatomy guidelines: "correct anatomy, proper proportions, accurate [body parts], realistic pose"
-4. For humans: specify "5 fingers on each hand, 2 arms, 2 legs, correct facial proportions"
-5. For animals: specify "correct [species] anatomy, proper leg count, realistic features"
-6. Avoid prompts that could cause: extra limbs, distorted faces, wrong finger counts, impossible poses
-7. Each page's imagePrompt should describe the SAME character but in different scenes/actions
-
 EXAMPLE of good characterDescription:
-"A majestic bald eagle with white head feathers, sharp yellow curved beak, piercing golden eyes, dark brown body and wing feathers with white tail feathers, powerful yellow talons, wingspan of 6-7 feet"
+"A 7-year-old girl with curly brown hair in two pigtails, bright green eyes, wearing a red and white striped t-shirt, blue denim overalls, and white sneakers"
 
-EXAMPLE of good imagePrompt:
-"A majestic bald eagle (white head, yellow beak, golden eyes, dark brown wings, white tail) soaring high above mountain peaks at sunrise, wings fully spread showing correct eagle anatomy with proper feather arrangement, ${formData.selectedArtStyle} art style, dramatic lighting, correct bird proportions"
+CRITICAL imagePrompt STRUCTURE - You MUST follow this EXACT format for EVERY page:
+
+"${formData.selectedArtStyle} illustration of [EXACT characterDescription with all details]. [Specific action/pose - VARIED per page]. [Detailed environment with specific objects, plants, weather]. [Camera angle: Wide establishing shot/Medium shot/Close-up shot/Low angle/High angle]. [Character position: positioned in lower right leaving space for text/centered in frame/upper left]. [Detailed lighting: warm golden hour lighting filtering through trees casting long shadows/soft overcast lighting/dramatic side lighting/backlit with rim light]. [Atmospheric effects: morning mist/dust particles in air/lens flare/bokeh background]. Professional children's book illustration, highly detailed, vibrant colors, sharp focus."
+
+EXAMPLE 1 (establishing shot):
+"${formData.selectedArtStyle} illustration of a 7-year-old girl with curly brown hair in two pigtails, bright green eyes, wearing a red and white striped t-shirt, blue denim overalls, and white sneakers, standing with arms raised excitedly in a sun-dappled backyard garden with tall oak trees, colorful wildflowers, a white picket fence, and a mysterious glowing door. Wide establishing shot with girl positioned in lower right, leaving space for text at top. Warm golden hour lighting filtering through tree canopy, casting dappled shadows on grass. Morning mist softly glowing. Professional children's book illustration, highly detailed, vibrant colors, sharp focus."
+
+EXAMPLE 2 (close-up emotional):
+"${formData.selectedArtStyle} illustration of a 7-year-old girl with curly brown hair in two pigtails, bright green eyes, wearing a red and white striped t-shirt, blue denim overalls, and white sneakers, sitting cross-legged with a curious expression examining a glowing magical key in her hands, surrounded by floating sparkles. Close-up shot focusing on girl's face and hands, positioned in upper right with negative space on left for text. Soft magical glow from key illuminating her face from below, creating wonder in her eyes. Sparkles creating bokeh effect in background. Professional children's book illustration, highly detailed, vibrant colors, sharp focus."
+
+EXAMPLE 3 (action scene):
+"${formData.selectedArtStyle} illustration of a 7-year-old girl with curly brown hair in two pigtails, bright green eyes, wearing a red and white striped t-shirt, blue denim overalls, and white sneakers, running joyfully through a field of tall sunflowers with butterflies flying around her. Dynamic low angle shot capturing movement with girl in center frame, showing energy and motion. Bright afternoon sunlight creating strong shadows and highlighting the golden sunflowers. Blue butterflies adding pops of color. Dust particles visible in sunbeams. Professional children's book illustration, highly detailed, vibrant colors, sharp focus."
+
+Make sure EVERY page's imagePrompt:
+1. Starts with EXACT SAME characterDescription
+2. Has DIFFERENT specific action/pose
+3. Has UNIQUE environment details
+4. Includes explicit camera angle (Wide/Medium/Close-up/Low/High)
+5. Includes character position in frame (lower right/centered/upper left - for text spacing)
+6. Has detailed lighting description (golden hour/overcast/dramatic/backlit)
+7. Includes atmospheric effects (mist/dust/lens flare/bokeh)
+8. CRITICAL: Correct anatomy - proper proportions, realistic poses, no extra limbs, correct finger count
+9. For humans: "5 fingers on each hand, 2 arms, 2 legs, correct facial proportions"
+10. For animals: "correct [species] anatomy, proper leg count, realistic features"
+11. Ends with quality keywords: "Professional children's book illustration, highly detailed, vibrant colors, sharp focus"
       `.trim();
       
       const storyJSON = await analyzeImageWithGemini(formData.capturedImage, analysisPrompt);
@@ -610,6 +624,17 @@ EXAMPLE of good imagePrompt:
       // Step 4: Finalize (100%)
       setGenerationProgress(100);
       setGenerationStage('Story complete!');
+
+      // CRITICAL FIX: Sync story to backend immediately to get backendId
+      // This prevents duplicate stories when user clicks "Save" later
+      try {
+        console.log('🔄 Syncing story to backend to prevent duplicates...');
+        const backendId = await useStoryStore.getState().syncStoryToBackend(newStory.id);
+        console.log(`✅ Story synced to backend with ID: ${backendId}`);
+      } catch (error) {
+        console.warn('⚠️ Failed to sync story to backend:', error);
+        // Continue anyway - story is saved locally
+      }
 
       // Clear the captured image from memory
       console.log('Clearing captured image from memory...');
