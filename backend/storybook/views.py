@@ -2192,12 +2192,12 @@ def cast_collaboration_vote(request, session_id):
         # Broadcast vote update to all participants
         channel_layer = get_channel_layer()
         if channel_layer:
-            # Convert sets to dict for JSON serialization (use integer keys for frontend)
+            # Convert sets to dict for JSON serialization (use string keys for MessagePack compatibility)
             voting_data_dict = {}
             for uid in vote_data['yes']:
-                voting_data_dict[int(uid)] = True
+                voting_data_dict[str(uid)] = True
             for uid in vote_data['no']:
-                voting_data_dict[int(uid)] = False
+                voting_data_dict[str(uid)] = False
             
             print(f"📊 Broadcasting vote_update: vote_id={vote_id}, voting_data={voting_data_dict}")
             async_to_sync(channel_layer.group_send)(
