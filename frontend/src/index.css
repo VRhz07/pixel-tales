@@ -9199,9 +9199,8 @@ h3.section-title,
 }
 
 .card-icon.mystical {
-  background-image: url('./assets/template-icon.jpg');
-  background-size: cover;
-  background-position: center;
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  border-color: #A78BFA;
   position: relative;
 }
 
@@ -9477,7 +9476,7 @@ h3.section-title,
 
 /* Background Image Utilities */
 .magical-home.with-bg-image {
-  background-image: url('your-background-image.jpg');
+  /* Background image applied via herobg2.png in .magical-home */
 }
 
 .magical-home.with-bg-image::after {
