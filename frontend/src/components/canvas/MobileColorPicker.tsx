@@ -14,7 +14,7 @@ interface MobileColorPickerProps {
   suggestions?: string[];
 }
 
-export const MobileColorPicker: React.FC<MobileColorPickerProps> = ({
+const MobileColorPicker: React.FC<MobileColorPickerProps> = ({
   color,
   onColorChange,
   onClose,
@@ -275,4 +275,4 @@ export const MobileColorPicker: React.FC<MobileColorPickerProps> = ({
   );
 };
 
-export default MobileColorPicker;
+export default React.memo(MobileColorPicker);

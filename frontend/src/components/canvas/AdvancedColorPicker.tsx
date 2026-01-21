@@ -29,7 +29,7 @@ interface AdvancedColorPickerProps {
   showBrushSettings?: boolean;
 }
 
-export const AdvancedColorPicker: React.FC<AdvancedColorPickerProps> = ({
+const AdvancedColorPicker: React.FC<AdvancedColorPickerProps> = ({
   color,
   onChange,
   showAlpha = true,
@@ -470,4 +470,4 @@ export const AdvancedColorPicker: React.FC<AdvancedColorPickerProps> = ({
   );
 };
 
-export default AdvancedColorPicker;
+export default React.memo(AdvancedColorPicker);

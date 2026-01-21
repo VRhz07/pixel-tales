@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import './GradientEditor.css';
-import { MobileColorPicker } from './MobileColorPicker';
+import MobileColorPicker from './MobileColorPicker';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
 
 export interface GradientStop {

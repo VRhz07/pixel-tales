@@ -4,7 +4,7 @@
  */
 import React, { useEffect, useRef, useState } from 'react';
 import paper from 'paper';
-import { CollaborationPanel } from './CollaborationPanel';
+import CollaborationPanel from './CollaborationPanel';
 import { collaborationService } from '../../services/collaborationService';
 import ReconnectingModal from '../collaboration/ReconnectingModal';
 

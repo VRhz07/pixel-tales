@@ -1,38 +1,42 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { useCapacitorBackButton } from './hooks/useCapacitorBackButton';
 import { useBackgroundMusic } from './hooks/useBackgroundMusic';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import BottomNav from './components/navigation/BottomNav';
-import HomePage from './components/pages/HomePage';
-import LibraryPage from './components/pages/LibraryPage';
-import ProfilePage from './components/pages/ProfilePage';
-import EnhancedSocialPage from './components/pages/EnhancedSocialPage';
-import MessagingPage from './components/pages/MessagingPage';
-import SettingsPage from './components/pages/SettingsPage';
-import AuthPage from './components/auth/AuthPage';
+
+// Lazy load route components for better performance
+const HomePage = lazy(() => import('./components/pages/HomePage'));
+const LibraryPage = lazy(() => import('./components/pages/LibraryPage'));
+const ProfilePage = lazy(() => import('./components/pages/ProfilePage'));
+const EnhancedSocialPage = lazy(() => import('./components/pages/EnhancedSocialPage'));
+const MessagingPage = lazy(() => import('./components/pages/MessagingPage'));
+const SettingsPage = lazy(() => import('./components/pages/SettingsPage'));
+const AuthPage = lazy(() => import('./components/auth/AuthPage'));
+const OfflineStoriesPage = lazy(() => import('./pages/OfflineStoriesPage'));
+const OnlineStoriesPage = lazy(() => import('./pages/OnlineStoriesPage'));
+const CharactersLibraryPage = lazy(() => import('./pages/CharactersLibraryPage'));
+const YourWorksPage = lazy(() => import('./pages/YourWorksPage'));
+const ManualStoryCreationPage = lazy(() => import('./pages/ManualStoryCreationPage'));
+const CanvasDrawingPage = lazy(() => import('./pages/CanvasDrawingPage'));
+const CoverImageCanvasPage = lazy(() => import('./pages/CoverImageCanvasPage'));
+const StoryReaderPage = lazy(() => import('./pages/StoryReaderPage'));
+const PublicLibraryPage = lazy(() => import('./pages/PublicLibraryPage'));
+const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage'));
+const CollaborationWaitingPage = lazy(() => import('./pages/CollaborationWaitingPage'));
+const ParentDashboardPage = lazy(() => import('./pages/ParentDashboardPage'));
+const ParentSettingsPage = lazy(() => import('./pages/ParentSettingsPage'));
+const TeacherDashboardPage = lazy(() => import('./pages/TeacherDashboardPage'));
+const TeacherSettingsPage = lazy(() => import('./pages/TeacherSettingsPage'));
+const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
+const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
+const GamesPage = lazy(() => import('./pages/GamesPage'));
+const StoryGamesPage = lazy(() => import('./pages/StoryGamesPage'));
+const GamePlayPage = lazy(() => import('./pages/GamePlayPage'));
+
+// Keep these as static imports (needed immediately)
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AnonymousRoute from './components/auth/AnonymousRoute';
 import ParentRoute from './components/auth/ParentRoute';
-import OfflineStoriesPage from './pages/OfflineStoriesPage';
-import OnlineStoriesPage from './pages/OnlineStoriesPage';
-import CharactersLibraryPage from './pages/CharactersLibraryPage';
-import YourWorksPage from './pages/YourWorksPage';
-import ManualStoryCreationPage from './pages/ManualStoryCreationPage';
-import CanvasDrawingPage from './pages/CanvasDrawingPage';
-import CoverImageCanvasPage from './pages/CoverImageCanvasPage';
-import StoryReaderPage from './pages/StoryReaderPage';
-import PublicLibraryPage from './pages/PublicLibraryPage';
-import AdminDashboardPage from './pages/AdminDashboardPage';
-import CollaborationWaitingPage from './pages/CollaborationWaitingPage';
-import ParentDashboardPage from './pages/ParentDashboardPage';
-import ParentSettingsPage from './pages/ParentSettingsPage';
-import TeacherDashboardPage from './pages/TeacherDashboardPage';
-import TeacherSettingsPage from './pages/TeacherSettingsPage';
-import TermsOfServicePage from './pages/TermsOfServicePage';
-import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
-import GamesPage from './pages/GamesPage';
-import StoryGamesPage from './pages/StoryGamesPage';
-import GamePlayPage from './pages/GamePlayPage';
 import { useAuthStore } from './stores/authStore';
 import { useThemeStore } from './stores/themeStore';
 import { storage } from './utils/storage';
@@ -572,7 +576,15 @@ function AppContent() {
     <div className={`min-h-screen bg-gray-50 ${isHomePage ? 'home-page-wrapper' : ''}`}>
       {/* Notification Reconnecting Toast - Removed (was annoying) */}
       
-      <Routes>
+      <Suspense fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading page...</p>
+          </div>
+        </div>
+      }>
+        <Routes>
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/home" element={
           <AnonymousRoute>
@@ -708,7 +720,8 @@ function AppContent() {
           </AnonymousRoute>
         } />
         <Route path="/" element={<AuthPage />} />
-      </Routes>
+        </Routes>
+      </Suspense>
       {showBottomNav && <BottomNav />}
       
       {/* Toast Notifications */}

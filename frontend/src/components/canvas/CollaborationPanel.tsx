@@ -24,7 +24,7 @@ interface CollaborationPanelProps {
   onSessionEnded?: () => void;
 }
 
-export const CollaborationPanel: React.FC<CollaborationPanelProps> = ({
+const CollaborationPanel: React.FC<CollaborationPanelProps> = ({
   onSessionCreated,
   onSessionJoined,
   onSessionEnded
@@ -335,3 +335,5 @@ export const CollaborationPanel: React.FC<CollaborationPanelProps> = ({
     </div>
   );
 };
+
+export default React.memo(CollaborationPanel);
