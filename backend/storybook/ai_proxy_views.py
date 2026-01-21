@@ -424,11 +424,22 @@ def generate_image_with_replicate(request):
             client = replicate.Client(api_token=REPLICATE_API_TOKEN)
             
             # Create prediction (returns immediately)
-            prediction = client.predictions.create(
-                version=replicate_model.split(':')[1] if ':' in replicate_model else None,
-                input=input_params,
-                model=replicate_model.split(':')[0] if ':' not in replicate_model else None
-            )
+            # Handle two formats:
+            # 1. Model with version: "owner/name:version" -> use version parameter
+            # 2. Model without version: "owner/name" -> use model parameter
+            if ':' in replicate_model:
+                # Format: owner/name:version
+                prediction = client.predictions.create(
+                    version=replicate_model.split(':')[1],
+                    input=input_params
+                )
+            else:
+                # Format: owner/name (no version)
+                prediction = client.predictions.create(
+                    model=replicate_model,
+                    input=input_params
+                )
+
             
             print(f"✅ Prediction created: {prediction.id}")
             print(f"📊 Status: {prediction.status}")

@@ -18,6 +18,7 @@ import { analyzeImageWithGemini } from '../../services/geminiProxyService';
 import { generateStoryIllustrationsFromPrompts } from '../../services/imageGenerationService';
 import { VoiceFilteredTextarea } from '../common/VoiceFilteredTextarea';
 import { processImageWithOCR } from '../../services/ocrProxyService';
+import { convertImageToDataUrl } from '../../utils/imageCache';
 
 interface PhotoStoryModalProps {
   isOpen: boolean;
@@ -486,7 +487,7 @@ Make sure EVERY page's imagePrompt:
           const coverImageWithText = canvas.toDataURL('image/jpeg', 0.95);
           console.log('✅ Cover illustration with title text created');
           
-          // Update story with cover image
+          // Update story with cover image (already a data URL from canvas)
           updateStory(newStory.id, {
             description: storyData.description,
             genre: 'Photo Story',
@@ -498,17 +499,35 @@ Make sure EVERY page's imagePrompt:
             isPublished: false
           });
         } else {
-          // Fallback: use image without text if canvas fails
-          updateStory(newStory.id, {
-            description: storyData.description,
-            genre: 'Photo Story',
-            illustrationStyle: formData.selectedArtStyle,
-            coverImage: baseImageUrl,
-            language: formData.storyLanguage, // Set the story language
-            creationType: 'ai_assisted', // Mark as AI-assisted for achievement tracking
-            isDraft: false,
-            isPublished: false
-          });
+          // Fallback: convert HTTP URL to data URL for permanent storage
+          console.log('🔄 Converting cover image to data URL for permanent storage...');
+          try {
+            // Use aggressive compression for Photo Story (600px max, 0.7 quality)
+            const coverDataUrl = await convertImageToDataUrl(baseImageUrl, 600, 0.7);
+            updateStory(newStory.id, {
+              description: storyData.description,
+              genre: 'Photo Story',
+              illustrationStyle: formData.selectedArtStyle,
+              coverImage: coverDataUrl,
+              language: formData.storyLanguage, // Set the story language
+              creationType: 'ai_assisted', // Mark as AI-assisted for achievement tracking
+              isDraft: false,
+              isPublished: false
+            });
+            console.log('✅ Cover image converted and saved as data URL');
+          } catch (error) {
+            console.warn('⚠️ Failed to convert cover image, saving original URL:', error);
+            updateStory(newStory.id, {
+              description: storyData.description,
+              genre: 'Photo Story',
+              illustrationStyle: formData.selectedArtStyle,
+              coverImage: baseImageUrl,
+              language: formData.storyLanguage, // Set the story language
+              creationType: 'ai_assisted', // Mark as AI-assisted for achievement tracking
+              isDraft: false,
+              isPublished: false
+            });
+          }
         }
       } catch (error) {
         console.error('Error generating cover illustration:', error);
@@ -562,14 +581,25 @@ Make sure EVERY page's imagePrompt:
           const imageUrl = imageUrls[i];
           
           if (imageUrl) {
-            console.log(`✅ Saving page ${i + 1} with image: ${imageUrl.substring(0, 60)}...`);
+            console.log(`✅ Converting page ${i + 1} image to data URL for permanent storage...`);
+            
+            // Convert HTTP URL to data URL for permanent storage (like AI Story does)
+            // Use aggressive compression for Photo Story to prevent localStorage quota errors
+            // (600px max width, 0.7 quality - smaller than AI Story to save space)
+            let permanentImageUrl = imageUrl;
+            try {
+              permanentImageUrl = await convertImageToDataUrl(imageUrl, 600, 0.7);
+              console.log(`✅ Page ${i + 1} image converted to data URL`);
+            } catch (error) {
+              console.warn(`⚠️ Failed to convert page ${i + 1} image, using original URL:`, error);
+            }
             
             // For the first page, update the existing empty page instead of adding new one
             if (i === 0 && hasEmptyFirstPage && currentStory) {
               console.log(`📝 Replacing empty page with Page ${i + 1} content`);
               updatePage(newStory.id, currentStory.pages[0].id, {
                 text: page.text,
-                canvasData: imageUrl,
+                canvasData: permanentImageUrl,
                 order: 0
               });
             } else {
@@ -577,7 +607,7 @@ Make sure EVERY page's imagePrompt:
               console.log(`➕ Adding Page ${i + 1}`);
               const newPage = addPage(newStory.id, page.text);
               updatePage(newStory.id, newPage.id, {
-                canvasData: imageUrl,
+                canvasData: permanentImageUrl,
                 order: i
               });
             }
@@ -634,6 +664,28 @@ Make sure EVERY page's imagePrompt:
       } catch (error) {
         console.warn('⚠️ Failed to sync story to backend:', error);
         // Continue anyway - story is saved locally
+      }
+
+      // Check localStorage size and warn if needed
+      try {
+        const { checkStorageSize } = await import('../../utils/hybridStorage');
+        const { sizeMB, needsExtraction } = checkStorageSize();
+        
+        if (needsExtraction) {
+          console.warn(`⚠️ localStorage is ${sizeMB.toFixed(2)} MB. Consider using offline storage for old stories.`);
+          
+          // Show user-friendly warning
+          setTimeout(() => {
+            const message = `📊 Storage Notice: You have ${sizeMB.toFixed(1)} MB of stories saved.\n\n` +
+              `💡 Tip: To save space, you can:\n` +
+              `1. Move old stories to "Offline Stories" (saves to device storage)\n` +
+              `2. Delete stories you no longer need\n` +
+              `3. Sync stories to the cloud (requires account)`;
+            console.log(message);
+          }, 2000);
+        }
+      } catch (error) {
+        console.warn('Could not check storage size:', error);
       }
 
       // Clear the captured image from memory

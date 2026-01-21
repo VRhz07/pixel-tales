@@ -488,26 +488,9 @@ export const generateStoryIllustrations = async (
         narrativePurpose: page.narrativePurpose
       });
       
-      // Fallback to Pollinations if Replicate fails
-      // TEMPORARILY DISABLED: Pollinations is making generation slower
-      /*
+      // Check if image generation succeeded
       if (!imageUrl) {
-        console.log(`⚠️ Page ${pageNumber}: Replicate failed, falling back to Pollinations...`);
-        imageUrl = await generateImage({
-          prompt: enhancedPrompt,
-          width: 512,
-          height: 512,
-          seed: baseSeed + (index * 10),
-          pageNumber,
-          totalPages,
-          mood: page.mood,
-          narrativePurpose: page.narrativePurpose
-        });
-      }
-      */
-      
-      if (!imageUrl) {
-        console.warn(`⚠️ Page ${pageNumber}: Replicate failed, skipping fallback for now`);
+        console.warn(`⚠️ Page ${pageNumber}: Image generation failed (likely rate limit - try again tomorrow)`);
       }
       
       results.push(imageUrl);
@@ -731,24 +714,9 @@ export const generateStoryIllustrationsFromPrompts = async (
         totalPages: pages.length
       });
       
-      // Fallback to Pollinations if Replicate fails
-      // TEMPORARILY DISABLED: Pollinations is making generation slower
-      /*
+      // Check if image generation succeeded
       if (!imageUrl) {
-        console.log(`⚠️ Page ${index + 1}: Replicate failed, falling back to Pollinations...`);
-        imageUrl = await generateImage({
-          prompt: page.imagePrompt,
-          width: 512,
-          height: 512,
-          seed: uniqueSeed,
-          pageNumber: page.pageNumber || (index + 1),
-          totalPages: pages.length
-        });
-      }
-      */
-      
-      if (!imageUrl) {
-        console.error(`❌ Page ${index + 1}: Replicate failed, no fallback enabled`);
+        console.error(`❌ Page ${index + 1}: Image generation failed (likely rate limit - try again tomorrow)`);
         results.push(null);
         continue;
       }
