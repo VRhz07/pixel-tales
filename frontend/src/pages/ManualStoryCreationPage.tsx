@@ -20,6 +20,8 @@ import ReconnectingModal from '../components/collaboration/ReconnectingModal';
 import { useToastContext } from '../contexts/ToastContext';
 import { usePresenceTracking } from '../hooks/usePresenceTracking';
 import { TypingIndicator, CursorIndicator, TextCaretIndicator, TouchIndicator, PRESENCE_STYLES } from '../components/collaboration/PresenceSystem';
+import TextEnhancementModal from '../components/creation/TextEnhancementModal';
+import { EnhancementType } from '../services/textEnhancementService';
 import './ManualStoryCreationPage.css';
 import {
   ChevronLeftIcon,
@@ -34,7 +36,8 @@ import {
   SparklesIcon,
   UserGroupIcon,
   TrashIcon,
-  XMarkIcon
+  XMarkIcon,
+  ChevronDownIcon
 } from '@heroicons/react/24/outline';
 
 // Remove local interface as we'll use the store types
@@ -93,6 +96,11 @@ const ManualStoryCreationPage: React.FC = () => {
   const [wasVoteInitiator, setWasVoteInitiator] = useState(false);
   const hasCreatedStory = useRef(false); // Track if we've already created a story in this session
   const originalIsDraft = useRef<boolean | undefined>(undefined); // Track original draft status
+  
+  // AI Enhancement state
+  const [showEnhancementModal, setShowEnhancementModal] = useState(false);
+  const [enhancementType, setEnhancementType] = useState<EnhancementType>('grammar');
+  const [showEnhancementDropdown, setShowEnhancementDropdown] = useState(false);
   
   // Collaboration state
   const [isCollaborating, setIsCollaborating] = useState(false);
@@ -2465,6 +2473,24 @@ const ManualStoryCreationPage: React.FC = () => {
     }
   };
 
+  // AI Enhancement handlers
+  const handleEnhanceText = (type: EnhancementType) => {
+    if (!currentPage?.text || currentPage.text.trim().length < 10) {
+      showInfoToast('Please write at least 10 characters before enhancing.');
+      return;
+    }
+    setEnhancementType(type);
+    setShowEnhancementModal(true);
+    setShowEnhancementDropdown(false);
+  };
+
+  const handleApplyEnhancement = (enhancedText: string) => {
+    if (currentStory && currentPage) {
+      updateCurrentPageContent(enhancedText);
+      showInfoToast('✨ Text enhanced successfully!');
+    }
+  };
+
   const goToPreviousPage = () => {
     if (currentPageIndex > 0) {
       const newPageIndex = currentPageIndex - 1;
@@ -2966,6 +2992,68 @@ const ManualStoryCreationPage: React.FC = () => {
           <div className="page-editor-section-character-count">
             {characterCount} characters
           </div>
+
+          {/* AI Enhancement Button with Dropdown */}
+          {currentPage?.text && currentPage.text.trim().length >= 10 && (
+            <div className="ai-enhancement-container">
+              <div className="ai-enhancement-dropdown-wrapper">
+                <button
+                  onClick={() => setShowEnhancementDropdown(!showEnhancementDropdown)}
+                  className="ai-enhancement-button"
+                  title="AI Text Enhancement"
+                >
+                  <SparklesIcon className="ai-enhancement-icon" />
+                  <span>Enhance with AI</span>
+                  <ChevronDownIcon className="ai-enhancement-chevron" />
+                </button>
+
+                {showEnhancementDropdown && (
+                  <div className="ai-enhancement-dropdown">
+                    <button
+                      onClick={() => handleEnhanceText('grammar')}
+                      className="ai-enhancement-dropdown-item"
+                    >
+                      <span className="ai-enhancement-dropdown-icon">✓</span>
+                      <div className="ai-enhancement-dropdown-text">
+                        <span className="ai-enhancement-dropdown-title">Fix Grammar</span>
+                        <span className="ai-enhancement-dropdown-description">Correct spelling and grammar errors</span>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleEnhanceText('extend')}
+                      className="ai-enhancement-dropdown-item"
+                    >
+                      <span className="ai-enhancement-dropdown-icon">↔</span>
+                      <div className="ai-enhancement-dropdown-text">
+                        <span className="ai-enhancement-dropdown-title">Extend Text</span>
+                        <span className="ai-enhancement-dropdown-description">Add more details and descriptions</span>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleEnhanceText('simplify')}
+                      className="ai-enhancement-dropdown-item"
+                    >
+                      <span className="ai-enhancement-dropdown-icon">◐</span>
+                      <div className="ai-enhancement-dropdown-text">
+                        <span className="ai-enhancement-dropdown-title">Simplify</span>
+                        <span className="ai-enhancement-dropdown-description">Make it easier for kids to understand</span>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => handleEnhanceText('creative')}
+                      className="ai-enhancement-dropdown-item"
+                    >
+                      <span className="ai-enhancement-dropdown-icon">✨</span>
+                      <div className="ai-enhancement-dropdown-text">
+                        <span className="ai-enhancement-dropdown-title">Make Creative</span>
+                        <span className="ai-enhancement-dropdown-description">Add imagination and fun details</span>
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Compact Page Management */}
@@ -3367,6 +3455,15 @@ const ManualStoryCreationPage: React.FC = () => {
       {isCollaborating && (
         <style>{PRESENCE_STYLES}</style>
       )}
+
+      {/* AI Text Enhancement Modal */}
+      <TextEnhancementModal
+        isOpen={showEnhancementModal}
+        onClose={() => setShowEnhancementModal(false)}
+        originalText={currentPage?.text || ''}
+        onApply={handleApplyEnhancement}
+        enhancementType={enhancementType}
+      />
 
     </div>
   );
