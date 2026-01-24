@@ -58,17 +58,28 @@ async function fetchProfanityWords(forceRefresh = false) {
  */
 export async function refreshProfanityWords() {
   console.log('🔄 Force refreshing profanity words from backend...');
+  // Clear pattern cache when refreshing words
+  patternCache.clear();
   await fetchProfanityWords(true);
 }
 
 // Initialize profanity list on module load
 fetchProfanityWords();
 
+// Cache for compiled regex patterns to avoid recreating them on every check
+const patternCache = new Map<string, RegExp>();
+
 /**
  * Creates a regex pattern for detecting profanity
  * Handles variations like spaces, special characters, and letter substitutions
+ * OPTIMIZED: Caches compiled patterns for reuse
  */
 function createProfanityPattern(word: string): RegExp {
+  // Check cache first
+  if (patternCache.has(word)) {
+    return patternCache.get(word)!;
+  }
+  
   // Escape special regex characters
   const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   
@@ -82,7 +93,12 @@ function createProfanityPattern(word: string): RegExp {
     .replace(/t/gi, '[t7]')
     .replace(/\s/g, '[\\s\\-_]*'); // Allow spaces, hyphens, underscores between letters
   
-  return new RegExp(`\\b${pattern}\\b`, 'gi');
+  const regex = new RegExp(`\\b${pattern}\\b`, 'gi');
+  
+  // Cache the pattern
+  patternCache.set(word, regex);
+  
+  return regex;
 }
 
 /**

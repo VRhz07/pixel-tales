@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { validateAndCensor, containsProfanity } from '../utils/profanityFilter';
+import { validateAndCensor, containsProfanitySync } from '../utils/profanityFilter';
 
 /**
  * Custom hook for profanity filtering
@@ -29,9 +29,10 @@ export const useProfanityFilter = (initialValue: string = '') => {
 
   /**
    * Checks if text contains profanity without updating state
+   * Uses synchronous check with cached profanity list
    */
   const checkProfanity = useCallback((text: string): boolean => {
-    return containsProfanity(text);
+    return containsProfanitySync(text);
   }, []);
 
   /**

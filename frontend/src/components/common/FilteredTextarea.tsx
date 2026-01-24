@@ -13,6 +13,7 @@ interface FilteredTextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTe
 /**
  * FilteredTextarea Component
  * Automatically censors profanity in multi-line text and shows warning indicator
+ * OPTIMIZED: Uses debounced profanity checking to improve typing performance
  */
 export const FilteredTextarea: React.FC<FilteredTextareaProps> = ({
   value,
@@ -24,43 +25,68 @@ export const FilteredTextarea: React.FC<FilteredTextareaProps> = ({
 }) => {
   const [warning, setWarning] = useState<string | null>(null);
   const [showWarningMessage, setShowWarningMessage] = useState(false);
-  const timeoutRef = useRef<number | null>(null);
+  const [localValue, setLocalValue] = useState(value);
+  const warningTimeoutRef = useRef<number | null>(null);
+  const filterTimeoutRef = useRef<number | null>(null);
 
-  // Handle textarea change with profanity filtering
+  // Sync local value when prop value changes
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  // Handle textarea change - immediate update without filtering
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const inputValue = e.target.value;
-    const { censored, hasProfanity, warning: warningMsg } = validateAndCensor(inputValue);
     
-    // Update value with censored version
-    onChange(censored);
+    // Immediately update local state for responsive typing
+    setLocalValue(inputValue);
     
-    // Show warning if profanity detected
-    if (hasProfanity && showWarning) {
-      setWarning(warningMsg);
-      setShowWarningMessage(true);
-      
-      // Notify parent component
-      onProfanityDetected?.(true);
-      
-      // Clear warning after 3 seconds
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      timeoutRef.current = setTimeout(() => {
-        setShowWarningMessage(false);
-      }, 3000);
-    } else {
-      setWarning(null);
-      setShowWarningMessage(false);
-      onProfanityDetected?.(false);
+    // Clear any pending filter timeout
+    if (filterTimeoutRef.current) {
+      clearTimeout(filterTimeoutRef.current);
     }
+    
+    // Debounce the profanity filtering (300ms)
+    filterTimeoutRef.current = window.setTimeout(() => {
+      const { censored, hasProfanity, warning: warningMsg } = validateAndCensor(inputValue);
+      
+      // Only update parent if text was actually censored
+      if (censored !== inputValue) {
+        onChange(censored);
+        setLocalValue(censored);
+      } else {
+        onChange(inputValue);
+      }
+      
+      // Show warning if profanity detected
+      if (hasProfanity && showWarning) {
+        setWarning(warningMsg);
+        setShowWarningMessage(true);
+        onProfanityDetected?.(true);
+        
+        // Clear warning after 3 seconds
+        if (warningTimeoutRef.current) {
+          clearTimeout(warningTimeoutRef.current);
+        }
+        warningTimeoutRef.current = window.setTimeout(() => {
+          setShowWarningMessage(false);
+        }, 3000);
+      } else {
+        setWarning(null);
+        setShowWarningMessage(false);
+        onProfanityDetected?.(false);
+      }
+    }, 300); // 300ms debounce
   };
 
-  // Cleanup timeout on unmount
+  // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      if (warningTimeoutRef.current) {
+        clearTimeout(warningTimeoutRef.current);
+      }
+      if (filterTimeoutRef.current) {
+        clearTimeout(filterTimeoutRef.current);
       }
     };
   }, []);
@@ -70,7 +96,7 @@ export const FilteredTextarea: React.FC<FilteredTextareaProps> = ({
       <div className="filtered-textarea-container">
         <textarea
           {...props}
-          value={value}
+          value={localValue}
           onChange={handleChange}
           className={`filtered-textarea ${warning ? 'filtered-textarea-warning' : ''} ${className}`}
         />
