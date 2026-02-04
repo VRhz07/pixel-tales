@@ -97,9 +97,9 @@ elif DATABASE_URL:
     # PostgreSQL or other database URL
     db_config = dj_database_url.parse(DATABASE_URL, conn_max_age=0)
     
-    # Close connections immediately to avoid exhausting DigitalOcean connection limit
-    db_config['CONN_MAX_AGE'] = 0  # Close connections immediately (no pooling)
-    db_config['CONN_HEALTH_CHECKS'] = False  # Disable health checks
+    # ULTRA AGGRESSIVE memory optimization for Render free tier with WebSockets
+    db_config['CONN_MAX_AGE'] = 30  # 30 seconds only (minimal pooling)
+    db_config['CONN_HEALTH_CHECKS'] = True
     
     # Add PostgreSQL-specific optimizations
     if 'postgres' in DATABASE_URL:
@@ -107,8 +107,8 @@ elif DATABASE_URL:
             'connect_timeout': 10,
             'options': '-c statement_timeout=30000',
         }
-        # No connection pooling - close immediately
-        db_config['CONN_MAX_AGE'] = 0
+        # Minimal connection pooling
+        db_config['CONN_MAX_AGE'] = 30
     
     DATABASES = {
         'default': db_config
@@ -255,10 +255,21 @@ POLLINATIONS_API_KEY = os.getenv('POLLINATIONS_API_KEY')
 # Replicate API Configuration
 REPLICATE_API_TOKEN = os.getenv('REPLICATE_API_TOKEN')
 
-# SendGrid Email Configuration
+# Email Configuration
+# Supports Brevo, SendGrid, and Gmail SMTP
+BREVO_API_KEY = os.getenv('BREVO_API_KEY')
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 FROM_EMAIL = os.getenv('FROM_EMAIL', 'noreply@pixeltales.com')
 EMAIL_VERIFICATION_EXPIRY_MINUTES = int(os.getenv('EMAIL_VERIFICATION_EXPIRY_MINUTES', 15))
+
+# Gmail SMTP Configuration (Fallback option)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('GMAIL_EMAIL')
+EMAIL_HOST_PASSWORD = os.getenv('GMAIL_APP_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('FROM_EMAIL', os.getenv('GMAIL_EMAIL', 'noreply@pixeltales.com'))
 
 # Google Cloud Text-to-Speech Configuration
 # Handle both local development (file path) and production (base64 encoded JSON)
@@ -307,36 +318,16 @@ CACHES = {
     }
 }
 
-# Channels Configuration
-# Use Redis for production (multi-process support)
-# Use InMemory for local development
-REDIS_URL = os.getenv('REDIS_URL')
-
-if REDIS_URL and not DEBUG:
-    # Production: Use Redis for multi-process WebSocket support
-    CHANNEL_LAYERS = {
-        'default': {
-            'BACKEND': 'channels_redis.core.RedisChannelLayer',
-            'CONFIG': {
-                "hosts": [REDIS_URL],
-                "capacity": 300,  # Messages per channel
-                "expiry": 60,  # Message expiry in seconds
-            },
+# Channels Configuration - ULTRA MINIMAL for free tier
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        'CONFIG': {
+            'capacity': 50,  # REDUCED: Only 50 messages in memory
+            'expiry': 30,  # REDUCED: Messages expire after 30 seconds
         },
-    }
-    print("✅ Using Redis for Channels (Production)")
-else:
-    # Local development: Use InMemory
-    CHANNEL_LAYERS = {
-        'default': {
-            'BACKEND': 'channels.layers.InMemoryChannelLayer',
-            'CONFIG': {
-                'capacity': 50,  # Only 50 messages in memory
-                'expiry': 30,  # Messages expire after 30 seconds
-            },
-        },
-    }
-    print("⚠️ Using InMemory Channels (Development only - not for production)")
+    },
+}
 
 # ASGI application timeout settings for memory efficiency
 ASGI_APPLICATION = 'storybookapi.asgi.application'

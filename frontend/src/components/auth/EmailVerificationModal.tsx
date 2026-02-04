@@ -128,16 +128,33 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
     try {
       const response = await authService.resendVerificationCode(email);
       
+      // Check if email is already verified
+      if (response.already_verified) {
+        setSuccess('Email is already verified! You can now log in.');
+        setIsResending(false);
+        setTimeout(() => {
+          onVerificationSuccess();
+        }, 2000);
+        return;
+      }
+      
       if (response.email_sent) {
         setSuccess('New verification code sent! Check your email.');
         setResendCountdown(60); // 60 second cooldown
         setVerificationCode(['', '', '', '', '', '']);
         
-        // Focus first input
-        const firstInput = document.getElementById('code-input-0');
-        if (firstInput) {
-          firstInput.focus();
-        }
+        // Clear success message after 3 seconds to re-enable inputs
+        setTimeout(() => {
+          setSuccess('');
+        }, 3000);
+        
+        // Focus first input after a short delay
+        setTimeout(() => {
+          const firstInput = document.getElementById('code-input-0');
+          if (firstInput) {
+            firstInput.focus();
+          }
+        }, 100);
       } else {
         setError('Failed to resend code. Please try again.');
       }
@@ -198,7 +215,7 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
               onChange={(e) => handleCodeChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={index === 0 ? handlePaste : undefined}
-              disabled={isVerifying || success !== ''}
+              disabled={isVerifying || success === 'Email verified successfully! Redirecting...'}
               className={`email-verification-code-input ${digit ? 'filled' : ''}`}
             />
           ))}
@@ -207,10 +224,10 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
         {/* Verify Button */}
         <button
           onClick={() => handleVerify()}
-          disabled={isVerifying || verificationCode.some(d => !d) || success !== ''}
+          disabled={isVerifying || verificationCode.some(d => !d) || success === 'Email verified successfully! Redirecting...'}
           className="email-verification-verify-btn"
         >
-          {isVerifying ? 'Verifying...' : success ? 'Verified ✓' : 'Verify Email'}
+          {isVerifying ? 'Verifying...' : success === 'Email verified successfully! Redirecting...' ? 'Verified ✓' : 'Verify Email'}
         </button>
 
         {/* Resend Code */}
@@ -220,7 +237,7 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
           </p>
           <button
             onClick={handleResend}
-            disabled={isResending || resendCountdown > 0 || success !== ''}
+            disabled={isResending || resendCountdown > 0 || success === 'Email verified successfully! Redirecting...'}
             className="email-verification-resend-btn"
           >
             {isResending ? 'Sending...' : resendCountdown > 0 ? `Resend in ${resendCountdown}s` : 'Resend Code'}
@@ -230,14 +247,14 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
         {/* Help Text */}
         <div className="email-verification-help">
           <p>
-            💡 <strong>Tip:</strong> Check your spam folder if you don't see the email. The code expires in 15 minutes.
+            💡 <strong>Tip:</strong> Check your spam folder if you don't see the email. The code expires in 2 minutes.
           </p>
         </div>
 
         {/* Cancel Button */}
         <button
           onClick={onCancel}
-          disabled={success !== ''}
+          disabled={success === 'Email verified successfully! Redirecting...'}
           className="email-verification-cancel-btn"
         >
           Cancel
