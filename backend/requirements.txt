@@ -13,6 +13,7 @@ channels==4.0.0
 channels-redis>=4.0.0
 daphne==4.0.0
 sendgrid==6.11.0
+sib-api-v3-sdk==7.6.0
 gunicorn==21.2.0
 whitenoise==6.6.0
 dj-database-url==2.1.0

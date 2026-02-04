@@ -1,13 +1,31 @@
 """
-Email service for sending verification codes and other emails using SendGrid
+Email service for sending verification codes and other emails
+Supports SendGrid, Brevo (Sendinblue), and Gmail SMTP (Django's email backend)
 """
 import os
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Email, To, Content
+from django.core.mail import send_mail
 from django.conf import settings
 import logging
 
 logger = logging.getLogger(__name__)
+
+# Try to import SendGrid (optional)
+try:
+    from sendgrid import SendGridAPIClient
+    from sendgrid.helpers.mail import Mail, Email, To, Content
+    SENDGRID_AVAILABLE = True
+except ImportError:
+    SENDGRID_AVAILABLE = False
+    logger.info("SendGrid not installed")
+
+# Try to import Brevo (optional)
+try:
+    import sib_api_v3_sdk
+    from sib_api_v3_sdk.rest import ApiException
+    BREVO_AVAILABLE = True
+except ImportError:
+    BREVO_AVAILABLE = False
+    logger.info("Brevo not installed")
 
 
 class EmailService:
@@ -17,6 +35,7 @@ class EmailService:
     def send_verification_email(to_email, verification_code, user_name):
         """
         Send email verification code to user
+        Automatically uses SendGrid if available, otherwise uses Gmail SMTP
         
         Args:
             to_email (str): Recipient email address
@@ -27,15 +46,6 @@ class EmailService:
             bool: True if email sent successfully, False otherwise
         """
         try:
-            # Get SendGrid API key from settings
-            api_key = settings.SENDGRID_API_KEY
-            if not api_key:
-                logger.error("SendGrid API key not configured")
-                return False
-            
-            # Create email content
-            from_email = Email(settings.FROM_EMAIL)
-            to_email_obj = To(to_email)
             subject = "Verify Your Email - PixelTales"
             
             # HTML email template
@@ -139,25 +149,71 @@ class EmailService:
             © 2025 PixelTales
             """
             
-            # Create the email message
-            message = Mail(
-                from_email=from_email,
-                to_emails=to_email_obj,
-                subject=subject,
-                plain_text_content=text_content,
-                html_content=html_content
-            )
+            # Try Brevo first, then SendGrid, then Gmail SMTP
+            brevo_key = getattr(settings, 'BREVO_API_KEY', None)
+            sendgrid_key = getattr(settings, 'SENDGRID_API_KEY', None)
             
-            # Send the email
-            sg = SendGridAPIClient(api_key)
-            response = sg.send(message)
-            
-            if response.status_code in [200, 201, 202]:
-                logger.info(f"Verification email sent successfully to {to_email}")
-                return True
+            if brevo_key and BREVO_AVAILABLE:
+                # Use Brevo (Sendinblue)
+                logger.info("Sending email via Brevo")
+                try:
+                    configuration = sib_api_v3_sdk.Configuration()
+                    configuration.api_key['api-key'] = brevo_key
+                    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+                        sib_api_v3_sdk.ApiClient(configuration)
+                    )
+                    
+                    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+                        to=[{"email": to_email, "name": user_name}],
+                        sender={"name": "Imaginary Worlds", "email": settings.FROM_EMAIL},
+                        subject=subject,
+                        html_content=html_content,
+                        text_content=text_content.strip()
+                    )
+                    
+                    response = api_instance.send_transac_email(send_smtp_email)
+                    logger.info(f"Verification email sent successfully via Brevo to {to_email}")
+                    return True
+                except ApiException as e:
+                    logger.error(f"Brevo API error: {str(e)}")
+                    return False
+                    
+            elif sendgrid_key and SENDGRID_AVAILABLE:
+                # Use SendGrid
+                logger.info("Sending email via SendGrid")
+                from_email_obj = Email(settings.FROM_EMAIL)
+                to_email_obj = To(to_email)
+                
+                message = Mail(
+                    from_email=from_email_obj,
+                    to_emails=to_email_obj,
+                    subject=subject,
+                    plain_text_content=text_content,
+                    html_content=html_content
+                )
+                
+                sg = SendGridAPIClient(sendgrid_key)
+                response = sg.send(message)
+                
+                if response.status_code in [200, 201, 202]:
+                    logger.info(f"Verification email sent successfully via SendGrid to {to_email}")
+                    return True
+                else:
+                    logger.error(f"SendGrid returned status code: {response.status_code}")
+                    return False
             else:
-                logger.error(f"SendGrid returned status code: {response.status_code}")
-                return False
+                # Use Gmail SMTP (Django's email backend)
+                logger.info("Sending email via Gmail SMTP (Django email backend)")
+                send_mail(
+                    subject=subject,
+                    message=text_content,
+                    html_message=html_content,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[to_email],
+                    fail_silently=False,
+                )
+                logger.info(f"Verification email sent successfully via Gmail SMTP to {to_email}")
+                return True
                 
         except Exception as e:
             logger.error(f"Error sending verification email: {str(e)}")
@@ -177,13 +233,6 @@ class EmailService:
             bool: True if email sent successfully, False otherwise
         """
         try:
-            api_key = settings.SENDGRID_API_KEY
-            if not api_key:
-                logger.error("SendGrid API key not configured")
-                return False
-            
-            from_email = Email(settings.FROM_EMAIL)
-            to_email_obj = To(to_email)
             subject = "Password Reset Code - PixelTales"
             
             html_content = f"""
@@ -272,23 +321,71 @@ class EmailService:
             © 2025 Pixel Tales
             """
             
-            message = Mail(
-                from_email=from_email,
-                to_emails=to_email_obj,
-                subject=subject,
-                plain_text_content=text_content,
-                html_content=html_content
-            )
+            # Try Brevo first, then SendGrid, then Gmail SMTP
+            brevo_key = getattr(settings, 'BREVO_API_KEY', None)
+            sendgrid_key = getattr(settings, 'SENDGRID_API_KEY', None)
             
-            sg = SendGridAPIClient(api_key)
-            response = sg.send(message)
-            
-            if response.status_code in [200, 201, 202]:
-                logger.info(f"Password reset email sent successfully to {to_email}")
-                return True
+            if brevo_key and BREVO_AVAILABLE:
+                # Use Brevo (Sendinblue)
+                logger.info("Sending password reset email via Brevo")
+                try:
+                    configuration = sib_api_v3_sdk.Configuration()
+                    configuration.api_key['api-key'] = brevo_key
+                    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+                        sib_api_v3_sdk.ApiClient(configuration)
+                    )
+                    
+                    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+                        to=[{"email": to_email, "name": user_name}],
+                        sender={"name": "Imaginary Worlds", "email": settings.FROM_EMAIL},
+                        subject=subject,
+                        html_content=html_content,
+                        text_content=text_content.strip()
+                    )
+                    
+                    response = api_instance.send_transac_email(send_smtp_email)
+                    logger.info(f"Password reset email sent successfully via Brevo to {to_email}")
+                    return True
+                except ApiException as e:
+                    logger.error(f"Brevo API error: {str(e)}")
+                    return False
+                    
+            elif sendgrid_key and SENDGRID_AVAILABLE:
+                # Use SendGrid
+                logger.info("Sending password reset email via SendGrid")
+                from_email = Email(settings.FROM_EMAIL)
+                to_email_obj = To(to_email)
+                
+                message = Mail(
+                    from_email=from_email,
+                    to_emails=to_email_obj,
+                    subject=subject,
+                    plain_text_content=text_content,
+                    html_content=html_content
+                )
+                
+                sg = SendGridAPIClient(sendgrid_key)
+                response = sg.send(message)
+                
+                if response.status_code in [200, 201, 202]:
+                    logger.info(f"Password reset email sent successfully via SendGrid to {to_email}")
+                    return True
+                else:
+                    logger.error(f"SendGrid returned status code: {response.status_code}")
+                    return False
             else:
-                logger.error(f"SendGrid returned status code: {response.status_code}")
-                return False
+                # Use Gmail SMTP (Django's email backend)
+                logger.info("Sending password reset email via Gmail SMTP")
+                send_mail(
+                    subject=subject,
+                    message=text_content,
+                    html_message=html_content,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[to_email],
+                    fail_silently=False,
+                )
+                logger.info(f"Password reset email sent successfully via Gmail SMTP to {to_email}")
+                return True
                 
         except Exception as e:
             logger.error(f"Error sending password reset email: {str(e)}")
@@ -309,13 +406,6 @@ class EmailService:
             bool: True if email sent successfully, False otherwise
         """
         try:
-            api_key = settings.SENDGRID_API_KEY
-            if not api_key:
-                logger.error("SendGrid API key not configured")
-                return False
-            
-            from_email = Email(settings.FROM_EMAIL)
-            to_email_obj = To(to_email)
             subject = f"🎉 {child_name} Earned an Achievement!"
             
             html_content = f"""
@@ -436,19 +526,67 @@ class EmailService:
             © 2024 Pixel Tales. All rights reserved.
             """
             
-            message = Mail(
-                from_email=from_email,
-                to_emails=to_email_obj,
-                subject=subject,
-                plain_text_content=plain_text_content,
-                html_content=html_content
-            )
+            # Try Brevo first, then SendGrid, then Gmail SMTP
+            brevo_key = getattr(settings, 'BREVO_API_KEY', None)
+            sendgrid_key = getattr(settings, 'SENDGRID_API_KEY', None)
             
-            sg = SendGridAPIClient(api_key)
-            response = sg.send(message)
-            
-            logger.info(f"Achievement alert email sent successfully to {to_email}. Status: {response.status_code}")
-            return True
+            if brevo_key and BREVO_AVAILABLE:
+                # Use Brevo (Sendinblue)
+                logger.info("Sending achievement alert via Brevo")
+                try:
+                    configuration = sib_api_v3_sdk.Configuration()
+                    configuration.api_key['api-key'] = brevo_key
+                    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+                        sib_api_v3_sdk.ApiClient(configuration)
+                    )
+                    
+                    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+                        to=[{"email": to_email, "name": child_name}],
+                        sender={"name": "Imaginary Worlds", "email": settings.FROM_EMAIL},
+                        subject=subject,
+                        html_content=html_content,
+                        text_content=plain_text_content.strip()
+                    )
+                    
+                    response = api_instance.send_transac_email(send_smtp_email)
+                    logger.info(f"Achievement alert email sent successfully via Brevo to {to_email}")
+                    return True
+                except ApiException as e:
+                    logger.error(f"Brevo API error: {str(e)}")
+                    return False
+                    
+            elif sendgrid_key and SENDGRID_AVAILABLE:
+                # Use SendGrid
+                logger.info("Sending achievement alert via SendGrid")
+                from_email = Email(settings.FROM_EMAIL)
+                to_email_obj = To(to_email)
+                
+                message = Mail(
+                    from_email=from_email,
+                    to_emails=to_email_obj,
+                    subject=subject,
+                    plain_text_content=plain_text_content,
+                    html_content=html_content
+                )
+                
+                sg = SendGridAPIClient(sendgrid_key)
+                response = sg.send(message)
+                
+                logger.info(f"Achievement alert email sent successfully via SendGrid to {to_email}. Status: {response.status_code}")
+                return True
+            else:
+                # Use Gmail SMTP (Django's email backend)
+                logger.info("Sending achievement alert via Gmail SMTP")
+                send_mail(
+                    subject=subject,
+                    message=plain_text_content,
+                    html_message=html_content,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[to_email],
+                    fail_silently=False,
+                )
+                logger.info(f"Achievement alert email sent successfully via Gmail SMTP to {to_email}")
+                return True
             
         except Exception as e:
             logger.error(f"Error sending achievement alert email: {str(e)}")
@@ -469,13 +607,6 @@ class EmailService:
             bool: True if email sent successfully, False otherwise
         """
         try:
-            api_key = settings.SENDGRID_API_KEY
-            if not api_key:
-                logger.error("SendGrid API key not configured")
-                return False
-            
-            from_email = Email(settings.FROM_EMAIL)
-            to_email_obj = To(to_email)
             subject = f"🎯 {child_name} Completed a Learning Goal!"
             
             html_content = f"""
@@ -596,19 +727,67 @@ class EmailService:
             © 2024 Pixel Tales. All rights reserved.
             """
             
-            message = Mail(
-                from_email=from_email,
-                to_emails=to_email_obj,
-                subject=subject,
-                plain_text_content=plain_text_content,
-                html_content=html_content
-            )
+            # Try Brevo first, then SendGrid, then Gmail SMTP
+            brevo_key = getattr(settings, 'BREVO_API_KEY', None)
+            sendgrid_key = getattr(settings, 'SENDGRID_API_KEY', None)
             
-            sg = SendGridAPIClient(api_key)
-            response = sg.send(message)
-            
-            logger.info(f"Goal completion alert email sent successfully to {to_email}. Status: {response.status_code}")
-            return True
+            if brevo_key and BREVO_AVAILABLE:
+                # Use Brevo (Sendinblue)
+                logger.info("Sending goal completion alert via Brevo")
+                try:
+                    configuration = sib_api_v3_sdk.Configuration()
+                    configuration.api_key['api-key'] = brevo_key
+                    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+                        sib_api_v3_sdk.ApiClient(configuration)
+                    )
+                    
+                    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+                        to=[{"email": to_email, "name": child_name}],
+                        sender={"name": "Imaginary Worlds", "email": settings.FROM_EMAIL},
+                        subject=subject,
+                        html_content=html_content,
+                        text_content=plain_text_content.strip()
+                    )
+                    
+                    response = api_instance.send_transac_email(send_smtp_email)
+                    logger.info(f"Goal completion alert email sent successfully via Brevo to {to_email}")
+                    return True
+                except ApiException as e:
+                    logger.error(f"Brevo API error: {str(e)}")
+                    return False
+                    
+            elif sendgrid_key and SENDGRID_AVAILABLE:
+                # Use SendGrid
+                logger.info("Sending goal completion alert via SendGrid")
+                from_email = Email(settings.FROM_EMAIL)
+                to_email_obj = To(to_email)
+                
+                message = Mail(
+                    from_email=from_email,
+                    to_emails=to_email_obj,
+                    subject=subject,
+                    plain_text_content=plain_text_content,
+                    html_content=html_content
+                )
+                
+                sg = SendGridAPIClient(sendgrid_key)
+                response = sg.send(message)
+                
+                logger.info(f"Goal completion alert email sent successfully via SendGrid to {to_email}. Status: {response.status_code}")
+                return True
+            else:
+                # Use Gmail SMTP (Django's email backend)
+                logger.info("Sending goal completion alert via Gmail SMTP")
+                send_mail(
+                    subject=subject,
+                    message=plain_text_content,
+                    html_message=html_content,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[to_email],
+                    fail_silently=False,
+                )
+                logger.info(f"Goal completion alert email sent successfully via Gmail SMTP to {to_email}")
+                return True
             
         except Exception as e:
             logger.error(f"Error sending goal completion alert email: {str(e)}")
@@ -634,13 +813,6 @@ class EmailService:
             bool: True if email sent successfully, False otherwise
         """
         try:
-            api_key = settings.SENDGRID_API_KEY
-            if not api_key:
-                logger.error("SendGrid API key not configured")
-                return False
-            
-            from_email = Email(settings.FROM_EMAIL)
-            to_email_obj = To(to_email)
             subject = f"📊 Weekly Progress Report for {child_name}"
             
             # Extract stats with defaults
@@ -807,19 +979,67 @@ class EmailService:
             © 2024 Pixel Tales. All rights reserved.
             """
             
-            message = Mail(
-                from_email=from_email,
-                to_emails=to_email_obj,
-                subject=subject,
-                plain_text_content=plain_text_content,
-                html_content=html_content
-            )
+            # Try Brevo first, then SendGrid, then Gmail SMTP
+            brevo_key = getattr(settings, 'BREVO_API_KEY', None)
+            sendgrid_key = getattr(settings, 'SENDGRID_API_KEY', None)
             
-            sg = SendGridAPIClient(api_key)
-            response = sg.send(message)
-            
-            logger.info(f"Weekly progress report email sent successfully to {to_email}. Status: {response.status_code}")
-            return True
+            if brevo_key and BREVO_AVAILABLE:
+                # Use Brevo (Sendinblue)
+                logger.info("Sending weekly progress report via Brevo")
+                try:
+                    configuration = sib_api_v3_sdk.Configuration()
+                    configuration.api_key['api-key'] = brevo_key
+                    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+                        sib_api_v3_sdk.ApiClient(configuration)
+                    )
+                    
+                    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+                        to=[{"email": to_email, "name": parent_name}],
+                        sender={"name": "Imaginary Worlds", "email": settings.FROM_EMAIL},
+                        subject=subject,
+                        html_content=html_content,
+                        text_content=plain_text_content.strip()
+                    )
+                    
+                    response = api_instance.send_transac_email(send_smtp_email)
+                    logger.info(f"Weekly progress report email sent successfully via Brevo to {to_email}")
+                    return True
+                except ApiException as e:
+                    logger.error(f"Brevo API error: {str(e)}")
+                    return False
+                    
+            elif sendgrid_key and SENDGRID_AVAILABLE:
+                # Use SendGrid
+                logger.info("Sending weekly progress report via SendGrid")
+                from_email = Email(settings.FROM_EMAIL)
+                to_email_obj = To(to_email)
+                
+                message = Mail(
+                    from_email=from_email,
+                    to_emails=to_email_obj,
+                    subject=subject,
+                    plain_text_content=plain_text_content,
+                    html_content=html_content
+                )
+                
+                sg = SendGridAPIClient(sendgrid_key)
+                response = sg.send(message)
+                
+                logger.info(f"Weekly progress report email sent successfully via SendGrid to {to_email}. Status: {response.status_code}")
+                return True
+            else:
+                # Use Gmail SMTP (Django's email backend)
+                logger.info("Sending weekly progress report via Gmail SMTP")
+                send_mail(
+                    subject=subject,
+                    message=plain_text_content,
+                    html_message=html_content,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[to_email],
+                    fail_silently=False,
+                )
+                logger.info(f"Weekly progress report email sent successfully via Gmail SMTP to {to_email}")
+                return True
             
         except Exception as e:
             logger.error(f"Error sending weekly progress report email: {str(e)}")
@@ -838,13 +1058,6 @@ class EmailService:
             bool: True if email sent successfully, False otherwise
         """
         try:
-            api_key = settings.SENDGRID_API_KEY
-            if not api_key:
-                logger.error("SendGrid API key not configured")
-                return False
-            
-            from_email = Email(settings.FROM_EMAIL)
-            to_email_obj = To(to_email)
             subject = "🔔 Test Notification from Pixel Tales"
             
             html_content = f"""
@@ -949,19 +1162,67 @@ class EmailService:
             © 2024 Pixel Tales. All rights reserved.
             """
             
-            message = Mail(
-                from_email=from_email,
-                to_emails=to_email_obj,
-                subject=subject,
-                plain_text_content=plain_text_content,
-                html_content=html_content
-            )
+            # Try Brevo first, then SendGrid, then Gmail SMTP
+            brevo_key = getattr(settings, 'BREVO_API_KEY', None)
+            sendgrid_key = getattr(settings, 'SENDGRID_API_KEY', None)
             
-            sg = SendGridAPIClient(api_key)
-            response = sg.send(message)
-            
-            logger.info(f"Test notification email sent successfully to {to_email}. Status: {response.status_code}")
-            return True
+            if brevo_key and BREVO_AVAILABLE:
+                # Use Brevo (Sendinblue)
+                logger.info("Sending test notification email via Brevo")
+                try:
+                    configuration = sib_api_v3_sdk.Configuration()
+                    configuration.api_key['api-key'] = brevo_key
+                    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+                        sib_api_v3_sdk.ApiClient(configuration)
+                    )
+                    
+                    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+                        to=[{"email": to_email, "name": user_name}],
+                        sender={"name": "Imaginary Worlds", "email": settings.FROM_EMAIL},
+                        subject=subject,
+                        html_content=html_content,
+                        text_content=plain_text_content.strip()
+                    )
+                    
+                    response = api_instance.send_transac_email(send_smtp_email)
+                    logger.info(f"Test notification email sent successfully via Brevo to {to_email}")
+                    return True
+                except ApiException as e:
+                    logger.error(f"Brevo API error: {str(e)}")
+                    return False
+                    
+            elif sendgrid_key and SENDGRID_AVAILABLE:
+                # Use SendGrid
+                logger.info("Sending test notification email via SendGrid")
+                from_email = Email(settings.FROM_EMAIL)
+                to_email_obj = To(to_email)
+                
+                message = Mail(
+                    from_email=from_email,
+                    to_emails=to_email_obj,
+                    subject=subject,
+                    plain_text_content=plain_text_content,
+                    html_content=html_content
+                )
+                
+                sg = SendGridAPIClient(sendgrid_key)
+                response = sg.send(message)
+                
+                logger.info(f"Test notification email sent successfully via SendGrid to {to_email}. Status: {response.status_code}")
+                return True
+            else:
+                # Use Gmail SMTP (Django's email backend)
+                logger.info("Sending test notification email via Gmail SMTP")
+                send_mail(
+                    subject=subject,
+                    message=plain_text_content,
+                    html_message=html_content,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[to_email],
+                    fail_silently=False,
+                )
+                logger.info(f"Test notification email sent successfully via Gmail SMTP to {to_email}")
+                return True
             
         except Exception as e:
             logger.error(f"Error sending test notification email: {str(e)}")
