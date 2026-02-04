@@ -40,7 +40,11 @@ backend/db.sqlite3.backup
 
 # Environment files with sensitive data
 .env
+.env.*
 backend/.env
+backend/.env.*
+frontend/.env
+frontend/.env.*
 
 # Google Cloud Service Account Keys (NEVER COMMIT THESE!)
 *-key.json

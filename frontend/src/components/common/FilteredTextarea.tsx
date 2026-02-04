@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/solid';
 import { validateAndCensor } from '../../utils/profanityFilter';
 
@@ -13,7 +13,7 @@ interface FilteredTextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTe
 /**
  * FilteredTextarea Component
  * Automatically censors profanity in multi-line text and shows warning indicator
- * OPTIMIZED: Uses debounced profanity checking to improve typing performance
+ * HIGHLY OPTIMIZED: Uses controlled local state with aggressive debouncing for APK performance
  */
 export const FilteredTextarea: React.FC<FilteredTextareaProps> = ({
   value,
@@ -28,34 +28,36 @@ export const FilteredTextarea: React.FC<FilteredTextareaProps> = ({
   const [localValue, setLocalValue] = useState(value);
   const warningTimeoutRef = useRef<number | null>(null);
   const filterTimeoutRef = useRef<number | null>(null);
+  const parentUpdateTimeoutRef = useRef<number | null>(null);
+  const lastEmittedValueRef = useRef<string>(value);
 
-  // Sync local value when prop value changes
+  // Sync local value when prop value changes externally (but not from our own updates)
   useEffect(() => {
-    setLocalValue(value);
+    if (value !== lastEmittedValueRef.current && value !== localValue) {
+      setLocalValue(value);
+      lastEmittedValueRef.current = value;
+    }
   }, [value]);
 
-  // Handle textarea change - immediate update without filtering
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const inputValue = e.target.value;
-    
-    // Immediately update local state for responsive typing
-    setLocalValue(inputValue);
-    
-    // Clear any pending filter timeout
-    if (filterTimeoutRef.current) {
-      clearTimeout(filterTimeoutRef.current);
+  // Memoized handler to update parent (debounced)
+  const updateParent = useCallback((inputValue: string) => {
+    if (parentUpdateTimeoutRef.current) {
+      clearTimeout(parentUpdateTimeoutRef.current);
     }
     
-    // Debounce the profanity filtering (300ms)
-    filterTimeoutRef.current = window.setTimeout(() => {
+    // Debounce parent updates to reduce store operations (150ms for better responsiveness)
+    parentUpdateTimeoutRef.current = window.setTimeout(() => {
       const { censored, hasProfanity, warning: warningMsg } = validateAndCensor(inputValue);
       
-      // Only update parent if text was actually censored
-      if (censored !== inputValue) {
+      // Only update parent if value actually changed
+      if (censored !== lastEmittedValueRef.current) {
+        lastEmittedValueRef.current = censored;
         onChange(censored);
-        setLocalValue(censored);
-      } else {
-        onChange(inputValue);
+        
+        // Update local value if censored
+        if (censored !== inputValue) {
+          setLocalValue(censored);
+        }
       }
       
       // Show warning if profanity detected
@@ -76,8 +78,19 @@ export const FilteredTextarea: React.FC<FilteredTextareaProps> = ({
         setShowWarningMessage(false);
         onProfanityDetected?.(false);
       }
-    }, 300); // 300ms debounce
-  };
+    }, 150); // Reduced to 150ms for better balance
+  }, [onChange, onProfanityDetected, showWarning]);
+
+  // Handle textarea change - immediate local update only
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const inputValue = e.target.value;
+    
+    // Immediately update local state for instant visual feedback
+    setLocalValue(inputValue);
+    
+    // Debounce parent update
+    updateParent(inputValue);
+  }, [updateParent]);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -87,6 +100,9 @@ export const FilteredTextarea: React.FC<FilteredTextareaProps> = ({
       }
       if (filterTimeoutRef.current) {
         clearTimeout(filterTimeoutRef.current);
+      }
+      if (parentUpdateTimeoutRef.current) {
+        clearTimeout(parentUpdateTimeoutRef.current);
       }
     };
   }, []);

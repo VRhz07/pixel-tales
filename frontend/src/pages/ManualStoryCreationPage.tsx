@@ -2453,24 +2453,39 @@ const ManualStoryCreationPage: React.FC = () => {
     markAsDraft(currentStory.id);
   };
 
+  // Ref to debounce updateCurrentPageContent
+  const contentUpdateTimeoutRef = useRef<number | null>(null);
+  const lastContentRef = useRef<string>('');
+
   const updateCurrentPageContent = (content: string) => {
-    // Emit typing activity presence
-    if (isCollaborating && currentSessionId) {
-      collaborationService.updatePresence(null, 'text', 'typing_text');
-    }
     if (!currentStory || !currentPage) return;
     
+    // Immediately update the page content for instant feedback
     updatePage(currentStory.id, currentPage.id, { text: content });
-    setHasUnsavedChanges(true);
     
-    // Mark as draft when content changes
-    markAsDraft(currentStory.id);
-    
-    // If collaborating, sync text changes
-    if (isCollaborating && currentSessionId) {
-      console.log('📤 Syncing text change to collaborators...');
-      handleTextChange(currentPageIndex, content);
+    // Clear any pending timeout
+    if (contentUpdateTimeoutRef.current) {
+      clearTimeout(contentUpdateTimeoutRef.current);
     }
+    
+    // Debounce the heavy operations (presence, draft marking, collaboration sync)
+    contentUpdateTimeoutRef.current = window.setTimeout(() => {
+      // Only proceed if content actually changed
+      if (content === lastContentRef.current) return;
+      lastContentRef.current = content;
+      
+      setHasUnsavedChanges(true);
+      
+      // Mark as draft when content changes
+      markAsDraft(currentStory.id);
+      
+      // Emit typing activity presence (throttled)
+      if (isCollaborating && currentSessionId) {
+        collaborationService.updatePresence(null, 'text', 'typing_text');
+        console.log('📤 Syncing text change to collaborators...');
+        handleTextChange(currentPageIndex, content);
+      }
+    }, 100); // Very short delay, just enough to batch rapid keystrokes
   };
 
   // AI Enhancement handlers
