@@ -975,3 +975,61 @@ def delete_account(request):
         return Response({
             'error': f'Failed to delete account: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def change_email(request):
+    """
+    Change user email (requires authentication and password confirmation)
+    """
+    try:
+        new_email = request.data.get('new_email')
+        password = request.data.get('password')
+        
+        if not new_email or not password:
+            return Response({
+                'error': 'New email and password are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = request.user
+        
+        # Verify password
+        if not user.check_password(password):
+            return Response({
+                'error': 'Incorrect password'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if email already exists
+        if User.objects.filter(email=new_email).exclude(id=user.id).exists():
+            return Response({
+                'error': 'This email is already in use'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate email format
+        from django.core.validators import validate_email
+        from django.core.exceptions import ValidationError
+        try:
+            validate_email(new_email)
+        except ValidationError:
+            return Response({
+                'error': 'Invalid email format'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Update email
+        user.email = new_email
+        user.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Email changed successfully',
+            'email': new_email
+        }, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Email change error: {str(e)}")
+        return Response({
+            'error': f'Failed to change email: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

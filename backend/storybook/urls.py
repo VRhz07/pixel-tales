@@ -5,7 +5,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from .jwt_auth import CustomTokenObtainPairView, jwt_register, jwt_logout, jwt_user_profile, jwt_create_session, verify_email, resend_verification_code, verify_password, send_password_reset_code, verify_password_reset_code, reset_password, change_password, delete_account
+from .jwt_auth import CustomTokenObtainPairView, jwt_register, jwt_logout, jwt_user_profile, jwt_create_session, verify_email, resend_verification_code, verify_password, send_password_reset_code, verify_password_reset_code, reset_password, change_password, change_email, delete_account
 from . import views, admin_views, admin_auth, admin_features, admin_profanity, ai_proxy_views, tts_views, game_views, teacher_views, notification_views
 
 # Create a router for ViewSets (we'll add these later)
@@ -34,6 +34,7 @@ urlpatterns = [
     path('auth/password-reset/verify/', verify_password_reset_code, name='verify_password_reset_code'),
     path('auth/password-reset/reset/', reset_password, name='reset_password'),
     path('auth/change-password/', change_password, name='change_password'),
+    path('auth/change-email/', change_email, name='change_email'),
     path('auth/delete-account/', delete_account, name='delete_account'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='jwt_refresh'),
     path('auth/logout/', jwt_logout, name='jwt_logout'),

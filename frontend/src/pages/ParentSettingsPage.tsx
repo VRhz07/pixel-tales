@@ -1123,7 +1123,7 @@ const ParentSettingsPage: React.FC = () => {
       <PasswordUpdateModal
         isOpen={showPasswordModal}
         onClose={() => setShowPasswordModal(false)}
-        onUpdate={handlePasswordChange}
+        onSave={handlePasswordChange}
       />
 
       {/* Add Child Modal */}

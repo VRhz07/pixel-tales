@@ -1429,7 +1429,7 @@ const TeacherSettingsPage: React.FC = () => {
       <PasswordUpdateModal
         isOpen={showPasswordModal}
         onClose={() => setShowPasswordModal(false)}
-        onUpdate={handlePasswordChange}
+        onSave={handlePasswordChange}
       />
 
       {/* Add Student Modal - List of Available Students */}
