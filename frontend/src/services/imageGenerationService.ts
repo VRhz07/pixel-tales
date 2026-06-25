@@ -4,60 +4,7 @@ import apiService from './api';
 import { getVariedCompositionGuidelines, resetCompositionMemory, getEnvironmentSuggestions } from './imageVariety';
 // Alternative: Can be switched to Hugging Face or other services
 
-/**
- * Wait for Pollinations to actually generate the image
- * Polls the URL to check if image is ready (not a placeholder)
- */
-const waitForImageGeneration = async (
-  imageUrl: string, 
-  pageNumber: number,
-  onProgress?: (current: number, total: number, message: string) => void,
-  totalPages?: number
-): Promise<boolean> => {
-  const maxAttempts = 60; // Try for up to 60 seconds (60 attempts x 1 second)
-  const delayMs = 1000; // Check every 1 second
-  
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      // Update progress
-      if (onProgress && totalPages) {
-        const progressMessage = `Waiting for page ${pageNumber} image (${attempt}/${maxAttempts})...`;
-        onProgress(pageNumber, totalPages, progressMessage);
-      }
-      
-      // Fetch the image to check size
-      const response = await fetch(imageUrl, { cache: 'no-cache' });
-      if (!response.ok) {
-        console.log(`⏳ Page ${pageNumber}: Attempt ${attempt}/${maxAttempts} - Not ready yet (${response.status})`);
-        await new Promise(resolve => setTimeout(resolve, delayMs));
-        continue;
-      }
-      
-      const blob = await response.blob();
-      const sizeKB = blob.size / 1024;
-      
-      console.log(`📊 Page ${pageNumber}: Attempt ${attempt}/${maxAttempts} - Image size: ${sizeKB.toFixed(1)}KB`);
-      
-      // Pollinations placeholders are LARGE (1-2MB), real images are smaller (50-100KB)
-      // Accept images that are reasonably sized (< 500KB)
-      if (sizeKB < 500 && sizeKB > 10) {
-        console.log(`✅ Page ${pageNumber}: Real image ready! Size: ${sizeKB.toFixed(1)}KB (attempt ${attempt}/${maxAttempts})`);
-        return true;
-      }
-      
-      console.log(`⏳ Page ${pageNumber}: Large placeholder detected (${sizeKB.toFixed(1)}KB), waiting...`);
-      
-    } catch (error) {
-      console.log(`⏳ Page ${pageNumber}: Attempt ${attempt}/${maxAttempts} - Error checking image:`, error);
-    }
-    
-    // Wait before next attempt
-    await new Promise(resolve => setTimeout(resolve, delayMs));
-  }
-  
-  console.warn(`⚠️ Page ${pageNumber}: Timeout after ${maxAttempts} attempts - image may not be ready`);
-  return false;
-};
+
 
 export interface ImageGenerationParams {
   prompt: string;
@@ -68,6 +15,7 @@ export interface ImageGenerationParams {
   totalPages?: number;
   mood?: string;
   narrativePurpose?: string;
+  model?: string;
 }
 
 // Enhanced composition guidelines with dynamic camera work and environments
@@ -201,17 +149,17 @@ const pollPredictionStatus = async (
  * @returns URL of the generated image or null if generation fails
  */
 export const generateImageWithReplicate = async (params: ImageGenerationParams): Promise<string | null> => {
-  const { prompt, width = 1024, height = 1024, seed } = params;
+  const { prompt, width = 1024, height = 1024, seed, model = 'flux-schnell' } = params;
   
   try {
-    console.log('🎨 Creating Replicate prediction (async, non-blocking)...');
+    console.log(`🎨 Creating Replicate prediction with model ${model} (async, non-blocking)...`);
     const startTime = Date.now();
     
     const response = await apiService.post('/ai/replicate/generate-image/', {
       prompt: prompt,
       width,
       height,
-      model: 'flux-schnell', // Fast and free model
+      model, // Pass selected model
       seed: seed || Math.floor(Math.random() * 1000000),
       async: true, // Use async mode
     });
@@ -663,11 +611,13 @@ export const generateStoryIllustrationsFromPrompts = async (
     pageNumber?: number;
   }>,
   characterDescription?: string,
-  onProgress?: (current: number, total: number, message: string) => void
+  onProgress?: (current: number, total: number, message: string) => void,
+  imageModel: string = 'pollinations'
 ): Promise<(string | null)[]> => {
   console.log('🎨 generateStoryIllustrationsFromPrompts called with:', {
     pageCount: pages.length,
     characterDescription: characterDescription?.substring(0, 50) + '...',
+    imageModel,
     pagesStructure: pages.map((p, i) => ({
       index: i,
       hasImagePrompt: !!p.imagePrompt,
@@ -677,77 +627,124 @@ export const generateStoryIllustrationsFromPrompts = async (
     }))
   });
   
-  const results: (string | null)[] = [];
-  
-  // Process pages sequentially to avoid overwhelming Pollinations
-  for (let index = 0; index < pages.length; index++) {
-    const page = pages[index];
+  if (imageModel === 'pollinations') {
+    console.log(`🚀 Using PARALLEL generation for Pollinations AI (${pages.length} pages)`);
     
-    if (!page.imagePrompt) {
-      console.error(`❌ Page ${index + 1} missing imagePrompt field!`);
-      console.error(`   Available keys:`, Object.keys(page));
-      results.push(null);
-      continue;
-    }
-
-    if (index > 0) {
-      console.log(`⏳ Waiting 10 seconds before requesting page ${index + 1} to respect rate limit...`);
-      await new Promise(resolve => setTimeout(resolve, 10000));
-    }
+    // Variables for concurrent progress tracking
+    let completedCount = 0;
     
-    try {
-      console.log(`🖼️ Page ${index + 1}/${pages.length}: Starting image generation...`);
-      if (onProgress) {
-        onProgress(index + 1, pages.length, `Generating image for page ${index + 1}...`);
+    // Process all pages concurrently for Pollinations
+    const generationPromises = pages.map(async (page, index) => {
+      if (!page.imagePrompt) {
+        console.error(`❌ Page ${index + 1} missing imagePrompt field!`);
+        return null;
       }
       
-      // Generate unique seed
-      const uniqueSeed = Date.now() + (index * 10000);
+      try {
+        // Generate unique seed
+        const uniqueSeed = Date.now() + (index * 10000);
+        
+        console.log(`🖼️ Page ${index + 1}/${pages.length}: Starting image generation...`);
+        if (onProgress) {
+          onProgress(completedCount, pages.length, `Generating ${pages.length} images concurrently...`);
+        }
+        
+        // Add a tiny stagger to avoid slamming the backend connection pool at the exact same millisecond
+        if (index > 0) {
+          await new Promise(resolve => setTimeout(resolve, index * 200)); 
+        }
+        
+        const imageUrl = await generateImage({
+          prompt: page.imagePrompt,
+          width: 1024,
+          height: 1024,
+          seed: uniqueSeed
+        });
+        
+        if (!imageUrl) {
+          console.error(`❌ Page ${index + 1}: Image generation failed`);
+          completedCount++;
+          return null;
+        }
+        
+        console.log(`📝 Page ${index + 1}: URL received: ${imageUrl.substring(0, 100)}...`);
+        console.log(`✅ Page ${index + 1}: Image proxy URL mapped and ready!`);
+        
+        completedCount++;
+        if (onProgress) {
+          onProgress(completedCount, pages.length, `Completed ${completedCount} of ${pages.length} images...`);
+        }
+        
+        return imageUrl;
+        
+      } catch (error) {
+        console.error(`❌ Page ${index + 1}: Error during generation:`, error);
+        completedCount++;
+        return null;
+      }
+    });
+    
+    const results = await Promise.all(generationPromises);
+    console.log(`🎉 Parallel image generation complete! ${results.filter(r => r !== null).length}/${pages.length} images ready`);
+    return results;
+    
+  } else {
+    // Keep sequential processing for Replicate/others to respect rate limits
+    console.log(`🐌 Using SEQUENTIAL generation for ${imageModel} to respect rate limits`);
+    const results: (string | null)[] = [];
+    
+    for (let index = 0; index < pages.length; index++) {
+      const page = pages[index];
       
-      // Try Replicate first, fallback to Pollinations
-      let imageUrl = await generateImageWithReplicate({
-        prompt: page.imagePrompt,
-        width: 1024,
-        height: 1024,
-        seed: uniqueSeed,
-        pageNumber: page.pageNumber || (index + 1),
-        totalPages: pages.length
-      });
-      
-      // Check if image generation succeeded
-      if (!imageUrl) {
-        console.error(`❌ Page ${index + 1}: Image generation failed (likely rate limit - try again tomorrow)`);
+      if (!page.imagePrompt) {
+        console.error(`❌ Page ${index + 1} missing imagePrompt field!`);
         results.push(null);
         continue;
       }
-      
-      console.log(`📝 Page ${index + 1}: URL received: ${imageUrl.substring(0, 100)}...`);
-      
-      // Poll the URL to wait for real image (not placeholder)
-      console.log(`⏳ Page ${index + 1}: Waiting for real image to be generated...`);
-      
-      const isImageReady = await waitForImageGeneration(imageUrl, index + 1, onProgress, pages.length);
-      
-      if (!isImageReady) {
-        console.warn(`⚠️ Page ${index + 1}: Image generation timed out after 60 seconds`);
-        console.warn(`⚠️ Saving URL anyway - image may still be generating in background`);
-      } else {
-        console.log(`✅ Page ${index + 1}: Real image verified and ready!`);
+
+      if (index > 0) {
+        console.log(`⏳ Waiting 10 seconds before requesting page ${index + 1} to respect rate limit...`);
+        await new Promise(resolve => setTimeout(resolve, 10000));
       }
       
-      results.push(imageUrl);
-      
-      // No additional delay needed here since we already waited before the request
-      // The 10s delay before each request handles rate limiting
-      
-    } catch (error) {
-      console.error(`❌ Page ${index + 1}: Error during generation:`, error);
-      results.push(null);
+      try {
+        console.log(`🖼️ Page ${index + 1}/${pages.length}: Starting image generation with model ${imageModel}...`);
+        if (onProgress) {
+          onProgress(index + 1, pages.length, `Generating image for page ${index + 1}...`);
+        }
+        
+        const uniqueSeed = Date.now() + (index * 10000);
+        
+        const imageUrl = await generateImageWithReplicate({
+          prompt: page.imagePrompt,
+          width: 1024,
+          height: 1024,
+          seed: uniqueSeed,
+          pageNumber: page.pageNumber || (index + 1),
+          totalPages: pages.length,
+          model: imageModel
+        });
+        
+        if (!imageUrl) {
+          console.error(`❌ Page ${index + 1}: Image generation failed (likely rate limit or service error)`);
+          results.push(null);
+          continue;
+        }
+        
+        console.log(`📝 Page ${index + 1}: URL received: ${imageUrl.substring(0, 100)}...`);
+        console.log(`✅ Page ${index + 1}: Image ready!`);
+        
+        results.push(imageUrl);
+        
+      } catch (error) {
+        console.error(`❌ Page ${index + 1}: Error during generation:`, error);
+        results.push(null);
+      }
     }
+    
+    console.log(`🎉 Sequential image generation complete! ${results.filter(r => r !== null).length}/${pages.length} images ready`);
+    return results;
   }
-  
-  console.log(`🎉 Image generation complete! ${results.filter(r => r !== null).length}/${pages.length} images ready`);
-  return results;
 };
 
 /**
@@ -918,7 +915,8 @@ export const generateCoverIllustration = async (
   storyDescription: string,
   artStyle: string,
   characterDescription?: string,
-  colorScheme?: string
+  colorScheme?: string,
+  imageModel: string = 'pollinations'
 ): Promise<string | null> => {
   // Cover-specific style prompts with anatomy quality emphasis
   const stylePrompts: Record<string, string> = {
@@ -956,23 +954,36 @@ export const generateCoverIllustration = async (
   // Use consistent seed based on title for reproducibility
   const titleSeed = storyTitle.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   
-  // Try Replicate first for higher quality cover
-  let baseImageUrl = await generateImageWithReplicate({
-    prompt: coverPrompt,
-    width: 1024,
-    height: 1365, // 3:4 ratio for book covers (1024 * 1.333)
-    seed: titleSeed * 100
-  });
-  
-  // Fallback to Pollinations if Replicate fails
-  if (!baseImageUrl) {
-    console.log('⚠️ Replicate failed for cover, falling back to Pollinations...');
+  let baseImageUrl: string | null = null;
+
+  if (imageModel === 'pollinations') {
+    console.log('🎨 Generating cover image with Pollinations...');
     baseImageUrl = await generateImage({
       prompt: coverPrompt,
       width: 512,
       height: 683, // Slightly taller aspect ratio for book covers (3:4 ratio)
       seed: titleSeed * 100
     });
+  } else {
+    console.log(`🎨 Generating cover image with Replicate model ${imageModel}...`);
+    baseImageUrl = await generateImageWithReplicate({
+      prompt: coverPrompt,
+      width: 1024,
+      height: 1365, // 3:4 ratio for book covers (1024 * 1.333)
+      seed: titleSeed * 100,
+      model: imageModel
+    });
+    
+    // Fallback to Pollinations if Replicate fails
+    if (!baseImageUrl) {
+      console.log('⚠️ Replicate failed for cover, falling back to Pollinations...');
+      baseImageUrl = await generateImage({
+        prompt: coverPrompt,
+        width: 512,
+        height: 683,
+        seed: titleSeed * 100
+      });
+    }
   }
   
   if (!baseImageUrl) {

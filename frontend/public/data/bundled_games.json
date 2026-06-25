@@ -1,0 +1,1121 @@
+{
+  "story_games": {
+    "110": {
+      "story_title": "Lila and the Jungle Helpers",
+      "games": [
+        {
+          "id": 466,
+          "story": 110,
+          "story_title": "Lila and the Jungle Helpers",
+          "game_type": "word_search",
+          "game_type_display": "Word Search",
+          "difficulty": "medium",
+          "questions_count": 1,
+          "created_at": "2025-12-15T04:26:24.421185Z"
+        },
+        {
+          "id": 383,
+          "story": 110,
+          "story_title": "Lila and the Jungle Helpers",
+          "game_type": "fill_blanks",
+          "game_type_display": "Fill in the Blanks",
+          "difficulty": "medium",
+          "questions_count": 5,
+          "created_at": "2025-12-14T10:55:08.322405Z"
+        },
+        {
+          "id": 382,
+          "story": 110,
+          "story_title": "Lila and the Jungle Helpers",
+          "game_type": "quiz",
+          "game_type_display": "Multiple Choice Quiz",
+          "difficulty": "medium",
+          "questions_count": 6,
+          "created_at": "2025-12-14T10:55:08.251572Z"
+        }
+      ]
+    },
+    "111": {
+      "story_title": "Whiskers and the Lost School",
+      "games": [
+        {
+          "id": 494,
+          "story": 111,
+          "story_title": "Whiskers and the Lost School",
+          "game_type": "quiz",
+          "game_type_display": "Multiple Choice Quiz",
+          "difficulty": "medium",
+          "questions_count": 3,
+          "created_at": "2025-12-15T05:52:47.167016Z"
+        },
+        {
+          "id": 467,
+          "story": 111,
+          "story_title": "Whiskers and the Lost School",
+          "game_type": "word_search",
+          "game_type_display": "Word Search",
+          "difficulty": "medium",
+          "questions_count": 1,
+          "created_at": "2025-12-15T04:26:24.448199Z"
+        },
+        {
+          "id": 386,
+          "story": 111,
+          "story_title": "Whiskers and the Lost School",
+          "game_type": "fill_blanks",
+          "game_type_display": "Fill in the Blanks",
+          "difficulty": "medium",
+          "questions_count": 5,
+          "created_at": "2025-12-14T10:55:08.538222Z"
+        }
+      ]
+    },
+    "114": {
+      "story_title": "Ang Mahiwagang Bato ni Maya",
+      "games": [
+        {
+          "id": 468,
+          "story": 114,
+          "story_title": "Ang Mahiwagang Bato ni Maya",
+          "game_type": "word_search",
+          "game_type_display": "Word Search",
+          "difficulty": "medium",
+          "questions_count": 1,
+          "created_at": "2025-12-15T04:26:24.474969Z"
+        },
+        {
+          "id": 389,
+          "story": 114,
+          "story_title": "Ang Mahiwagang Bato ni Maya",
+          "game_type": "fill_blanks",
+          "game_type_display": "Fill in the Blanks",
+          "difficulty": "medium",
+          "questions_count": 5,
+          "created_at": "2025-12-14T10:55:08.713986Z"
+        },
+        {
+          "id": 388,
+          "story": 114,
+          "story_title": "Ang Mahiwagang Bato ni Maya",
+          "game_type": "quiz",
+          "game_type_display": "Multiple Choice Quiz",
+          "difficulty": "medium",
+          "questions_count": 6,
+          "created_at": "2025-12-14T10:55:08.675467Z"
+        }
+      ]
+    },
+    "115": {
+      "story_title": "Sparkle's Starry Flight",
+      "games": [
+        {
+          "id": 469,
+          "story": 115,
+          "story_title": "Sparkle's Starry Flight",
+          "game_type": "word_search",
+          "game_type_display": "Word Search",
+          "difficulty": "medium",
+          "questions_count": 1,
+          "created_at": "2025-12-15T04:26:24.501327Z"
+        },
+        {
+          "id": 392,
+          "story": 115,
+          "story_title": "Sparkle's Starry Flight",
+          "game_type": "fill_blanks",
+          "game_type_display": "Fill in the Blanks",
+          "difficulty": "medium",
+          "questions_count": 5,
+          "created_at": "2025-12-14T10:55:08.898001Z"
+        },
+        {
+          "id": 391,
+          "story": 115,
+          "story_title": "Sparkle's Starry Flight",
+          "game_type": "quiz",
+          "game_type_display": "Multiple Choice Quiz",
+          "difficulty": "medium",
+          "questions_count": 3,
+          "created_at": "2025-12-14T10:55:08.860943Z"
+        }
+      ]
+    },
+    "123": {
+      "story_title": "Pip's Puddle Peril",
+      "games": [
+        {
+          "id": 470,
+          "story": 123,
+          "story_title": "Pip's Puddle Peril",
+          "game_type": "word_search",
+          "game_type_display": "Word Search",
+          "difficulty": "medium",
+          "questions_count": 1,
+          "created_at": "2025-12-15T04:26:24.527847Z"
+        },
+        {
+          "id": 395,
+          "story": 123,
+          "story_title": "Pip's Puddle Peril",
+          "game_type": "fill_blanks",
+          "game_type_display": "Fill in the Blanks",
+          "difficulty": "medium",
+          "questions_count": 5,
+          "created_at": "2025-12-14T10:55:09.082129Z"
+        },
+        {
+          "id": 394,
+          "story": 123,
+          "story_title": "Pip's Puddle Peril",
+          "game_type": "quiz",
+          "game_type_display": "Multiple Choice Quiz",
+          "difficulty": "medium",
+          "questions_count": 6,
+          "created_at": "2025-12-14T10:55:09.047001Z"
+        }
+      ]
+    }
+  },
+  "games_data": {
+    "466": {
+      "id": 466,
+      "game_type": "word_search",
+      "questions": [
+        {
+          "id": 2040,
+          "question_type": "word_search",
+          "question_text": "Find all the hidden words from the story in the grid",
+          "options": [
+            "TCASGHTMWWPI",
+            "EALHERSELFVG",
+            "AYSENTIAMFYR",
+            "MCLHATQWKCSA",
+            "WROCIRQITATT",
+            "ORTPOLIYURRE",
+            "REUHROONCRAF",
+            "KVGWIILDGYNU",
+            "RANILCOOZBDL",
+            "WDVUEZKVMHEG",
+            "OZGUIHNMNWDQ",
+            "ORMUABNVUOAP"
+          ],
+          "order": 1,
+          "hint": "Words can be horizontal, vertical, or diagonal",
+          "context": "Words to find: THICK, COOL, HERSELF, TEAMWORK, GRATEFUL, CARRY, STRANDED, CLEARING",
+          "points": 50
+        }
+      ]
+    },
+    "383": {
+      "id": 383,
+      "game_type": "fill_blanks",
+      "questions": [
+        {
+          "id": 1677,
+          "question_type": "fill_blank",
+          "question_text": "Far from her ocean home, Lila the mermaid found herself ______ in a sunny jungle clearing, wondering how she got there.",
+          "options": [
+            "winding",
+            "goodbye",
+            "stranded",
+            "wondering"
+          ],
+          "order": 1,
+          "hint": "The word has 8 letters",
+          "context": "Far from her ocean home, Lila the mermaid found herself stranded in a sunny jungle clearing, wondering how she got there.",
+          "points": 10
+        },
+        {
+          "id": 1678,
+          "question_type": "fill_blank",
+          "question_text": "She longed for the water, but her beautiful tail couldn't ______ her through the thick, green jungle.",
+          "options": [
+            "carry",
+            "sunny",
+            "goodbye",
+            "their"
+          ],
+          "order": 2,
+          "hint": "The word has 5 letters",
+          "context": "She longed for the water, but her beautiful tail couldn't carry her through the thick, green jungle.",
+          "points": 10
+        },
+        {
+          "id": 1679,
+          "question_type": "fill_blank",
+          "question_text": "Suddenly, a group of curious ______ chattered and pointed, showing her a way to the river.",
+          "options": [
+            "monkeys",
+            "stranded",
+            "winding",
+            "goodbye"
+          ],
+          "order": 3,
+          "hint": "The word has 7 letters",
+          "context": "Suddenly, a group of curious monkeys chattered and pointed, showing her a way to the river.",
+          "points": 10
+        },
+        {
+          "id": 1680,
+          "question_type": "fill_blank",
+          "question_text": "With clever teamwork, the monkeys found a big leaf and ______ pushed Lila all the way to the winding riverbank.",
+          "options": [
+            "clever",
+            "gently",
+            "group",
+            "winding"
+          ],
+          "order": 4,
+          "hint": "The word has 6 letters",
+          "context": "With clever teamwork, the monkeys found a big leaf and gently pushed Lila all the way to the winding riverbank.",
+          "points": 10
+        },
+        {
+          "id": 1681,
+          "question_type": "fill_blank",
+          "question_text": "Splashing happily in the cool water, Lila waved ______ to her new jungle friends, grateful for their kindness.",
+          "options": [
+            "through",
+            "winding",
+            "goodbye",
+            "group"
+          ],
+          "order": 5,
+          "hint": "The word has 7 letters",
+          "context": "Splashing happily in the cool water, Lila waved goodbye to her new jungle friends, grateful for their kindness.",
+          "points": 10
+        }
+      ]
+    },
+    "382": {
+      "id": 382,
+      "game_type": "quiz",
+      "questions": [
+        {
+          "id": 1674,
+          "question_type": "multiple_choice",
+          "question_text": "What is the title of this story?",
+          "options": [
+            "Lila and the Jungle Helpers",
+            "The Adventure Begins",
+            "A Magical Journey",
+            "The Secret Discovery"
+          ],
+          "order": 1,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 2037,
+          "question_type": "multiple_choice",
+          "question_text": "What is the title of this story?",
+          "options": [
+            "Lila and the Jungle Helpers",
+            "The Adventure Begins",
+            "A Magical Journey",
+            "The Secret Discovery"
+          ],
+          "order": 1,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 1675,
+          "question_type": "multiple_choice",
+          "question_text": "What type of story is this?",
+          "options": [
+            "Other",
+            "Adventure",
+            "Fantasy",
+            "Mystery"
+          ],
+          "order": 2,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 2038,
+          "question_type": "multiple_choice",
+          "question_text": "What type of story is this?",
+          "options": [
+            "Other",
+            "Adventure",
+            "Fantasy",
+            "Mystery"
+          ],
+          "order": 2,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 1676,
+          "question_type": "multiple_choice",
+          "question_text": "What is the main theme of the story?",
+          "options": [
+            "Adventure and friendship",
+            "Mystery and suspense",
+            "Love and romance",
+            "Fear and danger"
+          ],
+          "order": 3,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 2039,
+          "question_type": "multiple_choice",
+          "question_text": "What is the main theme of the story?",
+          "options": [
+            "Adventure and friendship",
+            "Mystery and suspense",
+            "Love and romance",
+            "Fear and danger"
+          ],
+          "order": 3,
+          "hint": null,
+          "context": null,
+          "points": 10
+        }
+      ]
+    },
+    "494": {
+      "id": 494,
+      "game_type": "quiz",
+      "questions": [
+        {
+          "id": 2153,
+          "question_type": "multiple_choice",
+          "question_text": "What is the title of this story?",
+          "options": [
+            "Whiskers and the Lost School",
+            "The Adventure Begins",
+            "A Magical Journey",
+            "The Secret Discovery"
+          ],
+          "order": 1,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 2154,
+          "question_type": "multiple_choice",
+          "question_text": "What type of story is this?",
+          "options": [
+            "Mystery",
+            "Adventure",
+            "Fantasy",
+            "Action"
+          ],
+          "order": 2,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 2155,
+          "question_type": "multiple_choice",
+          "question_text": "What is the main theme of the story?",
+          "options": [
+            "Adventure and friendship",
+            "Mystery and suspense",
+            "Love and romance",
+            "Fear and danger"
+          ],
+          "order": 3,
+          "hint": null,
+          "context": null,
+          "points": 10
+        }
+      ]
+    },
+    "467": {
+      "id": 467,
+      "game_type": "word_search",
+      "questions": [
+        {
+          "id": 2044,
+          "question_type": "word_search",
+          "question_text": "Find all the hidden words from the story in the grid",
+          "options": [
+            "KYLSMTUXMEWJ",
+            "NOOOYOOAYHOT",
+            "KXTDSBSDLKRR",
+            "ZEOTLTERTDRU",
+            "WFGVOJIBLYIE",
+            "PGEAOKHZNOEB",
+            "OSTHKBQBOFDS",
+            "QJHQIHKMGIDU",
+            "CSEJNTHZCNTN",
+            "AEREGRWOCDXN",
+            "VCUDAQBZMPUY",
+            "REQAKPTUCECF"
+          ],
+          "order": 1,
+          "hint": "Words can be horizontal, vertical, or diagonal",
+          "context": "Words to find: LOOKING, FIND, LOST, HOME, WORRIED, SUNNY, TOGETHER, TRUE",
+          "points": 50
+        }
+      ]
+    },
+    "386": {
+      "id": 386,
+      "game_type": "fill_blanks",
+      "questions": [
+        {
+          "id": 1690,
+          "question_type": "fill_blank",
+          "question_text": "Whiskers, a curious cat with emerald eyes, ______ exploring the quiet pond near his home.",
+          "options": [
+            "friends",
+            "helping",
+            "loved",
+            "dipped"
+          ],
+          "order": 1,
+          "hint": "The word has 5 letters",
+          "context": "Whiskers, a curious cat with emerald eyes, loved exploring the quiet pond near his home.",
+          "points": 10
+        },
+        {
+          "id": 1691,
+          "question_type": "fill_blank",
+          "question_text": "One sunny morning, he spotted a school of ______ goldfish, looking worried and lost far from their home reef.",
+          "options": [
+            "whiskers",
+            "beautiful",
+            "carefully",
+            "shimmering"
+          ],
+          "order": 2,
+          "hint": "The word has 10 letters",
+          "context": "One sunny morning, he spotted a school of shimmering goldfish, looking worried and lost far from their home reef.",
+          "points": 10
+        },
+        {
+          "id": 1692,
+          "question_type": "fill_blank",
+          "question_text": "Whiskers dipped his paw carefully into the cool water, ______ nudging them towards clearer paths.",
+          "options": [
+            "towards",
+            "gently",
+            "found",
+            "helping"
+          ],
+          "order": 3,
+          "hint": "The word has 6 letters",
+          "context": "Whiskers dipped his paw carefully into the cool water, gently nudging them towards clearer paths.",
+          "points": 10
+        },
+        {
+          "id": 1693,
+          "question_type": "fill_blank",
+          "question_text": "Together, they swam until the lost fish found their way back to a beautiful, colorful coral reef – their true home! ______ purred softly, feeling warm and happy for helping his new friends find their way home.",
+          "options": [
+            "purred",
+            "towards",
+            "Whiskers",
+            "dipped"
+          ],
+          "order": 4,
+          "hint": "The word has 8 letters",
+          "context": "Together, they swam until the lost fish found their way back to a beautiful, colorful coral reef – their true home! Whiskers purred softly, feeling warm and happy for helping his new friends find their way home.",
+          "points": 10
+        },
+        {
+          "id": 1694,
+          "question_type": "fill_blank",
+          "question_text": "the cat who help the school of fish find ______ home.",
+          "options": [
+            "found",
+            "helping",
+            "towards",
+            "their"
+          ],
+          "order": 5,
+          "hint": "The word has 5 letters",
+          "context": "the cat who help the school of fish find their home.",
+          "points": 10
+        }
+      ]
+    },
+    "468": {
+      "id": 468,
+      "game_type": "word_search",
+      "questions": [
+        {
+          "id": 2048,
+          "question_type": "word_search",
+          "question_text": "Find all the hidden words from the story in the grid",
+          "options": [
+            "ATAVFHDZKCKU",
+            "GMBSLNAPMXFD",
+            "TBAGKIIBIFOA",
+            "MMDLUYWYARGH",
+            "JAXQACKAANDC",
+            "BLKGRMTRNNGG",
+            "AXMIAABGMAGF",
+            "TLMXNJPOYPGQ",
+            "APNSBIRQTDHK",
+            "GGICCBSRSWSU",
+            "ERYHZPTABIBD",
+            "UZAMHXXHIBEO"
+          ],
+          "order": 1,
+          "hint": "Words can be horizontal, vertical, or diagonal",
+          "context": "Words to find: NIYANG, NIYA, MAKINIS, TABI, BATA, MALAMBOT, HABANG, LIWANAG",
+          "points": 50
+        }
+      ]
+    },
+    "389": {
+      "id": 389,
+      "game_type": "fill_blanks",
+      "questions": [
+        {
+          "id": 1703,
+          "question_type": "fill_blank",
+          "question_text": "Si Maya ay mahilig maglaro sa tabi ng ilog, kung saan ang ______ ay malinaw at ang mga bato ay makinis.",
+          "options": [
+            "tubig",
+            "niyang",
+            "maglaro",
+            "nakita"
+          ],
+          "order": 1,
+          "hint": "The word has 5 letters",
+          "context": "Si Maya ay mahilig maglaro sa tabi ng ilog, kung saan ang tubig ay malinaw at ang mga bato ay makinis.",
+          "points": 10
+        },
+        {
+          "id": 1704,
+          "question_type": "fill_blank",
+          "question_text": "Isang araw, habang naghuhukay, natuklasan niya ang ______ kakaibang bato na may malambot na liwanag.",
+          "options": [
+            "bawat",
+            "maglaro",
+            "isang",
+            "malinaw"
+          ],
+          "order": 2,
+          "hint": "The word has 5 letters",
+          "context": "Isang araw, habang naghuhukay, natuklasan niya ang isang kakaibang bato na may malambot na liwanag.",
+          "points": 10
+        },
+        {
+          "id": 1705,
+          "question_type": "fill_blank",
+          "question_text": "Nang hawakan niya ito, isang malambot na alon ng ______ ang lumabas, at naramdaman niya ang kakaibang init.",
+          "options": [
+            "hawakan",
+            "liwanag",
+            "bawat",
+            "malambot"
+          ],
+          "order": 3,
+          "hint": "The word has 7 letters",
+          "context": "Nang hawakan niya ito, isang malambot na alon ng liwanag ang lumabas, at naramdaman niya ang kakaibang init.",
+          "points": 10
+        },
+        {
+          "id": 1706,
+          "question_type": "fill_blank",
+          "question_text": "Itinuro niya ang bato sa isang dahon, at doon niya nakita ang nawawala niyang laruang ibon! ______ ni Maya na ang bawat bagay, kahit maliit, ay may sariling hiwaga at kakayahang tumulong.",
+          "options": [
+            "Naintindihan",
+            "quickly",
+            "suddenly",
+            "beautiful"
+          ],
+          "order": 4,
+          "hint": "The word has 12 letters",
+          "context": "Itinuro niya ang bato sa isang dahon, at doon niya nakita ang nawawala niyang laruang ibon! Naintindihan ni Maya na ang bawat bagay, kahit maliit, ay may sariling hiwaga at kakayahang tumulong.",
+          "points": 10
+        },
+        {
+          "id": 1707,
+          "question_type": "fill_blank",
+          "question_text": "Ang bata at ang ______ bato.",
+          "options": [
+            "kakaibang",
+            "sariling",
+            "mahiwagang",
+            "nawawala"
+          ],
+          "order": 5,
+          "hint": "The word has 10 letters",
+          "context": "Ang bata at ang mahiwagang bato.",
+          "points": 10
+        }
+      ]
+    },
+    "388": {
+      "id": 388,
+      "game_type": "quiz",
+      "questions": [
+        {
+          "id": 1700,
+          "question_type": "multiple_choice",
+          "question_text": "What is the title of this story?",
+          "options": [
+            "Ang Mahiwagang Bato ni Maya",
+            "The Adventure Begins",
+            "A Magical Journey",
+            "The Secret Discovery"
+          ],
+          "order": 1,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 2045,
+          "question_type": "multiple_choice",
+          "question_text": "What is the title of this story?",
+          "options": [
+            "Ang Mahiwagang Bato ni Maya",
+            "The Adventure Begins",
+            "A Magical Journey",
+            "The Secret Discovery"
+          ],
+          "order": 1,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 1701,
+          "question_type": "multiple_choice",
+          "question_text": "What type of story is this?",
+          "options": [
+            "Mystery",
+            "Adventure",
+            "Fantasy",
+            "Action"
+          ],
+          "order": 2,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 2046,
+          "question_type": "multiple_choice",
+          "question_text": "What type of story is this?",
+          "options": [
+            "Mystery",
+            "Adventure",
+            "Fantasy",
+            "Action"
+          ],
+          "order": 2,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 1702,
+          "question_type": "multiple_choice",
+          "question_text": "What is the main theme of the story?",
+          "options": [
+            "Adventure and friendship",
+            "Mystery and suspense",
+            "Love and romance",
+            "Fear and danger"
+          ],
+          "order": 3,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 2047,
+          "question_type": "multiple_choice",
+          "question_text": "What is the main theme of the story?",
+          "options": [
+            "Adventure and friendship",
+            "Mystery and suspense",
+            "Love and romance",
+            "Fear and danger"
+          ],
+          "order": 3,
+          "hint": null,
+          "context": null,
+          "points": 10
+        }
+      ]
+    },
+    "469": {
+      "id": 469,
+      "game_type": "word_search",
+      "questions": [
+        {
+          "id": 2052,
+          "question_type": "word_search",
+          "question_text": "Find all the hidden words from the story in the grid",
+          "options": [
+            "VFVYDZDBVHFO",
+            "QRDPSAVCMYLU",
+            "SXRQRTNEYAGL",
+            "PSECQUACVIYD",
+            "AZANANJREENS",
+            "RZMMZMGKDDNY",
+            "KNSTGIOYWUQM",
+            "LDIFRVHNYTSV",
+            "EMAGICALGEOT",
+            "ICIVHKOGJZEM",
+            "XZMFTTQNOIAL",
+            "DHCRJRRNAJMH"
+          ],
+          "order": 1,
+          "hint": "Words can be horizontal, vertical, or diagonal",
+          "context": "Words to find: STARDUST, EVEN, DREAMS, AMONG, MAGICAL, NIGHT, SPARKLE, DANCED",
+          "points": 50
+        }
+      ]
+    },
+    "392": {
+      "id": 392,
+      "game_type": "fill_blanks",
+      "questions": [
+        {
+          "id": 1716,
+          "question_type": "fill_blank",
+          "question_text": "High on a mossy mountain lived Sparkle, a ______ with shimmering scales and big dreams.",
+          "options": [
+            "millions",
+            "mountain",
+            "dragon",
+            "broke"
+          ],
+          "order": 1,
+          "hint": "The word has 6 letters",
+          "context": "High on a mossy mountain lived Sparkle, a dragon with shimmering scales and big dreams.",
+          "points": 10
+        },
+        {
+          "id": 1717,
+          "question_type": "fill_blank",
+          "question_text": "Every night, Sparkle gazed at the ______ stars, wishing to visit them.",
+          "options": [
+            "flapping",
+            "millions",
+            "twinkling",
+            "sparkle"
+          ],
+          "order": 2,
+          "hint": "The word has 9 letters",
+          "context": "Every night, Sparkle gazed at the twinkling stars, wishing to visit them.",
+          "points": 10
+        },
+        {
+          "id": 1718,
+          "question_type": "fill_blank",
+          "question_text": "But the stars were so far away, like tiny diamonds ______ on a velvet cloth.",
+          "options": [
+            "sprinkled",
+            "millions",
+            "sparkle",
+            "twinkling"
+          ],
+          "order": 3,
+          "hint": "The word has 9 letters",
+          "context": "But the stars were so far away, like tiny diamonds sprinkled on a velvet cloth.",
+          "points": 10
+        },
+        {
+          "id": 1719,
+          "question_type": "fill_blank",
+          "question_text": "How could a dragon, even one with strong wings, ever fly that high? Day after day, Sparkle practiced, ______ its powerful wings harder and higher.",
+          "options": [
+            "flapping",
+            "diamonds",
+            "mountain",
+            "returning"
+          ],
+          "order": 4,
+          "hint": "The word has 8 letters",
+          "context": "How could a dragon, even one with strong wings, ever fly that high? Day after day, Sparkle practiced, flapping its powerful wings harder and higher.",
+          "points": 10
+        },
+        {
+          "id": 1720,
+          "question_type": "fill_blank",
+          "question_text": "Past the tallest clouds it soared, ______ and ______ to the sky's dark edge.",
+          "options": [
+            "diamonds",
+            "broke",
+            "closer",
+            "wings"
+          ],
+          "order": 5,
+          "hint": "The word has 6 letters",
+          "context": "Past the tallest clouds it soared, closer and closer to the sky's dark edge.",
+          "points": 10
+        }
+      ]
+    },
+    "391": {
+      "id": 391,
+      "game_type": "quiz",
+      "questions": [
+        {
+          "id": 1713,
+          "question_type": "multiple_choice",
+          "question_text": "What is the title of this story?",
+          "options": [
+            "Sparkle's Starry Flight",
+            "The Adventure Begins",
+            "A Magical Journey",
+            "The Secret Discovery"
+          ],
+          "order": 1,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 1714,
+          "question_type": "multiple_choice",
+          "question_text": "What type of story is this?",
+          "options": [
+            "Other",
+            "Adventure",
+            "Fantasy",
+            "Mystery"
+          ],
+          "order": 2,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 1715,
+          "question_type": "multiple_choice",
+          "question_text": "What is the main theme of the story?",
+          "options": [
+            "Adventure and friendship",
+            "Mystery and suspense",
+            "Love and romance",
+            "Fear and danger"
+          ],
+          "order": 3,
+          "hint": null,
+          "context": null,
+          "points": 10
+        }
+      ]
+    },
+    "470": {
+      "id": 470,
+      "game_type": "word_search",
+      "questions": [
+        {
+          "id": 2056,
+          "question_type": "word_search",
+          "question_text": "Find all the hidden words from the story in the grid",
+          "options": [
+            "WIQOLHEARTRV",
+            "ACXRGOFPXADE",
+            "DYYTBNVWUDHE",
+            "JRVLMIOEOBSP",
+            "OGNIBXRXDJTL",
+            "IUPFUPWDMFRA",
+            "NQMTOVGVDFAC",
+            "MPOEBPCUOHNE",
+            "NMADVXSMAGDD",
+            "TXYSIFGQHNEP",
+            "UAVXPJYKVUDA",
+            "TLLCSVETINYN"
+          ],
+          "order": 1,
+          "hint": "Words can be horizontal, vertical, or diagonal",
+          "context": "Words to find: BIRD, LIFTED, STRANDED, PLACED, JOIN, TINY, LOVED, HEART",
+          "points": 50
+        }
+      ]
+    },
+    "395": {
+      "id": 395,
+      "game_type": "fill_blanks",
+      "questions": [
+        {
+          "id": 1729,
+          "question_type": "fill_blank",
+          "question_text": "In a big, green jungle lived a happy ______ monkey named Pip, who loved to swing and play.",
+          "options": [
+            "jungle",
+            "little",
+            "named",
+            "reached"
+          ],
+          "order": 1,
+          "hint": "The word has 6 letters",
+          "context": "In a big, green jungle lived a happy little monkey named Pip, who loved to swing and play.",
+          "points": 10
+        },
+        {
+          "id": 1730,
+          "question_type": "fill_blank",
+          "question_text": "One day, after a big rain, Pip saw a tiny baby bird stuck in a ______ puddle, looking lost and scared.",
+          "options": [
+            "swing",
+            "courage",
+            "muddy",
+            "scoop"
+          ],
+          "order": 2,
+          "hint": "The word has 5 letters",
+          "context": "One day, after a big rain, Pip saw a tiny baby bird stuck in a muddy puddle, looking lost and scared.",
+          "points": 10
+        },
+        {
+          "id": 1731,
+          "question_type": "fill_blank",
+          "question_text": "Pip knew he had to be brave! He carefully reached his nimble hand out, ______ to scoop up the little bird.",
+          "options": [
+            "swing",
+            "lifted",
+            "named",
+            "trying"
+          ],
+          "order": 3,
+          "hint": "The word has 6 letters",
+          "context": "Pip knew he had to be brave! He carefully reached his nimble hand out, trying to scoop up the little bird.",
+          "points": 10
+        },
+        {
+          "id": 1732,
+          "question_type": "fill_blank",
+          "question_text": "With a gentle touch, Pip lifted the tiny bird and ______ placed it back into its cozy nest high up in the tree.",
+          "options": [
+            "stranded",
+            "climbing",
+            "carefully",
+            "discovers"
+          ],
+          "order": 4,
+          "hint": "The word has 9 letters",
+          "context": "With a gentle touch, Pip lifted the tiny bird and carefully placed it back into its cozy nest high up in the tree.",
+          "points": 10
+        },
+        {
+          "id": 1733,
+          "question_type": "fill_blank",
+          "question_text": "Pip felt warm and happy inside, ______ he had been brave and kind.",
+          "options": [
+            "stranded",
+            "scoop",
+            "knowing",
+            "about"
+          ],
+          "order": 5,
+          "hint": "The word has 7 letters",
+          "context": "Pip felt warm and happy inside, knowing he had been brave and kind.",
+          "points": 10
+        }
+      ]
+    },
+    "394": {
+      "id": 394,
+      "game_type": "quiz",
+      "questions": [
+        {
+          "id": 1726,
+          "question_type": "multiple_choice",
+          "question_text": "What is the title of this story?",
+          "options": [
+            "Pip's Puddle Peril",
+            "The Adventure Begins",
+            "A Magical Journey",
+            "The Secret Discovery"
+          ],
+          "order": 1,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 2053,
+          "question_type": "multiple_choice",
+          "question_text": "What is the title of this story?",
+          "options": [
+            "Pip's Puddle Peril",
+            "The Adventure Begins",
+            "A Magical Journey",
+            "The Secret Discovery"
+          ],
+          "order": 1,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 1727,
+          "question_type": "multiple_choice",
+          "question_text": "What type of story is this?",
+          "options": [
+            "Adventure",
+            "Fantasy",
+            "Mystery",
+            "Action"
+          ],
+          "order": 2,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 2054,
+          "question_type": "multiple_choice",
+          "question_text": "What type of story is this?",
+          "options": [
+            "Adventure",
+            "Fantasy",
+            "Mystery",
+            "Action"
+          ],
+          "order": 2,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 1728,
+          "question_type": "multiple_choice",
+          "question_text": "What is the main theme of the story?",
+          "options": [
+            "Adventure and friendship",
+            "Mystery and suspense",
+            "Love and romance",
+            "Fear and danger"
+          ],
+          "order": 3,
+          "hint": null,
+          "context": null,
+          "points": 10
+        },
+        {
+          "id": 2055,
+          "question_type": "multiple_choice",
+          "question_text": "What is the main theme of the story?",
+          "options": [
+            "Adventure and friendship",
+            "Mystery and suspense",
+            "Love and romance",
+            "Fear and danger"
+          ],
+          "order": 3,
+          "hint": null,
+          "context": null,
+          "points": 10
+        }
+      ]
+    }
+  }
+}

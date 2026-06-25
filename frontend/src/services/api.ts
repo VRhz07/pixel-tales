@@ -8,6 +8,7 @@ import { API_BASE_URL, STORAGE_KEYS, ERROR_MESSAGES } from '@/config/constants';
 import { storage } from '@/utils/storage';
 import type { ApiError, ApiResponse } from '@/types/api.types';
 import { apiConfigService } from './apiConfig.service';
+import { offlineFallbackService } from './offlineFallback.service';
 
 class ApiService {
   private axiosInstance: AxiosInstance;
@@ -252,8 +253,32 @@ class ApiService {
    * GET request
    */
   async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    const response = await this.axiosInstance.get<T>(url, config);
-    return response.data;
+    try {
+      const response = await this.axiosInstance.get<T>(url, config);
+      return response.data;
+    } catch (error) {
+      // Check if this is a network error or offline scenario
+      const isNetworkError = !navigator.onLine || 
+                            (error as any).code === 'ECONNABORTED' ||
+                            (error as any).code === 'NETWORK_ERROR' ||
+                            (error as any).message?.includes('Network Error') ||
+                            !(error as any).response;
+      
+      if (isNetworkError) {
+        console.log(`[API Fallback] Network error for GET ${url}, attempting offline fallback...`);
+        try {
+          const fallbackData = await offlineFallbackService.handleGetRequest(url);
+          if (fallbackData !== undefined) {
+            return fallbackData as unknown as T;
+          }
+        } catch (fallbackError) {
+          console.warn(`[API Fallback] Offline fallback failed for ${url}:`, fallbackError);
+        }
+      }
+      
+      // Re-throw if fallback failed or it wasn't a network error
+      throw error;
+    }
   }
 
   /**

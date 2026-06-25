@@ -1,0 +1,68 @@
+# Offline AI Integration Plan
+
+This document outlines the architectural strategy and technical steps to implement offline AI story generation into PixelTales. This will allow users to generate custom stories without relying on external cloud APIs (like Gemini or Pollinations.ai) or an internet connection.
+
+## User Review Required
+
+> [!IMPORTANT]
+> Because running AI locally requires significant hardware resources (RAM and GPU), you must choose the primary deployment strategy. Please review the **Open Questions** below and provide your feedback before we proceed with any code changes.
+
+## Open Questions
+
+1. **Target Audience/Platform:** Do you want to prioritize Desktop users (who can install Ollama) or Web/PWA users (who would download a model directly into their browser cache via WebLLM)? 
+2. **Image Generation Constraint:** Generating images offline is extremely resource-heavy. Are you okay with an "Offline Mode" that generates the text locally but uses a set of generic pre-installed placeholder images for the illustrations? (The user could later click "Generate Illustrations" once they reconnect to the internet).
+3. **Model Size:** For WebLLM, downloading a model requires the user to download ~2GB of data on their first offline run. Is this acceptable for your user experience?
+
+---
+
+## Proposed Changes
+
+We will implement a modular AI architecture, allowing the app to hot-swap between Cloud AI (Gemini) and Local AI based on user preference and network connectivity.
+
+### 1. Service Layer
+
+#### [NEW] `frontend/src/services/localAiService.ts`
+Create a new service dedicated to offline inference. Depending on the chosen architecture:
+- **For WebLLM:** Integrate the `@mlc-ai/web-llm` library. This service will handle downloading the model (e.g., `Llama-3-8B-Instruct-q4f32_1-MLC` or `Phi-3-mini`), caching it in IndexedDB, and generating the JSON story structure mirroring the prompt format currently used in `geminiService.ts`.
+- **For Ollama:** Create an API wrapper that targets `http://localhost:11434/api/generate`.
+
+#### [MODIFY] `frontend/src/services/geminiService.ts` (or create a Factory)
+Refactor the story generation logic to act as a router. If the app is offline or the user selected "Local AI", route the generation parameters (prompt, genre, age group) to `localAiService.ts` instead of the Gemini API.
+
+---
+
+### 2. UI / UX Layer
+
+#### [MODIFY] `frontend/src/components/pages/SettingsPage.tsx` (or equivalent)
+Add an "AI Engine Preferences" section.
+- Add a toggle: **"Use Cloud AI (Recommended)"** vs **"Use Local Offline AI"**.
+- If Local AI is selected (and WebLLM is the architecture), display a progress bar for the initial 2GB model download.
+
+#### [MODIFY] `frontend/src/components/pages/CreateStoryPage.tsx` (or equivalent)
+- Add network detection logic.
+- If the user clicks "Generate" while offline, display an alert: 
+  > *"You are currently offline. We will generate your story using your Local AI. Illustrations cannot be generated offline and will use placeholders until you reconnect."*
+
+---
+
+### 3. Image Generation Fallback
+
+#### [MODIFY] `frontend/src/components/story/StoryViewer.tsx` (or equivalent)
+Because offline Stable Diffusion is unfeasible for most web/mobile devices:
+- Create a library of ~10 generic, colorful placeholder images (e.g., a generic forest, a generic castle, a starry night).
+- When `localAiService.ts` generates a story, it will assign these local generic images to the `coverImage` and `canvas_data` fields.
+- Add a button in the UI: **"✨ Generate Custom Illustrations"**. This button is only active when the user regains internet access, allowing them to retroactively generate the Pollinations.ai images based on the local AI's image prompts.
+
+---
+
+## Verification Plan
+
+### Automated / Browser Tests
+1. Disconnect the network (Chrome DevTools -> Network -> Offline).
+2. Attempt to generate a story. Verify that the request is routed to `localAiService.ts`.
+3. Verify that the generated JSON matches the strict schema required by PixelTales (no trailing commas, correct object structures).
+4. Reconnect to the internet and verify that clicking "Generate Custom Illustrations" correctly fires the API calls to Pollinations.ai to replace the placeholders.
+
+### Manual Verification
+1. Test the WebLLM model download process on a fresh browser profile to ensure IndexedDB caching works smoothly without crashing the tab.
+2. Verify memory consumption during generation to ensure low-end devices handle the local inference gracefully.

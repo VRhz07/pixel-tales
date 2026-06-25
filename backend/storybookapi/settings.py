@@ -1,4 +1,4 @@
-"""
+﻿"""
 Django settings for Imaginary Worlds API
 Optimized for API-only backend with React frontend
 """
@@ -296,15 +296,15 @@ if GOOGLE_CLOUD_CREDENTIALS_BASE64:
         
         # Set environment variable for Google Cloud libraries
         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = temp_credentials_path
-        print(f"✅ Google Cloud credentials loaded from base64: {temp_credentials_path}")
+        pass  # Google Cloud credentials loaded
     except Exception as e:
-        print(f"❌ Failed to decode Google Cloud credentials: {e}")
+        pass  # Failed to decode credentials
 elif GOOGLE_APPLICATION_CREDENTIALS and os.path.exists(GOOGLE_APPLICATION_CREDENTIALS):
     # Local development: Use file path directly
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = GOOGLE_APPLICATION_CREDENTIALS
-    print(f"✅ Google Cloud credentials loaded from file: {GOOGLE_APPLICATION_CREDENTIALS}")
+    pass  # Google Cloud credentials loaded from file
 else:
-    print("⚠️ Google Cloud TTS credentials not configured. TTS features will be disabled.")
+    pass  # TTS credentials not configured
 
 # Cache configuration for memory efficiency - MINIMAL for WebSocket mode
 CACHES = {

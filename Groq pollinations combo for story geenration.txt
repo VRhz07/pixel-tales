@@ -1,0 +1,82 @@
+1. Get your API key
+
+Go to console.groq.com
+Sign up with your email (no credit card needed)
+Go to API Keys → click Create API Key
+Copy and save it somewhere safe
+
+
+2. Install the SDK
+If you're using your React/Electron setup:
+bashnpm install groq-sdk
+
+3. Basic usage
+jsimport Groq from "groq-sdk";
+
+const groq = new Groq({ apiKey: "your_api_key_here" });
+
+const response = await groq.chat.completions.create({
+  model: "llama-3.1-8b-instant", // fastest, most generous free tier
+  messages: [
+    {
+      role: "system",
+      content: "You are a children's storybook writer. Write short, simple, and fun stories for kids aged 4-8."
+    },
+    {
+      role: "user",
+      content: "Write a short story about a bunny who finds a magic carrot."
+    }
+  ],
+  max_tokens: 300
+});
+
+console.log(response.choices[0].message.content);
+
+4. For a storybook — generate page by page
+jsasync function generateStoryPage(pagePrompt) {
+  const response = await groq.chat.completions.create({
+    model: "llama-3.1-8b-instant",
+    messages: [
+      {
+        role: "system",
+        content: `You are a children's storybook writer. 
+          Write exactly 2-3 short sentences per page. 
+          Simple words, warm and fun tone. 
+          No titles, just the story text.`
+      },
+      {
+        role: "user",
+        content: pagePrompt
+      }
+    ],
+    max_tokens: 100 // keep it short per page
+  });
+
+  return response.choices[0].message.content;
+}
+
+// Usage
+const page1 = await generateStoryPage("Page 1: Benny the bunny wakes up and discovers something glowing in the garden.");
+const page2 = await generateStoryPage("Page 2: Benny digs up a golden carrot that grants one wish.");
+
+5. Pair it with Pollinations for images
+jsasync function generateStoryPage(prompt) {
+  // Generate text
+  const response = await groq.chat.completions.create({ ... });
+  const storyText = response.choices[0].message.content;
+
+  // Generate matching image (no API key needed)
+  const imagePrompt = encodeURIComponent(
+    `children's book illustration, ${prompt}, soft watercolor style`
+  );
+  const imageUrl = `https://image.pollinations.ai/prompt/${imagePrompt}`;
+
+  return { storyText, imageUrl };
+}
+
+6. Keep your API key safe
+Never hardcode it in frontend code. For your Electron app, store it in a .env file:
+GROQ_API_KEY=your_key_here
+Then access it via:
+js// In your Django backend or Electron main process
+const apiKey = process.env.GROQ_API_KEY;

@@ -64,6 +64,7 @@ const PhotoStoryModal = ({ isOpen, onClose }: PhotoStoryModalProps) => {
   const [ocrProgress, setOcrProgress] = useState<number>(0);
   const [ocrStatus, setOcrStatus] = useState<string>('');
   const [isHandwritten, setIsHandwritten] = useState(false);
+  const [imageModel, setImageModel] = useState<string>('pollinations'); // Default to Pollinations (free)
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -364,7 +365,9 @@ Make sure EVERY page's imagePrompt:
         
         const coverImageUrls = await generateStoryIllustrationsFromPrompts(
           [{ imagePrompt: coverPrompt, pageNumber: 0 }],
-          storyData.characterDescription
+          storyData.characterDescription,
+          undefined,
+          imageModel
         );
         
         const baseImageUrl = coverImageUrls[0];
@@ -570,7 +573,8 @@ Make sure EVERY page's imagePrompt:
             const progress = 35 + (current / total) * 60;
             setGenerationProgress(progress);
             setGenerationStage(message);
-          }
+          },
+          imageModel
         );
         
         console.log(`✅ All images generated: ${imageUrls.length}/${totalPages}`);
@@ -700,7 +704,17 @@ Make sure EVERY page's imagePrompt:
 
     } catch (error) {
       console.error('Error generating photo story:', error);
-      alert('Failed to generate story. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const isRateLimit = errorMessage.includes('429') || 
+                          errorMessage.toLowerCase().includes('too many requests') || 
+                          errorMessage.toLowerCase().includes('rate limit') ||
+                          errorMessage.toLowerCase().includes('resource has been exhausted');
+      
+      if (isRateLimit) {
+        alert('Wow, a lot of people are creating stories right now! 😅\n\nOur servers are a bit overwhelmed. Please wait about 30-60 seconds and try again.');
+      } else {
+        alert(`Oops! Failed to generate story.\n\nError: ${errorMessage}`);
+      }
       // Clear image even on error to free memory
       setFormData(prev => ({ ...prev, capturedImage: null }));
     } finally {
@@ -1116,6 +1130,49 @@ Make sure EVERY page's imagePrompt:
                           <span className="art-style-name">{style.name}</span>
                         </button>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Illustration Model Selector */}
+                  <div className="form-section">
+                    <label className="form-label">
+                      <SparklesIcon className="w-5 h-5" />
+                      Illustration Model
+                    </label>
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      padding: '12px',
+                      background: isDarkMode ? '#1f2937' : '#f8fafc',
+                      borderRadius: '8px',
+                      border: `1px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`
+                    }}>
+                      <select
+                        id="image-model-select"
+                        value={imageModel}
+                        onChange={(e) => setImageModel(e.target.value)}
+                        style={{
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          border: `1px solid ${isDarkMode ? '#4b5563' : '#cbd5e1'}`,
+                          background: isDarkMode ? '#111827' : '#ffffff',
+                          color: isDarkMode ? '#f3f4f6' : '#1f2937',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          outline: 'none',
+                          cursor: 'pointer',
+                          width: '100%'
+                        }}
+                      >
+                        <option value="pollinations">Free (Pollinations AI - Flux)</option>
+                        <option value="flux-schnell">Flux Schnell (Replicate)</option>
+                        <option value="flux-dev">Flux Dev (Replicate)</option>
+                        <option value="flux-pro">Flux Pro (Replicate)</option>
+                      </select>
+                      <span style={{ fontSize: '12px', color: isDarkMode ? '#9ca3af' : '#64748b' }}>
+                        {imageModel === 'pollinations' ? '✨ Completely free, fast generation' : '🎨 High quality, requires Replicate API token'}
+                      </span>
                     </div>
                   </div>
 

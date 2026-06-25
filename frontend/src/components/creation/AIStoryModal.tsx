@@ -49,6 +49,8 @@ const AIStoryModal = ({ isOpen, onClose }: AIStoryModalProps) => {
     pageCount: 5, // Default 5 pages
     storyLanguage: language as 'en' | 'tl' // Use current app language
   });
+  const [aiEngine, setAiEngine] = useState<'gemini' | 'groq'>('groq'); // Default to Groq (faster)
+  const [imageModel, setImageModel] = useState<string>('pollinations'); // Default to Pollinations (free)
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStage, setGenerationStage] = useState<string>('');
   const [generationProgress, setGenerationProgress] = useState(0);
@@ -117,6 +119,7 @@ const AIStoryModal = ({ isOpen, onClose }: AIStoryModalProps) => {
       storyLanguage: 'en'
     });
     setIsGenerating(false);
+    setImageModel('pollinations');
     setImageGenerationWarnings([]);
   };
 
@@ -142,14 +145,8 @@ const AIStoryModal = ({ isOpen, onClose }: AIStoryModalProps) => {
       console.log('?? INSIDE TRY BLOCK - About to generate story');
       console.log('Generating story with:', formData);
       
-      // Stage 1: Writing the story
-      setGenerationStage('? Creating your magical story...');
-      setGenerationProgress(20);
-      
-      // Import the Gemini proxy service (secure - API key stays on backend)
-      const { generateStoryWithGemini } = await import('../../services/geminiProxyService');
-      
-      // Build comprehensive prompt with structured image generation
+      // Build prompt first, then call AI engine
+      // Build comprehensive prompt with structured image generation FIRST
       const selectedGenreNames = formData.selectedGenres.map(id => genres.find(g => g.id === id)?.name || id).join(', ');
       const artStyle = formData.selectedArtStyle || 'cartoon';
       const fullPrompt = `
@@ -205,157 +202,104 @@ Make sure EVERY page's imagePrompt:
 8. Ends with quality keywords
 
       `.trim();
-      
-      // Call Gemini API via secure backend proxy
-      const generatedText = await generateStoryWithGemini(fullPrompt, {
-        temperature: 0.9,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 16384,
-      });
-      
-      setGenerationProgress(40);
-      console.log('Generated story text:', generatedText);
-      
-      // Parse the JSON response from Gemini
-      let storyData;
-      try {
-        console.log('Raw generated text length:', generatedText.length);
-        
-        // Extract JSON from markdown code blocks if present
-        let jsonText = generatedText;
-        
-        // Try different markdown patterns
-        const patterns = [
-          /```json\s*([\s\S]*?)\s*```/,  // ```json ... ```
-          /```\s*([\s\S]*?)\s*```/,       // ``` ... ```
-          /`([\s\S]*?)`/                   // ` ... `
-        ];
-        
-        for (const pattern of patterns) {
-          const match = generatedText.match(pattern);
-          if (match) {
-            jsonText = match[1].trim();
-            break;
-          }
-        }
-        
-        // If no code blocks found, try to find JSON object directly
-        if (jsonText === generatedText) {
-          const jsonStart = generatedText.indexOf('{');
-          const jsonEnd = generatedText.lastIndexOf('}');
-          if (jsonStart !== -1 && jsonEnd !== -1) {
-            jsonText = generatedText.substring(jsonStart, jsonEnd + 1);
-          }
-        }
-        
-        // Clean up common JSON issues
-        console.log('Cleaning JSON text...');
-        jsonText = jsonText
-          // Remove trailing commas before closing braces/brackets
-          .replace(/,\s*}/g, '}')
-          .replace(/,\s*]/g, ']')
-          // Fix escaped quotes in strings
-          .replace(/\\'/g, "'")
-          // Remove any BOM or special characters at start
-          .replace(/^\uFEFF/, '')
-          .trim();
-        
-        console.log('Attempting to parse JSON (length:', jsonText.length, ')');
-        
-        // Try to parse
+
+      // ── Call the selected AI engine ──────────────────────────────────────────
+      const engineLabel = aiEngine === 'groq' ? '⚡ Groq (Llama)' : '✨ Gemini';
+      setGenerationStage(`${engineLabel}: Creating your magical story...`);
+      setGenerationProgress(20);
+
+      let storyData: any;
+
+      if (aiEngine === 'groq') {
+        // Groq: structured call — generates text ONLY (~1,500 tokens total)
+        // imagePrompts are auto-built client-side. No TPM issues.
+        const { generateStoryWithGroq } = await import('../../services/groqService');
+        storyData = await generateStoryWithGroq(
+          formData.storyIdea,
+          {
+            genres: formData.selectedGenres.map(id => genres.find(g => g.id === id)?.name || id),
+            artStyle: formData.selectedArtStyle || 'cartoon',
+            pageCount: formData.pageCount,
+            language: formData.storyLanguage,
+          },
+          { temperature: 0.85, maxTokens: 2048 }
+        );
+        console.log('[Groq] storyData ready:', storyData.pages?.length, 'pages');
+        setGenerationProgress(40);
+
+      } else {
+        // Gemini: full detailed prompt → parse JSON response
+        const { generateStoryWithGemini } = await import('../../services/geminiProxyService');
+        const generatedText = await generateStoryWithGemini(fullPrompt, {
+          temperature: 0.9,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 16384,
+        });
+
+        setGenerationProgress(40);
+        console.log('Generated story text:', generatedText);
+
+        // Parse JSON from Gemini response
         try {
-          storyData = JSON.parse(jsonText);
-        } catch (firstError) {
-          console.warn('First parse attempt failed:', firstError);
-          
-          // Try more aggressive cleaning
-          console.log('Attempting aggressive JSON repair...');
-          
-          // Find the last complete closing brace
-          let braceCount = 0;
-          let lastValidIndex = -1;
-          for (let i = 0; i < jsonText.length; i++) {
-            if (jsonText[i] === '{') braceCount++;
-            if (jsonText[i] === '}') {
-              braceCount--;
-              if (braceCount === 0) {
-                lastValidIndex = i;
+          console.log('Raw generated text length:', generatedText.length);
+          let jsonText = generatedText;
+
+          const patterns = [
+            /```json\s*([\s\S]*?)\s*```/,
+            /```\s*([\s\S]*?)\s*```/,
+            /`([\s\S]*?)`/
+          ];
+          for (const pattern of patterns) {
+            const match = generatedText.match(pattern);
+            if (match) { jsonText = match[1].trim(); break; }
+          }
+          if (jsonText === generatedText) {
+            const jsonStart = generatedText.indexOf('{');
+            const jsonEnd = generatedText.lastIndexOf('}');
+            if (jsonStart !== -1 && jsonEnd !== -1) {
+              jsonText = generatedText.substring(jsonStart, jsonEnd + 1);
+            }
+          }
+
+          jsonText = jsonText
+            .replace(/,\s*}/g, '}')
+            .replace(/,\s*]/g, ']')
+            .replace(/\\'/g, "'")
+            .replace(/^\uFEFF/, '')
+            .trim();
+
+          try {
+            storyData = JSON.parse(jsonText);
+          } catch (firstError) {
+            let braceCount = 0;
+            let lastValidIndex = -1;
+            for (let i = 0; i < jsonText.length; i++) {
+              if (jsonText[i] === '{') braceCount++;
+              if (jsonText[i] === '}') {
+                braceCount--;
+                if (braceCount === 0) lastValidIndex = i;
               }
             }
-          }
-          
-          if (lastValidIndex > 0) {
-            jsonText = jsonText.substring(0, lastValidIndex + 1);
-            console.log('Truncated to last valid brace at position:', lastValidIndex);
-            storyData = JSON.parse(jsonText);
-          } else {
-            throw firstError;
-          }
-        }
-        
-        // Validate that pages have imagePrompt field
-        console.log('========================================');
-        console.log('?? GEMINI RESPONSE STRUCTURE VALIDATION');
-        console.log('========================================');
-        console.log('?? Full storyData keys:', Object.keys(storyData));
-        console.log('?? storyData.pages exists:', !!storyData.pages);
-        console.log('?? storyData.pages is array:', Array.isArray(storyData.pages));
-        
-        if (storyData.pages && Array.isArray(storyData.pages)) {
-          const pagesWithPrompts = storyData.pages.filter((p: any) => p.imagePrompt);
-          console.log(`?? Story has ${storyData.pages.length} pages, ${pagesWithPrompts.length} have imagePrompt`);
-          
-          // Log ALL pages structure in detail
-          storyData.pages.forEach((page: any, i: number) => {
-            console.log(`\n?? Page ${i + 1} details:`);
-            console.log(`   Keys: [${Object.keys(page).join(', ')}]`);
-            console.log(`   Has imagePrompt: ${!!page.imagePrompt}`);
-            console.log(`   Has text: ${!!page.text}`);
-            if (page.imagePrompt) {
-              console.log(`   imagePrompt (first 100 chars): ${page.imagePrompt.substring(0, 100)}...`);
+            if (lastValidIndex > 0) {
+              storyData = JSON.parse(jsonText.substring(0, lastValidIndex + 1));
+            } else {
+              throw firstError;
             }
-            if (page.text) {
-              console.log(`   text (first 80 chars): ${page.text.substring(0, 80)}...`);
-            }
-          });
-          
-          if (pagesWithPrompts.length > 0) {
-            console.log('\n? GOOD: Pages have imagePrompt field');
-          } else {
-            console.error('\n? PROBLEM: NO PAGES HAVE imagePrompt FIELD!');
-            console.error('?? This means Gemini did not generate the imagePrompt field.');
-            console.error('?? Full first page object:', JSON.stringify(storyData.pages[0], null, 2));
           }
-        } else {
-          console.error('? PROBLEM: storyData.pages is missing or not an array!');
-        }
-        console.log('========================================');
-      } catch (parseError: any) {
-        console.error('Failed to parse story JSON:', parseError);
-        console.error('Error message:', parseError.message);
-        
-        // Log the problematic area
-        if (parseError.message && parseError.message.includes('position')) {
-          const posMatch = parseError.message.match(/position (\d+)/);
-          if (posMatch) {
-            const pos = parseInt(posMatch[1]);
-            const start = Math.max(0, pos - 100);
-            const end = Math.min(generatedText.length, pos + 100);
-            console.error('Context around error position:', generatedText.substring(start, end));
-            console.error('Error at character:', generatedText[pos]);
+
+          // Validate pages
+          if (storyData.pages && Array.isArray(storyData.pages)) {
+            const pagesWithPrompts = storyData.pages.filter((p: any) => p.imagePrompt);
+            console.log(`✅ Gemini: ${storyData.pages.length} pages, ${pagesWithPrompts.length} have imagePrompt`);
           }
+        } catch (parseError: any) {
+          console.error('Failed to parse Gemini JSON:', parseError);
+          throw new Error(`Failed to parse generated story. Please try again. (${parseError.message})`);
         }
-        
-        // Save the failed response for debugging
-        console.error('Full generated text saved to console');
-        console.log('===== FAILED JSON START =====');
-        console.log(generatedText);
-        console.log('===== FAILED JSON END =====');
-        
-        throw new Error(`Failed to parse generated story. The AI response was malformed at position ${parseError.message}. Please try again with a simpler prompt or fewer pages.`);
       }
-      
+
+
       // Create the story in the store
       const genreNames = formData.selectedGenres.map(id => genres.find(g => g.id === id)?.name || id);
       const newStory = createStory(storyData.title || 'AI Generated Story');
@@ -422,7 +366,8 @@ Make sure EVERY page's imagePrompt:
           coverDescription,  // Use AI-generated description
           formData.selectedArtStyle || 'cartoon',
           storyData.characterDescription,
-          storyData.colorScheme
+          storyData.colorScheme,
+          imageModel
         );
         
         console.log('? Cover illustration generated');
@@ -506,8 +451,9 @@ Make sure EVERY page's imagePrompt:
             const progressRange = 30; // 60% to 90%
             const currentProgress = baseProgress + (current / total) * progressRange;
             setGenerationProgress(Math.round(currentProgress));
-            setGenerationStage(`?? ${message}`);
-          }
+            setGenerationStage(`🖼️ ${message}`);
+          },
+          imageModel
         );
         console.log('?? generateStoryIllustrationsFromPrompts COMPLETED');
         console.log('?? Returned URLs:', imageUrls);
@@ -649,7 +595,20 @@ Make sure EVERY page's imagePrompt:
       console.error('Error generating story:', error);
       playError();
       const errorMessage = error instanceof Error ? error.message : 'Failed to generate story';
-      alert(`Error: ${errorMessage}\n\nMake sure your Gemini API key is configured correctly.`);
+      const engineHint = aiEngine === 'groq'
+        ? 'Make sure your Groq API key (VITE_GROQ_API_KEY) is configured correctly.'
+        : 'Make sure your Gemini API key is configured correctly.';
+      // Friendly error handling for beta testers hitting concurrency limits
+      const isRateLimit = errorMessage.includes('429') || 
+                          errorMessage.toLowerCase().includes('too many requests') || 
+                          errorMessage.toLowerCase().includes('rate limit') ||
+                          errorMessage.toLowerCase().includes('resource has been exhausted');
+                          
+      if (isRateLimit) {
+        alert('Wow, a lot of people are writing stories right now! 😅\n\nOur servers are a bit overwhelmed. Please wait about 30-60 seconds and click Generate again.');
+      } else {
+        alert(`Oops! Something went wrong:\n${errorMessage}\n\n${engineHint}`);
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -798,6 +757,103 @@ Make sure EVERY page's imagePrompt:
               <button onClick={handleClose} className="modal-close-button">
                 <XMarkIcon className="w-6 h-6" />
               </button>
+            </div>
+
+            {/* AI Engine Toggle */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '10px 20px',
+              background: isDarkMode ? '#1f2937' : '#f8fafc',
+              borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
+              flexWrap: 'wrap'
+            }}>
+              <span style={{ fontSize: '12px', fontWeight: '600', color: isDarkMode ? '#9ca3af' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Story Engine:
+              </span>
+              {/* Groq Button */}
+              <button
+                id="engine-toggle-groq"
+                onClick={() => setAiEngine('groq')}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '5px 14px', borderRadius: '999px', border: 'none',
+                  cursor: 'pointer', fontSize: '13px', fontWeight: '600',
+                  transition: 'all 0.2s',
+                  background: aiEngine === 'groq'
+                    ? 'linear-gradient(135deg, #f59e0b, #d97706)'
+                    : isDarkMode ? '#374151' : '#e5e7eb',
+                  color: aiEngine === 'groq' ? '#fff' : isDarkMode ? '#9ca3af' : '#6b7280',
+                  boxShadow: aiEngine === 'groq' ? '0 2px 8px rgba(245,158,11,0.4)' : 'none'
+                }}
+              >
+                <span>⚡</span> Groq (Llama)
+                {aiEngine === 'groq' && (
+                  <span style={{ fontSize: '10px', background: 'rgba(255,255,255,0.25)', borderRadius: '999px', padding: '1px 6px' }}>FAST</span>
+                )}
+              </button>
+              {/* Gemini Button */}
+              <button
+                id="engine-toggle-gemini"
+                onClick={() => setAiEngine('gemini')}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '5px 14px', borderRadius: '999px', border: 'none',
+                  cursor: 'pointer', fontSize: '13px', fontWeight: '600',
+                  transition: 'all 0.2s',
+                  background: aiEngine === 'gemini'
+                    ? 'linear-gradient(135deg, #667eea, #764ba2)'
+                    : isDarkMode ? '#374151' : '#e5e7eb',
+                  color: aiEngine === 'gemini' ? '#fff' : isDarkMode ? '#9ca3af' : '#6b7280',
+                  boxShadow: aiEngine === 'gemini' ? '0 2px 8px rgba(102,126,234,0.4)' : 'none'
+                }}
+              >
+                <span>✨</span> Gemini
+              </button>
+              <span style={{ fontSize: '11px', color: isDarkMode ? '#6b7280' : '#94a3b8', marginLeft: 'auto' }}>
+                {aiEngine === 'groq' ? 'Groq: ultra-fast text' : 'Gemini: detailed text'}
+              </span>
+            </div>
+
+            {/* Image Model Selector */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '10px 20px',
+              background: isDarkMode ? '#111827' : '#f1f5f9',
+              borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
+              flexWrap: 'wrap'
+            }}>
+              <span style={{ fontSize: '12px', fontWeight: '600', color: isDarkMode ? '#9ca3af' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Illustration Model:
+              </span>
+              <select
+                id="image-model-select"
+                value={imageModel}
+                onChange={(e) => setImageModel(e.target.value)}
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: '999px',
+                  border: `1px solid ${isDarkMode ? '#4b5563' : '#cbd5e1'}`,
+                  background: isDarkMode ? '#1f2937' : '#ffffff',
+                  color: isDarkMode ? '#f3f4f6' : '#1f2937',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  outline: 'none',
+                  cursor: 'pointer',
+                  minWidth: '240px'
+                }}
+              >
+                <option value="pollinations">Free (Pollinations AI - Flux)</option>
+                <option value="flux-schnell">Flux Schnell (Replicate)</option>
+                <option value="flux-dev">Flux Dev (Replicate)</option>
+                <option value="flux-pro">Flux Pro (Replicate)</option>
+              </select>
+              <span style={{ fontSize: '11px', color: isDarkMode ? '#9ca3af' : '#64748b', marginLeft: 'auto' }}>
+                {imageModel === 'pollinations' ? '✨ Completely free, proxy-auth, fast' : '🎨 High quality, requires Replicate token'}
+              </span>
             </div>
 
             {/* Body */}

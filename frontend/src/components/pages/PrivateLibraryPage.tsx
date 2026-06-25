@@ -5,6 +5,7 @@ import { offlineStorageService } from '../../services/offlineStorageService';
 import { useI18nStore } from '../../stores/i18nStore';
 import { useAuthStore } from '../../stores/authStore';
 import { storyApiService } from '../../services/storyApiService';
+import { offlineFallbackService } from '../../services/offlineFallback.service';
 import StoryExportImport from '../library/StoryExportImport';
 import ConfirmationModal, { ConfirmationModalType } from '../common/ConfirmationModal';
 import StoryCreationModal from '../common/StoryCreationModal';
@@ -23,7 +24,7 @@ import {
   GlobeAltIcon
 } from '@heroicons/react/24/outline';
 
-type FilterType = 'all' | 'drafts' | 'works' | 'saved' | 'offline';
+type FilterType = 'all' | 'drafts' | 'works' | 'saved' | 'offline' | 'preinstalled';
 
 const PrivateLibraryPage = () => {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ const PrivateLibraryPage = () => {
   const [savedStories, setSavedStories] = useState<any[]>([]);
   const [isLoadingSaved, setIsLoadingSaved] = useState(false);
   const [offlineStoriesFromDB, setOfflineStoriesFromDB] = useState<any[]>([]);
+  const [bundledStories, setBundledStories] = useState<any[]>([]);
   
   // Get current user for author name
   const { user } = useAuthStore();
@@ -51,6 +53,13 @@ const PrivateLibraryPage = () => {
         setOfflineStoriesFromDB(stories);
       } catch (error) {
         console.error('Failed to load offline stories:', error);
+      }
+      
+      try {
+        const preInstalled = await offlineFallbackService.getBundledStories();
+        setBundledStories(preInstalled);
+      } catch (error) {
+        console.error('Failed to load bundled stories:', error);
       }
     };
     loadOfflineStories();
@@ -489,12 +498,20 @@ const PrivateLibraryPage = () => {
   const filteredYourWorks = filterStoriesBySearch(yourWorks);
   const filteredSaved = filterStoriesBySearch(savedStories);
   const filteredOffline = filterStoriesBySearch(offlineStories);
+  const filteredPreInstalled = filterStoriesBySearch(bundledStories.map(story => ({
+    ...story,
+    author: story.is_collaborative && story.authors_names && story.authors_names.length > 0 
+      ? story.authors_names.join(', ') 
+      : (story.author_name || story.author || t('library.unknownAuthor')),
+    isPreInstalled: true
+  })));
 
   // Determine which sections to show based on selected filter
   const shouldShowDrafts = selectedFilter === 'all' || selectedFilter === 'drafts';
   const shouldShowWorks = selectedFilter === 'all' || selectedFilter === 'works';
   const shouldShowSaved = selectedFilter === 'all' || selectedFilter === 'saved';
   const shouldShowOffline = selectedFilter === 'all' || selectedFilter === 'offline';
+  const shouldShowPreInstalled = selectedFilter === 'all' || selectedFilter === 'preinstalled';
 
   return (
     <div className="library-page-content">
@@ -558,7 +575,8 @@ const PrivateLibraryPage = () => {
                 { value: 'drafts', label: t('library.drafts') || 'Drafts' },
                 { value: 'works', label: t('library.savedWorks') || 'Saved Works' },
                 { value: 'saved', label: 'Saved Stories' },
-                { value: 'offline', label: t('library.offline') || 'Offline' }
+                { value: 'offline', label: t('library.offline') || 'Offline' },
+                { value: 'preinstalled', label: 'Free Included Stories' }
               ]}
             />
           </div>
@@ -899,6 +917,65 @@ const PrivateLibraryPage = () => {
               ))}
             </div>
           )}
+        </div>
+        )}
+
+        {/* Pre-installed Section */}
+        {shouldShowPreInstalled && filteredPreInstalled.length > 0 && (
+        <div className="library-section">
+          <div className="library-section-header">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <BookOpenIcon className="h-4 w-4" />
+              <h2 className="library-section-title">
+                Free Included Stories ({filteredPreInstalled.length})
+              </h2>
+            </div>
+          </div>
+
+          <div className="library-stories list-view">
+            {filteredPreInstalled.map((story: any) => (
+              <div 
+                key={story.id} 
+                className="library-story-card"
+                onClick={() => handleViewStory(story.id)}
+              >
+                <div className="library-story-cover">
+                  {story.coverImage || story.cover_image ? (
+                    <img 
+                      src={story.coverImage || story.cover_image} 
+                      alt={story.title}
+                      className="library-story-cover-image"
+                    />
+                  ) : (
+                    <div className="library-story-placeholder">
+                      <BookOpenIcon className="library-story-placeholder-icon" />
+                    </div>
+                  )}
+                </div>
+                <div className="library-story-content">
+                  <h3 className="library-story-title">
+                    <span className="library-story-title-inner">{story.title}</span>
+                  </h3>
+                  <p className="library-story-author">
+                    {t('common.by')} {story.author || t('library.unknownAuthor')}
+                  </p>
+                </div>
+                <div className="library-story-actions">
+                  <button 
+                    className="library-action-button view"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleViewStory(story.id);
+                    }}
+                    title="View Story"
+                  >
+                    <EyeIcon className="h-4 w-4" />
+                    <span>{t('library.view')}</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
         )}
 
