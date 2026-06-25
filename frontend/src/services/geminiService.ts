@@ -217,78 +217,72 @@ CRITICAL JSON FORMATTING REQUIREMENTS:
 Respond with ONLY this JSON format:
 {
   "title": "Story Title",
-  "description": "A compelling 2-3 sentence summary of what the story is about - the main character, their challenge or adventure, and what they learn or achieve. Make it engaging and age-appropriate.",
-  "characterDescription": "EXTREMELY detailed description of main character(s) appearance - be specific about colors, patterns, features",
-  "colorScheme": "Overall color palette for the story (e.g., warm autumn tones, cool blues and purples, vibrant rainbow)",
+  "description": "A compelling 2-3 sentence summary of what the story is about - the main characters, their challenge or adventure, and what they learn or achieve. Make it engaging and age-appropriate.",
+  "characterDescription": "Describe ALL main characters, one sentence each. Example: 'Lily is a six-year-old girl with curly blonde hair, blue eyes, wearing a yellow sundress. Gecky is a small green gecko with big round eyes, green and yellow stripes, wearing a tiny red backpack.'",
+  "colorScheme": "Overall color palette for the story (e.g., warm earthy cave tones, soft blues and greens)",
   "pages": [
     {
       "pageNumber": 1,
       "narrativePurpose": "introduction/problem/action/climax/resolution",
       "mood": "happy/sad/exciting/calm/dramatic",
       "illustrationDescription": "Brief human-readable description of the scene",
-      "imagePrompt": "DETAILED TEXT-TO-IMAGE PROMPT: [Art style] illustration of [EXACT character description with all details: colors, clothing, accessories, features] [UNIQUE specific action/pose - VARY THIS] in [COMPLETELY DIFFERENT detailed environment from previous page with specific elements, colors, lighting, atmosphere]. [VARIED camera angle: wide/medium/close-up/low angle/high angle/side profile/back view]. [DIFFERENT character position: left/right/center/foreground/background]. [UNIQUE lighting: golden hour/midday/overcast/dramatic/backlit/moonlight]. [Atmospheric effects: mist/rain/sparkles/wind/light rays]. [Mood and color palette]. Professional children's book illustration, high quality, vibrant colors, detailed background, atmospheric lighting, safe for children. CRITICAL: Make this page visually DISTINCT from previous pages.",
+      "imagePrompt": "WRITE THE imagePrompt BASED ON THE page text (see rules below)",
       "text": "The story text for this page (${pageCount <= 5 ? '1-2' : pageCount <= 10 ? '2-3' : '3-4'} sentences)"
     }
   ]
 }
 
-For each page, you MUST create TWO descriptions:
+IMAGE PROMPT RULES — read carefully:
 
-1. **illustrationDescription**: A brief, human-readable description of what's happening in the scene (for reference)
+Structure: [STYLE ANCHOR], [ALL CHARACTERS IN THIS SCENE], [SCENE FROM PAGE TEXT], [SETTING], [MOOD], [QUALITY SUFFIX]
 
-2. **imagePrompt**: A HIGHLY DETAILED text-to-image prompt optimized for AI image generation. You MUST include ALL of these MANDATORY elements:
-   - MANDATORY: Start with the art style (${artStyle} style illustration)
-   - MANDATORY: Include the COMPLETE character description with EXACT colors, clothing, features from characterDescription
-   - MANDATORY: Describe specific action, pose, and emotion (must be VARIED per page - no repetition)
-   - MANDATORY: Detail the environment with specific objects, plants, buildings, weather, time of day
-   - MANDATORY: Specify camera angle explicitly (e.g., "Wide establishing shot", "Medium close-up", "Low angle shot", "High angle view", "Side profile view")
-   - MANDATORY: Specify character position in frame (e.g., "positioned in lower right leaving space for text", "centered in frame", "upper left corner")
-   - MANDATORY: Specify detailed lighting (e.g., "warm golden hour lighting filtering through canopy casting long shadows", not just "warm tones")
-   - RECOMMENDED: Include atmospheric effects (mist, rain, sparkles, light rays, dust particles)
-   - MANDATORY: Include color palette and mood keywords
-   - MANDATORY: End with quality keywords: "Professional children's book illustration, detailed, high quality, vibrant colors, safe for children"
-   - FOR MULTI-CHARACTER SCENES: Describe EACH character separately with spatial positioning and add separation keywords: "clearly separated", "distinct individuals", "each with complete anatomy", "visible space between"
+1. STYLE ANCHOR (always first):
+   "${artStyle} style children's book illustration, Pixar style, cute and friendly, soft pastel colors"
 
-Example imagePrompt (single character):
-"Cartoon style illustration of a small fox with bright orange fur, white-tipped tail, wearing a dark green vest with shiny brass buttons and brown leather boots, standing with one paw raised curiously in a sun-dappled forest clearing surrounded by tall oak trees with golden leaves, moss-covered rocks, and wildflowers. Wide establishing shot with fox positioned in lower right, leaving space for text at top. Warm golden hour lighting filtering through canopy, casting long shadows. Warm autumn color palette with oranges, golds, and greens. Cheerful and inviting atmosphere. Professional children's book illustration, vibrant colors, detailed forest environment, atmospheric lighting, high quality, safe for children."
+2. CHARACTERS — CRITICAL RULE:
+   - List EVERY character that appears in the page text BY THEIR PHYSICAL DESCRIPTION, not just their name
+   - If the page mentions "Lily and Gecky", you MUST describe both visually:
+     "a six-year-old girl with curly blonde hair wearing a yellow sundress, and beside her a small green gecko with big round eyes"
+   - NEVER write just a name like "Lily" or "Gecky" without their visual description
+   - If a character is an animal/creature, describe their species + colors + any accessories
+   - If only one character appears in the scene, describe only that one
+   - For 2+ characters: add "two clearly separated characters, distinct individuals, visible space between them"
 
-Example imagePrompt (multiple characters):
-"Cartoon style illustration of TWO CLEARLY SEPARATED characters: On the LEFT side, a small fox with bright orange fur, white-tipped tail, wearing a dark green vest with brass buttons, standing upright. On the RIGHT side, a tall gray rabbit with long ears, wearing a blue jacket and red scarf, waving with one paw. The two characters are CLEARLY SEPARATED by a wooden garden fence between them, each character distinct and complete with their own anatomy. They are positioned 4 feet apart in a sunny meadow with yellow flowers. Medium wide shot showing both characters fully visible with clear space between them. Each character has complete, separate bodies with no overlapping or merging. Bright afternoon lighting, cheerful atmosphere. Professional children's book illustration, clear character boundaries, distinct individuals, vibrant colors, safe for children."
+3. SCENE — translate the page "text" into a specific visual action:
+   - WHAT is happening? (walking into a dark cave, discovering glowing mushrooms, running from a shadow)
+   - WHERE exactly? (inside a dark cave with glowing crystals, at the mouth of a rocky cave, deep underground)
+   - Each page MUST show a DIFFERENT action and DIFFERENT location within the story setting
 
-Example imagePrompt (action scene with dynamic camera):
-"Watercolor illustration of a small fox with bright orange fur, white-tipped tail, wearing a dark green vest with brass buttons, leaping joyfully over a fallen moss-covered log in a misty morning forest with towering pine trees, ferns sprouting from the forest floor, and mushrooms clustered at tree bases. Dynamic low angle shot capturing fox mid-jump in center frame with front paws extended forward. Soft morning mist creating atmospheric depth with light rays piercing through trees from behind. Cool blue-green forest tones with warm orange fox accents. Professional children's book illustration, detailed watercolor style, atmospheric lighting, high quality, safe for children."
+4. SETTING DETAIL: one short environment phrase, varied each page
 
-Example imagePrompt (emotional close-up):
-"Cartoon illustration of a small fox with bright orange fur, white-tipped tail, wearing a dark green vest with brass buttons, sitting with head down and drooping ears under a large oak tree with colorful autumn leaves falling around. Close-up shot focusing on fox's sad expression, character positioned in upper right corner with negative space on left for text placement. Soft overcast lighting with gentle shadows creating a melancholy mood. Muted autumn colors with orange, brown, and gray tones. Professional children's book illustration, expressive character art, detailed emotional portrayal, high quality, safe for children."
+5. MOOD: cheerful / nervous / adventurous / sad / excited / peaceful / dramatic
 
-Example imagePrompt (dramatic climax scene):
-"Digital art illustration of a small fox with bright orange fur, white-tipped tail, wearing a torn dark green vest, standing bravely on a rocky cliff edge with stormy clouds and lightning flashing in the background, wind-blown trees bending dramatically. High angle bird's eye view shot with fox small in foreground against vast stormy sky. Dramatic side lighting from lightning bolts creating strong contrast and casting long shadows across rocks. Dark stormy colors with purple-gray clouds, flashes of bright white lightning, and warm orange fox standing out. Professional children's book illustration, cinematic composition, dramatic atmospheric lighting, high quality, safe for children."
+6. QUALITY SUFFIX (always last):
+   "full body, normal anatomy, correct proportions, 4 limbs, vibrant colors, high quality, safe for children, no text"
 
-FINAL CHECKLIST - Verify before responding:
+EXAMPLE — story about a girl and a gecko exploring caves:
+
+Page text: "Lily and Gecky stepped into the dark cave entrance, holding hands, feeling the cool air."
+CORRECT imagePrompt:
+"${artStyle} style children's book illustration, Pixar style, cute and friendly, soft pastel colors, two clearly separated characters: a six-year-old girl with curly blonde hair wearing a yellow sundress on the left, and a small bright green gecko with yellow stripes and big round eyes on the right, both stepping cautiously into a dark rocky cave entrance with sunlight fading behind them, warm forest outside cool dark cave inside, nervous and curious, full body, normal anatomy, correct proportions, 4 limbs, vibrant colors, high quality, safe for children, no text"
+
+WRONG (never do this):
+"...Lily and Gecky were playing outside..." ← just pasting the story text without describing what they look like
+
+FINAL CHECKLIST:
 ✓ Valid JSON syntax with no trailing commas
-✓ All strings use double quotes"
-✓ All brackets and braces properly closed
-✓ title is engaging and age-appropriate
-✓ description is a compelling 2-3 sentence summary of the story
-✓ characterDescription with EXTREME detail (colors, patterns, accessories)
-✓ colorScheme included for visual consistency
-✓ EVERY page has BOTH illustrationDescription AND imagePrompt
-✓ imagePrompt is EXTREMELY detailed and ready for text-to-image AI
-✓ EXACT characterDescription used in EVERY page's imagePrompt
-✓ FOR MULTI-CHARACTER SCENES: Each character described separately with spatial positioning
-✓ Specific environmental details in each imagePrompt (trees, rocks, weather, lighting)
-? Camera angles DRAMATICALLY DIFFERENT on each page (no repetition)
-? Environments COMPLETELY VARIED across pages (forest?beach?mountain?indoor?etc)
-? Character positions and actions UNIQUE per page (standing?running?sitting?reaching?etc)
-? Lighting conditions CHANGE each page (golden hour?midday?overcast?dramatic?backlit?etc)
-? Atmospheric effects VARY (mist?rain?sparkles?light rays?clear?etc)
-? Mood matches colors and composition
-? Each imagePrompt creates a VISUALLY DISTINCT scene from previous pages
-? NO consecutive pages should have similar angles, environments, or compositions
-✓ Multi-character scenes emphasize SEPARATION and DISTINCT IDENTITIES
-✓ Positioning words used: "on the left", "on the right", "in the foreground", "in the background", "separated by"
+✓ All strings use double quotes
+✓ characterDescription covers ALL main characters (one sentence each)
+✓ EVERY imagePrompt describes characters by appearance, not just by name
+✓ EVERY imagePrompt is based on the ACTUAL page text action and setting
+✓ Every imagePrompt starts with the style anchor
+✓ Every imagePrompt ends with the quality suffix
+✓ Each page has a VISUALLY DIFFERENT scene (different action + different location)
 ✓ Story has exactly ${pageCount} pages
 ✓ JSON is complete and not truncated`;
+
+
+
 
   try {
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
@@ -585,7 +579,7 @@ Respond with ONLY this JSON format:
 {
   "title": "Story Title",
   "description": "A compelling 2-3 sentence summary",
-  "characterDescription": "DETAILED description of main character(s) based on the photo",
+  "characterDescription": "Concise character description based on the photo (one sentence: type/species, main colors, 1-2 clothing items or features)",
   "colorScheme": "Overall color palette matching the photo",
   "pages": [
     {
@@ -593,26 +587,28 @@ Respond with ONLY this JSON format:
       "narrativePurpose": "introduction/problem/action/climax/resolution",
       "mood": "happy/sad/exciting/calm/dramatic",
       "illustrationDescription": "Brief description of the scene",
-      "imagePrompt": "DETAILED TEXT-TO-IMAGE PROMPT: [Art style] illustration of [EXACT character description with all details from photo] [specific action/pose] in [detailed environment]. [Camera angle]. [Character position in frame]. [Detailed lighting]. Professional children's book illustration, detailed, high quality, vibrant colors, safe for children.",
+      "imagePrompt": "WRITE THE imagePrompt BASED ON THE page text (see rules below)",
       "text": "The story text for this page (1-3 sentences)"
     }
   ]
 }
 
-CRITICAL: Each page's imagePrompt MUST include ALL these elements:
-1. Art style at the start (${artStyle} style illustration)
-2. COMPLETE character description from photo with exact colors and features
-3. Specific action and pose
-4. Detailed environment with specific elements
-5. Camera angle explicitly stated (Wide shot/Medium close-up/Low angle/High angle/Side view)
-6. Character position in frame (lower right/centered/upper left/leaving space for text)
-7. Detailed lighting (e.g., "warm golden hour lighting filtering through trees casting long shadows" not just "good lighting")
-8. Quality keywords at the end: "Professional children's book illustration, detailed, high quality, vibrant colors, safe for children"
+IMAGE PROMPT RULES — Structure: [STYLE ANCHOR], [CHARACTER], [SCENE FROM PAGE TEXT], [SETTING], [MOOD], [QUALITY SUFFIX]
 
-Example for multi-character scene based on photo:
-"Watercolor illustration of a noble wild mustang with rich bay coat and flowing black mane standing on the LEFT side, and a small frightened deer with soft brown fur and white spots on the RIGHT side trapped under a fallen log, clearly separated by the log between them. Wide establishing shot in a forest clearing with both characters visible, mustang positioned in lower left, deer in lower right. Warm dappled sunlight filtering through dense canopy creating patches of light and shadow across the forest floor. Professional children's book illustration, detailed, high quality, vibrant colors, safe for children."
+1. STYLE ANCHOR (always first): "${artStyle} style children's book illustration, Pixar style, cute and friendly, soft pastel colors"
+2. CHARACTER: one concise sentence describing what you see in the photo
+3. SCENE — translate the page "text" into a specific visual action + location:
+   - What is the character DOING? (running, hiding, eating, playing, searching, crying)
+   - WHERE exactly? (in a sunny garden, inside a treehouse, on a mountain trail)
+   - Each page MUST show a DIFFERENT action and DIFFERENT setting
+4. MOOD word: cheerful / nervous / adventurous / sad / excited / peaceful / dramatic
+5. QUALITY SUFFIX (always last): "full body, normal anatomy, correct proportions, 4 limbs, vibrant colors, high quality, safe for children, no text"
 
-IMPORTANT: The first page's imagePrompt should closely recreate the photo's composition and subjects, then subsequent pages continue the story with consistent characters and style.`;
+For multi-character scenes, add before quality suffix: "two clearly separated characters, distinct individuals, visible space between them"
+
+IMPORTANT: The first page should be inspired by the photo's setting, then each subsequent page depicts a new scene based on what happens in that page's text.`;
+
+
 
   try {
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {

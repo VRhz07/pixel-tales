@@ -4,7 +4,15 @@ import apiService from './api';
 import { getVariedCompositionGuidelines, resetCompositionMemory, getEnvironmentSuggestions } from './imageVariety';
 // Alternative: Can be switched to Hugging Face or other services
 
-
+/**
+ * Standard negative prompt applied to ALL Pollinations requests.
+ * Prevents the most common issues: bad anatomy, merged characters, horror content.
+ */
+export const CHILDREN_BOOK_NEGATIVE =
+  'extra limbs, extra arms, extra legs, missing limbs, deformed hands, bad anatomy, ' +
+  'wrong anatomy, distorted body, merged characters, fused characters, overlapping bodies, ' +
+  'conjoined, blended bodies, shared limbs, horror, scary, dark, realistic, photorealistic, ' +
+  'photograph, blurry, low quality, ugly, watermark, text, signature, nsfw';
 
 export interface ImageGenerationParams {
   prompt: string;
@@ -157,6 +165,7 @@ export const generateImageWithReplicate = async (params: ImageGenerationParams):
     
     const response = await apiService.post('/ai/replicate/generate-image/', {
       prompt: prompt,
+      negative: CHILDREN_BOOK_NEGATIVE,
       width,
       height,
       model, // Pass selected model
@@ -219,12 +228,13 @@ export const generateImage = async (params: ImageGenerationParams): Promise<stri
     console.log('🎨 Generating image with Pollinations (Flux Schnell model)...');
     const response = await apiService.post('/ai/pollinations/generate-image/', {
       prompt: prompt,
+      negative: CHILDREN_BOOK_NEGATIVE,
       width,
       height,
       model: 'flux-schnell', // Flux Schnell model (fast and free)
       seed: seed || Math.floor(Math.random() * 1000000),
       nologo: true,
-      enhance: true
+      enhance: false  // Disable enhance — it overwrites our carefully crafted prompt
     });
 
     if (!response) {

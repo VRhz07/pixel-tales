@@ -385,6 +385,8 @@ def generate_image_with_replicate(request):
         
         replicate_model = model_map.get(model, model_map['flux-schnell'])
         
+        negative = request.data.get('negative', '')
+
         # Prepare input based on model type
         input_params = {
             "prompt": prompt,
@@ -406,10 +408,17 @@ def generate_image_with_replicate(request):
             input_params["aspect_ratio"] = aspect_ratio
             # Add num_outputs for flux
             input_params["num_outputs"] = 1
+            
+            # Replicate's Flux does not have a negative_prompt parameter, 
+            # so we append it as an explicit instruction to the prompt
+            if negative:
+                input_params["prompt"] = f"{prompt}. DO NOT INCLUDE: {negative}"
         else:
-            # Stable Diffusion models use width/height
+            # Stable Diffusion models use width/height and support negative_prompt
             input_params["width"] = width
             input_params["height"] = height
+            if negative:
+                input_params["negative_prompt"] = negative
         
         # Add seed if provided
         if seed and seed != -1:
@@ -529,7 +538,8 @@ def generate_image_with_pollinations(request):
         model = request.data.get('model', 'flux')  # Changed to flux model (no rate limits)
         seed = request.data.get('seed', None)
         nologo = request.data.get('nologo', True)
-        enhance = request.data.get('enhance', True)
+        enhance = request.data.get('enhance', False)
+        negative = request.data.get('negative', '')
         
         if not prompt:
             return Response(
@@ -548,6 +558,9 @@ def generate_image_with_pollinations(request):
         
         if seed:
             params['seed'] = seed
+        
+        if negative:
+            params['negative'] = negative
         
         # Encode parameters for the proxy URL
         from urllib.parse import quote, urlencode
@@ -597,7 +610,8 @@ def fetch_pollinations_image(request):
         model = request.GET.get('model', 'flux')  # Changed to flux model (no rate limits)
         seed = request.GET.get('seed', None)
         nologo = request.GET.get('nologo', 'true')
-        enhance = request.GET.get('enhance', 'true')
+        enhance = request.GET.get('enhance', 'false')
+        negative = request.GET.get('negative', '')
         
         if not prompt:
             return Response(
@@ -616,6 +630,9 @@ def fetch_pollinations_image(request):
         
         if seed:
             params['seed'] = seed
+        
+        if negative:
+            params['negative'] = negative
         
         from urllib.parse import urlencode, quote
         

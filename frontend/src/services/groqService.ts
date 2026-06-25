@@ -12,66 +12,9 @@ export interface GroqGenerationConfig {
   maxTokens?: number;
 }
 
-// ─── Camera & lighting variety for auto-built imagePrompts ───────────────────
-const CAMERA_ANGLES = [
-  'Wide establishing shot',
-  'Medium shot',
-  'Close-up shot focusing on character expression',
-  'Low angle dynamic shot',
-  'High angle bird\'s eye view',
-  'Side profile view',
-  'Over-the-shoulder shot',
-];
-
-const LIGHTING_OPTIONS = [
-  'warm golden hour lighting casting long shadows',
-  'soft overcast natural lighting',
-  'bright midday sunlight with vivid colors',
-  'dramatic side lighting with deep shadows',
-  'gentle morning light with soft gradients',
-  'magical glowing ambient light',
-  'cool moonlight with soft blue tones',
-];
 
 /**
  * Auto-build an imagePrompt for a page without calling any AI.
- * Uses the page text + characterDescription + artStyle to construct a
- * detailed Pollinations-ready prompt — costing 0 additional tokens.
- */
-export function buildImagePromptFromText(
-  pageText: string,
-  characterDescription: string,
-  artStyle: string,
-  pageNumber: number,
-  totalPages: number
-): string {
-  const idx = (pageNumber - 1) % CAMERA_ANGLES.length;
-  const camera = CAMERA_ANGLES[idx];
-  const lighting = LIGHTING_OPTIONS[idx % LIGHTING_OPTIONS.length];
-
-  const position = pageNumber / totalPages;
-  let compositionHint = 'character positioned in lower right leaving space for text at top';
-  if (position < 0.2) compositionHint = 'wide establishing composition, character small in frame';
-  else if (position < 0.5) compositionHint = 'character centered in frame, dynamic action pose';
-  else if (position < 0.8) compositionHint = 'close focus on emotion, negative space for text';
-  else compositionHint = 'peaceful resolution composition, character in harmony with environment';
-
-  const charPart = characterDescription
-    ? `${characterDescription}. `
-    : '';
-
-  return (
-    `${artStyle} style children's book illustration. ` +
-    `${charPart}` +
-    `Scene: ${pageText.trim()} ` +
-    `${camera}, ${compositionHint}. ` +
-    `${lighting}. ` +
-    `Professional children's book illustration, vibrant colors, detailed background, ` +
-    `atmospheric lighting, safe for children, high quality.`
-  );
-}
-
-/**
  * Generate a story using Groq AI (llama-3.3-70b-versatile).
  *
  * IMPORTANT: We ask Groq for ONLY story text (title, description,
@@ -115,35 +58,65 @@ export async function generateStoryWithGroq(
       ? 'Write ALL story text in natural child-friendly TAGALOG. JSON keys stay in English.'
       : 'Write ALL story text in natural child-friendly ENGLISH.';
 
-  // Minimal prompt — only asks for text, NO imagePrompts
-  // Keeps token count tiny so it fits within the free 6,000 TPM limit
-  const prompt = `You are a children's storybook writer.
+  // Map user-facing art style names to Flux-friendly style anchors
+  const styleAnchorMap: Record<string, string> = {
+    cartoon:   "children's book illustration, Pixar style, cute cartoon, soft pastel colors",
+    watercolor:"children's book illustration, soft watercolor, hand-painted, pastel tones",
+    digital:   "children's book illustration, digital art, flat design, vibrant colors",
+    sketch:    "children's book illustration, pencil sketch, hand-drawn, warm tones",
+    realistic: "children's book illustration, painterly storybook art, warm tones",
+    anime:     "children's book illustration, anime style, Studio Ghibli, soft colors",
+  };
+  const styleAnchor = styleAnchorMap[artStyle] || styleAnchorMap.cartoon;
+
+  const prompt = `You are a children's storybook writer and prompt engineer.
 
 ${langInstruction}
 
 Write a ${pageCount}-page ${genres.join(', ')} story for children aged 6-8.
 Story idea: "${storyIdea}"
-Art style (for reference only): ${artStyle}
 
 Respond ONLY with this JSON (no markdown, no explanation):
 {
   "title": "Story title",
   "description": "2-3 sentence summary of the story",
-  "characterDescription": "Detailed main character appearance: age, hair color/style, eye color, clothing colors, distinctive features",
+  "characterDescription": "Describe ALL main characters physically in ONE concise sentence total (e.g. 'Timmy is a 7-year-old blonde boy in a blue shirt and his friend Max is a brown mule.')",
   "colorScheme": "Overall color palette for the story (e.g. warm sunset tones with orange and pink)",
   "pages": [
-    { "text": "1-3 sentences for page 1" },
-    { "text": "1-3 sentences for page 2" }
+    {
+      "text": "1-3 sentences for page 1",
+      "imagePrompt": "WRITE THE imagePrompt BASED ON THE page text (see rules below)"
+    }
   ]
 }
 
+IMAGE PROMPT RULES — read carefully:
+Structure: [STYLE ANCHOR], [ALL CHARACTERS IN THIS SCENE], [SCENE FROM PAGE TEXT], [SETTING], [MOOD], [QUALITY SUFFIX]
+
+1. STYLE ANCHOR (always first):
+   "${styleAnchor}"
+
+2. CHARACTERS:
+   - List EVERY character that appears in the page text BY THEIR PHYSICAL DESCRIPTION, not just their name.
+   - Example: "a 7-year-old blonde boy in a blue shirt, and beside him a brown mule"
+   - For 2+ characters: add "two clearly separated characters, distinct individuals, visible space between them"
+
+3. SCENE: translate the page "text" into a specific visual action.
+   - WHAT is happening? WHERE exactly?
+   - Each page MUST show a DIFFERENT action and DIFFERENT location.
+
+4. SETTING DETAIL: one short environment phrase, varied each page.
+
+5. MOOD: cheerful / nervous / adventurous / sad / excited / peaceful / dramatic
+
+6. QUALITY SUFFIX (always last):
+   "full body, normal anatomy, correct proportions, 4 limbs, vibrant colors, high quality, safe for children, no text"
+
 Rules:
 - Exactly ${pageCount} pages
-- Each page: 1-3 sentences, simple vocabulary, warm tone
-- characterDescription must be very specific (exact colors, clothing)
 - Valid JSON only, no trailing commas`.trim();
 
-  console.log('[Groq] Sending request — text-only mode (no imagePrompts)');
+  console.log('[Groq] Sending request — text and imagePrompts');
   console.log('[Groq] Model:', GROQ_MODEL);
   console.log('[Groq] Estimated input tokens: ~', Math.ceil(prompt.length / 4));
 
@@ -202,27 +175,17 @@ Rules:
     throw new Error('Groq response missing pages array.');
   }
 
-  // Auto-build imagePrompts client-side (costs 0 extra tokens)
-  const pagesWithPrompts = storyData.pages.map((page: any, i: number) => ({
-    text: page.text || '',
-    imagePrompt: buildImagePromptFromText(
-      page.text || '',
-      storyData.characterDescription || '',
-      artStyle,
-      i + 1,
-      storyData.pages.length
-    ),
-  }));
-
-  console.log('[Groq] ✅ Story generated with', pagesWithPrompts.length, 'pages');
-  console.log('[Groq] imagePrompts auto-built client-side (0 extra tokens)');
+  console.log('[Groq] ✅ Story generated with', storyData.pages.length, 'pages');
 
   return {
     title: storyData.title || 'My Story',
     description: storyData.description || '',
     characterDescription: storyData.characterDescription || '',
     colorScheme: storyData.colorScheme || '',
-    pages: pagesWithPrompts,
+    pages: storyData.pages.map((p: any) => ({
+      text: p.text || '',
+      imagePrompt: p.imagePrompt || '',
+    })),
   };
 }
 
