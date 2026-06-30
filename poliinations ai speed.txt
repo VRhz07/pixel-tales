@@ -1,0 +1,35 @@
+The real culprit — image generation is slow
+Each image request to Pollinations takes 10–30 seconds to generate. If your storybook has say 6 pages, that's:
+
+6 images × 15 seconds each = ~90 seconds minimum
+Plus if they're generating one by one (sequentially), they stack up
+
+
+Common mistake — sequential loading
+If your code does this:
+js// ❌ Slow — waits for each page to finish before starting the next
+for (const page of pages) {
+  const image = await generateImage(page);
+}
+Each image waits for the previous one to finish. That's where your 5 minutes comes from.
+
+Fix — generate all images in parallel
+js// ✅ Fast — all images generate at the same time
+const imagePromises = pages.map(page => generateImage(page));
+const images = await Promise.all(imagePromises);
+This cuts your wait time from 5 minutes → ~30 seconds.
+
+Another tip — show text first, load images after
+js// Show story text immediately
+setStoryText(generatedText);
+
+// Load images in background
+generateImages().then(images => setStoryImages(images));
+This way your user sees the story right away and images pop in as they load, instead of staring at a blank screen.
+Want me to help refactor your current code to use parallel loading?You said: Oh so this pollinations ai can generate multiple images at the same time?Oh so this pollinations ai can generate multiple images at the same time?Jun 24Claude responded: Yes!Yes! Since it's just a URL, every request is independent — there's no session or queue on your end. You just fire all the requests at the same time and they all process simultaneously on Pollinations' servers.
+Think of it like loading multiple images on a webpage:
+js// This is basically what happens — all 6 load at the same time
+<img src="https://image.pollinations.ai/prompt/page1..." />
+<img src="https://image.pollinations.ai/prompt/page2..." />
+<img src="https://image.pollinations.ai/prompt/page3..." />
+The browser/app doesn't wait for one to finish before starting the next.

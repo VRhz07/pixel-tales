@@ -17,7 +17,8 @@ import {
   TrashIcon,
   CloudArrowDownIcon,
   DocumentArrowDownIcon,
-  PuzzlePieceIcon
+  PuzzlePieceIcon,
+  SparklesIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon, BookmarkIcon as BookmarkSolidIcon } from '@heroicons/react/24/solid';
 import { useThemeStore } from '../stores/themeStore';
@@ -32,7 +33,8 @@ import { useSoundEffects } from '../hooks/useSoundEffects';
 import api from '../services/api';
 import gamesCacheService from '../services/gamesCache.service';
 import { offlineStorageService } from '../services/offlineStorageService';
-import { convertStoryImagesToDataUrls } from '../utils/imageCache';
+import { convertStoryImagesToDataUrls, convertImageToDataUrl } from '../utils/imageCache';
+import { generateCoverIllustration, generateStoryIllustrationsFromPrompts } from '../services/imageGenerationService';
 import './StoryReaderPage.css';
 
 type ReadingMode = 'verticalScroll' | 'leftToRight';
@@ -762,6 +764,89 @@ const StoryReaderPage: React.FC = () => {
     }
   };
 
+  
+    const handleAIGenerateImage = async (pageId: string, type: 'page' | 'cover') => {
+    if (!story) return;
+    if (regeneratingImages.has(pageId)) return;
+    
+    setRegeneratingImages(prev => new Set([...prev, pageId]));
+    setFailedImages(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(pageId);
+      return newSet;
+    });
+
+    try {
+      let newImageUrl: string | null = null;
+      if (type === 'cover') {
+        const coverDescription = story.coverPrompt || story.description || story.title;
+        newImageUrl = await generateCoverIllustration(
+          story.title,
+          coverDescription,
+          story.illustrationStyle || 'cartoon',
+          story.characterDescription,
+          story.colorScheme,
+          story.imageModel
+        );
+        if (newImageUrl) {
+          const dataUrl = await convertImageToDataUrl(newImageUrl).catch(() => newImageUrl);
+          useStoryStore.getState().updateStory(story.id, { coverImage: dataUrl || undefined });
+          setStory(prev => prev ? { ...prev, coverImage: dataUrl || undefined } : null);
+        }
+      } else {
+        const page = story.pages.find(p => p.id === pageId);
+        if (!page) throw new Error('Page not found');
+                let prompt = page.imagePrompt || page.text;
+        
+        // Ensure the prompt has proper style context if it's missing or just raw text
+        if (!prompt.toLowerCase().includes('illustration') && !prompt.toLowerCase().includes('style')) {
+          const styleAnchors: Record<string, string> = {
+            cartoon: "children's book illustration, Pixar style, cute cartoon, soft pastel colors",
+            watercolor: "children's book illustration, soft watercolor, hand-painted, pastel tones",
+            digital: "children's book illustration, digital art, flat design, vibrant colors",
+            sketch: "children's book illustration, pencil sketch, hand-drawn, warm tones",
+            realistic: "children's book illustration, painterly storybook art, warm tones",
+            anime: "children's book illustration, anime style, Studio Ghibli, soft colors",
+          };
+          const styleAnchor = styleAnchors[story.illustrationStyle || 'cartoon'] || styleAnchors.cartoon;
+          const charDesc = story.characterDescription ? `, featuring: ${story.characterDescription}` : '';
+          const colorDesc = story.colorScheme ? `, colors: ${story.colorScheme}` : '';
+          
+          prompt = `${styleAnchor}${charDesc}${colorDesc}. Scene: ${prompt}`;
+        }
+        
+        const resultUrls = await generateStoryIllustrationsFromPrompts(
+          [{ text: page.text, imagePrompt: prompt }],
+          story.characterDescription,
+          (current, total, msg) => console.log('Regenerate progress:', msg),
+          story.imageModel
+        );
+        
+        if (resultUrls && resultUrls[0]) {
+          const dataUrl = await convertImageToDataUrl(resultUrls[0] as string).catch(() => resultUrls[0] as string);
+          useStoryStore.getState().updatePage(story.id, page.id, { canvasData: dataUrl || undefined });
+          
+          setStory(prev => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              pages: prev.pages.map(p => p.id === pageId ? { ...p, canvasData: dataUrl || undefined } : p)
+            };
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to regenerate image with AI:', err);
+      alert('Failed to regenerate image. Please try again later.');
+    } finally {
+      setRegeneratingImages(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(pageId);
+        return newSet;
+      });
+    }
+  };
+
   const handlePreviousPage = () => {
     if (currentPage > 0) {
       playPageTurn();
@@ -846,10 +931,38 @@ const StoryReaderPage: React.FC = () => {
                     </span>
                   </div>
                 )}
-                
-                
+                  {/* Regenerate Image AI Button for Page */}
+                  {isOwnStory && !regeneratingImages.has(page.id) && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleAIGenerateImage(page.id, 'page'); }}
+                      title="Regenerate this image using AI"
+                      style={{
+                        position: 'absolute',
+                        top: '1rem',
+                        right: '1rem',
+                        zIndex: 20,
+                        backgroundColor: 'rgba(0,0,0,0.6)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '40px',
+                        height: '40px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s',
+                        backdropFilter: 'blur(4px)'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(139, 92, 246, 0.9)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.6)'}
+                    >
+                      <SparklesIcon style={{ width: '20px', height: '20px' }} />
+                    </button>
+                  )}
+                  
                 <img
-                  data-page-id={page.id}
+                    data-page-id={page.id}
                   src={canvasData}
                   alt={`Page ${index + 1} illustration`}
                   className="story-reader-illustration"
@@ -999,10 +1112,38 @@ const StoryReaderPage: React.FC = () => {
                       </span>
                     </div>
                   )}
-                  
-                  
+                    {/* Regenerate Image AI Button for Page */}
+                    {page && isOwnStory && !regeneratingImages.has(page.id) && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleAIGenerateImage(page.id, 'page'); }}
+                        title="Regenerate this image using AI"
+                        style={{
+                          position: 'absolute',
+                          top: '1rem',
+                          right: '1rem',
+                          zIndex: 20,
+                          backgroundColor: 'rgba(0,0,0,0.6)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '40px',
+                          height: '40px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          transition: 'background-color 0.2s',
+                          backdropFilter: 'blur(4px)'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(139, 92, 246, 0.9)'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.6)'}
+                      >
+                        <SparklesIcon style={{ width: '20px', height: '20px' }} />
+                      </button>
+                    )}
+                    
                   <img
-                    data-page-id={page?.id}
+                      data-page-id={page?.id}
                     src={canvasData}
                     alt={`Page ${currentPage + 1} illustration`}
                     className="story-reader-horizontal-illustration"
@@ -1311,7 +1452,38 @@ const StoryReaderPage: React.FC = () => {
               </div>
             )}
             
-            {/* Regenerating Spinner for Cover */}
+            
+              {/* Regenerate Image AI Button for Cover */}
+              {isOwnStory && !regeneratingImages.has('cover') && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleAIGenerateImage('cover', 'cover'); }}
+                  title="Regenerate this image using AI"
+                  style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    right: '1rem',
+                    zIndex: 20,
+                    backgroundColor: 'rgba(0,0,0,0.6)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '40px',
+                    height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s',
+                    backdropFilter: 'blur(4px)'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(139, 92, 246, 0.9)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.6)'}
+                >
+                  <SparklesIcon style={{ width: '20px', height: '20px' }} />
+                </button>
+              )}
+
+              {/* Regenerating Spinner for Cover */}
             {regeneratingImages.has('cover') && (
               <div style={{
                 position: 'absolute',
@@ -1388,7 +1560,7 @@ const StoryReaderPage: React.FC = () => {
                     const blob = await response.blob();
                     const sizeKB = blob.size / 1024;
                     
-                    console.log(`?? Cover: Loaded image size: ${sizeKB.toFixed(1)}KB (${img.naturalWidth}×${img.naturalHeight})`);
+                    console.log(`?? Cover: Loaded image size: ${sizeKB.toFixed(1)}KB (${img.naturalWidth}ï¿½${img.naturalHeight})`);
                     
                     // Real images are 50-100KB, placeholders are much larger (~1.3MB)
                     if (sizeKB > 200) {
@@ -1653,7 +1825,7 @@ const StoryReaderPage: React.FC = () => {
                   padding: '0.25rem'
                 }}
               >
-                ×
+                ï¿½
               </button>
             </div>
 

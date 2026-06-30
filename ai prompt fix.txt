@@ -1,0 +1,96 @@
+The fix — use Groq to write the image prompt
+Instead of:
+Story text → Pollinations ❌
+Do this:
+Story text → Groq (convert to image prompt) → Pollinations ✅
+
+Implementation:
+jsasync function generateImagePrompt(storyPageText) {
+  const response = await groq.chat.completions.create({
+    model: "llama-3.1-8b-instant",
+    messages: [
+      {
+        role: "system",
+        content: `You are an expert at writing image generation prompts for children's book illustrations.
+        Given a story page text, write a detailed image prompt that describes:
+        1. The character(s) — appearance, expression, pose, action
+        2. The setting — location, time of day, weather, background details
+        3. The mood — warm, adventurous, cozy, magical, etc.
+        4. Art style — always end with: "children's book illustration, Pixar style, soft pastel colors, clean lines, cute and friendly, normal anatomy, high quality"
+        
+        Return ONLY the image prompt, nothing else. No explanation, no quotes.`
+      },
+      {
+        role: "user",
+        content: `Story page: "${storyPageText}"`
+      }
+    ],
+    max_tokens: 150
+  });
+
+  return response.choices[0].message.content;
+}
+
+Example of what this does:
+Story text:
+Benny the bunny woke up one morning and noticed 
+a strange golden glow coming from the garden.
+Groq converts it to:
+A small fluffy white bunny with big curious blue eyes 
+standing at the edge of a lush green garden at sunrise, 
+leaning forward with ears perked up, looking at a 
+glowing golden light coming from the soil, surrounded 
+by colorful flowers and dewy grass, warm golden morning 
+light, sense of wonder and excitement, children's book 
+illustration, Pixar style, soft pastel colors, clean lines, 
+cute and friendly, normal anatomy, high quality
+That's a night and day difference in image quality.
+
+Full pipeline:
+jsasync function generateStoryPage(pagePrompt, characterDescription) {
+  // Step 1 — Generate story text
+  const storyResponse = await groq.chat.completions.create({
+    model: "llama-3.1-8b-instant",
+    messages: [
+      {
+        role: "system",
+        content: `You are a children's storybook writer. 
+        Write exactly 2-3 short sentences per page.
+        Main character: ${characterDescription}`
+      },
+      { role: "user", content: pagePrompt }
+    ],
+    max_tokens: 100
+  });
+  const storyText = storyResponse.choices[0].message.content;
+
+  // Step 2 — Convert story text to image prompt
+  const imagePromptResponse = await groq.chat.completions.create({
+    model: "llama-3.1-8b-instant",
+    messages: [
+      {
+        role: "system",
+        content: `Convert story text into a detailed image generation prompt for a children's book.
+        Describe: character appearance + action, setting, mood.
+        Always end with: "children's book illustration, Pixar style, soft pastel colors, clean lines, normal anatomy, high quality"
+        Return ONLY the prompt.`
+      },
+      { role: "user", content: storyText }
+    ],
+    max_tokens: 150
+  });
+  const imagePrompt = imagePromptResponse.choices[0].message.content;
+  const negative = "scary,realistic,dark,extra limbs,bad anatomy,distorted,ugly,blurry";
+
+  // Step 3 — Generate image
+  const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}&negative=${encodeURIComponent(negative)}&model=flux&width=512&height=512&nologo=true`;
+
+  return { storyText, imagePrompt, imageUrl };
+}
+
+One more tip — define your character once at the top
+To keep the character looking consistent across pages, pass a fixed character description into every image prompt:
+jsconst characterDescription = `
+  Benny: a small fluffy white bunny, big blue eyes, 
+  wearing a tiny red scarf, always cheerful
+`;

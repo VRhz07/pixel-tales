@@ -9,7 +9,8 @@ import { Capacitor } from '@capacitor/core';
 export interface StoryPage {
   id: string;
   text: string;
-  canvasData?: string; // Base64 encoded canvas data
+  canvasData?: string; // Base64 encoded canvas data or URL
+  imagePrompt?: string; // Prompt used to generate the image (for regeneration)
   canvasOperations?: any[]; // Drawing operations for collaboration sync
   canvasDrawingState?: any; // Full Paper.js drawing state for solo mode
   characterIds: string[]; // IDs of characters on this page
@@ -25,7 +26,11 @@ export interface Story {
   is_collaborative?: boolean; // Whether this is a collaborative story
   description?: string;
   pages: StoryPage[];
-  coverImage?: string; // Base64 encoded cover image
+  coverImage?: string; // Base64 encoded cover image or URL
+  coverPrompt?: string; // Prompt used to generate cover image
+  characterDescription?: string; // AI generated character appearance
+  colorScheme?: string; // AI generated color scheme
+  imageModel?: string; // AI model used to generate images (e.g. 'pollinations', 'flux-schnell')
   coverImageOperations?: any[]; // Drawing operations for cover image collaboration sync
   coverImageDrawingState?: any; // Full Paper.js drawing state for cover image solo mode
   genre?: string;

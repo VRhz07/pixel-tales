@@ -377,13 +377,21 @@ Make sure EVERY page's imagePrompt:
           try {
             const coverDataUrl = await convertImageToDataUrl(coverUrl);
             updateStory(newStory.id, {
-              coverImage: coverDataUrl
+              coverImage: coverDataUrl,
+              coverPrompt: coverDescription,
+              characterDescription: storyData.characterDescription,
+              colorScheme: storyData.colorScheme,
+              imageModel: imageModel
             });
             console.log('? Cover image converted and saved as data URL');
           } catch (error) {
             console.warn('?? Failed to convert cover image, saving original URL:', error);
             updateStory(newStory.id, {
-              coverImage: coverUrl
+              coverImage: coverUrl,
+              coverPrompt: coverDescription,
+              characterDescription: storyData.characterDescription,
+              colorScheme: storyData.colorScheme,
+              imageModel: imageModel
             });
           }
         }
@@ -500,6 +508,7 @@ Make sure EVERY page's imagePrompt:
                 updatePage(newStory.id, defaultPage.id, {
                   text: pageText,
                   canvasData: imageDataUrl,
+                  imagePrompt: pageData.imagePrompt,
                   order: index
                 });
                 console.log(`? Updated page 1 with text and converted image`);
@@ -508,12 +517,14 @@ Make sure EVERY page's imagePrompt:
                 updatePage(newStory.id, defaultPage.id, {
                   text: pageText,
                   canvasData: imageUrl,
+                  imagePrompt: pageData.imagePrompt,
                   order: index
                 });
               }
             } else {
               updatePage(newStory.id, defaultPage.id, {
                 text: pageText,
+                imagePrompt: pageData.imagePrompt,
                 order: index
               });
             }
@@ -524,13 +535,15 @@ Make sure EVERY page's imagePrompt:
               try {
                 const imageDataUrl = await convertImageToDataUrl(imageUrl);
                 updatePage(newStory.id, newPage.id, {
-                  canvasData: imageDataUrl
+                  canvasData: imageDataUrl,
+                  imagePrompt: pageData.imagePrompt
                 });
                 console.log(`? Added page ${index + 1} with text and converted image`);
               } catch (error) {
                 console.warn(`?? Failed to convert page ${index + 1} image, using original URL:`, error);
                 updatePage(newStory.id, newPage.id, {
-                  canvasData: imageUrl
+                  canvasData: imageUrl,
+                  imagePrompt: pageData.imagePrompt
                 });
               }
             }
