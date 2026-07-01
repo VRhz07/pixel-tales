@@ -49,11 +49,8 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
     volume,
     setVolume,
     progress,
-    cloudVoiceId,
-    setCloudVoiceId,
-    useCloudTTS,
-    setUseCloudTTS,
-    isOnline
+    hasFilipinoVoices,
+    storyLanguage: hookLanguage
   } = useTextToSpeech({ storyLanguage });
 
   const [showSettings, setShowSettings] = useState(false);
@@ -277,55 +274,8 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
           </div>
 
           <div className="tts-settings-content">
-            {/* TTS Provider Selection */}
             <div className="tts-setting-item">
-              <label htmlFor="tts-provider">Voice Quality</label>
-              <CustomDropdown
-                options={[
-                  { value: 'cloud', label: `☁️ Cloud Voice (${isOnline ? 'Online' : 'Offline'})` },
-                  { value: 'device', label: '📱 Device Voice (Offline)' }
-                ]}
-                value={useCloudTTS ? 'cloud' : 'device'}
-                onChange={(value) => setUseCloudTTS(value === 'cloud')}
-                className="tts-select"
-              />
-              <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>
-                {useCloudTTS 
-                  ? isOnline 
-                    ? '✅ Premium quality (Google WaveNet)' 
-                    : '⚠️ Offline - will use device voice'
-                  : '📱 Uses installed TTS engine'}
-              </p>
-            </div>
-
-            {/* Voice Selection (for Cloud TTS) */}
-            {useCloudTTS && (
-              <div className="tts-setting-item">
-                <label htmlFor="tts-cloud-voice">Voice</label>
-                <CustomDropdown
-                  options={[
-                    { value: 'female_english', label: '👩 Female (US English)' },
-                    { value: 'female_filipino', label: '👩 Female (Filipino Tagalog)' },
-                    { value: 'male_english', label: '👨 Male (US English)' },
-                    { value: 'male_filipino', label: '👨 Male (Filipino Tagalog)' }
-                  ]}
-                  value={cloudVoiceId}
-                  onChange={(value) => {
-                    console.log('🎤 Voice changed to:', value);
-                    setCloudVoiceId(value);
-                  }}
-                  className="tts-select"
-                />
-                <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px', fontStyle: 'italic' }}>
-                  {cloudVoiceId.includes('english') ? '🇺🇸 Natural US English voice' : '🇵🇭 Native Filipino/Tagalog voice'}
-                </p>
-              </div>
-            )}
-
-            {/* Device Voice Selection (for Device TTS) */}
-            {!useCloudTTS && (
-              <div className="tts-setting-item">
-                <label htmlFor="tts-voice">{t('tts.voice')}</label>
+              <label htmlFor="tts-voice">{t('tts.voice')}</label>
                 {voices.length === 0 ? (
                   <div className="tts-no-voices">
                     <p style={{ color: '#f59e0b', marginBottom: '8px', fontSize: '14px' }}>
@@ -343,6 +293,25 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
                   </div>
                 ) : (
                   <>
+                    {/* Show warning when story is Tagalog but no Filipino voices installed */}
+                    {hookLanguage === 'tl' && !hasFilipinoVoices && !isNativePlatform && (
+                      <div style={{
+                        padding: '8px 12px',
+                        backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                        border: '1px solid rgba(245, 158, 11, 0.4)',
+                        borderRadius: '8px',
+                        marginBottom: '8px',
+                        fontSize: '13px',
+                        color: '#f59e0b',
+                        lineHeight: '1.5'
+                      }}>
+                        ⚠️ <strong>No Filipino voices found</strong> on this browser.<br />
+                        <span style={{ color: '#9ca3af', fontSize: '12px' }}>
+                          Install Filipino language in Windows Settings → Time &amp; Language → Language &amp; Region
+                          and then add the Filipino (Philippines) speech pack. Showing English voices as fallback.
+                        </span>
+                      </div>
+                    )}
                     <CustomDropdown
                       options={(() => {
                         // Build voice options (will only log on re-render, not continuously)
@@ -363,7 +332,34 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
                           // Extract a more readable identifier from the voice name
                           // Voice names are like: "fil-ph-x-fie-local", "fil-ph-x-fid-local"
                           let voiceIdentifier = '';
+                          let genderEmoji = '🗣️';
+                          let genderText = '';
+
                           if (voice.name) {
+                            const nameLower = voice.name.toLowerCase();
+                            
+                            // Heuristics for Google TTS Android voices and Web/Desktop voices
+                            if (
+                              nameLower.includes('female') || nameLower.includes('-fie-') || 
+                              nameLower.includes('-fic-') || nameLower.includes('-fia-') || 
+                              nameLower.includes('-sfg-') || nameLower.includes('-iom-') || 
+                              nameLower.includes('-iog-') || nameLower.includes('zira') || 
+                              nameLower.includes('samantha') || nameLower.includes('karen') ||
+                              nameLower.includes('hazel') || nameLower.includes('moira')
+                            ) {
+                              genderEmoji = '👩';
+                              genderText = ' Female';
+                            } else if (
+                              nameLower.includes('male') || nameLower.includes('-fid-') || 
+                              nameLower.includes('-tpd-') || nameLower.includes('-iol-') || 
+                              nameLower.includes('-iod-') || nameLower.includes('david') || 
+                              nameLower.includes('mark') || nameLower.includes('daniel') ||
+                              nameLower.includes('aaron')
+                            ) {
+                              genderEmoji = '👨';
+                              genderText = ' Male';
+                            }
+
                             // Try to get a unique part from the voice name
                             const nameParts = voice.name.split('-');
                             if (nameParts.length > 3) {
@@ -376,8 +372,8 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
                           
                           // Add number if there are multiple voices for same language
                           const label = sameLanguageVoices.length > 1 
-                            ? `${languageLabel} - Voice ${voiceNumber}${voiceIdentifier}` 
-                            : languageLabel;
+                            ? `${genderEmoji}${genderText} ${languageLabel} - Voice ${voiceNumber}${voiceIdentifier}` 
+                            : `${genderEmoji}${genderText} ${languageLabel}`;
                           
                           return {
                             value: `${voice.name || ''}|||${voice.lang || ''}|||${(voice as any).originalIndex ?? index}`, 
@@ -402,17 +398,18 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
                         
                         return options;
                       })()}
-                      value={currentVoice ? `${currentVoice.name || ''}|||${currentVoice.lang || ''}|||${(currentVoice as any).originalIndex ?? ''}` : ''}
+                      value={currentVoice ? `${currentVoice.name || ''}|||${currentVoice.lang || ''}|||${(currentVoice as any).originalIndex ?? voices.indexOf(currentVoice)}` : ''}
                       onChange={(value) => {
-                        const [name, lang, originalIndexStr] = value.split('|||');
-                        const originalIndex = Number(originalIndexStr);
+                        const [name, lang, idxStr] = value.split('|||');
+                        const idx = idxStr !== '' ? Number(idxStr) : NaN;
 
-                        const selected = voices.find(v => {
+                        const selected = voices.find((v, index) => {
                           const oi = (v as any).originalIndex;
+                          const compareIdx = oi !== undefined ? oi : index;
                           return (
                             (name ? v.name === name : true) &&
                             (lang ? v.lang === lang : true) &&
-                            (!Number.isNaN(originalIndex) ? oi === originalIndex : true)
+                            (!Number.isNaN(idx) ? compareIdx === idx : true)
                           );
                         });
 
@@ -448,7 +445,6 @@ export const TTSControls: React.FC<TTSControlsProps> = ({
                   </>
                 )}
               </div>
-            )}
 
             {/* Speed Control */}
             <div className="tts-setting-item">

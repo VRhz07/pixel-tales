@@ -858,6 +858,9 @@ def reset_password(request):
             # Reset password
             with transaction.atomic():
                 user.set_password(new_password)
+                # Also activate the account — a valid reset code proves email ownership.
+                # This handles the case where the user never completed initial verification.
+                user.is_active = True
                 user.save()
                 
                 # Mark verification as used

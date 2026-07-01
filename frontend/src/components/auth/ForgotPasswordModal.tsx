@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { KeyIcon, CheckCircleIcon, XCircleIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
+import { KeyIcon, CheckCircleIcon, XCircleIcon, EnvelopeIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { authService } from '../../services/auth.service';
 import { useThemeStore } from '../../stores/themeStore';
 import './ForgotPasswordModal.css';
@@ -19,6 +19,8 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ onClose }) =>
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [resendCountdown, setResendCountdown] = useState(0);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Countdown for resend button
   useEffect(() => {
@@ -45,7 +47,7 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ onClose }) =>
       const response = await authService.sendPasswordResetCode(email);
       
       if (response.email_sent) {
-        setSuccess('Reset code sent to your email!');
+        setSuccess('If this email is registered, a reset code has been sent. Please check your inbox.');
         setResendCountdown(60);
         setStep('code');
       } else {
@@ -164,7 +166,7 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ onClose }) =>
       const response = await authService.sendPasswordResetCode(email);
       
       if (response.email_sent) {
-        setSuccess('New reset code sent!');
+        setSuccess('If this email is registered, a new reset code has been sent.');
         setResendCountdown(60);
         setResetCode(['', '', '', '', '', '']);
         
@@ -198,7 +200,7 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ onClose }) =>
           </h2>
           <p className="forgot-password-subtitle">
             {step === 'email' && "Enter your email to receive a reset code"}
-            {step === 'code' && `We sent a 6-digit code to ${email}`}
+            {step === 'code' && `We sent a 6-digit code to ${email} — if it's registered.`}
             {step === 'newPassword' && "Create a strong password for your account"}
           </p>
         </div>
@@ -298,6 +300,14 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ onClose }) =>
 
             <button
               type="button"
+              onClick={() => { setStep('email'); setError(''); setSuccess(''); setResetCode(['', '', '', '', '', '']); }}
+              className="forgot-password-btn-secondary forgot-password-btn-back"
+            >
+              ← Try a different email
+            </button>
+
+            <button
+              type="button"
               onClick={onClose}
               className="forgot-password-btn-secondary"
             >
@@ -311,28 +321,50 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ onClose }) =>
           <form onSubmit={handleResetPassword}>
             <div className="forgot-password-form-group">
               <label className="forgot-password-label">New Password</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new password"
-                className="forgot-password-input"
-                required
-                disabled={isLoading}
-              />
+              <div className="forgot-password-input-wrapper">
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  className="forgot-password-input forgot-password-input--password"
+                  required
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className="forgot-password-toggle-visibility"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  tabIndex={-1}
+                  aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showNewPassword ? <EyeSlashIcon /> : <EyeIcon />}
+                </button>
+              </div>
             </div>
 
             <div className="forgot-password-form-group">
               <label className="forgot-password-label">Confirm Password</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm new password"
-                className="forgot-password-input"
-                required
-                disabled={isLoading}
-              />
+              <div className="forgot-password-input-wrapper">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  className="forgot-password-input forgot-password-input--password"
+                  required
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className="forgot-password-toggle-visibility"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  tabIndex={-1}
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? <EyeSlashIcon /> : <EyeIcon />}
+                </button>
+              </div>
             </div>
 
             <div className="forgot-password-help">

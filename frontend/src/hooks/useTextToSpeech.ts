@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useI18nStore } from '../stores/i18nStore';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { Capacitor } from '@capacitor/core';
@@ -37,11 +37,8 @@ interface UseTextToSpeechReturn {
   volume: number;
   setVolume: (volume: number) => void;
   progress: number; // 0 to 100
-  cloudVoiceId: string;
-  setCloudVoiceId: (voiceId: string) => void;
-  useCloudTTS: boolean;
-  setUseCloudTTS: (use: boolean) => void;
-  isOnline: boolean;
+  hasFilipinoVoices: boolean;
+  storyLanguage: string;
 }
 
 export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpeechReturn => {
@@ -59,30 +56,14 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
     }
   }, []);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [allVoices, setAllVoices] = useState<SpeechSynthesisVoice[]>([]); // all loaded voices
   const [currentVoice, setCurrentVoice] = useState<SpeechSynthesisVoice | null>(null);
 
-  // Persist device voice selection (native TTS) using a stable key
-  // Format: name|||lang|||originalIndex
-  const [deviceVoiceId, setDeviceVoiceId] = useState<string>(() => {
-    const saved = localStorage.getItem('tts_deviceVoiceId');
-    return saved || '';
-  });
+  // (Removed deviceVoiceId state, we read/write to localStorage directly per language)
   const [rate, setRate] = useState(1);
   const [pitch, setPitch] = useState(1);
   const [volume, setVolume] = useState(1);
   const [progress, setProgress] = useState(0);
-  
-  // Load cloudVoiceId from localStorage with proper initialization
-  const [cloudVoiceId, setCloudVoiceId] = useState<string>(() => {
-    const saved = localStorage.getItem('tts_cloudVoiceId');
-    return saved || 'female_english';
-  });
-  
-  // Load useCloudTTS preference from localStorage
-  const [useCloudTTS, setUseCloudTTS] = useState(() => {
-    const saved = localStorage.getItem('tts_useCloudTTS');
-    return saved !== null ? saved === 'true' : true; // Default to cloud when available
-  });
   
   const isOnline = useOnlineStatus();
   
@@ -101,27 +82,6 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
   
   const isNativePlatform = Capacitor.isNativePlatform();
   
-  // Save cloudVoiceId to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem('tts_cloudVoiceId', cloudVoiceId);
-    console.log('🎤 TTS: Saved cloud voice preference:', cloudVoiceId);
-  }, [cloudVoiceId]);
-  
-  // Save useCloudTTS to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem('tts_useCloudTTS', String(useCloudTTS));
-    console.log('🎤 TTS: Saved cloud TTS preference:', useCloudTTS);
-  }, [useCloudTTS]);
-
-  // Save device voice selection key to localStorage when it changes
-  useEffect(() => {
-    if (deviceVoiceId) {
-      localStorage.setItem('tts_deviceVoiceId', deviceVoiceId);
-    } else {
-      localStorage.removeItem('tts_deviceVoiceId');
-    }
-  }, [deviceVoiceId]);
-
   // Check if TTS is supported (always true on mobile with plugin, check Web Speech API on web)
   const isSupported = isNativePlatform || (typeof window !== 'undefined' && 'speechSynthesis' in window);
 
@@ -209,14 +169,19 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
             }
 
             console.log('📢 TTS: Filtered voices (English & Filipino only):', filteredVoices.length, filteredVoices);
+            setAllVoices(filteredVoices);
             setVoices(filteredVoices);
 
             // Restore saved device voice if available; otherwise auto-select by language
             if (filteredVoices.length > 0) {
               let preferredVoice: any = null;
 
-              if (deviceVoiceId) {
-                const [savedName, savedLang, savedIndexStr] = deviceVoiceId.split('|||');
+              const langPrefix = language.split('-')[0];
+              const storageKey = `tts_deviceVoiceId_${langPrefix}`;
+              const savedId = localStorage.getItem(storageKey);
+
+              if (savedId) {
+                const [savedName, savedLang, savedIndexStr] = savedId.split('|||');
                 const savedIndex = Number(savedIndexStr);
                 preferredVoice = filteredVoices.find(v => {
                   const originalIndex = (v as any).originalIndex;
@@ -243,8 +208,10 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
               // Ensure currentVoice always references an object from the current voices array
               setCurrentVoice(preferredVoice);
 
-              const preferredId = `${preferredVoice.name || ''}|||${preferredVoice.lang || ''}|||${(preferredVoice as any).originalIndex ?? ''}`;
-              setDeviceVoiceId(preferredId);
+              if (preferredVoice) {
+                const preferredId = `${preferredVoice.name || ''}|||${preferredVoice.lang || ''}|||${(preferredVoice as any).originalIndex ?? ''}`;
+                localStorage.setItem(storageKey, preferredId);
+              }
             }
           } else {
             console.warn('📢 TTS: No native voices found. User may need to install a TTS engine.');
@@ -285,16 +252,48 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
         });
         
         console.log('📢 TTS: Filtered web voices (English & Filipino only):', filteredVoices.length, filteredVoices);
+        setAllVoices(filteredVoices);
         setVoices(filteredVoices);
 
-        // Auto-select voice based on current language
-        if (filteredVoices.length > 0 && !currentVoice) {
-          const langCode = language === 'tl' ? 'fil' : 'en'; // Filipino or English
-          const preferredVoice = filteredVoices.find(v => 
-            v.lang.startsWith(langCode) || v.lang.startsWith(language)
-          ) || filteredVoices[0];
-          console.log('📢 TTS: Selected web voice:', preferredVoice);
-          setCurrentVoice(preferredVoice);
+        if (filteredVoices.length > 0) {
+          let preferredVoice: any = null;
+
+          const langPrefix = language.split('-')[0];
+          const storageKey = `tts_deviceVoiceId_${langPrefix}`;
+          const savedId = localStorage.getItem(storageKey);
+
+          // Attempt to restore saved device voice
+          if (savedId) {
+            const [savedName, savedLang, savedIndexStr] = savedId.split('|||');
+            const savedIndex = savedIndexStr !== '' ? Number(savedIndexStr) : NaN;
+            
+            preferredVoice = filteredVoices.find((v, index) => {
+              const originalIndex = (v as any).originalIndex;
+              const compareIdx = originalIndex !== undefined ? originalIndex : index;
+              return (
+                (savedName ? v.name === savedName : true) &&
+                (savedLang ? v.lang === savedLang : true) &&
+                (!Number.isNaN(savedIndex) ? compareIdx === savedIndex : true)
+              );
+            }) || null;
+          }
+
+          // Auto-select voice based on current language if no saved voice or saved voice doesn't match language
+          const currentLangCode = language === 'tl' ? 'fil' : 'en';
+          
+          if (!preferredVoice || !preferredVoice.lang.toLowerCase().includes(currentLangCode)) {
+            preferredVoice = filteredVoices.find(v => 
+              v.lang.toLowerCase().includes(currentLangCode) || v.lang.toLowerCase().startsWith(language)
+            ) || filteredVoices[0];
+          }
+
+          if (preferredVoice) {
+            console.log('📢 TTS: Selected web voice:', preferredVoice);
+            setCurrentVoice(preferredVoice);
+            
+            const preferredId = `${preferredVoice.name || ''}|||${preferredVoice.lang || ''}|||${(preferredVoice as any).originalIndex ?? filteredVoices.indexOf(preferredVoice)}`;
+            localStorage.setItem(storageKey, preferredId);
+          }
         }
       }
     };
@@ -324,186 +323,94 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
 
   // Auto-switch voice when language changes (for story language switching)
   useEffect(() => {
-    if (!isSupported || voices.length === 0) return;
+    if (!isSupported || allVoices.length === 0) return;
     
     console.log('📢 TTS: Language changed to:', language);
     
-    // Find a voice that matches the current language
-    const langCode = language === 'tl' ? 'fil' : language;
-    const matchingVoice = voices.find(v => 
-      v.lang && (
-        v.lang.toLowerCase().includes(langCode) || 
-        v.lang.toLowerCase().startsWith('fil') ||
-        (language === 'tl' && v.lang.toLowerCase().includes('ph'))
-      )
-    );
+    const langCode = language === 'tl' ? 'fil' : 'en';
+
+    // Helper: does a voice strictly match the desired language?
+    const voiceMatchesLang = (v: SpeechSynthesisVoice) => {
+      const l = v.lang.toLowerCase();
+      if (language === 'tl') {
+        return l.startsWith('fil') || l.startsWith('tl-') || l === 'tl' || l.includes('-ph-');
+      } else {
+        return (l === 'en-us' || l === 'en_us' || (l.startsWith('en') && !l.startsWith('fil') && !l.startsWith('tl')));
+      }
+    };
     
-    // If we found a matching voice and it's different from current
-    if (matchingVoice && matchingVoice !== currentVoice) {
+    // Check if currentVoice already strictly matches the new language
+    if (currentVoice && voiceMatchesLang(currentVoice)) {
+      console.log('📢 TTS: Current voice already matches language:', currentVoice);
+      return;
+    }
+
+    // Try to restore saved preference for this language
+    const langPrefix = language.split('-')[0];
+    const storageKey = `tts_deviceVoiceId_${langPrefix}`;
+    const savedId = localStorage.getItem(storageKey);
+    let matchingVoice: SpeechSynthesisVoice | undefined;
+
+    if (savedId) {
+      const [savedName, savedLang] = savedId.split('|||');
+      matchingVoice = allVoices.find(v =>
+        (savedName ? v.name === savedName : true) &&
+        (savedLang ? v.lang === savedLang : true)
+      );
+    }
+
+    // Fall back to first voice that matches language
+    if (!matchingVoice) {
+      matchingVoice = allVoices.find(v => voiceMatchesLang(v));
+    }
+    
+    if (matchingVoice) {
       console.log('📢 TTS: Auto-switching voice to match language:', matchingVoice);
       setCurrentVoice(matchingVoice);
-    } else if (matchingVoice) {
-      console.log('📢 TTS: Voice already matches language:', matchingVoice);
     } else {
       console.log('📢 TTS: No matching voice found for language:', language);
     }
-  }, [language, voices, isSupported]); // Watch language changes
+  }, [language, allVoices, isSupported]); // Watch language changes
 
-  // Auto-switch Cloud TTS voice ID when language changes
-  // DISABLED: Let users manually choose their preferred voice
-  // The voice selection should persist across language changes
-  useEffect(() => {
-    console.log('🌥️ TTS: Current voice:', cloudVoiceId, 'Language:', language);
-    // No auto-switching - user's choice is respected
-  }, [language, cloudVoiceId]);
+  // Compute filtered voices to only show voices matching the story language in the UI
+  const filteredVoicesForUI = useMemo(() => {
+    if (allVoices.length === 0) return voices; // fall back to all voices
+    const filtered = allVoices.filter(v => {
+      const l = v.lang.toLowerCase();
+      if (language === 'tl') {
+        return l.startsWith('fil') || l.startsWith('tl-') || l === 'tl' || l.includes('-ph-') || l.includes('tagalog') || l.includes('filipino');
+      } else {
+        return l === 'en-us' || l === 'en_us' || (l.startsWith('en') && !l.includes('fil') && !l.startsWith('tl'));
+      }
+    });
+    // If no voices match the target language, return ALL voices as fallback
+    // so the user can still pick something usable
+    return filtered.length > 0 ? filtered : allVoices;
+  }, [allVoices, voices, language]);
 
-  // Speak with Google Cloud TTS
-  const speakWithCloudTTS = useCallback(async (text: string) => {
-    try {
-      console.log('🌥️ TTS: Using Google Cloud TTS');
-      
-      setIsSpeaking(true);
-      setIsPaused(false);
-      setProgress(0);
-      
-      // Determine language code
-      const lang = language === 'tl' ? 'fil' : 'en';
-      
-      // Log the request for debugging
-      console.log('🌥️ TTS: Cloud request:', {
-        voice_id: cloudVoiceId,
-        language: lang,
-        text_length: text.length,
-        rate,
-        pitch,
-        volume
-      });
-      
-      // Create abort controller for this request
-      abortControllerRef.current = new AbortController();
-      
-      // Call backend API with abort signal
-      const response = await fetch(`${API_BASE_URL}/tts/synthesize/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text,
-          voice_id: cloudVoiceId,
-          language: lang,
-          rate: rate,
-          pitch: pitch,
-          volume: volume
-        }),
-        signal: abortControllerRef.current.signal
-      });
-      
-      console.log('🌥️ TTS: Response status:', response.status);
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        
-        // If cloud TTS fails and fallback is suggested, use device TTS
-        if (errorData.fallback) {
-          console.log('🌥️ TTS: Cloud TTS not available, falling back to device TTS');
-          return false; // Indicate fallback needed
-        }
-        
-        throw new Error(`Cloud TTS failed: ${response.status}`);
-      }
-      
-      // Get audio blob
-      const audioBlob = await response.blob();
-      
-      // Check if component is still mounted before proceeding
-      if (!isMountedRef.current) {
-        console.log('🌥️ TTS: Component unmounted, aborting playback');
-        return true;
-      }
-      
-      const audioUrl = URL.createObjectURL(audioBlob);
-      
-      // Clean up previous audio if exists
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-      
-      // Play audio
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
-      
-      audio.onloadedmetadata = () => {
-        console.log('🌥️ TTS: Audio loaded, duration:', audio.duration);
-      };
-      
-      audio.ontimeupdate = () => {
-        if (audio.duration) {
-          const progressPercent = (audio.currentTime / audio.duration) * 100;
-          setProgress(progressPercent);
-        }
-      };
-      
-      audio.onended = () => {
-        console.log('🌥️ TTS: Audio playback completed');
-        setIsSpeaking(false);
-        setProgress(100);
-        URL.revokeObjectURL(audioUrl);
-        audioRef.current = null;
-        resumeBackgroundMusic();
-      };
-      
-      audio.onerror = (error) => {
-        console.error('🌥️ TTS: Audio playback error:', error);
-        setIsSpeaking(false);
-        setProgress(0);
-        URL.revokeObjectURL(audioUrl);
-        audioRef.current = null;
-        resumeBackgroundMusic();
-      };
-      
-      // Check again before playing
-      if (!isMountedRef.current) {
-        console.log('🌥️ TTS: Component unmounted, not playing audio');
-        URL.revokeObjectURL(audioUrl);
-        audioRef.current = null;
-        return true;
-      }
-      
-      await audio.play();
-      console.log('🌥️ TTS: Cloud TTS playback started');
-      return true; // Success
-      
-    } catch (error) {
-      // Check if error is due to abort
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.log('🌥️ TTS: Fetch aborted (user left page)');
-        setIsSpeaking(false);
-        setProgress(0);
-        return true; // Not a real error, just aborted
-      }
-      
-      console.error('🌥️ TTS: Cloud TTS error:', error);
-      setIsSpeaking(false);
-      setProgress(0);
-      return false; // Indicate fallback needed
-    }
-  }, [language, cloudVoiceId, rate, pitch, volume]);
+  // True if there are actual Filipino voices available in the loaded set
+  const hasFilipinoVoices = useMemo(() => {
+    return allVoices.some(v => {
+      const l = v.lang.toLowerCase();
+      return l.startsWith('fil') || l.startsWith('tl-') || l === 'tl' || l.includes('-ph-');
+    });
+  }, [allVoices]);
 
-  // Speak text
   const setVoice = useCallback((voice: SpeechSynthesisVoice | null) => {
     setCurrentVoice(voice);
 
-    // Persist native/device voice selection as a stable key
+    const langPrefix = language.split('-')[0];
+    const storageKey = `tts_deviceVoiceId_${langPrefix}`;
+
+    // Persist native/device voice selection as a stable key per language
     if (voice) {
       const originalIndex = (voice as any).originalIndex;
-      const id = `${voice.name || ''}|||${voice.lang || ''}|||${originalIndex ?? ''}`;
-      setDeviceVoiceId(id);
+      const id = `${voice.name || ''}|||${voice.lang || ''}|||${originalIndex !== undefined ? originalIndex : ''}`;
+      localStorage.setItem(storageKey, id);
     } else {
-      setDeviceVoiceId('');
+      localStorage.removeItem(storageKey);
     }
-  }, []);
+  }, [language]);
 
   const speak = useCallback(async (text: string, options?: TextToSpeechOptions) => {
     if (!isSupported || !text.trim()) return;
@@ -520,16 +427,6 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
     wordsArrayRef.current = words;
     totalWordsRef.current = words.length;
     currentWordRef.current = 0;
-
-    // Try cloud TTS first if enabled and online
-    if (useCloudTTS && isOnline) {
-      const success = await speakWithCloudTTS(text);
-      if (success) {
-        return; // Cloud TTS worked, we're done
-      }
-      // If cloud TTS failed, fall through to device TTS
-      console.log('📢 TTS: Falling back to device TTS');
-    }
 
     if (isNativePlatform) {
       // Use Capacitor TTS for mobile
@@ -685,6 +582,8 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
       utterance.pitch = options?.pitch ?? pitch;
       utterance.volume = options?.volume ?? volume;
       utterance.voice = options?.voice ?? currentVoice;
+      // Set lang so the browser's speech engine knows what language is being spoken
+      utterance.lang = language === 'tl' ? 'fil-PH' : 'en-US';
 
       utterance.onstart = () => {
         setIsSpeaking(true);
@@ -720,19 +619,10 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
       utteranceRef.current = utterance;
       window.speechSynthesis.speak(utterance);
     }
-  }, [isSupported, isNativePlatform, rate, pitch, volume, currentVoice, language, useCloudTTS, isOnline, speakWithCloudTTS]);
+  }, [isSupported, isNativePlatform, rate, pitch, volume, currentVoice, language]);
 
-  // Pause speech
   const pause = useCallback(async () => {
     if (!isSupported || !isSpeaking) return;
-    
-    // If using Cloud TTS (audio element)
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPaused(true);
-      console.log('🌥️ TTS: Cloud audio paused');
-      return;
-    }
     
     if (isNativePlatform) {
       // Native (Android/iOS) plugin does not support pause. Treat pause as stop.
@@ -748,14 +638,6 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
   // Resume speech
   const resume = useCallback(() => {
     if (!isSupported || !isPaused) return;
-    
-    // If using Cloud TTS (audio element)
-    if (audioRef.current) {
-      audioRef.current.play();
-      setIsPaused(false);
-      console.log('🌥️ TTS: Cloud audio resumed');
-      return;
-    }
     
     if (isNativePlatform) {
       // Native plugin cannot resume because it cannot pause.
@@ -926,7 +808,7 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
     isSpeaking,
     isPaused,
     isSupported,
-    voices,
+    voices: filteredVoicesForUI,
     currentVoice,
     setVoice,
     rate,
@@ -936,10 +818,7 @@ export const useTextToSpeech = (options?: UseTextToSpeechOptions): UseTextToSpee
     volume,
     setVolume,
     progress,
-    cloudVoiceId,
-    setCloudVoiceId,
-    useCloudTTS,
-    setUseCloudTTS,
-    isOnline
+    hasFilipinoVoices,
+    storyLanguage: language,
   };
 };
