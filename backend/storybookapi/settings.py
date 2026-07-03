@@ -1,4 +1,4 @@
-﻿"""
+"""
 Django settings for Imaginary Worlds API
 Optimized for API-only backend with React frontend
 """
@@ -306,25 +306,24 @@ elif GOOGLE_APPLICATION_CREDENTIALS and os.path.exists(GOOGLE_APPLICATION_CREDEN
 else:
     pass  # TTS credentials not configured
 
-# Cache configuration for memory efficiency - MINIMAL for WebSocket mode
+# Cache configuration using Redis for scalable snapshot and state storage
+# NOTE: Upstash free tier only supports DB 0 — do not add any 'db' option here.
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
-        'OPTIONS': {
-            'MAX_ENTRIES': 300,  # REDUCED to 300 entries for WebSocket mode
-            'CULL_FREQUENCY': 3,  # Cull cache more frequently
-        }
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': os.getenv('REDIS_URL', 'rediss://default:gQAAAAAAAV8vAAIgcDFkNWI1ZTNlNmQ4NDQ0YzAxYWJmNDEyZjdlODk2Y2JhYw@cosmic-parrot-89903.upstash.io:6379'),
+        'KEY_PREFIX': 'pixeltales',  # Namespace to avoid collisions with channel layer keys
     }
 }
 
-# Channels Configuration - ULTRA MINIMAL for free tier
+# Channels Configuration - Optimized for production with Redis
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'capacity': 50,  # REDUCED: Only 50 messages in memory
-            'expiry': 30,  # REDUCED: Messages expire after 30 seconds
+            'hosts': [os.getenv('REDIS_URL', 'rediss://default:gQAAAAAAAV8vAAIgcDFkNWI1ZTNlNmQ4NDQ0YzAxYWJmNDEyZjdlODk2Y2JhYw@cosmic-parrot-89903.upstash.io:6379')],
+            'capacity': 1500,  # Increased capacity to prevent ChannelFull with batched strokes
+            'expiry': 60,      # Give enough time for reconnects
         },
     },
 }

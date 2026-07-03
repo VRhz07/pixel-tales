@@ -394,6 +394,35 @@ function AppContent() {
     };
   }, [isAuthenticated]);
 
+  // Listen for collaboration session start
+  useEffect(() => {
+    const handleSessionStart = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const { session_id, story_title } = customEvent.detail;
+      
+      if (showWaitingScreen && waitingScreenData?.sessionId === session_id) {
+        setShowWaitingScreen(false);
+        const storyId = `collab-${session_id}`;
+        navigate('/create-story-manual', {
+          state: {
+            sessionId: session_id,
+            storyId: storyId,
+            pageId: 'page_1',
+            storyTitle: story_title,
+            isCollaborative: true,
+            bypassLobby: true,
+            isHost: false
+          }
+        });
+      }
+    };
+
+    window.addEventListener('collaboration-session-started', handleSessionStart);
+    return () => {
+      window.removeEventListener('collaboration-session-started', handleSessionStart);
+    };
+  }, [showWaitingScreen, waitingScreenData, navigate]);
+
   // XP system event listeners will be added in the future
 
   // Handle accepting collaboration invitation from notification modal
@@ -428,21 +457,6 @@ function AppContent() {
           inviterName: currentInviteNotification.inviter_name
         });
         setShowWaitingScreen(true);
-        
-        // TODO: Listen for session start event from WebSocket
-        // For now, we'll navigate after a delay (this should be replaced with WebSocket event)
-        setTimeout(() => {
-          setShowWaitingScreen(false);
-          const storyId = `collab-${currentInviteNotification.sessionId}`;
-          navigate('/create-story-manual', {
-            state: {
-              sessionId: currentInviteNotification.sessionId,
-              storyId: storyId,
-              storyTitle: currentInviteNotification.storyTitle,
-              isCollaborative: true
-            }
-          });
-        }, 3000); // Temporary: Will be replaced with WebSocket event
       }
     } catch (err) {
       console.error('Failed to accept invitation:', err);
@@ -498,16 +512,13 @@ function AppContent() {
       if (response.ok) {
         // Remove from invitations
         setCollaborationInvites(prev => prev.filter(inv => inv.id !== invitation.id));
-        
-        // Navigate to story creation page with collaboration info
-        const storyId = `collab-${invitation.sessionId}`;
-        navigate('/create-story-manual', {
-          state: {
-            sessionId: invitation.sessionId,
-            storyId: storyId,
-            isCollaborative: true
-          }
+        // Show waiting screen instead of navigating immediately
+        setWaitingScreenData({
+          sessionId: invitation.sessionId,
+          storyTitle: invitation.storyTitle,
+          inviterName: invitation.inviter_name
         });
+        setShowWaitingScreen(true);
       }
     } catch (err) {
       console.error('Failed to accept invitation:', err);

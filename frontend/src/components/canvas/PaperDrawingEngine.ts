@@ -63,6 +63,12 @@ export class PaperDrawingEngine {
   private isDrawingBlocked = false;
   private textClickPoint: paper.Point | null = null;
   private onTextInputRequest: ((point: { x: number; y: number }) => void) | null = null;
+  
+  // Real-time batching state
+  private currentStrokeId: string = '';
+  private batchedPoints: {x: number, y: number}[] = [];
+  private activeRemoteStrokes: Map<string, paper.Path> = new Map();
+  private lastBatchTime: number = 0;
   private currentFontSize = 24;
   private currentFontFamily = 'Arial';
   private currentFontWeight = 'normal';
@@ -326,6 +332,14 @@ export class PaperDrawingEngine {
         
         // Notify collaboration about completed drawing (ALL TOOLS NOW SUPPORTED)
         if (this.onDrawingComplete) {
+          if (this.currentTool === 'brush' || this.currentTool === 'eraser') {
+            this.flushBatchedPoints();
+            // Send final end signal for stroke
+            this.onDrawingComplete({
+              type: 'draw_batch_end',
+              strokeId: this.currentStrokeId
+            });
+          }
           this.notifyDrawingComplete(pathForCollaboration, toolForCollaboration);
         }
       }
@@ -424,6 +438,9 @@ export class PaperDrawingEngine {
 
   private startBrushStroke(point: paper.Point) {
     this.currentPath = new this.scope.Path();
+    this.currentStrokeId = `stroke_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    this.batchedPoints = [];
+    this.lastBatchTime = Date.now();
     
     // For gradients, we'll need to convert to filled path later
     // For now, set stroke color (will be converted if gradient is active)
@@ -489,8 +506,35 @@ export class PaperDrawingEngine {
         this.createAirbrushEffect(point);
       } else {
         this.currentPath.add(point);
+        
+        // Accumulate points for real-time batching
+        this.batchedPoints.push({ x: point.x, y: point.y });
+        
+        // Flush if we have 10 points or 50ms have passed
+        const now = Date.now();
+        if (this.batchedPoints.length >= 10 || now - this.lastBatchTime > 50) {
+           this.flushBatchedPoints();
+           this.lastBatchTime = now;
+        }
       }
     }
+  }
+
+  private flushBatchedPoints() {
+    if (this.batchedPoints.length === 0) return;
+    
+    if (this.onDrawingComplete) {
+      this.onDrawingComplete({
+        type: 'draw_batch_progress',
+        strokeId: this.currentStrokeId,
+        points: [...this.batchedPoints],
+        color: this.currentColor,
+        strokeWidth: this.currentSize,
+        tool: this.currentTool
+      });
+    }
+    
+    this.batchedPoints = [];
   }
 
   private createAirbrushEffect(point: paper.Point) {
@@ -1642,6 +1686,12 @@ export class PaperDrawingEngine {
             this.applyRemotePath(data.points, data.color || data.strokeColor || '#000000', data.strokeWidth || 5);
           }
           break;
+        case 'draw_batch_progress':
+          this.applyRemoteDrawBatchProgress(data);
+          break;
+        case 'draw_batch_end':
+          this.applyRemoteDrawBatchEnd(data);
+          break;
         case 'transform':
           // Handle transform operations through the new collaboration enhancer
           // This is now handled by the CollaborationEnhancer, not the legacy drawing system
@@ -1685,6 +1735,42 @@ export class PaperDrawingEngine {
 
     path.simplify(10);
     this.scope.project.activeLayer.addChild(path);
+  }
+
+  private applyRemoteDrawBatchProgress(data: any) {
+    if (!data.points || data.points.length === 0 || !data.strokeId) return;
+    
+    let path = this.activeRemoteStrokes.get(data.strokeId);
+    if (!path) {
+      path = new this.scope.Path({
+        strokeColor: new this.scope.Color(data.color || '#000000'),
+        strokeWidth: data.strokeWidth || 5,
+        strokeCap: 'round',
+        strokeJoin: 'round'
+      });
+      this.scope.project.activeLayer.addChild(path);
+      this.activeRemoteStrokes.set(data.strokeId, path);
+    }
+    
+    data.points.forEach((p: any) => {
+      path!.add(new this.scope.Point(p.x, p.y));
+    });
+    
+    // Path smoothing on the fly
+    path.smooth({ type: 'continuous' });
+  }
+
+  private applyRemoteDrawBatchEnd(data: any) {
+    if (!data.strokeId) return;
+    const path = this.activeRemoteStrokes.get(data.strokeId);
+    if (path) {
+      path.simplify(10);
+      this.activeRemoteStrokes.delete(data.strokeId);
+      // We will let the full 'brush' path data replace this if it arrives later via notifyDrawingComplete.
+      // Alternatively, we can just leave it as is. But PixelTales' notifyDrawingComplete ALSO sends a full 'brush' event.
+      // So let's remove the temporary batched path when the end arrives, because the full 'brush' payload will draw the final simplified path!
+      path.remove();
+    }
   }
 
   private applyRemoteRectangle(data: any) {

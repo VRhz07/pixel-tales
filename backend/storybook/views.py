@@ -147,11 +147,11 @@ def story_list(request):
     if public_library:
         # Return all published stories from all users
         stories = Story.objects.filter(is_published=True).select_related('author', 'author__profile').order_by('-date_created')
-        print(f"📚 Public library: {stories.count()} published stories from all users")
+        print(f" Public library: {stories.count()} published stories from all users")
     elif request.user.is_authenticated:
         # Return user's own stories (including drafts)
         stories = Story.objects.filter(author=request.user).order_by('-date_created')
-        print(f"📚 User {request.user.id} has {stories.count()} total stories")
+        print(f" User {request.user.id} has {stories.count()} total stories")
         print(f"   Published: {stories.filter(is_published=True).count()}")
         print(f"   Drafts: {stories.filter(is_published=False).count()}")
     else:
@@ -358,11 +358,11 @@ def unpublish_story(request, story_id):
     """Unpublish a story (remove from public library, move back to drafts)"""
     story = get_object_or_404(Story, id=story_id, author=request.user)
     
-    print(f"📤 Unpublish request for story {story_id}: {story.title}")
+    print(f"[SEND] Unpublish request for story {story_id}: {story.title}")
     print(f"   Current is_published: {story.is_published}")
     
     if not story.is_published:
-        print(f"⚠️ Story {story_id} is already unpublished")
+        print(f"[WARN] Story {story_id} is already unpublished")
         return Response({
             'success': False,
             'message': 'Story is already unpublished'
@@ -373,7 +373,7 @@ def unpublish_story(request, story_id):
     
     # Verify the change was saved
     story.refresh_from_db()
-    print(f"✅ Story {story_id} unpublished successfully")
+    print(f"[OK] Story {story_id} unpublished successfully")
     print(f"   New is_published: {story.is_published}")
     
     return Response({
@@ -971,7 +971,7 @@ def search_users(request):
             'id': user.id,
             'username': user.username,
             'name': user.profile.display_name if hasattr(user, 'profile') else user.username,
-            'avatar': user.profile.avatar_emoji if hasattr(user, 'profile') and user.profile.avatar_emoji else '📚',
+            'avatar': user.profile.avatar_emoji if hasattr(user, 'profile') and user.profile.avatar_emoji else '',
             'bio': user.profile.bio if hasattr(user, 'profile') and user.profile.bio else '',
             'is_friend': user.id in friend_ids,
             'request_sent': user.id in pending_sent_ids,
@@ -1031,7 +1031,7 @@ def friend_list(request):
         friend_data = {
             'id': friend.id,
             'name': friend_profile.display_name if friend_profile else friend.username,
-            'avatar': friend_profile.avatar_emoji if friend_profile and friend_profile.avatar_emoji else '👤',
+            'avatar': friend_profile.avatar_emoji if friend_profile and friend_profile.avatar_emoji else '',
             'selected_avatar_border': friend_profile.selected_avatar_border if friend_profile else 'basic',
             'username': friend.username,
             'is_online': friend_profile.is_online if friend_profile else False,
@@ -1487,7 +1487,7 @@ def get_activity_feed(request):
                 'id': f'story_{story.id}',
                 'user_id': story.author.id,
                 'user_name': profile.display_name if profile else story.author.username,
-                'user_avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '👤',
+                'user_avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '',
                 'selected_avatar_border': profile.selected_avatar_border if profile else 'basic',
                 'activity_type': 'published',
                 'story_title': story.title,
@@ -1507,7 +1507,7 @@ def get_activity_feed(request):
                 'id': f'like_{like.id}',
                 'user_id': like.user.id,
                 'user_name': profile.display_name if profile else like.user.username,
-                'user_avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '👤',
+                'user_avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '',
                 'selected_avatar_border': profile.selected_avatar_border if profile else 'basic',
                 'activity_type': 'liked_your_story',
                 'story_title': like.story.title,
@@ -1526,7 +1526,7 @@ def get_activity_feed(request):
                 'id': f'comment_{comment.id}',
                 'user_id': comment.author.id,
                 'user_name': profile.display_name if profile else comment.author.username,
-                'user_avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '👤',
+                'user_avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '',
                 'selected_avatar_border': profile.selected_avatar_border if profile else 'basic',
                 'activity_type': 'commented_on_your_story',
                 'story_title': comment.story.title,
@@ -1546,7 +1546,7 @@ def get_activity_feed(request):
                     'id': f'save_{save.id}',
                     'user_id': save.user.id,
                     'user_name': profile.display_name if profile else save.user.username,
-                    'user_avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '👤',
+                    'user_avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '',
                     'selected_avatar_border': profile.selected_avatar_border if profile else 'basic',
                     'activity_type': 'saved_your_story',
                     'story_title': save.story.title,
@@ -1606,13 +1606,13 @@ def get_leaderboard(request):
         
         # Get achievement count and icons
         achievement_count = user_achievements.count()
-        badge_icons = [ua.achievement.icon or '🏆' for ua in user_achievements[:10]]  # Show up to 10 badges
+        badge_icons = [ua.achievement.icon or '' for ua in user_achievements[:10]]  # Show up to 10 badges
         
         profile = user.profile if hasattr(user, 'profile') else None
         leaderboard.append({
             'id': user.id,
             'name': profile.display_name if profile else user.username,
-            'avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '👤',
+            'avatar': profile.avatar_emoji if profile and profile.avatar_emoji else '',
             'selected_avatar_border': profile.selected_avatar_border if profile else 'basic',
             'rank': 0,  # Rank will be assigned by frontend based on filter
             'story_count': user.story_count or 0,
@@ -1671,7 +1671,7 @@ def get_friend_profile(request, user_id):
     ).select_related('achievement').order_by('-earned_at')
     
     achievement_count = user_achievements.count()
-    badges = [ua.achievement.icon or '🏆' for ua in user_achievements[:10]]
+    badges = [ua.achievement.icon or '' for ua in user_achievements[:10]]
     
     # Get recent stories
     recent_stories = Story.objects.filter(
@@ -1685,7 +1685,7 @@ def get_friend_profile(request, user_id):
         recent_stories_data.append({
             'id': story.id,
             'title': story.title,
-            'cover': '📖',  # Default cover
+            'cover': '',  # Default cover
             'likes': likes_count,
         })
     
@@ -1695,7 +1695,7 @@ def get_friend_profile(request, user_id):
             'id': user.id,
             'username': user.username,
             'name': profile.display_name if profile else user.username,
-            'avatar': '👤',
+            'avatar': '',
             'bio': profile.bio if profile and profile.bio else '',
             'story_count': story_stats['story_count'] or 0,
             'follower_count': follower_count,
@@ -1978,7 +1978,7 @@ def end_collaboration_session(request, session_id):
         # Broadcast session ended to all participants via collaboration WebSocket
         channel_layer = get_channel_layer()
         if channel_layer:
-            print(f"🎬 Broadcasting session_ended to group: collab_{session_id}")
+            print(f" Broadcasting session_ended to group: collab_{session_id}")
             async_to_sync(channel_layer.group_send)(
                 f'collab_{session_id}',
                 {
@@ -2045,7 +2045,7 @@ def start_collaboration_session(request, session_id):
         if channel_layer:
             # Send to collaboration group (this is where participants are listening!)
             collaboration_group_name = f'collab_{session_id}'
-            print(f'🎯 Broadcasting session_started to collaboration group: {collaboration_group_name}')
+            print(f' Broadcasting session_started to collaboration group: {collaboration_group_name}')
             async_to_sync(channel_layer.group_send)(
                 collaboration_group_name,
                 {
@@ -2054,7 +2054,7 @@ def start_collaboration_session(request, session_id):
                     'story_title': session.canvas_name
                 }
             )
-            print(f'✅ Sent session_started message to collaboration group: {collaboration_group_name}')
+            print(f'[OK] Sent session_started message to collaboration group: {collaboration_group_name}')
             
             # Also send to individual notification channels as backup
             for participant in participants:
@@ -2108,8 +2108,8 @@ def initiate_collaboration_vote(request, session_id):
         # Broadcast vote initiation to all participants via collaboration WebSocket
         channel_layer = get_channel_layer()
         if channel_layer:
-            print(f"🗳️ Broadcasting vote_initiated to group: collab_{session_id}")
-            print(f"🗳️ Vote data: vote_id={vote_id}, initiated_by={request.user.id}, total={total_participants}")
+            print(f" Broadcasting vote_initiated to group: collab_{session_id}")
+            print(f" Vote data: vote_id={vote_id}, initiated_by={request.user.id}, total={total_participants}")
             async_to_sync(channel_layer.group_send)(
                 f'collab_{session_id}',
                 {
@@ -2121,9 +2121,9 @@ def initiate_collaboration_vote(request, session_id):
                     'question': 'Save and end the collaboration session?'
                 }
             )
-            print(f"✅ Vote initiation broadcast complete")
+            print(f"[OK] Vote initiation broadcast complete")
         else:
-            print(f"❌ No channel_layer available!")
+            print(f"[ERROR] No channel_layer available!")
         
         return Response({
             'success': True,
@@ -2199,7 +2199,7 @@ def cast_collaboration_vote(request, session_id):
             for uid in vote_data['no']:
                 voting_data_dict[str(uid)] = False
             
-            print(f"📊 Broadcasting vote_update: vote_id={vote_id}, voting_data={voting_data_dict}")
+            print(f" Broadcasting vote_update: vote_id={vote_id}, voting_data={voting_data_dict}")
             async_to_sync(channel_layer.group_send)(
                 f'collab_{session_id}',
                 {
@@ -2218,13 +2218,13 @@ def cast_collaboration_vote(request, session_id):
             # Vote is complete - determine result
             approved = yes_count > no_count
             
-            print(f"🎉 All votes collected! Result: {'APPROVED' if approved else 'REJECTED'}")
-            print(f"📊 Final tally: Yes={yes_count}, No={no_count}, Total={total_participants}")
+            print(f"[YAY] All votes collected! Result: {'APPROVED' if approved else 'REJECTED'}")
+            print(f" Final tally: Yes={yes_count}, No={no_count}, Total={total_participants}")
             
             # Broadcast result to all participants
             channel_layer = get_channel_layer()
             if channel_layer:
-                print(f"📢 Broadcasting vote_result to group: collab_{session_id}")
+                print(f" Broadcasting vote_result to group: collab_{session_id}")
                 async_to_sync(channel_layer.group_send)(
                     f'collab_{session_id}',
                     {
@@ -2236,7 +2236,7 @@ def cast_collaboration_vote(request, session_id):
                         'total_participants': total_participants
                     }
                 )
-                print(f"✅ vote_result broadcast complete")
+                print(f"[OK] vote_result broadcast complete")
             
             # Clean up vote data
             cache.delete(vote_key)
@@ -2299,7 +2299,7 @@ def get_collaboration_participants(request, session_id):
         participants_list.append({
             'user_id': session.host.id,
             'username': session.host.username,
-            'avatar': host_profile.avatar_emoji if host_profile and host_profile.avatar_emoji else '👤',
+            'avatar': host_profile.avatar_emoji if host_profile and host_profile.avatar_emoji else '',
             'selected_avatar_border': host_profile.selected_avatar_border if host_profile else 'basic',
             'status': 'joined',
             'is_host': True
@@ -2311,7 +2311,7 @@ def get_collaboration_participants(request, session_id):
             participants_list.append({
                 'user_id': participant.user.id,
                 'username': participant.user.username,
-                'avatar': participant_profile.avatar_emoji if participant_profile and participant_profile.avatar_emoji else '👤',
+                'avatar': participant_profile.avatar_emoji if participant_profile and participant_profile.avatar_emoji else '',
                 'selected_avatar_border': participant_profile.selected_avatar_border if participant_profile else 'basic',
                 'status': 'joined',
                 'is_host': False
@@ -2325,7 +2325,7 @@ def get_collaboration_participants(request, session_id):
                 participants_list.append({
                     'user_id': invite.recipient.id,
                     'username': invite.recipient.username,
-                    'avatar': invite_profile.avatar_emoji if invite_profile and invite_profile.avatar_emoji else '👤',
+                    'avatar': invite_profile.avatar_emoji if invite_profile and invite_profile.avatar_emoji else '',
                     'selected_avatar_border': invite_profile.selected_avatar_border if invite_profile else 'basic',
                     'status': 'pending',
                     'is_host': False
@@ -2362,11 +2362,11 @@ def send_collaboration_invite(request):
         }, status=status.HTTP_400_BAD_REQUEST)
     
     try:
-        print(f"🔔 Sending collaboration invite: session_id={session_id}, friend_id={friend_id}, story_title={story_title}")
+        print(f"[ALERT] Sending collaboration invite: session_id={session_id}, friend_id={friend_id}, story_title={story_title}")
         
         # Verify session exists and user is host
         session = CollaborationSession.objects.get(session_id=session_id)
-        print(f"✅ Session found: {session.session_id}, host: {session.host.username}")
+        print(f"[OK] Session found: {session.session_id}, host: {session.host.username}")
         
         if session.host != request.user:
             return Response({
@@ -2375,7 +2375,7 @@ def send_collaboration_invite(request):
         
         # Verify friend exists
         friend = User.objects.get(id=friend_id)
-        print(f"✅ Friend found: {friend.username}")
+        print(f"[OK] Friend found: {friend.username}")
         
         # Check if there's already a pending invite for this session and friend
         # Note: Using filter then checking in Python for SQLite compatibility
@@ -2394,17 +2394,17 @@ def send_collaboration_invite(request):
         
         if existing_invite:
             # Delete the old invite so we can create a fresh one (allows re-inviting)
-            print(f"🔄 Deleting existing invite and creating new one for session {session_id}")
+            print(f"[SYNC] Deleting existing invite and creating new one for session {session_id}")
             existing_invite.delete()
         
         # Create a notification for collaboration invite
         try:
             inviter_name = request.user.profile.display_name if hasattr(request.user, 'profile') and request.user.profile.display_name else request.user.username
         except Exception as profile_error:
-            print(f"⚠️ Error getting profile name: {profile_error}")
+            print(f"[WARN] Error getting profile name: {profile_error}")
             inviter_name = request.user.username
         
-        print(f"📝 Creating notification: inviter={inviter_name}, recipient={friend.username}")
+        print(f"[NOTE] Creating notification: inviter={inviter_name}, recipient={friend.username}")
         
         # Create notification
         notification = Notification.objects.create(
@@ -2421,16 +2421,16 @@ def send_collaboration_invite(request):
                 'is_session_active': is_session_active
             }
         )
-        print(f"✅ Notification created: ID={notification.id}")
+        print(f"[OK] Notification created: ID={notification.id}")
         
         # Send real-time notification via WebSocket
         channel_layer = get_channel_layer()
-        print(f"📡 Channel layer: {channel_layer}")
+        print(f"[WS] Channel layer: {channel_layer}")
         if channel_layer:
             from .serializers import NotificationSerializer
             notification_data = NotificationSerializer(notification).data
-            print(f"📤 Sending WebSocket message to notifications_{friend_id}")
-            print(f"📋 Notification data: {notification_data}")
+            print(f"[SEND] Sending WebSocket message to notifications_{friend_id}")
+            print(f"[DATA] Notification data: {notification_data}")
             async_to_sync(channel_layer.group_send)(
                 f'notifications_{friend_id}',
                 {
@@ -2438,11 +2438,11 @@ def send_collaboration_invite(request):
                     'notification': notification_data
                 }
             )
-            print(f"✅ WebSocket message sent successfully")
+            print(f"[OK] WebSocket message sent successfully")
         else:
-            print(f"⚠️ No channel layer available, skipping WebSocket")
+            print(f"[WARN] No channel layer available, skipping WebSocket")
         
-        print(f"🎉 Collaboration invite sent successfully!")
+        print(f"[YAY] Collaboration invite sent successfully!")
         return Response({
             'success': True,
             'message': 'Invitation sent as notification',
@@ -2459,7 +2459,7 @@ def send_collaboration_invite(request):
         }, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         import traceback
-        print(f"❌ Error sending collaboration invite: {str(e)}")
+        print(f"[ERROR] Error sending collaboration invite: {str(e)}")
         print(traceback.format_exc())
         return Response({
             'error': str(e)
@@ -2475,8 +2475,8 @@ def get_collaboration_invites(request):
     from datetime import timedelta
     
     try:
-        # Delete invitations older than 1 minute
-        timeout_threshold = timezone.now() - timedelta(minutes=1)
+        # Delete invitations older than 24 hours
+        timeout_threshold = timezone.now() - timedelta(hours=24)
         old_invites = Notification.objects.filter(
             recipient=request.user,
             notification_type='collaboration_invite',
@@ -2485,7 +2485,7 @@ def get_collaboration_invites(request):
         )
         deleted_count = old_invites.count()
         if deleted_count > 0:
-            print(f"🗑️ Deleted {deleted_count} expired collaboration invites for user {request.user.id}")
+            print(f"[DEL] Deleted {deleted_count} expired collaboration invites for user {request.user.id}")
             old_invites.delete()
         
         # Get remaining valid invitations
@@ -2508,7 +2508,7 @@ def get_collaboration_invites(request):
                     'story_title': data.get('story_title', 'Untitled Story'),
                     'inviter_id': data.get('inviter_id', sender.id if sender else 0),
                     'inviter_name': data.get('inviter_name', sender.username if sender else 'Unknown'),
-                    'inviter_avatar': '👤',
+                    'inviter_avatar': '',
                     'created_at': notification.created_at.isoformat() if notification.created_at else '',
                     'is_read': notification.is_read
                 })
@@ -2535,7 +2535,7 @@ def get_collaboration_invites(request):
 @permission_classes([IsAuthenticated])
 def respond_to_collaboration_invite(request, notification_id):
     """Accept or decline a collaboration invitation"""
-    from .models import Notification
+    from .models import Notification, CollaborationSession, SessionParticipant
     
     action = request.data.get('action')  # 'accept' or 'decline'
     
@@ -2556,11 +2556,33 @@ def respond_to_collaboration_invite(request, notification_id):
         notification.save()
         
         data = notification.data or {}
+        session_id = data.get('session_id')
+        
+        if action == 'accept' and session_id:
+            try:
+                session = CollaborationSession.objects.get(session_id=session_id)
+                # Register user as an authorized participant so the WebSocket auth check passes
+                participant, created = SessionParticipant.objects.get_or_create(
+                    session=session,
+                    user=request.user,
+                    defaults={
+                        'cursor_color': '#4ECDC4',
+                        'role': 'participant',
+                        'is_active': True
+                    }
+                )
+                if not created:
+                    # Reactivate if they had previously left
+                    participant.is_active = True
+                    participant.save(update_fields=['is_active'])
+                print(f"[OK] SessionParticipant created/reactivated for {request.user.username} in session {session_id}")
+            except CollaborationSession.DoesNotExist:
+                print(f"[WARN] Session {session_id} not found when accepting invite")
         
         return Response({
             'success': True,
             'action': action,
-            'session_id': data.get('session_id') if action == 'accept' else None
+            'session_id': session_id if action == 'accept' else None
         })
         
     except Notification.DoesNotExist:
@@ -2576,7 +2598,7 @@ def respond_to_collaboration_invite(request, notification_id):
 def get_parent_children(request):
     """Get all children associated with parent account"""
     try:
-        print(f"🔍 GET PARENT CHILDREN - User: {request.user.username} (ID: {request.user.id})")
+        print(f"[SEARCH] GET PARENT CHILDREN - User: {request.user.username} (ID: {request.user.id})")
         user_profile = request.user.profile
         print(f"   User type: {user_profile.user_type}")
         
@@ -2614,7 +2636,7 @@ def get_parent_children(request):
                 'id': child.id,
                 'username': child.username,
                 'name': child_profile.display_name,
-                'avatar': child_profile.avatar_emoji or (child_profile.avatar.url if child_profile.avatar else '📚'),
+                'avatar': child_profile.avatar_emoji or (child_profile.avatar.url if child_profile.avatar else ''),
                 'is_online': child_profile.is_online,
                 'last_seen': child_profile.last_seen.isoformat() if child_profile.last_seen else None,
                 'total_stories': total_stories,
@@ -2625,7 +2647,7 @@ def get_parent_children(request):
             print(f"   Added child: {child.username} (ID: {child.id})")
             children_data.append(child_data)
         
-        print(f"✅ Returning {len(children_data)} children")
+        print(f"[OK] Returning {len(children_data)} children")
         return Response({
             'success': True,
             'children': children_data
@@ -2649,16 +2671,16 @@ def get_teacher_students(request):
         
         # Check if user has a profile
         if not hasattr(request.user, 'profile'):
-            print(f"❌ User {request.user.id} ({request.user.username}) has no profile")
+            print(f"[ERROR] User {request.user.id} ({request.user.username}) has no profile")
             return Response({
                 'error': 'User profile not found'
             }, status=status.HTTP_404_NOT_FOUND)
         
         user_profile = request.user.profile
-        print(f"✅ User {request.user.id} profile found, user_type: {user_profile.user_type}")
+        print(f"[OK] User {request.user.id} profile found, user_type: {user_profile.user_type}")
         
         if user_profile.user_type != 'teacher':
-            print(f"❌ User {request.user.id} is not a teacher, type: {user_profile.user_type}")
+            print(f"[ERROR] User {request.user.id} is not a teacher, type: {user_profile.user_type}")
             return Response({
                 'error': 'Only teacher accounts can access this endpoint'
             }, status=status.HTTP_403_FORBIDDEN)
@@ -2693,7 +2715,7 @@ def get_teacher_students(request):
                 'date_added': rel.date_created.isoformat() if rel.date_created else None
             })
         
-        print(f"✅ Returning {len(students_data)} students for teacher {request.user.id}")
+        print(f"[OK] Returning {len(students_data)} students for teacher {request.user.id}")
         return Response({
             'success': True,
             'students': students_data
@@ -2701,7 +2723,7 @@ def get_teacher_students(request):
         
     except Exception as e:
         import traceback
-        print(f"❌ Error in get_teacher_students: {str(e)}")
+        print(f"[ERROR] Error in get_teacher_students: {str(e)}")
         print(traceback.format_exc())
         return Response({
             'error': str(e),
@@ -3159,7 +3181,7 @@ def get_child_activities(request, child_id):
             activities.append({
                 'type': 'story_read',
                 'title': story.title,
-                'subtitle': f'Completed reading • {story.category}',
+                'subtitle': f'Completed reading  {story.category}',
                 'progress': 100,
                 'timestamp': read.date_read.isoformat() if read.date_read else None,
                 'rating': Rating.objects.filter(user=child, story=story).first().value if Rating.objects.filter(user=child, story=story).exists() else None
@@ -3171,7 +3193,7 @@ def get_child_activities(request, child_id):
             activities.append({
                 'type': 'story_created',
                 'title': story.title,
-                'subtitle': f'Published story • {story.category}',
+                'subtitle': f'Published story  {story.category}',
                 'progress': 100,
                 'timestamp': story.date_created.isoformat() if story.date_created else None,
                 'likes': story.likes.count()
@@ -3374,7 +3396,7 @@ def get_child_analytics(request, child_id):
             milestones.append({
                 'title': ua.achievement.name,
                 'date': ua.earned_at.isoformat() if ua.earned_at else None,
-                'icon': ua.achievement.icon or '🏆',
+                'icon': ua.achievement.icon or '',
                 'color': ua.achievement.color or '#FFB347',
                 'rarity': ua.achievement.rarity or 'common'
             })
@@ -3914,7 +3936,7 @@ def close_lobby(request, session_id):
                     'story_title': session.canvas_name
                 }
             )
-            print(f'✅ Sent session_started message to collaboration group: {collaboration_group_name}')
+            print(f'[OK] Sent session_started message to collaboration group: {collaboration_group_name}')
         
         return Response({
             'success': True,

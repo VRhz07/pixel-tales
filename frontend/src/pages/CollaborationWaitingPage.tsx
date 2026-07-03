@@ -24,29 +24,53 @@ const CollaborationWaitingPage: React.FC = () => {
       return;
     }
 
-    // Auto-navigate to story creation with collaboration session
-    // If session is already active, participant bypasses lobby and joins directly
-    // If session is not active, participant will see lobby and wait for host to start
     const storyId = `collab-${sessionId}`;
     
-    console.log('✅ Navigating to story creation with state:', {
-      sessionId,
-      storyId,
-      storyTitle,
-      isCollaborative: true,
-      bypassLobby: isSessionActive || false
-    });
+    // If the session is already active, navigate immediately
+    if (isSessionActive) {
+      console.log('✅ Session active, navigating directly to story creation');
+      navigate('/create-story-manual', {
+        state: {
+          sessionId: sessionId,
+          storyId: storyId,
+          pageId: 'page_1',
+          storyTitle: storyTitle,
+          isCollaborative: true,
+          bypassLobby: true
+        },
+        replace: true
+      });
+      return;
+    }
+
+    // Otherwise, wait for the session start event
+    console.log('⏳ Session not active, waiting for start event');
     
-    navigate('/create-story-manual', {
-      state: {
-        sessionId: sessionId,
-        storyId: storyId,
-        storyTitle: storyTitle,
-        isCollaborative: true,
-        bypassLobby: isSessionActive || false
-      },
-      replace: true
-    });
+    const handleSessionStart = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const { session_id, story_title } = customEvent.detail;
+      
+      if (sessionId === session_id) {
+        console.log('✅ Session started event received, navigating to canvas');
+        navigate('/create-story-manual', {
+          state: {
+            sessionId: session_id,
+            storyId: storyId,
+            pageId: 'page_1',
+            storyTitle: story_title || storyTitle,
+            isCollaborative: true,
+            bypassLobby: true,
+            isHost: false
+          },
+          replace: true
+        });
+      }
+    };
+
+    window.addEventListener('collaboration-session-started', handleSessionStart);
+    return () => {
+      window.removeEventListener('collaboration-session-started', handleSessionStart);
+    };
   }, [sessionId, storyTitle, isWaiting, isSessionActive, navigate]);
 
   if (!sessionId || !storyTitle || !inviterName) {

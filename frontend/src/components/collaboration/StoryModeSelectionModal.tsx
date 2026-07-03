@@ -24,7 +24,7 @@ interface StoryModeSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSoloSelected: () => void;
-  onCollabReady: (sessionId: string, storyId: string) => void;
+  onCollabReady: (sessionId: string, storyId: string, pageId?: string) => void;
   onCollabModeSelected?: () => void;
   forceCollabSetup?: boolean;
   storyTitle: string;
@@ -75,10 +75,10 @@ export const StoryModeSelectionModal: React.FC<StoryModeSelectionModalProps> = (
   // Update friend online status when onlineUserIds changes
   useEffect(() => {
     if (friends.length > 0) {
-      setFriends(prevFriends => 
+      setFriends(prevFriends =>
         prevFriends.map(friend => ({
           ...friend,
-          isOnline: onlineUserIds.has(friend.id) || friend.is_online
+          isOnline: onlineUserIds.has(friend.id) || friend.isOnline
         }))
       );
     }
@@ -98,11 +98,15 @@ export const StoryModeSelectionModal: React.FC<StoryModeSelectionModalProps> = (
       setLoading(true);
       const friendsList = await socialService.getFriends();
       // Map friends with online status from WebSocket
-      const friendsWithOnlineStatus = friendsList.map(friend => ({
-        ...friend,
-        isOnline: onlineUserIds.has(friend.id) || friend.is_online
+      const friendsWithOnlineStatus = friendsList.map((friend: any) => ({
+        id: friend.id,
+        username: friend.username,
+        avatar: friend.avatar,
+        selected_avatar_border: friend.selected_avatar_border,
+        // Merge WebSocket real-time status with DB-persisted is_online from API response
+        isOnline: onlineUserIds.has(friend.id) || (friend.is_online ?? false)
       }));
-      setFriends(friendsWithOnlineStatus as any);
+      setFriends(friendsWithOnlineStatus);
     } catch (err) {
       console.error('Failed to load friends:', err);
       setError('Failed to load friends list');
@@ -202,12 +206,36 @@ export const StoryModeSelectionModal: React.FC<StoryModeSelectionModalProps> = (
     }
   };
 
-  const handleStartCollab = () => {
+  const handleStartCollab = async () => {
     if (sessionId) {
-      // Generate a unique story ID that will be shared
-      const storyId = `collab-${sessionId}`;
-      onCollabReady(sessionId, storyId);
-      onClose();
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch(
+          `${apiConfigService.getApiUrl()}/collaborate/${sessionId}/start/`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to start session');
+        }
+
+        // Generate a unique story ID that will be shared
+        const storyId = `collab-${sessionId}`;
+        onCollabReady(sessionId, storyId, 'page_1');
+        onClose();
+      } catch (err) {
+        console.error('Failed to start collaboration session:', err);
+        setError('Failed to start session');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

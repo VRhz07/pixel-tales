@@ -654,7 +654,16 @@ const CanvasDrawingPage: React.FC = () => {
                 'final page_index': enhancedData.page_index
               });
               
-              collaborationService.sendDrawing(enhancedData);
+              if (data.type === 'draw_batch_progress' || data.type === 'draw_batch_end') {
+                // Send transient updates using draw_batch
+                collaborationService.sendDrawingBatch([{
+                  ...enhancedData,
+                  // Keep data in nested 'data' key for compatibility with handleRemoteDrawBatch
+                  data: enhancedData
+                }], enhancedData.page_id, enhancedData.page_index, enhancedData.is_cover_image);
+              } else {
+                collaborationService.sendDrawing(enhancedData);
+              }
             } else {
               console.warn('⚠️ WebSocket not OPEN. State:', {
                 exists: !!collaborationService.ws,
@@ -1586,6 +1595,34 @@ const CanvasDrawingPage: React.FC = () => {
       }
     };
 
+    // Handle batched drawing updates
+    const handleRemoteDrawBatch = (message: any) => {
+      if (!drawingEngineRef.current || !message.batch) return;
+      
+      message.batch.forEach((item: any) => {
+        // Reuse canvas matching logic
+        const messageCoverImage = item.is_cover_image || item.page_id === 'cover_image';
+        const currentCoverImage = isCoverImage || false;
+        let shouldApplyDrawing = false;
+        
+        if (messageCoverImage && currentCoverImage) {
+          shouldApplyDrawing = true;
+        } else if (!messageCoverImage && !currentCoverImage) {
+          if (pageId && item.page_id === pageId) {
+            shouldApplyDrawing = true;
+          } else if (pageIndex !== undefined && item.page_index === pageIndex) {
+            shouldApplyDrawing = true;
+          } else if (pageIndex !== undefined && item.page_id === `page_${pageIndex}`) {
+            shouldApplyDrawing = true;
+          }
+        }
+        
+        if (shouldApplyDrawing && item.data) {
+          drawingEngineRef.current.applyRemoteDrawing(item.data);
+        }
+      });
+    };
+
     // Handle remote cursor movement with canvas filtering
     const handleRemoteCursor = (message: any) => {
       if (message.user_id && message.position) {
@@ -1792,6 +1829,7 @@ const CanvasDrawingPage: React.FC = () => {
     collaborationService.on('object_transformed', handleTransform);
     collaborationService.on('delete', handleDelete);
     collaborationService.on('object_deleted', handleDelete);
+    collaborationService.on('drawing_batch_update', handleRemoteDrawBatch);
     // Cross-page collaboration handlers
     collaborationService.on('text_edit', handleRemoteTextEdit);
     collaborationService.on('title_edit', handleRemoteTitleEdit);

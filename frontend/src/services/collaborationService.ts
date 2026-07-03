@@ -68,8 +68,14 @@ export class CollaborationService {
     console.log('🔌 connect() called with sessionId:', sessionId, 'length:', sessionId?.length);
     
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      console.log('Already connected to session');
-      return Promise.resolve();
+      if (this.sessionId === sessionId) {
+        console.log('Already connected to this session');
+        return Promise.resolve();
+      }
+
+      console.log(`Switching sessions: closing old socket for ${this.sessionId}, connecting to ${sessionId}`);
+      this.ws.close(1000, 'Switching sessions');
+      this.ws = null;
     }
 
     if (this.isConnecting) {
@@ -197,7 +203,21 @@ export class CollaborationService {
   }
 
   /**
-   * Send a drawing operation with page information for cross-page collaboration
+   * Send a batched drawing operation to reduce websocket load
+   */
+  sendDrawingBatch(batch: any[], pageId?: string, pageIndex?: number, isCoverImage?: boolean): void {
+    if (batch.length === 0) return;
+    this.send({
+      type: 'draw_batch',
+      batch,
+      page_id: pageId,
+      page_index: pageIndex,
+      is_cover_image: isCoverImage
+    });
+  }
+
+  /**
+   * Send a complete drawing operation with page information
    */
   sendDrawing(data: DrawingData & { page_id?: string; page_index?: number; is_cover_image?: boolean }): void {
     this.send({

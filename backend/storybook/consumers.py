@@ -24,39 +24,47 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
         
         # Check if user is authenticated
         if not self.user or not self.user.is_authenticated:
-            print(f"❌ User not authenticated for session {self.session_id}")
+            print(f"[ERROR] User not authenticated for session {self.session_id}")
             await self.close()
             return
         
         # Verify session exists
         session = await self.get_session()
         if not session:
-            print(f"❌ Session {self.session_id} not found")
+            print(f"[ERROR] Session {self.session_id} not found")
             await self.close()
             return
         
         # Check if user can join (new user) or reconnect (existing participant)
         is_existing_participant = await self.is_existing_participant(session)
-        can_join = await self.can_join_session(session)
         
-        if not is_existing_participant and not can_join:
-            print(f"❌ User {self.user.username} cannot join session {self.session_id}")
-            await self.close()
+        # STRICT AUTHORIZATION: Only allow users who are ALREADY participants
+        # Users must join via the REST API first (join_session_by_code)
+        if not is_existing_participant:
+            print(f"[ERROR] Unauthorized: User {self.user.username} is not a participant of session {self.session_id}")
+            await self.close(code=4003)  # Forbidden
             return
         
-        print(f"✅ User {self.user.username} {'reconnecting to' if is_existing_participant else 'joining'} session {self.session_id}")
+        # Check if session is actually active or in grace period
+        can_join = await self.can_join_session(session)
+        if not session.is_active and not can_join:
+            print(f"[ERROR] Session {self.session_id} is no longer active")
+            await self.close(code=4000)
+            return
+        
+        print(f"[OK] User {self.user.username} {'reconnecting to' if is_existing_participant else 'joining'} session {self.session_id}")
         
         # If host is reconnecting, clear the disconnection timestamp and reactivate session
         if is_existing_participant and await self.is_user_host():
             await self.mark_host_reconnected()
-            print(f"🎉 Host {self.user.username} reconnected to session {self.session_id}")
+            print(f"[YAY] Host {self.user.username} reconnected to session {self.session_id}")
         
         # Memory optimization: Track active connections for this session
         collab_conn_key = f'collab_connections_{self.session_id}'
         current_connections = cache.get(collab_conn_key, 0)
         
         if current_connections >= 10:  # Max 10 concurrent connections per session
-            print(f"⚠️ Session {self.session_id} has reached max connections ({current_connections})")
+            print(f"[WARN] Session {self.session_id} has reached max connections ({current_connections})")
             await self.close(code=4002)  # Session is full
             return
         
@@ -121,7 +129,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
                 # Set a timestamp for when the host disconnected
                 await self.mark_host_disconnected()
                 
-                print(f"⚠️ Host {self.user.username} disconnected from session {self.session_id}")
+                print(f"[WARN] Host {self.user.username} disconnected from session {self.session_id}")
                 print(f"   Session remains active for reconnection grace period")
                 
                 # Notify participants that host is temporarily disconnected
@@ -162,6 +170,9 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
             if message_type == 'draw':
                 # Handle drawing operation
                 await self.handle_draw(data)
+            elif message_type == 'draw_batch':
+                # Handle batched drawing operations
+                await self.handle_draw_batch(data)
             elif message_type == 'cursor':
                 # Handle cursor movement
                 await self.handle_cursor(data)
@@ -274,6 +285,44 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
                 'is_cover_image': is_cover_image
             }
         )
+
+    async def handle_draw_batch(self, data):
+        """Handle batched drawing operations to reduce channel load"""
+        page_id = data.get('page_id')
+        page_index = data.get('page_index')
+        is_cover_image = data.get('is_cover_image', False)
+        batch = data.get('batch', [])
+
+        # Broadcast the batch directly to other clients without DB save for every tiny point.
+        # DB save happens on full snapshot or completed stroke.
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'drawing_batch_update',
+                'user_id': self.user.id,
+                'username': self.user.username,
+                'batch': batch,
+                'page_id': page_id,
+                'page_index': page_index,
+                'is_cover_image': is_cover_image
+            }
+        )
+    
+    async def drawing_batch_update(self, event):
+        """Send batched drawing updates to the websocket"""
+        # Don't send back to the user who sent it
+        if event.get('user_id') == self.user.id:
+            return
+            
+        await self.send(text_data=json.dumps({
+            'type': 'draw_batch',
+            'user_id': event['user_id'],
+            'username': event['username'],
+            'batch': event['batch'],
+            'page_id': event.get('page_id'),
+            'page_index': event.get('page_index'),
+            'is_cover_image': event.get('is_cover_image', False)
+        }))
     
     async def handle_cursor(self, data):
         """Handle cursor position updates with canvas context"""
@@ -507,11 +556,11 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
     async def handle_finalize_collaborative_story(self, data):
         """Handle finalizing collaborative story after vote initiator saves with genres"""
         try:
-            print(f"🎬 Finalizing collaborative story for session {self.session_id}")
+            print(f" Finalizing collaborative story for session {self.session_id}")
             
             # Finalize the story
             story_data = await self.finalize_story()
-            print(f"✅ Story finalized: {story_data}")
+            print(f"[OK] Story finalized: {story_data}")
             
             # Notify all participants that story is saved
             await self.channel_layer.group_send(
@@ -522,7 +571,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
                     'message': 'Story saved to all participants!'
                 }
             )
-            print(f"📤 Broadcasted story_finalized to {self.room_group_name}")
+            print(f"[SEND] Broadcasted story_finalized to {self.room_group_name}")
             
             # End the session for all participants
             await self.channel_layer.group_send(
@@ -534,9 +583,9 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
                     'ended_by': 'vote'
                 }
             )
-            print(f"📤 Broadcasted session_ended to {self.room_group_name}")
+            print(f"[SEND] Broadcasted session_ended to {self.room_group_name}")
         except Exception as e:
-            print(f"❌ Error in handle_finalize_collaborative_story: {e}")
+            print(f"[ERROR] Error in handle_finalize_collaborative_story: {e}")
             import traceback
             traceback.print_exc()
             # Send error to client
@@ -791,13 +840,13 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
         page_index = data.get('page_index')
         is_cover_image = data.get('is_cover_image', False)
         
-        print(f"📥 User {self.user.username} requesting canvas sync for page_id={page_id}, is_cover={is_cover_image}")
+        print(f" User {self.user.username} requesting canvas sync for page_id={page_id}, is_cover={is_cover_image}")
         
         # First, try to get canvas state from the database
         canvas_state = await self.get_canvas_state_from_db(page_id, is_cover_image)
         
         if canvas_state:
-            print(f"✅ Found canvas state in database, sending directly to user")
+            print(f"[OK] Found canvas state in database, sending directly to user")
             # Send canvas state directly from database
             await self.send(text_data=json.dumps({
                 'type': 'canvas_state',
@@ -808,7 +857,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
                 'sender_user_id': 'server'  # Indicate it came from server
             }))
         else:
-            print(f"⚠️ No canvas state in database, requesting from other participants")
+            print(f"[WARN] No canvas state in database, requesting from other participants")
             # Request canvas state from other participants as fallback
             await self.channel_layer.group_send(
                 self.session_group_name,
@@ -835,10 +884,10 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
         
         # If target_user_id is 0, this is just an autosave, don't send to other users
         if target_user_id == 0:
-            print(f"💾 User {self.user.username} auto-saved canvas state for page_id={page_id}")
+            print(f" User {self.user.username} auto-saved canvas state for page_id={page_id}")
             return
         
-        print(f"📤 User {self.user.username} sending canvas state to user {target_user_id}")
+        print(f"[SEND] User {self.user.username} sending canvas state to user {target_user_id}")
         
         # Send canvas state to the specific user
         await self.channel_layer.group_send(
@@ -1033,7 +1082,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
     
     async def vote_initiated(self, event):
         """Send vote initiation notification"""
-        print(f"🗳️🗳️🗳️ vote_initiated handler called with event: {event}")
+        print(f" vote_initiated handler called with event: {event}")
         message = {
             'type': 'vote_initiated',
             'vote_id': event.get('vote_id'),
@@ -1042,9 +1091,9 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
             'total_participants': event.get('total_participants'),
             'question': event.get('question', 'Save and end the collaboration session?')
         }
-        print(f"📤📤📤 Sending vote_initiated message to WebSocket: {message}")
+        print(f"[SEND] Sending vote_initiated message to WebSocket: {message}")
         await self.send(text_data=json.dumps(message))
-        print(f"✅✅✅ vote_initiated message sent successfully")
+        print(f"[OK] vote_initiated message sent successfully")
     
     async def vote_updated(self, event):
         """Send vote update"""
@@ -1086,7 +1135,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
     
     async def session_started(self, event):
         """Send session started notification to all participants"""
-        print(f"✅ session_started handler called: {event}")
+        print(f"[OK] session_started handler called: {event}")
         await self.send(text_data=json.dumps({
             'type': 'session_started',
             'session_id': event.get('session_id'),
@@ -1095,7 +1144,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
     
     async def session_ended(self, event):
         """Send session ended notification"""
-        print(f"🎬 session_ended handler called: {event}")
+        print(f" session_ended handler called: {event}")
         await self.send(text_data=json.dumps({
             'type': 'session_ended',
             'session_id': event.get('session_id'),
@@ -1318,8 +1367,8 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
             # Use integer keys to match frontend expectations
             page_viewers_json[int(page_index)] = list(viewers)
         
-        print(f"📊 Sending page viewers: {page_viewers_json}")
-        print(f"📊 Total pages with viewers: {len(page_viewers_json)}")
+        print(f" Sending page viewers: {page_viewers_json}")
+        print(f" Total pages with viewers: {len(page_viewers_json)}")
         for page_idx, viewers in page_viewers_json.items():
             print(f"   Page {page_idx}: {[v['username'] for v in viewers]}")
         
@@ -1370,10 +1419,10 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
                     # Allow reconnection within 5 minutes of host disconnect
                     grace_period = timedelta(minutes=5)
                     if timezone.now() - disconnect_time < grace_period:
-                        print(f"🕐 Allowing join during grace period (host disconnected {(timezone.now() - disconnect_time).seconds}s ago)")
+                        print(f" Allowing join during grace period (host disconnected {(timezone.now() - disconnect_time).seconds}s ago)")
                         return True
                 except (ValueError, TypeError) as e:
-                    print(f"⚠️ Error parsing disconnect time: {e}")
+                    print(f"[WARN] Error parsing disconnect time: {e}")
         
         return False
     
@@ -1426,7 +1475,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
             session.canvas_state = canvas_state
             # Keep session active for reconnection - don't deactivate immediately
             session.save(update_fields=['canvas_state'])
-            print(f"📝 Marked host disconnection time for session {self.session_id}")
+            print(f"[NOTE] Marked host disconnection time for session {self.session_id}")
         except CollaborationSession.DoesNotExist:
             pass
     
@@ -1442,7 +1491,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
             # Ensure session is active
             session.is_active = True
             session.save(update_fields=['is_active', 'canvas_state'])
-            print(f"✅ Cleared host disconnection time for session {self.session_id}")
+            print(f"[OK] Cleared host disconnection time for session {self.session_id}")
         except CollaborationSession.DoesNotExist:
             pass
     
@@ -1460,13 +1509,21 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_canvas_data(self, session):
         """Get current canvas data"""
+        cache_key = f'collab_canvas_data_{session.session_id}'
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return cached_data
         return session.canvas_data
     
     @database_sync_to_async
     def update_canvas_snapshot(self, page_id, is_cover_image, canvas_data_url):
-        """Update canvas snapshot for a specific page or cover"""
+        """Update canvas snapshot for a specific page or cover (using Redis cache)"""
         session = CollaborationSession.objects.get(session_id=self.session_id)
-        canvas_data = session.canvas_data or {}
+        
+        cache_key = f'collab_canvas_data_{self.session_id}'
+        canvas_data = cache.get(cache_key)
+        if not canvas_data:
+            canvas_data = session.canvas_data or {}
         
         if is_cover_image:
             canvas_data['cover_image'] = canvas_data_url
@@ -1475,14 +1532,18 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
                 canvas_data['pages'] = {}
             canvas_data['pages'][str(page_id)] = canvas_data_url
         
-        session.canvas_data = canvas_data
-        session.save(update_fields=['canvas_data'])
+        # Store in Redis temporarily (prevent DB choking)
+        cache.set(cache_key, canvas_data, 86400)
     
     @database_sync_to_async
     def save_canvas_state_to_db(self, page_id, is_cover_image, canvas_state_data):
-        """Save complete canvas state (not just snapshot) to database"""
+        """Save complete canvas state to Redis temporarily (prevent DB choking)"""
         session = CollaborationSession.objects.get(session_id=self.session_id)
-        canvas_state = session.canvas_state or {}
+        
+        cache_key = f'collab_canvas_state_{self.session_id}'
+        canvas_state = cache.get(cache_key)
+        if not canvas_state:
+            canvas_state = session.canvas_state or {}
         
         if is_cover_image:
             canvas_state['cover_image'] = canvas_state_data
@@ -1491,16 +1552,20 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
                 canvas_state['pages'] = {}
             canvas_state['pages'][str(page_id)] = canvas_state_data
         
-        session.canvas_state = canvas_state
-        session.save(update_fields=['canvas_state'])
-        print(f"💾 Saved canvas state to database for page_id={page_id}, is_cover={is_cover_image}")
+        # Store in Redis temporarily (prevent DB choking)
+        cache.set(cache_key, canvas_state, 86400)
+        print(f" Cached canvas state to Redis for page_id={page_id}, is_cover={is_cover_image}")
     
     @database_sync_to_async
     def get_canvas_state_from_db(self, page_id, is_cover_image):
-        """Get canvas state from database"""
+        """Get canvas state from Redis cache or database"""
         try:
-            session = CollaborationSession.objects.get(session_id=self.session_id)
-            canvas_state = session.canvas_state or {}
+            cache_key = f'collab_canvas_state_{self.session_id}'
+            canvas_state = cache.get(cache_key)
+            
+            if not canvas_state:
+                session = CollaborationSession.objects.get(session_id=self.session_id)
+                canvas_state = session.canvas_state or {}
             
             if is_cover_image:
                 return canvas_state.get('cover_image')
@@ -1508,7 +1573,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
                 pages = canvas_state.get('pages', {})
                 return pages.get(str(page_id))
         except Exception as e:
-            print(f"❌ Error getting canvas state from DB: {e}")
+            print(f"[ERROR] Error getting canvas state: {e}")
             return None
     
     @database_sync_to_async
@@ -1687,7 +1752,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
         """Get count of active participants - aligned with model property"""
         session = CollaborationSession.objects.get(session_id=self.session_id)
         active_count = session.participants.filter(is_active=True).count()
-        print(f"🔢 Active participant count for session {self.session_id}: {active_count}")
+        print(f" Active participant count for session {self.session_id}: {active_count}")
         return active_count
     
     @database_sync_to_async

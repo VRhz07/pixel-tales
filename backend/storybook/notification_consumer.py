@@ -51,6 +51,9 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         # Broadcast user's online status to friends
         await self.broadcast_online_status(True)
         
+        # Send current online state of all friends to the newly connected user
+        await self.send_initial_online_status()
+        
         # Send initial connection confirmation
         await self.send(text_data=json.dumps({
             'type': 'connection',
@@ -262,3 +265,36 @@ class NotificationConsumer(AsyncWebsocketConsumer):
                     'username': self.user.username
                 }
             )
+    
+    async def send_initial_online_status(self):
+        """Send the current online status of all friends to the newly connected user.
+        Fixes the stale-empty-set bug where friends who were already online appear offline.
+        """
+        from .models import UserProfile
+        friend_ids = await self.get_friends()
+        if not friend_ids:
+            return
+        
+        online_friends = await self.get_online_friends(friend_ids)
+        if online_friends:
+            await self.send(text_data=json.dumps({
+                'type': 'initial_online_status',
+                'online_friends': online_friends
+            }))
+    
+    @database_sync_to_async
+    def get_online_friends(self, friend_ids):
+        """Return a list of {user_id, username} for all currently-online friends."""
+        from .models import UserProfile
+        online = []
+        profiles = (
+            UserProfile.objects
+            .filter(user_id__in=friend_ids, is_online=True)
+            .select_related('user')
+        )
+        for profile in profiles:
+            online.append({
+                'user_id': profile.user.id,
+                'username': profile.user.username
+            })
+        return online

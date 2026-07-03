@@ -272,6 +272,18 @@ class NotificationWebSocketService {
         // Pong received, connection is alive
         break;
 
+      case 'initial_online_status':
+        // Seed the online state with friends already online when we connected.
+        // Fixes the stale-empty-set bug — friends online before us appeared offline.
+        if (Array.isArray(message.online_friends)) {
+          message.online_friends.forEach((friend: { user_id: number; username: string }) => {
+            if (this.handlers.onFriendOnline) {
+              this.handlers.onFriendOnline(friend.user_id, friend.username);
+            }
+          });
+        }
+        break;
+
       default:
         console.log('🔔 Unknown message type:', message.type);
     }

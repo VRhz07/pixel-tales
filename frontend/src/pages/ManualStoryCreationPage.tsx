@@ -222,6 +222,14 @@ const ManualStoryCreationPage: React.FC = () => {
       (console as any).log = originalLog;
     };
   }, [isCollaborating]);
+
+  useEffect(() => {
+    return () => {
+      console.log('🧹 ManualStoryCreationPage unmounting — disconnecting collaboration socket');
+      collaborationService.disconnect();
+    };
+  }, []);
+
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [joinCode, setJoinCode] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
@@ -1855,11 +1863,21 @@ const ManualStoryCreationPage: React.FC = () => {
       setCurrentSessionId(sessionId);
       setIsHost(true);
       
+      // CRITICAL FIX: Host must connect to WebSocket BEFORE trying to broadcast
+      if (!collaborationService.isConnected() || collaborationService.getSessionId() !== sessionId) {
+        console.log('🔌 Host connecting to WebSocket for session:', sessionId);
+        await collaborationService.connect(sessionId);
+        console.log('✅ WebSocket connected for host');
+      }
+
       // Host starts collaborating immediately - NO LOBBY for host
       setShowLobby(false);
       
       // Set isCollaborating AFTER story is created
       setIsCollaborating(true);
+      
+      // Give React a moment to process the state changes so event listeners register
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       // Broadcast session start via WebSocket (reliable method)
       if (collaborationService.isConnected()) {
@@ -1939,8 +1957,8 @@ const ManualStoryCreationPage: React.FC = () => {
         hasCreatedStory.current = true;
       }
       
-      if (sessionAlreadyStarted) {
-        console.log('✅ Session already started - joining directly (no lobby)');
+      if (sessionAlreadyStarted || bypassLobby) {
+        console.log('✅ Session already started or bypass requested - joining directly (no lobby)');
         // Go directly to collaboration page
         setShowLobby(false);
         setIsCollaborating(true);
@@ -1985,7 +2003,7 @@ const ManualStoryCreationPage: React.FC = () => {
     }
   };
 
-  const handleStartCollaboration = () => {
+  const handleStartCollaboration = async () => {
     console.log('🚀 Host starting collaboration', { 
       hasCurrentStory: !!currentStory, 
       currentStoryId: currentStory?.id,
@@ -1994,25 +2012,68 @@ const ManualStoryCreationPage: React.FC = () => {
       isCollaborating
     });
     
+    if (!currentSessionId) {
+      console.error('❌ Cannot start - no session ID');
+      return;
+    }
+
     // Ensure story exists before starting collaboration
     if (!currentStory) {
       console.log('Creating new story for host collaboration');
       const story = createStory(storyTitle || 'Collaborative Story');
       setStoryTitle(story.title);
       console.log('New story created:', story.id);
-      // createStory() automatically sets currentStory in the store
     } else {
       console.log('Using existing story for collaboration:', currentStory.id);
+    }
+
+    // CRITICAL FIX 1: Ensure host is connected to WebSocket BEFORE broadcasting
+    if (!collaborationService.isConnected() || collaborationService.getSessionId() !== currentSessionId) {
+      console.log('🔌 Host connecting to WebSocket...');
+      try {
+        await collaborationService.connect(currentSessionId);
+        console.log('✅ Host WebSocket connected');
+      } catch (err) {
+        console.error('❌ Failed to connect WebSocket:', err);
+      }
     }
     
     // Update state to hide lobby and show collaboration UI
     console.log('🔧 Setting showLobby=false, isCollaborating=true, keeping isHost=', isHost);
     setShowLobby(false);
     setIsCollaborating(true);
+
+    // Give React a moment to process state changes
+    await new Promise(resolve => setTimeout(resolve, 100));
     
-    // Broadcast session start via WebSocket (reliable method)
-    if (currentSessionId && collaborationService.isConnected()) {
-      console.log('📡 Broadcasting session start via WebSocket');
+    // CRITICAL FIX 2: Call the backend REST API to officially start the session.
+    // This broadcasts via notification WebSocket to ALL participants waiting on
+    // CollaborationWaitingPage, which is the only way they receive the start signal.
+    const token = localStorage.getItem('access_token');
+    try {
+      const resp = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/${currentSessionId}/start/`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      if (resp.ok) {
+        console.log('✅ Backend session start broadcast sent');
+      } else {
+        const err = await resp.text();
+        console.warn('⚠️ Backend start returned non-OK:', resp.status, err);
+      }
+    } catch (err) {
+      console.error('❌ Failed to call backend start API:', err);
+    }
+
+    // Also broadcast directly via WebSocket for participants already in ManualStoryCreationPage lobby
+    if (collaborationService.isConnected()) {
+      console.log('📡 Also broadcasting via WebSocket for in-page lobby participants');
       collaborationService.sendMessage({
         type: 'session_started',
         session_id: currentSessionId

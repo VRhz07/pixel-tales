@@ -98,13 +98,14 @@ const HomePage = () => {
     });
   };
 
-  const handleCollabReady = (sessionId: string, storyId: string) => {
+  const handleCollabReady = (sessionId: string, storyId: string, pageId?: string) => {
     // Navigate to story creation with collaboration session
     // The user who triggers this is the HOST (they created the session)
     navigate('/create-story-manual', { 
       state: { 
         sessionId,
         storyId,
+        pageId,
         isCollaborative: true,
         isHost: true  // Mark this user as the host
       } 
