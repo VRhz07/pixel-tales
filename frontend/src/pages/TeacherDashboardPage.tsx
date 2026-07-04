@@ -15,6 +15,7 @@ import { useThemeStore } from '../stores/themeStore';
 import TeacherBottomNav from '../components/navigation/TeacherBottomNav';
 import ReportsTab from '../components/teacher/ReportsTab';
 import StoryViewModal from '../components/parent/StoryViewModal';
+import { apiConfigService } from '../services/apiConfig.service';
 import '../styles/dashboard-common.css';
 import './TeacherDashboardPage.css';
 
@@ -138,7 +139,7 @@ const TeacherDashboardPage: React.FC = () => {
     console.log('📊 Loading teacher dashboard data...');
     try {
       const token = localStorage.getItem('access_token');
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      const baseUrl = apiConfigService.getApiUrl();
       console.log('🔑 Token:', token ? 'Present' : 'Missing');
       console.log('🌐 Base URL:', baseUrl);
 
@@ -204,7 +205,7 @@ const TeacherDashboardPage: React.FC = () => {
   const handleCreateClass = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      const baseUrl = apiConfigService.getApiUrl();
 
       const response = await fetch(`${baseUrl}/teacher/classes/`, {
         method: 'POST',
@@ -236,7 +237,7 @@ const TeacherDashboardPage: React.FC = () => {
     // Load students for this class
     try {
       const token = localStorage.getItem('access_token');
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      const baseUrl = apiConfigService.getApiUrl();
       
       const response = await fetch(`${baseUrl}/teacher/classes/${cls.id}/students/`, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -255,7 +256,7 @@ const TeacherDashboardPage: React.FC = () => {
   const handleAddStudent = async (classId: number) => {
     try {
       const token = localStorage.getItem('access_token');
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      const baseUrl = apiConfigService.getApiUrl();
 
       // Load available students
       const response = await fetch(`${baseUrl}/teacher/available-students/`, {
@@ -279,7 +280,7 @@ const TeacherDashboardPage: React.FC = () => {
 
     try {
       const token = localStorage.getItem('access_token');
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      const baseUrl = apiConfigService.getApiUrl();
 
       const response = await fetch(`${baseUrl}/teacher/classes/${selectedClass.id}/add-student/`, {
         method: 'POST',
@@ -307,7 +308,7 @@ const TeacherDashboardPage: React.FC = () => {
     
     try {
       const token = localStorage.getItem('access_token');
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      const baseUrl = apiConfigService.getApiUrl();
       
       const response = await fetch(`${baseUrl}/teacher/students/${student.id}/stories/`, {
         headers: { 'Authorization': `Bearer ${token}` }

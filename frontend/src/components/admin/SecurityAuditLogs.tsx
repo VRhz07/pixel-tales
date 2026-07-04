@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Shield, Search, Filter, AlertTriangle, Eye, Trash2, Calendar } from 'lucide-react';
+import { apiConfigService } from '../../services/apiConfig.service';
 import { useThemeStore } from '../../stores/themeStore';
 import './SecurityAuditLogs.css';
 
@@ -52,7 +53,7 @@ export default function SecurityAuditLogs() {
       setError(null);
       
       // Fetch audit logs from our new endpoint
-      const logsRes = await fetch('http://localhost:8000/api/admin/audit-logs/', {
+      const logsRes = await fetch(`${apiConfigService.getApiUrl()}/admin/audit-logs/`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
       });
       

@@ -44,6 +44,7 @@ import { CollaborationInvitationsContainer, CollaborationInvite } from './compon
 import CollaborationInviteNotification from './components/collaboration/CollaborationInviteNotification';
 import CollaborationWaitingScreen from './components/collaboration/CollaborationWaitingScreen';
 import ToastNotification from './components/ui/ToastNotification';
+import { apiConfigService } from './services/apiConfig.service';
 import { notificationWebSocket } from './services/notificationWebSocket';
 import { updateOnlineStatus } from './hooks/useOnlineStatus';
 import { useSocialStore } from './stores/socialStore';
@@ -218,7 +219,7 @@ function AppContent() {
       try {
         const token = localStorage.getItem('access_token');
         console.log('🔔 Loading existing collaboration invites...');
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/invites/`, {
+        const response = await fetch(`${apiConfigService.getApiUrl()}/collaborate/invites/`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -432,7 +433,7 @@ function AppContent() {
     try {
       const token = localStorage.getItem('access_token');
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/invites/${currentInviteNotification.id}/respond/`,
+        `${apiConfigService.getApiUrl()}/collaborate/invites/${currentInviteNotification.id}/respond/`,
         {
           method: 'POST',
           headers: {
@@ -471,7 +472,7 @@ function AppContent() {
     try {
       const token = localStorage.getItem('access_token');
       await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/invites/${currentInviteNotification.id}/respond/`,
+        `${apiConfigService.getApiUrl()}/collaborate/invites/${currentInviteNotification.id}/respond/`,
         {
           method: 'POST',
           headers: {
@@ -498,7 +499,7 @@ function AppContent() {
     try {
       const token = localStorage.getItem('access_token');
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/invites/${invitation.id}/respond/`,
+        `${apiConfigService.getApiUrl()}/collaborate/invites/${invitation.id}/respond/`,
         {
           method: 'POST',
           headers: {
@@ -531,7 +532,7 @@ function AppContent() {
     try {
       const token = localStorage.getItem('access_token');
       await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/invites/${invitationId}/respond/`,
+        `${apiConfigService.getApiUrl()}/collaborate/invites/${invitationId}/respond/`,
         {
           method: 'POST',
           headers: {

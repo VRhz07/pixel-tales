@@ -1,5 +1,37 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import net from 'net'
+
+// Broad fix: patch Node's Socket prototype so ANY socket in this process
+// (Vite's HMR websocket, the /api proxy, etc.) silently ignores ECONNRESET
+// instead of crashing the whole dev server. This is needed because mobile
+// clients frequently drop connections abruptly (screen lock, backgrounding,
+// brief wifi hiccups), and Node treats an unhandled socket 'error' event
+// as fatal by default.
+const originalSocketEmit = net.Socket.prototype.emit;
+// @ts-ignore - overriding emit's signature intentionally
+net.Socket.prototype.emit = function (event: string, ...args: any[]) {
+  if (event === 'error' && args[0]?.code === 'ECONNRESET') {
+    console.warn('[dev-server] Ignored ECONNRESET on socket (client likely disconnected abruptly)');
+    return true;
+  }
+  return originalSocketEmit.call(this, event, ...args);
+};
+console.log('✅ Socket ECONNRESET patch applied');
+
+// Fallback safety net: catches anything the socket patch above doesn't,
+// so an unrelated crash doesn't take down the whole dev server either.
+process.on('uncaughtException', (err: any) => {
+  if (err.code === 'ECONNRESET' || err.code === 'EPIPE') {
+    console.warn(`[dev-server] Ignored ${err.code} (uncaughtException fallback)`);
+    return;
+  }
+  throw err;
+});
+
+process.on('unhandledRejection', (reason: any) => {
+  console.warn('[dev-server] Unhandled rejection:', reason);
+});
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -44,6 +76,14 @@ export default defineConfig({
         target: 'http://localhost:8000', // Backend API
         changeOrigin: true,
         secure: false,
+        configure: (proxy) => {
+          // Targeted fix: handle proxy socket errors (e.g. client disconnects
+          // mid-request from a phone locking/backgrounding) without crashing
+          // the whole dev server.
+          proxy.on('error', (err: any) => {
+            console.warn('Proxy error (likely client disconnect):', err.code);
+          });
+        },
       },
     },
   },

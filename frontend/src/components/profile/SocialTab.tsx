@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSocialStore, Friend, User, FriendRequest } from '../../stores/socialStore';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
+import { apiConfigService } from '../../services/apiConfig.service';
 
 const SocialTab = () => {
   const navigate = useNavigate();
@@ -59,7 +60,7 @@ const SocialTab = () => {
       playSound('collaboration-invite');
       const token = localStorage.getItem('access_token');
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/invites/${friend.collaborationInvite.id}/respond/`,
+        `${apiConfigService.getApiUrl()}/collaborate/invites/${friend.collaborationInvite.id}/respond/`,
         {
           method: 'POST',
           headers: {
@@ -99,7 +100,7 @@ const SocialTab = () => {
       playSound('button-cancel');
       const token = localStorage.getItem('access_token');
       await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/invites/${friend.collaborationInvite.id}/respond/`,
+        `${apiConfigService.getApiUrl()}/collaborate/invites/${friend.collaborationInvite.id}/respond/`,
         {
           method: 'POST',
           headers: {

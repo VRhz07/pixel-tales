@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   ChartBarIcon
 } from '@heroicons/react/24/outline';
+import { apiConfigService } from '../../services/apiConfig.service';
 
 interface ReportsTabProps {
   isDarkMode: boolean;
@@ -42,7 +43,7 @@ const ReportsTab: React.FC<ReportsTabProps> = ({ isDarkMode, onRefresh }) => {
   const loadReports = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      const baseUrl = apiConfigService.getApiUrl();
       
       const response = await fetch(`${baseUrl}/teacher/reports/`, {
         headers: { 'Authorization': `Bearer ${token}` }

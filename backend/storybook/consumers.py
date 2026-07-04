@@ -3,6 +3,7 @@ WebSocket consumers for real-time collaborative drawing
 Optimized for memory efficiency on limited resources
 """
 import json
+import time
 import uuid
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
@@ -331,13 +332,14 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
         page_index = data.get('page_index')
         is_cover_image = data.get('is_cover_image', False)
         
-        # Update cursor position in database
-        await self.update_cursor_position(position)
+        now = time.time()
+        last_write = getattr(self, '_last_cursor_db_write', 0)
+        if now - last_write > 2.0:
+            self._last_cursor_db_write = now
+            await self.update_cursor_position(position)
         
-        # Get user's cursor color
         cursor_color = await self.get_user_cursor_color()
         
-        # Broadcast cursor position to others with canvas context and color
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -489,12 +491,14 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
         """Handle user presence updates (cursor, tool, activity)"""
         cursor_position = data.get('cursor_position')
         current_tool = data.get('current_tool')
-        activity = data.get('activity')  # e.g., 'typing_title', 'typing_text', 'idle'
+        activity = data.get('activity')
         
-        # Update in database
-        await self.update_presence(cursor_position, current_tool)
+        now = time.time()
+        last_write = getattr(self, '_last_presence_db_write', 0)
+        if now - last_write > 2.0:
+            self._last_presence_db_write = now
+            await self.update_presence(cursor_position, current_tool)
         
-        # Broadcast to others
         await self.channel_layer.group_send(
             self.room_group_name,
             {

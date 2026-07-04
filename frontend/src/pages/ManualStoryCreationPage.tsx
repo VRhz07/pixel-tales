@@ -8,6 +8,7 @@ import { VoiceFilteredInput } from '../components/common/VoiceFilteredInput';
 import { VoiceFilteredTextarea } from '../components/common/VoiceFilteredTextarea';
 import { collaborationService } from '../services/collaborationService';
 import { getCollaborationSession } from '../services/collaborationApi';
+import { apiConfigService } from '../services/apiConfig.service';
 import { CollaborationInviteModal } from '../components/collaboration/CollaborationInviteModal';
 import { ActiveSessionInviteModal } from '../components/collaboration/ActiveSessionInviteModal';
 import CollaborationLobby from '../components/collaboration/CollaborationLobby';
@@ -1822,7 +1823,7 @@ const ManualStoryCreationPage: React.FC = () => {
     
     // Automatically start the session for participants
     const token = localStorage.getItem('access_token');
-    fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/${sessionId}/start/`, {
+    fetch(`${apiConfigService.getApiUrl()}/collaborate/${sessionId}/start/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -2052,7 +2053,7 @@ const ManualStoryCreationPage: React.FC = () => {
     const token = localStorage.getItem('access_token');
     try {
       const resp = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/${currentSessionId}/start/`,
+        `${apiConfigService.getApiUrl()}/collaborate/${currentSessionId}/start/`,
         {
           method: 'POST',
           headers: {
@@ -2090,7 +2091,7 @@ const ManualStoryCreationPage: React.FC = () => {
     if (isHost && currentSessionId) {
       try {
         const token = localStorage.getItem('access_token');
-        await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/collaborate/${currentSessionId}/end/`, {
+        await fetch(`${apiConfigService.getApiUrl()}/collaborate/${currentSessionId}/end/`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

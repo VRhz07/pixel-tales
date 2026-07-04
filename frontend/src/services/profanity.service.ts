@@ -5,8 +5,9 @@
 
 import axios from 'axios';
 import adminAuthService from './adminAuth.service';
+import { apiConfigService } from './apiConfig.service';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = apiConfigService.getApiUrl();
 
 // Create axios instance with admin auth for profanity management
 const profanityApi = axios.create({

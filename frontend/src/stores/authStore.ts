@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { authService } from '@/services/auth.service';
 import { featureAccessService } from '@/services/featureAccess.service';
+import { apiConfigService } from '@/services/apiConfig.service';
 import type { User, FeatureAccess, UserLimits, ApiError } from '@/types/api.types';
 import { createCapacitorStorage } from '@/utils/capacitorStorage';
 import { storage } from '@/utils/storage';
@@ -445,7 +446,7 @@ export const useAuthStore = create<AuthState>()(
               const timeoutId = setTimeout(() => controller.abort(), 3000);
               
               // Use GET instead of HEAD since the endpoint doesn't support HEAD
-              await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'}/auth/profile/`, {
+              await fetch(`${apiConfigService.getApiUrl()}/auth/profile/`, {
                 method: 'GET',
                 headers: {
                   'Authorization': `Bearer ${storage.getItemSync('access_token')}`

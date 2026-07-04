@@ -3,8 +3,9 @@
  * Separate from regular user authentication
  */
 import axios from 'axios';
+import { apiConfigService } from './apiConfig.service';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = apiConfigService.getApiUrl();
 
 // Storage keys for admin auth
 const ADMIN_TOKEN_KEY = 'admin_token';

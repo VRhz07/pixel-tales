@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 from django.db.models import Q, Avg
 from django.utils import timezone
 import json
@@ -3733,14 +3734,28 @@ def get_session_presence(request, session_id):
                 colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2']
                 import random
                 cursor_color = random.choice(colors)
-                
-                SessionParticipant.objects.create(
-                    session=session,
-                    user=request.user,
-                    role='host',
-                    cursor_color=cursor_color,
-                    is_active=True
-                )
+
+                with transaction.atomic():
+                    participant, created = SessionParticipant.objects.get_or_create(
+                        session=session,
+                        user=request.user,
+                        defaults={
+                            'role': 'host',
+                            'cursor_color': cursor_color,
+                            'is_active': True,
+                        }
+                    )
+
+                    if not created:
+                        updates = []
+                        if participant.role != 'host':
+                            participant.role = 'host'
+                            updates.append('role')
+                        if not participant.is_active:
+                            participant.is_active = True
+                            updates.append('is_active')
+                        if updates:
+                            participant.save(update_fields=updates)
             else:
                 # Check if user has been invited or has access via the session
                 # This allows invited users to see presence before connecting via WebSocket

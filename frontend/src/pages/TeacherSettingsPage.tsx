@@ -23,6 +23,7 @@ import { PasswordUpdateModal } from '../components/settings/PasswordUpdateModal'
 import { ParentProfileEditModal } from '../components/settings/ParentProfileEditModal';
 import { EmailChangeModal } from '../components/settings/EmailChangeModal';
 import { authService } from '../services/auth.service';
+import { apiConfigService } from '../services/apiConfig.service';
 import TeacherBottomNav from '../components/navigation/TeacherBottomNav';
 import parentDashboardService, { Child, ChildFormData } from '../services/parentDashboard.service';
 import './ParentSettingsPage.css';
@@ -287,7 +288,7 @@ const TeacherSettingsPage: React.FC = () => {
       setLoadingClasses(true);
       console.log('🔄 Loading classes...');
       const token = localStorage.getItem('access_token'); // Use access_token like dashboard
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      const baseUrl = apiConfigService.getApiUrl();
       
       const response = await fetch(`${baseUrl}/teacher/classes/`, {
         headers: {
@@ -343,7 +344,7 @@ const TeacherSettingsPage: React.FC = () => {
   const loadClassStudents = async (classId: number) => {
     try {
       const token = localStorage.getItem('access_token');
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      const baseUrl = apiConfigService.getApiUrl();
       
       const response = await fetch(`${baseUrl}/teacher/classes/${classId}/students/`, {
         headers: {
@@ -370,7 +371,7 @@ const TeacherSettingsPage: React.FC = () => {
 
     try {
       const token = localStorage.getItem('access_token');
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      const baseUrl = apiConfigService.getApiUrl();
       
       const response = await fetch(`${baseUrl}/teacher/classes/${classId}/students/${studentId}/`, {
         method: 'DELETE',
@@ -399,7 +400,7 @@ const TeacherSettingsPage: React.FC = () => {
 
     try {
       const token = localStorage.getItem('access_token');
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      const baseUrl = apiConfigService.getApiUrl();
       
       const response = await fetch(`${baseUrl}/teacher/classes/${classId}/`, {
         method: 'DELETE',
@@ -447,7 +448,7 @@ const TeacherSettingsPage: React.FC = () => {
     try {
       setLoadingAvailableStudents(true);
       const token = localStorage.getItem('access_token');
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      const baseUrl = apiConfigService.getApiUrl();
       
       const response = await fetch(`${baseUrl}/teacher/available-students/`, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -471,7 +472,7 @@ const TeacherSettingsPage: React.FC = () => {
   const handleAddStudentToAccount = async (studentId: number) => {
     try {
       const token = localStorage.getItem('access_token');
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+      const baseUrl = apiConfigService.getApiUrl();
 
       const response = await fetch(`${baseUrl}/teacher/add-student/`, {
         method: 'POST',
