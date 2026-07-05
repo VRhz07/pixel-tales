@@ -3,6 +3,8 @@
  * Handles WebSocket connections and synchronization
  */
 
+import { useStoryStore } from '../stores/storyStore';
+
 interface Participant {
   user_id: number;
   username: string;
@@ -42,6 +44,8 @@ type MessageHandler = (message: CollaborationMessage) => void;
 export class CollaborationService {
   private ws: WebSocket | null = null;
   private sessionId: string | null = null;
+  private currentStoryId: string | null = null;
+  private hasSyncedInitialDraft: boolean = false;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
@@ -74,6 +78,7 @@ export class CollaborationService {
       }
 
       console.log(`Switching sessions: closing old socket for ${this.sessionId}, connecting to ${sessionId}`);
+      this.hasSyncedInitialDraft = false;
       this.ws.close(1000, 'Switching sessions');
       this.ws = null;
     }
@@ -189,9 +194,19 @@ export class CollaborationService {
     });
   }
 
+  setCurrentStoryId(storyId: string | null): void {
+    this.currentStoryId = storyId;
+  }
+
+  shouldApplyInitialDraft(): boolean {
+    if (this.hasSyncedInitialDraft) return false;
+    this.hasSyncedInitialDraft = true;
+    return true;
+  }
+
   /**
-   * Disconnect from the session
-   */
+    * Disconnect from the session
+    */
   disconnect(): void {
     if (this.ws) {
       this.ws.close(1000, 'User disconnected');
@@ -757,10 +772,47 @@ export class CollaborationService {
     this.send(message);
   }
 
+  private syncToStore(message: any): void {
+    if (!this.currentStoryId) return;
+
+    switch (message.type) {
+      case 'title_edit':
+        useStoryStore.getState().updateStory(this.currentStoryId, { title: message.title });
+        break;
+
+      case 'text_edit': {
+        const store = useStoryStore.getState();
+        let story = store.getStory(this.currentStoryId);
+        if (!story) return;
+
+        let idx = -1;
+        if (typeof message.page_index === 'number') {
+          idx = message.page_index;
+        } else if (message.page_id !== undefined && message.page_id !== null) {
+          const pidStr = String(message.page_id);
+          idx = story.pages.findIndex(p => String(p.id) === pidStr);
+        }
+        if (idx < 0) return;
+
+        while (story && story.pages.length <= idx) {
+          store.insertPageAt(this.currentStoryId, story.pages.length);
+          story = store.getStory(this.currentStoryId);
+        }
+        if (!story || idx >= story.pages.length) return;
+
+        const localPageId = story.pages[idx].id;
+        store.updatePage(this.currentStoryId, localPageId, { text: message.text });
+        break;
+      }
+    }
+  }
+
   private handleMessage(message: CollaborationMessage): void {
     // Deep clone the message to avoid any reference issues
     const clonedMessage = JSON.parse(JSON.stringify(message));
-    
+
+    this.syncToStore(clonedMessage);
+
     const handlers = this.messageHandlers.get(clonedMessage.type);
     if (handlers) {
       handlers.forEach(handler => handler(clonedMessage));

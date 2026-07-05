@@ -224,13 +224,6 @@ const ManualStoryCreationPage: React.FC = () => {
     };
   }, [isCollaborating]);
 
-  useEffect(() => {
-    return () => {
-      console.log('🧹 ManualStoryCreationPage unmounting — disconnecting collaboration socket');
-      collaborationService.disconnect();
-    };
-  }, []);
-
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [joinCode, setJoinCode] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
@@ -620,63 +613,68 @@ const ManualStoryCreationPage: React.FC = () => {
             }, 500);
           }
 
-          const canvasData = message.canvas_data || {};
-          
-          if (draft.title) {
-            // Update local title state
-            setStoryTitle(draft.title);
-            // Also update the store story title so UI stays consistent
-            if (currentStory) {
-              updateStory(currentStory.id, { title: draft.title });
+           const canvasData = message.canvas_data || {};
+           
+           const serverPages: any[] = Array.isArray(draft.pages) ? draft.pages : [];
+           
+           if (collaborationService.shouldApplyInitialDraft()) {
+             if (draft.title) {
+               // Update local title state
+               setStoryTitle(draft.title);
+               // Also update the store story title so UI stays consistent
+               if (currentStory) {
+                 updateStory(currentStory.id, { title: draft.title });
+               } else {
+                 // If no story exists yet locally, create one with the server title
+                 // This should rarely happen since we now create stories before connecting
+                 console.log('Creating story from init message (unexpected path)');
+                 const newStory = createStory(draft.title);
+                 setStoryTitle(newStory.title);
+                 setCurrentStory(newStory);
+                 hasCreatedStory.current = true;
+               }
+             }
+             
+             if (currentStory) {
+               const localLen = currentStory.pages.length;
+               const serverLen = serverPages.length;
+     
+               // Add missing local pages to match server length
+               if (serverLen > localLen) {
+                 for (let i = localLen; i < serverLen; i++) {
+                   const serverPage = serverPages[i];
+                   if (serverPage && serverPage.id) {
+                     // Use server-provided page ID for consistency across collaborators
+                     addPageWithId(currentStory.id, serverPage.id, serverPage.text || '');
+                     console.log('Created page', i, 'with server ID:', serverPage.id);
+                   } else {
+                     // Fallback to normal page creation
+                     addPage(currentStory.id);
+                     console.log('Created page', i, 'with generated ID (server did not provide ID)');
+                   }
+                 }
+               } else if (serverLen < localLen) {
+                 console.warn('Local has more pages than server; skipping deletion. Consider reconciling later.', { localLen, serverLen });
+               }
+             }
+     
+             // Apply text for each page from server draft
+             const applyLen = Math.min(useStoryStore.getState().getStory(currentStory.id)?.pages.length || 0, serverLen);
+             for (let i = 0; i < applyLen; i++) {
+               const serverText = serverPages[i]?.text;
+               if (typeof serverText === 'string') {
+                 const latestStory = useStoryStore.getState().getStory(currentStory.id);
+                 if (latestStory && latestStory.pages[i]) {
+                   const pageId = latestStory.pages[i].id;
+                   updatePage(currentStory.id, pageId, { text: serverText });
+                 }
+               }
+             }
             } else {
-              // If no story exists yet locally, create one with the server title
-              // This should rarely happen since we now create stories before connecting
-              console.log('⚠️ Creating story from init message (unexpected path)');
-              const newStory = createStory(draft.title);
-              setStoryTitle(newStory.title);
-              setCurrentStory(newStory);
-              hasCreatedStory.current = true;
+              console.log('Skipping init draft overwrite (title + pages) — already synced this session, trusting live local state');
             }
-          }
-
-          const serverPages: any[] = Array.isArray(draft.pages) ? draft.pages : [];
-          if (currentStory) {
-            const localLen = currentStory.pages.length;
-            const serverLen = serverPages.length;
-
-            // Add missing local pages to match server length
-            if (serverLen > localLen) {
-              for (let i = localLen; i < serverLen; i++) {
-                const serverPage = serverPages[i];
-                if (serverPage && serverPage.id) {
-                  // Use server-provided page ID for consistency across collaborators
-                  addPageWithId(currentStory.id, serverPage.id, serverPage.text || '');
-                  console.log(`✅ Created page ${i} with server ID:`, serverPage.id);
-                } else {
-                  // Fallback to normal page creation
-                  addPage(currentStory.id);
-                  console.log(`⚠️ Created page ${i} with generated ID (server didn't provide ID)`);
-                }
-              }
-            } else if (serverLen < localLen) {
-              console.warn('⚠️ Local has more pages than server; skipping deletion. Consider reconciling later.', { localLen, serverLen });
-            }
-
-            // Apply text for each page from server draft
-            const applyLen = Math.min(useStoryStore.getState().getStory(currentStory.id)?.pages.length || 0, serverLen);
-            for (let i = 0; i < applyLen; i++) {
-              const serverText = serverPages[i]?.text;
-              if (typeof serverText === 'string') {
-                const latestStory = useStoryStore.getState().getStory(currentStory.id);
-                if (latestStory && latestStory.pages[i]) {
-                  const pageId = latestStory.pages[i].id;
-                  updatePage(currentStory.id, pageId, { text: serverText });
-                }
-              }
-            }
-          }
-          
-      // Load canvas data for all pages and cover
+            
+            // Load canvas data for all pages and cover
       console.log('📦 Loading canvas data from server:', canvasData);
           if (currentStory && canvasData) {
             // Load cover image canvas
@@ -699,9 +697,6 @@ const ManualStoryCreationPage: React.FC = () => {
       if (message.type !== 'title_edit') return;
       console.log('🖊️ Title update received:', message.title);
       setStoryTitle(message.title);
-          if (currentStory) {
-            updateStory(currentStory.id, { title: message.title });
-          }
         };
         
         const handleReconnectionFailed = (message: any) => {
@@ -938,56 +933,13 @@ const ManualStoryCreationPage: React.FC = () => {
 
         const handleTextUpdate = (message: any) => {
       if (message.type !== 'text_edit') return;
-      console.log('📨 Text update message received:', message);
-          if (message.user_id === currentUserId) {
-            console.log('🔇 Ignoring own echo');
-            return;
-          }
-
-      // Set flag to prevent sending our own updates while applying remote changes
-          isReceivingRemoteTextRef.current = true;
-
-      // Prefer authoritative server index for mapping; id is local-only and differs per client
-          const pageId = message.page_id;
-          let idx = -1;
-          if (currentStory) {
-            if (typeof message.page_index === 'number') {
-              idx = message.page_index;
-            } else if (pageId !== undefined && pageId !== null) {
-              // Compare as strings to handle mixed id types (string vs number)
-              const pidStr = String(pageId);
-              idx = currentStory.pages.findIndex(p => String(p.id) === pidStr);
-            }
-            // If the referenced page doesn't exist yet (out-of-order event), create pages up to that index
-            if (idx >= 0) {
-              let latest = useStoryStore.getState().getStory(currentStory.id);
-              while (latest && latest.pages.length <= idx) {
-                // Insert at the end until we reach the desired length
-                insertPageAt(currentStory.id, latest.pages.length);
-                latest = useStoryStore.getState().getStory(currentStory.id);
-              }
-            }
-            const latestStory = useStoryStore.getState().getStory(currentStory.id);
-            if (latestStory && idx >= 0 && idx < latestStory.pages.length) {
-              console.log('✍️ Applying remote text to page', idx, '(incoming id:', pageId, ')');
-              updatePage(latestStory.id, latestStory.pages[idx].id, {
-                text: message.text,
-              });
-              
-              // BUG FIX: DO NOT call setCurrentStory here!
-              // The updatePage function already updates the Zustand store, which will trigger
-              // React re-renders automatically. Calling setCurrentStory causes extra renders
-              // that interfere with currentPageIndex and cause users to be pulled to the wrong page.
-              // The setTimeout+setCurrentStory was unnecessary and causing the page pull bug.
-            } else {
-              console.warn('⚠️ Could not map incoming text_edit to a local page', message);
-            }
-          }
-
-      // Clear the flag after a short delay
-      setTimeout(() => {
-            isReceivingRemoteTextRef.current = false;
-          }, 100);
+      if (message.user_id === currentUserId) {
+        console.log('🔇 Ignoring own echo');
+        return;
+      }
+      isReceivingRemoteTextRef.current = true;
+      // Text + page creation already applied centrally in collaborationService.syncToStore.
+      // Nothing left to do here except the local UI-feedback flag above.
         };
 
         const handleSessionStarted = (message: any) => {
@@ -2660,10 +2612,11 @@ const ManualStoryCreationPage: React.FC = () => {
     if (storyId) {
       // Load existing story
       const story = useStoryStore.getState().getStory(storyId);
-      if (story) {
-        setCurrentStory(story);
-        setStoryTitle(story.title);
-        hasCreatedStory.current = true; // Mark that we have a story
+       if (story) {
+         setCurrentStory(story);
+         setStoryTitle(story.title);
+         hasCreatedStory.current = true; // Mark that we have a story
+         collaborationService.setCurrentStoryId(story.id);
         
         // Track the original draft status when story is first loaded
         if (originalIsDraft.current === undefined) {
@@ -2685,6 +2638,7 @@ const ManualStoryCreationPage: React.FC = () => {
       const newStory = createStory(incomingTitle);
       setStoryTitle(newStory.title);
       setCurrentStory(newStory);
+      collaborationService.setCurrentStoryId(newStory.id);
       originalIsDraft.current = true; // New stories start as drafts
 
       // If arriving in collaborative mode, preserve session info and trigger join flow
