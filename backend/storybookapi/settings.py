@@ -312,7 +312,13 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': os.getenv('REDIS_URL', 'rediss://default:gQAAAAAAAV8vAAIgcDFkNWI1ZTNlNmQ4NDQ0YzAxYWJmNDEyZjdlODk2Y2JhYw@cosmic-parrot-89903.upstash.io:6379'),
-        'KEY_PREFIX': 'pixeltales',  # Namespace to avoid collisions with channel layer keys
+        'KEY_PREFIX': 'pixeltales',
+        'OPTIONS': {
+            'socket_connect_timeout': 30,
+            'socket_timeout': 30,
+            'retry_on_timeout': True,
+            'health_check_interval': 30,
+        },
     }
 }
 
@@ -321,9 +327,16 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [os.getenv('REDIS_URL', 'rediss://default:gQAAAAAAAV8vAAIgcDFkNWI1ZTNlNmQ4NDQ0YzAxYWJmNDEyZjdlODk2Y2JhYw@cosmic-parrot-89903.upstash.io:6379')],
-            'capacity': 1500,  # Increased capacity to prevent ChannelFull with batched strokes
-            'expiry': 60,      # Give enough time for reconnects
+            'hosts': [{
+                'address': os.getenv('REDIS_URL', 'rediss://default:gQAAAAAAAV8vAAIgcDFkNWI1ZTNlNmQ4NDQ0YzAxYWJmNDEyZjdlODk2Y2JhYw@cosmic-parrot-89903.upstash.io:6379'),
+                'socket_connect_timeout': 30,
+                'socket_timeout': 30,
+                'retry_on_timeout': True,
+                'health_check_interval': 30,
+                'protocol': 2,
+            }],
+            'capacity': 1500,
+            'expiry': 60,
         },
     },
 }

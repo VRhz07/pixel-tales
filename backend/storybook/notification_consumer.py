@@ -43,7 +43,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         await self.accept()
         
         # Track connection count
-        cache.set(connection_key, current_connections + 1, 3600)  # 1 hour timeout
+        cache.set(connection_key, current_connections + 1, 300)  # 5 minute timeout
         
         # Mark user as online
         await self.set_user_online(True)
@@ -67,9 +67,9 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             # Decrement connection count
             if hasattr(self, 'user') and self.user:
                 connection_key = f'ws_connections_{self.user.id}'
-                current_connections = cache.get(connection_key, 1)
+                current_connections = cache.get(connection_key, 0)
                 if current_connections > 0:
-                    cache.set(connection_key, current_connections - 1, 3600)
+                    cache.set(connection_key, current_connections - 1, 300)
             
             # Mark user as offline
             await self.set_user_online(False)

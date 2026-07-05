@@ -1649,12 +1649,29 @@ const ManualStoryCreationPage: React.FC = () => {
 
       window.addEventListener('collaboration-session-started', handleSessionStart);
       
-      // TEMPORARY WORKAROUND: For testing, allow participants to also start
-      // In production, you might want to poll the session status
+      // Fallback: in case the event fired before this listener was attached
+      // (race condition when host starts very quickly after invite), poll
+      // session status directly so the lobby can self-correct.
+      const pollInterval = setInterval(async () => {
+        try {
+          const response = await fetch(`${apiConfigService.getApiUrl()}/collaborate/${currentSessionId}/`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.is_active) {
+              handleSessionStart({ detail: { session_id: currentSessionId } });
+              clearInterval(pollInterval);
+            }
+          }
+        } catch (err) {
+          console.error('Lobby poll failed:', err);
+        }
+      }, 2000);
+
       console.log('⏰ Participant waiting in lobby for session:', currentSessionId);
 
       return () => {
         window.removeEventListener('collaboration-session-started', handleSessionStart);
+        clearInterval(pollInterval);
       };
     }
   }, [isHost, showLobby, currentSessionId, currentStory, createStory]);
