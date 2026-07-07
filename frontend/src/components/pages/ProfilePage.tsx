@@ -180,20 +180,11 @@ const ProfilePage = () => {
         <h1 className="profile-page-header mb-0">{t('profile.title')}</h1>
         <button
           onClick={() => navigate('/settings')}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
-          style={{
-            background: 'linear-gradient(to right, #9333ea, #ec4899)',
-            color: 'white',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(to right, #7e22ce, #db2777)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(to right, #9333ea, #ec4899)';
-          }}
+          className="profile-settings-btn"
+          aria-label="Settings"
+          title="Settings"
         >
-          <CogIcon className="w-5 h-5" style={{ color: 'white' }} />
-          <span className="text-sm" style={{ color: 'white' }}>Settings</span>
+          <CogIcon className="profile-settings-btn-icon" />
         </button>
       </div>
       

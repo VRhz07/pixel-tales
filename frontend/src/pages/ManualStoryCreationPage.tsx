@@ -361,9 +361,19 @@ const ManualStoryCreationPage: React.FC = () => {
 
   // Auto-join collaboration if coming from collab mode or returning from canvas
   useEffect(() => {
-    // FIRST: Check if explicitly requesting solo mode
-    if (isCollaborative === false) {
-      console.log('🎯 Solo mode explicitly requested - clearing any stored collaboration state');
+    // FIRST: Check if explicitly requesting solo mode OR navigating without any collab intent
+    // (e.g. opening a story from the library). isCollaborative is `false` for explicit solo,
+    // or `undefined` when no collab nav state was provided at all.
+    // In both cases with no collabSessionId, clear any stale session to prevent the
+    // Collaboration Invite modal from flashing on story load.
+    const isExplicitlySolo = isCollaborative === false;
+    const hasNoCollabIntent = isCollaborative === undefined && !collabSessionId;
+    if (isExplicitlySolo || hasNoCollabIntent) {
+      if (isExplicitlySolo) {
+        console.log('🎯 Solo mode explicitly requested - clearing any stored collaboration state');
+      } else {
+        console.log('🎯 No collab intent (e.g. opened from library) - clearing stale collaboration state');
+      }
       // Clear session from sessionStorage
       try {
         sessionStorage.removeItem('collab_session_id');
@@ -384,7 +394,7 @@ const ManualStoryCreationPage: React.FC = () => {
       return;
     }
     
-    // Try to restore session from storage on page load/refresh
+    // Try to restore session from storage on page load/refresh (only reached when collab is intended)
     const storedSessionId = collaborationService.getStoredSessionId();
     
     if (storedSessionId && !collabSessionId && !isCollaborating) {

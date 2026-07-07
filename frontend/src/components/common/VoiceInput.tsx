@@ -98,11 +98,6 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
         </div>
       )}
 
-      {error && (
-        <div className="voice-input-error">
-          {error}
-        </div>
-      )}
     </div>
   );
 };
