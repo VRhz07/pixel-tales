@@ -429,6 +429,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
 
     async def handle_text_edit(self, data):
         """Handle text editing operations - persist to backend draft"""
+        print(f"[TEXT_EDIT] Received text_edit: {data}")
         # page_index is the authoritative position indicator; page_id is local-only
         page_id = data.get('page_id')
         page_index = data.get('page_index')
@@ -1829,6 +1830,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
         
         # Mark session as inactive
         session.is_active = False
+        session.story_id = story.id
         session.save()
         
         return {

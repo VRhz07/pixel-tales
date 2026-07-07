@@ -116,3 +116,6 @@ tmp_rovodev_*
 
 # Debug logs
 ss/logs.txt
+
+# Graphify
+graphify-out/

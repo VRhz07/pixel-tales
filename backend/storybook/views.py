@@ -1847,6 +1847,7 @@ def join_session_by_code(request):
             'max_participants': session.max_participants,
             'participant_count': len(participants),
             'can_join': session.can_join(),
+            'story_id': session.story_id,
             'participants': participants,
             'created_at': session.created_at.isoformat(),
             'expires_at': session.expires_at.isoformat() if session.expires_at else None,
@@ -1888,6 +1889,7 @@ def get_collaboration_session(request, session_id):
                 'participant_count': session.participant_count,
                 'can_join': session.can_join(),
                 'is_lobby_open': session.is_lobby_open,
+                'story_id': session.story_id,
                 'story_draft': session.story_draft,
                 'story_title': session.story_draft.get('title', 'Collaborative Story') if session.story_draft else 'Collaborative Story',
                 'participants': [
@@ -2583,7 +2585,8 @@ def respond_to_collaboration_invite(request, notification_id):
         return Response({
             'success': True,
             'action': action,
-            'session_id': session_id if action == 'accept' else None
+            'session_id': session_id if action == 'accept' else None,
+            'story_id': session.story_id if action == 'accept' and session_id else None
         })
         
     except Notification.DoesNotExist:
@@ -4181,7 +4184,8 @@ def respond_to_collaboration_invite_new(request, invite_id):
             return Response({
                 'success': True,
                 'message': 'Invite accepted successfully',
-                'session_id': invite.session.session_id
+                'session_id': invite.session.session_id,
+                'story_id': invite.session.story_id
             })
         else:
             invite.status = 'rejected'
@@ -4235,4 +4239,39 @@ def get_user_sessions(request):
         'sessions': sessions_data,
         'total': len(sessions_data)
     })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_session_story_id(request, session_id):
+    """Link a backend Story ID to a collaboration session"""
+    from .models import CollaborationSession
+    
+    try:
+        session = CollaborationSession.objects.get(session_id=session_id)
+        
+        if session.host != request.user:
+            return Response({
+                'error': 'Only the host can link a story to this session'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        story_id = request.data.get('story_id')
+        if not story_id:
+            return Response({
+                'error': 'story_id is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        session.story_id = story_id
+        session.save(update_fields=['story_id'])
+        
+        return Response({
+            'success': True,
+            'session_id': session.session_id,
+            'story_id': session.story_id
+        })
+        
+    except CollaborationSession.DoesNotExist:
+        return Response({
+            'error': 'Session not found'
+        }, status=status.HTTP_404_NOT_FOUND)
 

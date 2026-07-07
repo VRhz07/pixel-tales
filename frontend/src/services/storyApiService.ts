@@ -203,19 +203,41 @@ class StoryApiService {
     }
   }
 
-  /**
-   * Create a new story
-   */
+   /**
+     * Create a new story
+     */
   async createStory(data: CreateStoryRequest): Promise<any> {
     try {
       const response = await api.post<any>(API_ENDPOINTS.STORIES.CREATE, data);
       console.log('✅ Story created successfully:', response);
-      return response; // Returns {success, message, story: {...}}
-    } catch (error: any) {
+      return response;
+    } catch (error) {
       console.error('❌ Error creating story:', error);
-      console.log('📋 Validation errors:', error?.details);
-      console.log('📋 Full error details:', JSON.stringify(error?.details, null, 2));
-      console.log('📋 Full error response:', JSON.stringify(error?.response?.data, null, 2));
+      throw error;
+    }
+  }
+
+  /**
+   * Link a created story to an active collaboration session
+   */
+  async linkStoryToSession(sessionId: string, storyId: number): Promise<any> {
+    try {
+      const apiUrl = (await import('./apiConfig.service')).apiConfigService.getApiUrl();
+      const response = await fetch(`${apiUrl}/collaborate/sessions/${sessionId}/story/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ story_id: storyId })
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to link story to session: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('❌ Error linking story to session:', error);
       throw error;
     }
   }

@@ -56,11 +56,12 @@ const CollaborationModeModal: React.FC<CollaborationModeModalProps> = ({
       console.log('✅ Successfully joined session:', session);
       
       // Navigate to manual story creation page with collaboration info
-      const storyId = `collab-${session.session_id}`;
+      const storyId = session.story_id ? `backend-${session.story_id}` : `collab-${session.session_id}`;
       navigate('/create-story-manual', {
         state: {
           sessionId: session.session_id,
           storyId: storyId,
+          hostStoryId: session.story_id,
           storyTitle: session.canvas_name || 'Collaborative Story',
           isCollaborative: true,
           isHost: false

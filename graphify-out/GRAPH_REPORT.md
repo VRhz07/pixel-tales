@@ -1,16 +1,16 @@
-# Graph Report - PixelTales  (2026-06-23)
+# Graph Report - PixelTales  (2026-07-03)
 
 ## Corpus Check
-- 753 files · ~947,192 words
+- 935 files · ~1,101,790 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 19482 nodes · 26678 edges · 1292 communities (1058 shown, 234 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 936 edges (avg confidence: 0.54)
+- 23634 nodes · 30767 edges · 1690 communities (1400 shown, 290 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 959 edges (avg confidence: 0.55)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9bb9006d`
+- Built from commit: `f9d0c936`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -537,6 +537,7 @@
 - [[_COMMUNITY_Community 524|Community 524]]
 - [[_COMMUNITY_Community 526|Community 526]]
 - [[_COMMUNITY_Community 527|Community 527]]
+- [[_COMMUNITY_Community 528|Community 528]]
 - [[_COMMUNITY_Community 530|Community 530]]
 - [[_COMMUNITY_Community 531|Community 531]]
 - [[_COMMUNITY_Community 532|Community 532]]
@@ -648,6 +649,7 @@
 - [[_COMMUNITY_Community 641|Community 641]]
 - [[_COMMUNITY_Community 642|Community 642]]
 - [[_COMMUNITY_Community 643|Community 643]]
+- [[_COMMUNITY_Community 644|Community 644]]
 - [[_COMMUNITY_Community 645|Community 645]]
 - [[_COMMUNITY_Community 646|Community 646]]
 - [[_COMMUNITY_Community 647|Community 647]]
@@ -1224,40 +1226,438 @@
 - [[_COMMUNITY_Community 1275|Community 1275]]
 - [[_COMMUNITY_Community 1276|Community 1276]]
 - [[_COMMUNITY_Community 1277|Community 1277]]
+- [[_COMMUNITY_Community 1292|Community 1292]]
+- [[_COMMUNITY_Community 1293|Community 1293]]
+- [[_COMMUNITY_Community 1294|Community 1294]]
+- [[_COMMUNITY_Community 1295|Community 1295]]
+- [[_COMMUNITY_Community 1296|Community 1296]]
+- [[_COMMUNITY_Community 1297|Community 1297]]
+- [[_COMMUNITY_Community 1298|Community 1298]]
+- [[_COMMUNITY_Community 1299|Community 1299]]
+- [[_COMMUNITY_Community 1300|Community 1300]]
+- [[_COMMUNITY_Community 1301|Community 1301]]
+- [[_COMMUNITY_Community 1302|Community 1302]]
+- [[_COMMUNITY_Community 1303|Community 1303]]
+- [[_COMMUNITY_Community 1304|Community 1304]]
+- [[_COMMUNITY_Community 1305|Community 1305]]
+- [[_COMMUNITY_Community 1306|Community 1306]]
+- [[_COMMUNITY_Community 1307|Community 1307]]
+- [[_COMMUNITY_Community 1308|Community 1308]]
+- [[_COMMUNITY_Community 1309|Community 1309]]
+- [[_COMMUNITY_Community 1310|Community 1310]]
+- [[_COMMUNITY_Community 1311|Community 1311]]
+- [[_COMMUNITY_Community 1312|Community 1312]]
+- [[_COMMUNITY_Community 1313|Community 1313]]
+- [[_COMMUNITY_Community 1314|Community 1314]]
+- [[_COMMUNITY_Community 1315|Community 1315]]
+- [[_COMMUNITY_Community 1316|Community 1316]]
+- [[_COMMUNITY_Community 1317|Community 1317]]
+- [[_COMMUNITY_Community 1318|Community 1318]]
+- [[_COMMUNITY_Community 1319|Community 1319]]
+- [[_COMMUNITY_Community 1320|Community 1320]]
+- [[_COMMUNITY_Community 1321|Community 1321]]
+- [[_COMMUNITY_Community 1322|Community 1322]]
+- [[_COMMUNITY_Community 1323|Community 1323]]
+- [[_COMMUNITY_Community 1324|Community 1324]]
+- [[_COMMUNITY_Community 1325|Community 1325]]
+- [[_COMMUNITY_Community 1326|Community 1326]]
+- [[_COMMUNITY_Community 1327|Community 1327]]
+- [[_COMMUNITY_Community 1328|Community 1328]]
+- [[_COMMUNITY_Community 1329|Community 1329]]
+- [[_COMMUNITY_Community 1330|Community 1330]]
+- [[_COMMUNITY_Community 1331|Community 1331]]
+- [[_COMMUNITY_Community 1332|Community 1332]]
+- [[_COMMUNITY_Community 1333|Community 1333]]
+- [[_COMMUNITY_Community 1334|Community 1334]]
+- [[_COMMUNITY_Community 1335|Community 1335]]
+- [[_COMMUNITY_Community 1336|Community 1336]]
+- [[_COMMUNITY_Community 1337|Community 1337]]
+- [[_COMMUNITY_Community 1338|Community 1338]]
+- [[_COMMUNITY_Community 1339|Community 1339]]
+- [[_COMMUNITY_Community 1340|Community 1340]]
+- [[_COMMUNITY_Community 1341|Community 1341]]
+- [[_COMMUNITY_Community 1342|Community 1342]]
+- [[_COMMUNITY_Community 1343|Community 1343]]
+- [[_COMMUNITY_Community 1344|Community 1344]]
+- [[_COMMUNITY_Community 1345|Community 1345]]
+- [[_COMMUNITY_Community 1346|Community 1346]]
+- [[_COMMUNITY_Community 1347|Community 1347]]
+- [[_COMMUNITY_Community 1348|Community 1348]]
+- [[_COMMUNITY_Community 1349|Community 1349]]
+- [[_COMMUNITY_Community 1350|Community 1350]]
+- [[_COMMUNITY_Community 1351|Community 1351]]
+- [[_COMMUNITY_Community 1352|Community 1352]]
+- [[_COMMUNITY_Community 1353|Community 1353]]
+- [[_COMMUNITY_Community 1354|Community 1354]]
+- [[_COMMUNITY_Community 1355|Community 1355]]
+- [[_COMMUNITY_Community 1356|Community 1356]]
+- [[_COMMUNITY_Community 1357|Community 1357]]
+- [[_COMMUNITY_Community 1358|Community 1358]]
+- [[_COMMUNITY_Community 1359|Community 1359]]
+- [[_COMMUNITY_Community 1360|Community 1360]]
+- [[_COMMUNITY_Community 1361|Community 1361]]
+- [[_COMMUNITY_Community 1362|Community 1362]]
+- [[_COMMUNITY_Community 1363|Community 1363]]
+- [[_COMMUNITY_Community 1364|Community 1364]]
+- [[_COMMUNITY_Community 1365|Community 1365]]
+- [[_COMMUNITY_Community 1366|Community 1366]]
+- [[_COMMUNITY_Community 1367|Community 1367]]
+- [[_COMMUNITY_Community 1368|Community 1368]]
+- [[_COMMUNITY_Community 1369|Community 1369]]
+- [[_COMMUNITY_Community 1370|Community 1370]]
+- [[_COMMUNITY_Community 1371|Community 1371]]
+- [[_COMMUNITY_Community 1372|Community 1372]]
+- [[_COMMUNITY_Community 1373|Community 1373]]
+- [[_COMMUNITY_Community 1374|Community 1374]]
+- [[_COMMUNITY_Community 1375|Community 1375]]
+- [[_COMMUNITY_Community 1376|Community 1376]]
+- [[_COMMUNITY_Community 1377|Community 1377]]
+- [[_COMMUNITY_Community 1378|Community 1378]]
+- [[_COMMUNITY_Community 1379|Community 1379]]
+- [[_COMMUNITY_Community 1380|Community 1380]]
+- [[_COMMUNITY_Community 1381|Community 1381]]
+- [[_COMMUNITY_Community 1382|Community 1382]]
+- [[_COMMUNITY_Community 1383|Community 1383]]
+- [[_COMMUNITY_Community 1384|Community 1384]]
+- [[_COMMUNITY_Community 1385|Community 1385]]
+- [[_COMMUNITY_Community 1386|Community 1386]]
+- [[_COMMUNITY_Community 1387|Community 1387]]
+- [[_COMMUNITY_Community 1388|Community 1388]]
+- [[_COMMUNITY_Community 1389|Community 1389]]
+- [[_COMMUNITY_Community 1390|Community 1390]]
+- [[_COMMUNITY_Community 1391|Community 1391]]
+- [[_COMMUNITY_Community 1392|Community 1392]]
+- [[_COMMUNITY_Community 1393|Community 1393]]
+- [[_COMMUNITY_Community 1394|Community 1394]]
+- [[_COMMUNITY_Community 1395|Community 1395]]
+- [[_COMMUNITY_Community 1396|Community 1396]]
+- [[_COMMUNITY_Community 1397|Community 1397]]
+- [[_COMMUNITY_Community 1398|Community 1398]]
+- [[_COMMUNITY_Community 1399|Community 1399]]
+- [[_COMMUNITY_Community 1400|Community 1400]]
+- [[_COMMUNITY_Community 1401|Community 1401]]
+- [[_COMMUNITY_Community 1402|Community 1402]]
+- [[_COMMUNITY_Community 1403|Community 1403]]
+- [[_COMMUNITY_Community 1404|Community 1404]]
+- [[_COMMUNITY_Community 1405|Community 1405]]
+- [[_COMMUNITY_Community 1406|Community 1406]]
+- [[_COMMUNITY_Community 1407|Community 1407]]
+- [[_COMMUNITY_Community 1408|Community 1408]]
+- [[_COMMUNITY_Community 1409|Community 1409]]
+- [[_COMMUNITY_Community 1410|Community 1410]]
+- [[_COMMUNITY_Community 1411|Community 1411]]
+- [[_COMMUNITY_Community 1412|Community 1412]]
+- [[_COMMUNITY_Community 1413|Community 1413]]
+- [[_COMMUNITY_Community 1414|Community 1414]]
+- [[_COMMUNITY_Community 1415|Community 1415]]
+- [[_COMMUNITY_Community 1416|Community 1416]]
+- [[_COMMUNITY_Community 1417|Community 1417]]
+- [[_COMMUNITY_Community 1418|Community 1418]]
+- [[_COMMUNITY_Community 1419|Community 1419]]
+- [[_COMMUNITY_Community 1420|Community 1420]]
+- [[_COMMUNITY_Community 1421|Community 1421]]
+- [[_COMMUNITY_Community 1422|Community 1422]]
+- [[_COMMUNITY_Community 1423|Community 1423]]
+- [[_COMMUNITY_Community 1424|Community 1424]]
+- [[_COMMUNITY_Community 1425|Community 1425]]
+- [[_COMMUNITY_Community 1426|Community 1426]]
+- [[_COMMUNITY_Community 1427|Community 1427]]
+- [[_COMMUNITY_Community 1428|Community 1428]]
+- [[_COMMUNITY_Community 1429|Community 1429]]
+- [[_COMMUNITY_Community 1430|Community 1430]]
+- [[_COMMUNITY_Community 1431|Community 1431]]
+- [[_COMMUNITY_Community 1432|Community 1432]]
+- [[_COMMUNITY_Community 1433|Community 1433]]
+- [[_COMMUNITY_Community 1434|Community 1434]]
+- [[_COMMUNITY_Community 1435|Community 1435]]
+- [[_COMMUNITY_Community 1436|Community 1436]]
+- [[_COMMUNITY_Community 1437|Community 1437]]
+- [[_COMMUNITY_Community 1438|Community 1438]]
+- [[_COMMUNITY_Community 1439|Community 1439]]
+- [[_COMMUNITY_Community 1440|Community 1440]]
+- [[_COMMUNITY_Community 1441|Community 1441]]
+- [[_COMMUNITY_Community 1442|Community 1442]]
+- [[_COMMUNITY_Community 1443|Community 1443]]
+- [[_COMMUNITY_Community 1444|Community 1444]]
+- [[_COMMUNITY_Community 1445|Community 1445]]
+- [[_COMMUNITY_Community 1446|Community 1446]]
+- [[_COMMUNITY_Community 1447|Community 1447]]
+- [[_COMMUNITY_Community 1448|Community 1448]]
+- [[_COMMUNITY_Community 1449|Community 1449]]
+- [[_COMMUNITY_Community 1450|Community 1450]]
+- [[_COMMUNITY_Community 1451|Community 1451]]
+- [[_COMMUNITY_Community 1452|Community 1452]]
+- [[_COMMUNITY_Community 1453|Community 1453]]
+- [[_COMMUNITY_Community 1454|Community 1454]]
+- [[_COMMUNITY_Community 1455|Community 1455]]
+- [[_COMMUNITY_Community 1456|Community 1456]]
+- [[_COMMUNITY_Community 1457|Community 1457]]
+- [[_COMMUNITY_Community 1458|Community 1458]]
+- [[_COMMUNITY_Community 1459|Community 1459]]
+- [[_COMMUNITY_Community 1460|Community 1460]]
+- [[_COMMUNITY_Community 1461|Community 1461]]
+- [[_COMMUNITY_Community 1462|Community 1462]]
+- [[_COMMUNITY_Community 1463|Community 1463]]
+- [[_COMMUNITY_Community 1464|Community 1464]]
+- [[_COMMUNITY_Community 1465|Community 1465]]
+- [[_COMMUNITY_Community 1466|Community 1466]]
+- [[_COMMUNITY_Community 1467|Community 1467]]
+- [[_COMMUNITY_Community 1468|Community 1468]]
+- [[_COMMUNITY_Community 1469|Community 1469]]
+- [[_COMMUNITY_Community 1470|Community 1470]]
+- [[_COMMUNITY_Community 1471|Community 1471]]
+- [[_COMMUNITY_Community 1472|Community 1472]]
+- [[_COMMUNITY_Community 1473|Community 1473]]
+- [[_COMMUNITY_Community 1474|Community 1474]]
+- [[_COMMUNITY_Community 1475|Community 1475]]
+- [[_COMMUNITY_Community 1476|Community 1476]]
+- [[_COMMUNITY_Community 1477|Community 1477]]
+- [[_COMMUNITY_Community 1478|Community 1478]]
+- [[_COMMUNITY_Community 1479|Community 1479]]
+- [[_COMMUNITY_Community 1480|Community 1480]]
+- [[_COMMUNITY_Community 1481|Community 1481]]
+- [[_COMMUNITY_Community 1482|Community 1482]]
+- [[_COMMUNITY_Community 1483|Community 1483]]
+- [[_COMMUNITY_Community 1484|Community 1484]]
+- [[_COMMUNITY_Community 1485|Community 1485]]
+- [[_COMMUNITY_Community 1486|Community 1486]]
+- [[_COMMUNITY_Community 1487|Community 1487]]
+- [[_COMMUNITY_Community 1488|Community 1488]]
+- [[_COMMUNITY_Community 1489|Community 1489]]
+- [[_COMMUNITY_Community 1490|Community 1490]]
+- [[_COMMUNITY_Community 1491|Community 1491]]
+- [[_COMMUNITY_Community 1492|Community 1492]]
+- [[_COMMUNITY_Community 1493|Community 1493]]
+- [[_COMMUNITY_Community 1494|Community 1494]]
+- [[_COMMUNITY_Community 1495|Community 1495]]
+- [[_COMMUNITY_Community 1496|Community 1496]]
+- [[_COMMUNITY_Community 1497|Community 1497]]
+- [[_COMMUNITY_Community 1498|Community 1498]]
+- [[_COMMUNITY_Community 1499|Community 1499]]
+- [[_COMMUNITY_Community 1500|Community 1500]]
+- [[_COMMUNITY_Community 1501|Community 1501]]
+- [[_COMMUNITY_Community 1502|Community 1502]]
+- [[_COMMUNITY_Community 1503|Community 1503]]
+- [[_COMMUNITY_Community 1504|Community 1504]]
+- [[_COMMUNITY_Community 1505|Community 1505]]
+- [[_COMMUNITY_Community 1506|Community 1506]]
+- [[_COMMUNITY_Community 1507|Community 1507]]
+- [[_COMMUNITY_Community 1508|Community 1508]]
+- [[_COMMUNITY_Community 1509|Community 1509]]
+- [[_COMMUNITY_Community 1510|Community 1510]]
+- [[_COMMUNITY_Community 1511|Community 1511]]
+- [[_COMMUNITY_Community 1512|Community 1512]]
+- [[_COMMUNITY_Community 1513|Community 1513]]
+- [[_COMMUNITY_Community 1514|Community 1514]]
+- [[_COMMUNITY_Community 1515|Community 1515]]
+- [[_COMMUNITY_Community 1516|Community 1516]]
+- [[_COMMUNITY_Community 1517|Community 1517]]
+- [[_COMMUNITY_Community 1518|Community 1518]]
+- [[_COMMUNITY_Community 1519|Community 1519]]
+- [[_COMMUNITY_Community 1520|Community 1520]]
+- [[_COMMUNITY_Community 1521|Community 1521]]
+- [[_COMMUNITY_Community 1522|Community 1522]]
+- [[_COMMUNITY_Community 1523|Community 1523]]
+- [[_COMMUNITY_Community 1524|Community 1524]]
+- [[_COMMUNITY_Community 1525|Community 1525]]
+- [[_COMMUNITY_Community 1526|Community 1526]]
+- [[_COMMUNITY_Community 1527|Community 1527]]
+- [[_COMMUNITY_Community 1528|Community 1528]]
+- [[_COMMUNITY_Community 1529|Community 1529]]
+- [[_COMMUNITY_Community 1530|Community 1530]]
+- [[_COMMUNITY_Community 1531|Community 1531]]
+- [[_COMMUNITY_Community 1532|Community 1532]]
+- [[_COMMUNITY_Community 1533|Community 1533]]
+- [[_COMMUNITY_Community 1534|Community 1534]]
+- [[_COMMUNITY_Community 1535|Community 1535]]
+- [[_COMMUNITY_Community 1536|Community 1536]]
+- [[_COMMUNITY_Community 1537|Community 1537]]
+- [[_COMMUNITY_Community 1538|Community 1538]]
+- [[_COMMUNITY_Community 1539|Community 1539]]
+- [[_COMMUNITY_Community 1540|Community 1540]]
+- [[_COMMUNITY_Community 1541|Community 1541]]
+- [[_COMMUNITY_Community 1542|Community 1542]]
+- [[_COMMUNITY_Community 1543|Community 1543]]
+- [[_COMMUNITY_Community 1544|Community 1544]]
+- [[_COMMUNITY_Community 1545|Community 1545]]
+- [[_COMMUNITY_Community 1546|Community 1546]]
+- [[_COMMUNITY_Community 1547|Community 1547]]
+- [[_COMMUNITY_Community 1548|Community 1548]]
+- [[_COMMUNITY_Community 1549|Community 1549]]
+- [[_COMMUNITY_Community 1550|Community 1550]]
+- [[_COMMUNITY_Community 1551|Community 1551]]
+- [[_COMMUNITY_Community 1552|Community 1552]]
+- [[_COMMUNITY_Community 1553|Community 1553]]
+- [[_COMMUNITY_Community 1554|Community 1554]]
+- [[_COMMUNITY_Community 1555|Community 1555]]
+- [[_COMMUNITY_Community 1556|Community 1556]]
+- [[_COMMUNITY_Community 1557|Community 1557]]
+- [[_COMMUNITY_Community 1558|Community 1558]]
+- [[_COMMUNITY_Community 1559|Community 1559]]
+- [[_COMMUNITY_Community 1560|Community 1560]]
+- [[_COMMUNITY_Community 1561|Community 1561]]
+- [[_COMMUNITY_Community 1562|Community 1562]]
+- [[_COMMUNITY_Community 1563|Community 1563]]
+- [[_COMMUNITY_Community 1564|Community 1564]]
+- [[_COMMUNITY_Community 1565|Community 1565]]
+- [[_COMMUNITY_Community 1566|Community 1566]]
+- [[_COMMUNITY_Community 1567|Community 1567]]
+- [[_COMMUNITY_Community 1568|Community 1568]]
+- [[_COMMUNITY_Community 1569|Community 1569]]
+- [[_COMMUNITY_Community 1570|Community 1570]]
+- [[_COMMUNITY_Community 1571|Community 1571]]
+- [[_COMMUNITY_Community 1572|Community 1572]]
+- [[_COMMUNITY_Community 1573|Community 1573]]
+- [[_COMMUNITY_Community 1574|Community 1574]]
+- [[_COMMUNITY_Community 1575|Community 1575]]
+- [[_COMMUNITY_Community 1576|Community 1576]]
+- [[_COMMUNITY_Community 1577|Community 1577]]
+- [[_COMMUNITY_Community 1578|Community 1578]]
+- [[_COMMUNITY_Community 1579|Community 1579]]
+- [[_COMMUNITY_Community 1580|Community 1580]]
+- [[_COMMUNITY_Community 1581|Community 1581]]
+- [[_COMMUNITY_Community 1582|Community 1582]]
+- [[_COMMUNITY_Community 1583|Community 1583]]
+- [[_COMMUNITY_Community 1584|Community 1584]]
+- [[_COMMUNITY_Community 1585|Community 1585]]
+- [[_COMMUNITY_Community 1586|Community 1586]]
+- [[_COMMUNITY_Community 1587|Community 1587]]
+- [[_COMMUNITY_Community 1588|Community 1588]]
+- [[_COMMUNITY_Community 1589|Community 1589]]
+- [[_COMMUNITY_Community 1590|Community 1590]]
+- [[_COMMUNITY_Community 1591|Community 1591]]
+- [[_COMMUNITY_Community 1592|Community 1592]]
+- [[_COMMUNITY_Community 1593|Community 1593]]
+- [[_COMMUNITY_Community 1594|Community 1594]]
+- [[_COMMUNITY_Community 1595|Community 1595]]
+- [[_COMMUNITY_Community 1596|Community 1596]]
+- [[_COMMUNITY_Community 1597|Community 1597]]
+- [[_COMMUNITY_Community 1598|Community 1598]]
+- [[_COMMUNITY_Community 1599|Community 1599]]
+- [[_COMMUNITY_Community 1600|Community 1600]]
+- [[_COMMUNITY_Community 1601|Community 1601]]
+- [[_COMMUNITY_Community 1602|Community 1602]]
+- [[_COMMUNITY_Community 1603|Community 1603]]
+- [[_COMMUNITY_Community 1604|Community 1604]]
+- [[_COMMUNITY_Community 1605|Community 1605]]
+- [[_COMMUNITY_Community 1606|Community 1606]]
+- [[_COMMUNITY_Community 1607|Community 1607]]
+- [[_COMMUNITY_Community 1608|Community 1608]]
+- [[_COMMUNITY_Community 1609|Community 1609]]
+- [[_COMMUNITY_Community 1610|Community 1610]]
+- [[_COMMUNITY_Community 1611|Community 1611]]
+- [[_COMMUNITY_Community 1612|Community 1612]]
+- [[_COMMUNITY_Community 1613|Community 1613]]
+- [[_COMMUNITY_Community 1614|Community 1614]]
+- [[_COMMUNITY_Community 1615|Community 1615]]
+- [[_COMMUNITY_Community 1616|Community 1616]]
+- [[_COMMUNITY_Community 1617|Community 1617]]
+- [[_COMMUNITY_Community 1618|Community 1618]]
+- [[_COMMUNITY_Community 1619|Community 1619]]
+- [[_COMMUNITY_Community 1620|Community 1620]]
+- [[_COMMUNITY_Community 1621|Community 1621]]
+- [[_COMMUNITY_Community 1622|Community 1622]]
+- [[_COMMUNITY_Community 1623|Community 1623]]
+- [[_COMMUNITY_Community 1624|Community 1624]]
+- [[_COMMUNITY_Community 1625|Community 1625]]
+- [[_COMMUNITY_Community 1626|Community 1626]]
+- [[_COMMUNITY_Community 1627|Community 1627]]
+- [[_COMMUNITY_Community 1628|Community 1628]]
+- [[_COMMUNITY_Community 1629|Community 1629]]
+- [[_COMMUNITY_Community 1630|Community 1630]]
+- [[_COMMUNITY_Community 1631|Community 1631]]
+- [[_COMMUNITY_Community 1632|Community 1632]]
+- [[_COMMUNITY_Community 1633|Community 1633]]
+- [[_COMMUNITY_Community 1634|Community 1634]]
+- [[_COMMUNITY_Community 1635|Community 1635]]
+- [[_COMMUNITY_Community 1636|Community 1636]]
+- [[_COMMUNITY_Community 1637|Community 1637]]
+- [[_COMMUNITY_Community 1638|Community 1638]]
+- [[_COMMUNITY_Community 1639|Community 1639]]
+- [[_COMMUNITY_Community 1640|Community 1640]]
+- [[_COMMUNITY_Community 1641|Community 1641]]
+- [[_COMMUNITY_Community 1642|Community 1642]]
+- [[_COMMUNITY_Community 1643|Community 1643]]
+- [[_COMMUNITY_Community 1644|Community 1644]]
+- [[_COMMUNITY_Community 1645|Community 1645]]
+- [[_COMMUNITY_Community 1646|Community 1646]]
+- [[_COMMUNITY_Community 1647|Community 1647]]
+- [[_COMMUNITY_Community 1648|Community 1648]]
+- [[_COMMUNITY_Community 1649|Community 1649]]
+- [[_COMMUNITY_Community 1650|Community 1650]]
+- [[_COMMUNITY_Community 1651|Community 1651]]
+- [[_COMMUNITY_Community 1652|Community 1652]]
+- [[_COMMUNITY_Community 1653|Community 1653]]
+- [[_COMMUNITY_Community 1654|Community 1654]]
+- [[_COMMUNITY_Community 1655|Community 1655]]
+- [[_COMMUNITY_Community 1656|Community 1656]]
+- [[_COMMUNITY_Community 1657|Community 1657]]
+- [[_COMMUNITY_Community 1658|Community 1658]]
+- [[_COMMUNITY_Community 1659|Community 1659]]
+- [[_COMMUNITY_Community 1660|Community 1660]]
+- [[_COMMUNITY_Community 1661|Community 1661]]
+- [[_COMMUNITY_Community 1662|Community 1662]]
+- [[_COMMUNITY_Community 1663|Community 1663]]
+- [[_COMMUNITY_Community 1664|Community 1664]]
+- [[_COMMUNITY_Community 1665|Community 1665]]
+- [[_COMMUNITY_Community 1666|Community 1666]]
+- [[_COMMUNITY_Community 1667|Community 1667]]
+- [[_COMMUNITY_Community 1668|Community 1668]]
+- [[_COMMUNITY_Community 1669|Community 1669]]
+- [[_COMMUNITY_Community 1670|Community 1670]]
+- [[_COMMUNITY_Community 1671|Community 1671]]
+- [[_COMMUNITY_Community 1672|Community 1672]]
+- [[_COMMUNITY_Community 1673|Community 1673]]
+- [[_COMMUNITY_Community 1674|Community 1674]]
+- [[_COMMUNITY_Community 1675|Community 1675]]
+- [[_COMMUNITY_Community 1676|Community 1676]]
+- [[_COMMUNITY_Community 1677|Community 1677]]
+- [[_COMMUNITY_Community 1678|Community 1678]]
+- [[_COMMUNITY_Community 1679|Community 1679]]
+- [[_COMMUNITY_Community 1680|Community 1680]]
+- [[_COMMUNITY_Community 1681|Community 1681]]
+- [[_COMMUNITY_Community 1682|Community 1682]]
+- [[_COMMUNITY_Community 1683|Community 1683]]
+- [[_COMMUNITY_Community 1684|Community 1684]]
+- [[_COMMUNITY_Community 1685|Community 1685]]
+- [[_COMMUNITY_Community 1686|Community 1686]]
+- [[_COMMUNITY_Community 1687|Community 1687]]
+- [[_COMMUNITY_Community 1688|Community 1688]]
+- [[_COMMUNITY_Community 1689|Community 1689]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `PaperDrawingEngine` - 116 edges
+1. `PaperDrawingEngine` - 119 edges
 2. `Mo` - 114 edges
 3. `n()` - 91 edges
 4. `r()` - 88 edges
 5. `e()` - 81 edges
-6. `CollaborationConsumer` - 61 edges
-7. `Story` - 56 edges
-8. `CollaborationService` - 56 edges
+6. `CollaborationConsumer` - 63 edges
+7. `CollaborationService` - 57 edges
+8. `Story` - 56 edges
 9. `useThemeStore` - 55 edges
 10. `UserProfile` - 54 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Zv()` --calls--> `Zn()`  [INFERRED]
-  frontend/dist-admin/assets/index.admin-B1u80pKV.js → android/app/src/main/assets/public/assets/canvas-studio-C64LbNBV.js
-- `ir()` --calls--> `Fi()`  [INFERRED]
-  android/app/src/main/assets/public/assets/canvas-studio-C64LbNBV.js → frontend/dist-admin/assets/index.admin-B1u80pKV.js
-- `ms()` --calls--> `useToastContext()`  [INFERRED]
-  android/app/src/main/assets/public/assets/CoverImageCanvasPage-B4cjB8FI.js → frontend/src/contexts/ToastContext.tsx
-- `Zv()` --calls--> `Hi()`  [INFERRED]
-  frontend/dist-admin/assets/index.admin-B1u80pKV.js → android/app/src/main/assets/public/assets/index-C-dKitdQ.js
-- `og()` --calls--> `dA()`  [INFERRED]
-  frontend/dist-admin/assets/index.admin-B1u80pKV.js → android/app/src/main/assets/public/assets/index-C-dKitdQ.js
+- `_load_csv()` --calls--> `open`  [INFERRED]
+  .agent/.shared/ui-ux-pro-max/scripts/core.py → frontend/design_profiles_jsons/offline_library_design_profile.json
+- `persist_design_system()` --calls--> `open`  [INFERRED]
+  .agent/.shared/ui-ux-pro-max/scripts/design_system.py → frontend/design_profiles_jsons/offline_library_design_profile.json
+- `get_start_command()` --calls--> `open`  [INFERRED]
+  .agent/scripts/auto_preview.py → frontend/design_profiles_jsons/offline_library_design_profile.json
+- `start_server()` --calls--> `open`  [INFERRED]
+  .agent/scripts/auto_preview.py → frontend/design_profiles_jsons/offline_library_design_profile.json
+- `analyze_package_json()` --calls--> `open`  [INFERRED]
+  .agent/scripts/session_manager.py → frontend/design_profiles_jsons/offline_library_design_profile.json
 
-## Communities (1292 total, 234 thin omitted)
+## Communities (1690 total, 290 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.01
-Nodes (243): SUPPORT_FOREIGNOBJECT_DRAWING(), SUPPORT_RANGE_BOUNDS(), Gi(), a5, AA(), [aA,iA,sA,rA], ad(), al (+235 more)
+Nodes (294): $m, $2(), _5(), a2(), a5, AA(), [aA,iA,sA,rA], accessor() (+286 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.02
-Nodes (108): i, i, i, s, G, d, s, Is (+100 more)
+Nodes (119): i, i, i, s, G, d, s, Is (+111 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.09
@@ -1265,7 +1665,7 @@ Nodes (129): $a(), Ae(), af(), ah(), al(), an(), Ar(), bh() (+121 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.01
-Nodes (141): achievement_list(), achievement_progress(), add_child_relationship(), cast_collaboration_vote(), character_detail(), character_list(), close_lobby(), create_character() (+133 more)
+Nodes (163): achievement_list(), achievement_progress(), add_child_relationship(), cast_collaboration_vote(), character_detail(), character_list(), close_lobby(), create_character() (+155 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.02
@@ -1273,59 +1673,59 @@ Nodes (92): _0, _1, a1, Am, Au, ax, b1, {basename:E} (+84 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.09
-Nodes (95): BaseUserAdmin, Command, AchievementService, Service for managing user achievements, AchievementAdmin, CharacterAdmin, CommentAdmin, EmailVerificationAdmin (+87 more)
+Nodes (99): BaseUserAdmin, Command, AchievementService, Service for managing user achievements, AchievementAdmin, CharacterAdmin, CommentAdmin, EmailVerificationAdmin (+91 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.05
-Nodes (14): cc, D, dc, hn, Hr, ic(), Ir(), K (+6 more)
+Nodes (16): cc, D, dc, hn, Hr, ic(), Jf, K (+8 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.03
-Nodes (40): b2, cA(), d0(), Dd(), e1(), fb(), fR, from() (+32 more)
+Nodes (49): bA, bb(), c0(), cA(), d0(), Dd(), e1(), f0() (+41 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.03
-Nodes (76): aa, au(), b1, Bf, cc, Cd, Cf(), d1 (+68 more)
+Cohesion: 0.02
+Nodes (121): as, ts, Qn(), Gi(), wA(), i, a, _() (+113 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.04
-Nodes (32): aC(), Df, eC(), El(), g_(), getSetCookie(), gT(), h_() (+24 more)
+Cohesion: 0.03
+Nodes (45): f, aC(), br, Df, eb(), eC(), El(), g_() (+37 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.05
-Nodes (47): AnonymousRoute(), AnonymousRouteProps, FormInputProps, ParentRoute(), ParentRouteProps, ProtectedRoute(), ProtectedRouteProps, SignInForm() (+39 more)
+Cohesion: 0.08
+Nodes (24): FilteredInput(), ActivityCardProps, StatCardProps, StoryCardProps, TeacherSettingsPage(), AccountSwitcherProps, AddChildModalProps, ChildFormData (+16 more)
 
 ### Community 11 - "Community 11"
 Cohesion: 0.04
-Nodes (54): CollaborationPanelProps, Participant, RemoteCursor, Props, RealtimePreviewCanvas, RealtimePreviewCanvasRef, ActiveSessionInviteModal(), ActiveSessionInviteModalProps (+46 more)
+Nodes (56): CollaborationPanelProps, Participant, RemoteCursor, Props, RealtimePreviewCanvas, RealtimePreviewCanvasRef, CollaborationInviteModal(), CollaborationInviteModalProps (+48 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.06
 Nodes (12): _f(), Hu(), Ie, Ke(), ku(), Qu(), rc(), Wu() (+4 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.05
-Nodes (44): AddRelationshipModalProps, AdminLoginPageProps, AIConfig, AIServicesConfig(), Backup, BackupManagement(), EmptyStateProps, MobileAppSettings() (+36 more)
+Cohesion: 0.03
+Nodes (54): AddRelationshipModalProps, AdminLoginPageProps, AIConfig, AIServicesConfig(), ArchivedUserManagementProps, Backup, BackupManagement(), StatCardProps (+46 more)
 
 ### Community 14 - "Community 14"
-Cohesion: 0.04
-Nodes (51): CollaborationInvitationProps, CollaborationInvitationsContainer(), CollaborationInvitationsContainerProps, CollaborationInvite, CollaborationInviteNotificationProps, CollaborationWaitingScreenProps, useCapacitorBackButton(), listeners (+43 more)
+Cohesion: 0.03
+Nodes (57): ActiveSessionInviteModal(), ActiveSessionInviteModalProps, Friend, CollaborationInvitationProps, CollaborationInvitationsContainer(), CollaborationInvitationsContainerProps, CollaborationInvite, CollaborationInviteNotificationProps (+49 more)
 
 ### Community 15 - "Community 15"
-Cohesion: 0.04
-Nodes (34): StoryCreationModalProps, CreationMode, PhotoFormData, PhotoStoryModal(), PhotoStoryModalProps, StoryExportImport(), StoryExportImportProps, FilterType (+26 more)
+Cohesion: 0.05
+Nodes (18): ReadingMode, OfflineStorageService, OfflineStory, StoryApiService, FullStory, StoryMetadata, Comment, StoryInteractionService (+10 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.05
-Nodes (47): ANONYMOUS_RESTRICTIONS, API_ENDPOINTS, ERROR_MESSAGES, FEATURES, FREE_USER_LIMITS, PREMIUM_FEATURES, STORAGE_KEYS, SUCCESS_MESSAGES (+39 more)
+Cohesion: 0.03
+Nodes (86): AnonymousRoute(), AnonymousRouteProps, FormInputProps, ParentRoute(), ParentRouteProps, ProtectedRoute(), ProtectedRouteProps, SignInForm() (+78 more)
 
 ### Community 17 - "Community 17"
-Cohesion: 0.06
-Nodes (59): $m, _5(), a2(), aE(), ay(), BE(), bf(), bt() (+51 more)
+Cohesion: 0.04
+Nodes (48): 10. Quick Reference, 1. Framework Selection, 2. State Management Selection, 3. Navigation Pattern Selection, 4. Storage Strategy Selection, 5. Offline Strategy Selection, 6. Authentication Pattern Selection, 7. Project Type Templates (+40 more)
 
 ### Community 18 - "Community 18"
-Cohesion: 0.05
-Nodes (11): accessor(), Cx(), delete(), dv, Jp(), kT, ox(), oy (+3 more)
+Cohesion: 0.08
+Nodes (6): bC(), Cx(), i0(), kA, vC(), VT
 
 ### Community 19 - "Community 19"
 Cohesion: 0.05
@@ -1333,23 +1733,23 @@ Nodes (37): AuthPage(), AdvancedColorPicker(), AdvancedColorPickerProps, ColorVa
 
 ### Community 20 - "Community 20"
 Cohesion: 0.04
-Nodes (50): Ae, B, Be, bs, Ce, cs, ds, _e (+42 more)
+Nodes (51): Ae, B, Be, bs, Ce, cs, ds, _e (+43 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.06
-Nodes (40): CustomDropdown(), CustomDropdownProps, DropdownOption, TTSControls(), TTSControlsProps, VoiceFilteredInput(), VoiceFilteredInputProps, VoiceFilteredTextarea() (+32 more)
+Cohesion: 0.05
+Nodes (44): CustomDropdownProps, DropdownOption, StoryCreationModalProps, VoiceFilteredInput(), VoiceFilteredInputProps, VoiceFilteredTextarea(), VoiceFilteredTextareaProps, VoiceInput() (+36 more)
 
 ### Community 22 - "Community 22"
-Cohesion: 0.04
-Nodes (28): CollaborationConsumer, Send presence update to client, Send user kicked notification, Send vote initiation notification, Send story finalized notification, Send vote failed notification, Send vote result notification, Send session started notification to all participants (+20 more)
+Cohesion: 0.06
+Nodes (21): CollaborationConsumer, Send session started notification to all participants, Send session ended notification, Send page deleted notification, Send session started notification to all participants, Send session ended notification, Send delete item update to client, Send page deleted notification (+13 more)
 
 ### Community 23 - "Community 23"
 Cohesion: 0.05
-Nodes (38): _(), B, D, J, M, U(), V(), Y (+30 more)
+Nodes (43): c(), i(), l(), s(), t(), _(), B, D (+35 more)
 
 ### Community 24 - "Community 24"
-Cohesion: 0.04
-Nodes (32): u, $, br, eb(), h1(), h2(), has(), ib() (+24 more)
+Cohesion: 0.08
+Nodes (7): w, E, s, n, l, m(), R()
 
 ### Community 25 - "Community 25"
 Cohesion: 0.06
@@ -1360,8 +1760,8 @@ Cohesion: 0.05
 Nodes (40): ms(), BlendingModes(), BlendingModesProps, BlendMode, LayerData, TextEditData, TransformData, GradientAppliedModal() (+32 more)
 
 ### Community 28 - "Community 28"
-Cohesion: 0.05
-Nodes (36): _extract_content_questions(), _extract_story_text(), GameGenerationService, _generate_category_options(), _generate_fill_blank_questions(), _generate_fill_blanks_game(), generate_games(), generate_games_for_story() (+28 more)
+Cohesion: 0.14
+Nodes (18): _extract_content_questions(), _extract_story_text(), _generate_category_options(), _generate_fill_blank_questions(), _generate_fill_blanks_game(), generate_games(), generate_games_for_story(), _generate_options_for_title() (+10 more)
 
 ### Community 29 - "Community 29"
 Cohesion: 0.04
@@ -1388,12 +1788,12 @@ Cohesion: 0.04
 Nodes (48): 1. Parent Dashboard Dropdown Menu, 2. Admin Login Page, Admin Dashboard, Admin Dashboard, Admin Dashboard, Admin Dashboard, Admin Dashboard ✅, Admin Dashboard Components (+40 more)
 
 ### Community 35 - "Community 35"
-Cohesion: 0.04
-Nodes (44): change_email(), change_password(), delete_account(), jwt_create_session(), jwt_logout(), jwt_register(), jwt_user_profile(), JWT Authentication views for the Storybook platform (+36 more)
+Cohesion: 0.06
+Nodes (30): change_email(), change_password(), delete_account(), jwt_create_session(), jwt_logout(), jwt_register(), jwt_user_profile(), JWT Authentication views for the Storybook platform (+22 more)
 
 ### Community 36 - "Community 36"
-Cohesion: 0.05
-Nodes (30): f, s, $, B(), C(), E, O, R (+22 more)
+Cohesion: 0.09
+Nodes (13): s, $, A, B(), C(), E, O, R (+5 more)
 
 ### Community 37 - "Community 37"
 Cohesion: 0.04
@@ -1444,8 +1844,8 @@ Cohesion: 0.04
 Nodes (45): 1. Extended Cache Store, 1. `frontend/src/stores/cacheStore.ts`, 2. `frontend/src/pages/ParentDashboardPage.tsx`, 2. New Child-Specific Cache Methods, 3. Cache Strategy: Cache-First with Background Refresh, After Cache, Automatic, Before Cache (+37 more)
 
 ### Community 50 - "Community 50"
-Cohesion: 0.06
-Nodes (28): AI_GENRE_OPTIONS, ART_STYLE_OPTIONS, STORY_GENRES, AIAssistedCreation(), AIAssistedCreationProps, AICharacterGenerator(), AICharacterGeneratorProps, CharacterCreationModal() (+20 more)
+Cohesion: 0.08
+Nodes (23): AIAssistedCreation(), AICharacterGenerator(), AICharacterGeneratorProps, CharacterCreationModal(), CharacterCreationModalProps, CreationMethod, CreationMethod, StoryCreationModal() (+15 more)
 
 ### Community 51 - "Community 51"
 Cohesion: 0.04
@@ -1456,8 +1856,8 @@ Cohesion: 0.04
 Nodes (44): 1. Modal Opens But Nothing Inside, 2. Button Click Does Nothing, 3. Camera Permission Issues, 4. TypeScript Errors, Browser Compatibility:, Check These Files Exist:, code:bash (# Stop the current server (Ctrl+C)), code:typescript (<PhotoStoryModal) (+36 more)
 
 ### Community 53 - "Community 53"
-Cohesion: 0.07
-Nodes (15): aR(), cb(), cd, clear(), Er(), gd(), i2(), o0() (+7 more)
+Cohesion: 0.03
+Nodes (31): Ab(), aR(), cb(), cd, Er(), g2(), get(), Gf() (+23 more)
 
 ### Community 55 - "Community 55"
 Cohesion: 0.04
@@ -1468,8 +1868,8 @@ Cohesion: 0.05
 Nodes (43): 1. Smart Guides - Massive Threshold Increase, 2. Transform Handles - Touch-Friendly Sizing, 3. Hit Detection - Generous Tolerances, 4. Visual Improvements, Before vs After Comparison, Bounding Box, Browser Compatibility, Center Alignment Threshold (+35 more)
 
 ### Community 57 - "Community 57"
-Cohesion: 0.05
-Nodes (25): yn(), c(), i(), l(), s(), t(), bo(), Co (+17 more)
+Cohesion: 0.03
+Nodes (52): e, r, Zn(), yn(), e, n, s, y (+44 more)
 
 ### Community 58 - "Community 58"
 Cohesion: 0.05
@@ -1500,8 +1900,8 @@ Cohesion: 0.05
 Nodes (41): 🎯 Better Solutions (Recommended), code:typescript (const stylePrompts: Record<string, string> = {), code:typescript (const HF_API_KEY = import.meta.env.VITE_HUGGING_FACE_API_KEY), code:typescript (export const generateImage = async (params: ImageGenerationP), code:env (# Get free key from: https://huggingface.co/settings/tokens), code:block14 (CARTOON ILLUSTRATION STYLE, a happy dog playing in a park, b), code:block15 (PENCIL SKETCH DRAWING, a cat sitting on a windowsill, hand-d), code:block16 (WATERCOLOR PAINTING, a butterfly on a flower, soft edges, pa) (+33 more)
 
 ### Community 65 - "Community 65"
-Cohesion: 0.06
-Nodes (9): bl(), ee, hc, Jf, Kf, Qf, Xf, Ye() (+1 more)
+Cohesion: 0.09
+Nodes (5): bl(), ee, hc, Qf, Xf
 
 ### Community 66 - "Community 66"
 Cohesion: 0.05
@@ -1520,8 +1920,8 @@ Cohesion: 0.05
 Nodes (42): error, errorText, warning, warningText, colorPalette, alerts, dark, neutral (+34 more)
 
 ### Community 70 - "Community 70"
-Cohesion: 0.06
-Nodes (14): ArchivedUserManagementProps, StatCardProps, EditUserModalProps, UserDetailModalProps, UserManagementProps, UserViewEditModalProps, adminApi, AdminService (+6 more)
+Cohesion: 0.04
+Nodes (47): 10. Anti-Patterns to Avoid, 11. Decision Checklist, 1. Framework Selection (2025), 2. Runtime Considerations (2025), 3. Architecture Principles, 4. Error Handling Principles, 5. Async Patterns Principles, 6. Validation Principles (+39 more)
 
 ### Community 71 - "Community 71"
 Cohesion: 0.08
@@ -1568,8 +1968,8 @@ Cohesion: 0.05
 Nodes (39): 1. Explicit Storage Configuration, 2. Storage Debug Utilities, 3. Automatic Verification, 4. Enhanced Hydration Logging, code:block1 (✨ Story created: mgowbwlnvfw1nam9b5 for user: 4), code:javascript (const data = localStorage.getItem('story-store');), code:block11 (🔄 Starting story store hydration...), code:block12 (✨ Story created: [id] for user: 4) (+31 more)
 
 ### Community 83 - "Community 83"
-Cohesion: 0.10
-Nodes (13): Ad(), ah(), $d, Gd(), hd(), Kc(), Md(), Nd() (+5 more)
+Cohesion: 0.16
+Nodes (4): $d, Kc(), _r(), vd()
 
 ### Community 84 - "Community 84"
 Cohesion: 0.05
@@ -1631,13 +2031,9 @@ Nodes (39): dependencies, axios, canvas-confetti, @capacitor/app, @capacitor-com
 Cohesion: 0.05
 Nodes (37): **1. Page Position Detection**, **2. Scenario Selection**, **3. Prompt Construction**, **After (Page 1 - Introduction):**, **After (Page 4 - Climax):**, **Art Style Considerations:**, **Before (Generic):**, **Climax (85-95% through story)** (+29 more)
 
-### Community 99 - "Community 99"
-Cohesion: 0.12
-Nodes (4): J(), W(), z(), g
-
 ### Community 100 - "Community 100"
 Cohesion: 0.05
-Nodes (37): range, get_platform_analytics(), Get detailed platform analytics and trends, admin_add_parent_child(), admin_dashboard_stats(), admin_delete_user(), admin_get_user(), admin_list_archived_users() (+29 more)
+Nodes (38): range, main(), UXAuditor, admin_add_parent_child(), admin_dashboard_stats(), admin_delete_user(), admin_get_user(), admin_list_archived_users() (+30 more)
 
 ### Community 102 - "Community 102"
 Cohesion: 0.13
@@ -1672,12 +2068,12 @@ Cohesion: 0.05
 Nodes (37): 📚 All Documentation, All Images Generate, 📊 Before vs After, Code Changes, Code Verification, code:block1 (User creates AI story), code:block2 (User creates AI story), code:block3 (✅ Using backend proxy with Flux model (no rate limits)) (+29 more)
 
 ### Community 110 - "Community 110"
-Cohesion: 0.09
-Nodes (7): __vite__mapDeps(), API_PRESETS, ApiPreset, isOCRAvailable(), OCRResult, processImageWithOCR(), DeveloperModeModalProps
+Cohesion: 0.10
+Nodes (5): __vite__mapDeps(), API_PRESETS, ApiPreset, DeveloperModeModalProps, isImageAccessible()
 
 ### Community 111 - "Community 111"
 Cohesion: 0.06
-Nodes (22): AsyncWebsocketConsumer, get_friends(), mark_notification_read(), NotificationConsumer, WebSocket consumer for real-time notifications and user presence Optimized for, Send collaboration invite notification to client, Send new message notification to client, Send friend request notification to client (+14 more)
+Nodes (23): AsyncWebsocketConsumer, NotificationConsumer, Send collaboration invite notification to client, Send collaboration invite notification to client, Send new message notification to client, Send new message notification to client, Send friend request notification to client, Send friend request notification to client (+15 more)
 
 ### Community 112 - "Community 112"
 Cohesion: 0.05
@@ -1732,12 +2128,12 @@ Cohesion: 0.06
 Nodes (35): 401 Unauthorized, Backend Sync Setup Guide, code:bash (cd backend), code:javascript (// Enable detailed logging), code:javascript (// Check if backend is running), code:javascript (// Import the store), code:tsx (import { useStoryStore } from '../../stores/storyStore';), code:typescript (updateStory: (id: string, updates: Partial<Story>) => {) (+27 more)
 
 ### Community 126 - "Community 126"
-Cohesion: 0.06
-Nodes (33): admin_required(), Admin Authentication Decorators Separate from regular user authentication, Decorator to require admin authentication     Uses separate admin token system, delete_comment(), export_data(), get_system_health(), moderate_story(), Enhanced Admin Features for PixelTales Platform Management (+25 more)
+Cohesion: 0.05
+Nodes (35): admin_required(), Admin Authentication Decorators Separate from regular user authentication, Decorator to require admin authentication     Uses separate admin token system, delete_comment(), export_data(), get_platform_analytics(), get_system_health(), moderate_story() (+27 more)
 
 ### Community 127 - "Community 127"
-Cohesion: 0.07
-Nodes (24): get_all_rewards_info(), get_next_unlock_level(), get_unlocked_avatars(), get_unlocked_borders(), Reward Service for managing unlockable avatars and borders Children unlock cool, Service for managing user rewards (avatars and borders), RewardService, Serializer for stories (+16 more)
+Cohesion: 0.11
+Nodes (18): get_all_rewards_info(), get_next_unlock_level(), get_unlocked_avatars(), get_unlocked_borders(), Reward Service for managing unlockable avatars and borders Children unlock cool, Service for managing user rewards (avatars and borders), RewardService, create_story() (+10 more)
 
 ### Community 128 - "Community 128"
 Cohesion: 0.06
@@ -1804,8 +2200,8 @@ Cohesion: 0.11
 Nodes (35): Bg(), Bi(), Bm(), cg(), Cm(), d0(), eg(), f0() (+27 more)
 
 ### Community 144 - "Community 144"
-Cohesion: 0.07
-Nodes (29): FilteredInput(), FilteredInputProps, Achievement, ProfilePage(), UserStats, SettingsTab(), AVATAR_OPTIONS, ProfileEditModal() (+21 more)
+Cohesion: 0.12
+Nodes (17): ProfilePage(), SettingsTab(), AccessibilitySettings, AppPreferences, defaultAccessibilitySettings, defaultAppPreferences, defaultParentalControls, defaultPrivacySettings (+9 more)
 
 ### Community 146 - "Community 146"
 Cohesion: 0.06
@@ -1844,12 +2240,12 @@ Cohesion: 0.06
 Nodes (32): Alternative: Disable Stats Endpoint Temporarily, Check 1: Is the Story Published?, Check 2: Are You Testing with the Right Story?, Check 3: Frontend State Issue, code:bash (cd backend), code:python (from django.contrib.auth.models import User), code:typescript (// Temporarily disable stats endpoint), code:bash (# Replace 1 with your actual story ID) (+24 more)
 
 ### Community 157 - "Community 157"
-Cohesion: 0.08
-Nodes (18): Ab(), cv(), eT(), Ev(), getUri(), Gf(), IA(), ix() (+10 more)
+Cohesion: 0.04
+Nodes (44): 1. Testing Tool Selection, 2. Testing Pyramid for Mobile, 3. What to Test at Each Level, 4. Platform-Specific Testing, 5. Offline & Network Testing, 6. Performance Testing, 7. Accessibility Testing, 8. CI/CD Integration (+36 more)
 
 ### Community 158 - "Community 158"
-Cohesion: 0.08
-Nodes (33): as, ts, Xn(), Zn(), gn, Do(), fs(), _() (+25 more)
+Cohesion: 0.05
+Nodes (43): Accessibility, Available Domains, Available Stacks, code:bash (python3 --version || python --version), code:bash (python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "<key), code:bash (python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "beau), code:bash (# Get UX guidelines for animation and accessibility), code:bash (python3 .agent/.shared/ui-ux-pro-max/scripts/search.py "layo) (+35 more)
 
 ### Community 159 - "Community 159"
 Cohesion: 0.06
@@ -1881,7 +2277,7 @@ Nodes (32): 1. Cloud TTS Voice Selection, 2. Device/Offline Voice Filtering, Acc
 
 ### Community 166 - "Community 166"
 Cohesion: 0.08
-Nodes (20): add_page_to_draft(), get_page_viewers(), increment_operation_count(), Handle request for page viewer information, Handle incoming WebSocket messages, Handle canvas clear with page information, Handle object transformation, Handle object deletion (+12 more)
+Nodes (18): increment_operation_count(), Handle canvas clear with page information, Handle canvas clear with page information, Handle text editing operations - persist to backend draft, Handle page navigation, Handle text editing operations - persist to backend draft, Handle page navigation, Handle advanced text editing with full formatting (+10 more)
 
 ### Community 167 - "Community 167"
 Cohesion: 0.06
@@ -1908,8 +2304,8 @@ Cohesion: 0.06
 Nodes (22): EmailService, Email service for sending verification codes and other emails Supports SendGrid, Service class for sending emails via SendGrid, CustomTokenObtainPairSerializer, CustomTokenObtainPairView, Custom JWT login view that returns user information along with tokens, Custom JWT token serializer that accepts email instead of username     and incl, get_notification_preferences() (+14 more)
 
 ### Community 173 - "Community 173"
-Cohesion: 0.07
-Nodes (32): background, border, borderRadius, color, context, display, fontSize, fontWeight (+24 more)
+Cohesion: 0.11
+Nodes (19): background, border, borderRadius, color, context, display, fontSize, fontWeight (+11 more)
 
 ### Community 174 - "Community 174"
 Cohesion: 0.06
@@ -1968,12 +2364,12 @@ Cohesion: 0.06
 Nodes (30): accessibility, characterAvatars, createButton, editActions, usageStats, context, structure, characterTypes (+22 more)
 
 ### Community 188 - "Community 188"
-Cohesion: 0.06
-Nodes (31): card, dropdown, page, colorPalette, backgrounds, genre, neutral, primary (+23 more)
+Cohesion: 0.11
+Nodes (19): card, dropdown, page, colorPalette, backgrounds, genre, primary, secondary (+11 more)
 
 ### Community 189 - "Community 189"
-Cohesion: 0.07
-Nodes (31): genre, badges, badgesRow, container, description, downloadButton, header, metadataRow (+23 more)
+Cohesion: 0.08
+Nodes (29): genre, badges, badgesRow, container, description, header, metadataRow, title (+21 more)
 
 ### Community 190 - "Community 190"
 Cohesion: 0.10
@@ -2036,8 +2432,8 @@ Cohesion: 0.07
 Nodes (29): Alert Message:, APK Details:, ✅ Better User Feedback:, Changes Made, ✅ Clear Separation of Functions:, code:typescript (1. Save to Documents folder), code:block2 (/storage/emulated/0/Documents/the_gigantic_mystery_of_ant_hi), code:block3 (✅ PDF Downloaded Successfully!) (+21 more)
 
 ### Community 205 - "Community 205"
-Cohesion: 0.10
-Nodes (23): ProfanityManagement(), ProfanityManagementProps, FilteredTextarea(), FilteredTextareaProps, authHeader, profanityApi, ProfanityListParams, profanityService (+15 more)
+Cohesion: 0.09
+Nodes (24): ProfanityManagement(), ProfanityManagementProps, FilteredInputProps, FilteredTextarea(), FilteredTextareaProps, authHeader, profanityApi, ProfanityListParams (+16 more)
 
 ### Community 206 - "Community 206"
 Cohesion: 0.10
@@ -2045,7 +2441,7 @@ Nodes (23): createIllustrationPrompt(), generateCoverIllustration(), generateIma
 
 ### Community 207 - "Community 207"
 Cohesion: 0.10
-Nodes (23): add_participant(), can_join_session(), delete_page_from_draft(), get_canvas_data(), get_participants(), get_session(), get_story_draft(), get_user_cursor_color() (+15 more)
+Nodes (22): add_participant(), can_join_session(), get_canvas_data(), get_participants(), get_session(), get_story_draft(), get_user_cursor_color(), is_existing_participant() (+14 more)
 
 ### Community 208 - "Community 208"
 Cohesion: 0.07
@@ -2116,8 +2512,8 @@ Cohesion: 0.07
 Nodes (27): accessibility, buttons, dropdowns, filters, search, context, structure, designSystem (+19 more)
 
 ### Community 226 - "Community 226"
-Cohesion: 0.10
-Nodes (28): container, genre, FilterBar, background, border, borderRadius, context, display (+20 more)
+Cohesion: 0.09
+Nodes (27): container, FilterBar, context, display, spacing, elementStyling, filterBar, pageContainer (+19 more)
 
 ### Community 227 - "Community 227"
 Cohesion: 0.07
@@ -2148,16 +2544,16 @@ Cohesion: 0.07
 Nodes (27): behavior, context, position, selection, trigger, behavior, context, import (+19 more)
 
 ### Community 234 - "Community 234"
-Cohesion: 0.08
-Nodes (27): background, border, borderRadius, context, display, minHeight, canvasArea, editButton (+19 more)
+Cohesion: 0.07
+Nodes (33): background, border, borderRadius, context, display, minHeight, canvasArea, editButton (+25 more)
 
 ### Community 235 - "Community 235"
-Cohesion: 0.10
-Nodes (27): background, border, borderRadius, color, context, display, fontSize, hover (+19 more)
+Cohesion: 0.08
+Nodes (32): background, border, borderRadius, color, context, display, fontSize, hover (+24 more)
 
 ### Community 236 - "Community 236"
-Cohesion: 0.09
-Nodes (27): color, context, fontSize, prefix, spacing, StoryCard, color, context (+19 more)
+Cohesion: 0.07
+Nodes (30): color, context, fontSize, prefix, spacing, StoryCard, color, context (+22 more)
 
 ### Community 237 - "Community 237"
 Cohesion: 0.09
@@ -2204,8 +2600,8 @@ Cohesion: 0.08
 Nodes (26): pink, yellow, card, page, colorPalette, accent, backgrounds, genre (+18 more)
 
 ### Community 249 - "Community 249"
-Cohesion: 0.09
-Nodes (26): categoryBadge, difficultyBadge, category, difficulty, background, borderRadius, color, fontSize (+18 more)
+Cohesion: 0.13
+Nodes (17): category, difficulty, background, borderRadius, color, fontSize, fontWeight, padding (+9 more)
 
 ### Community 250 - "Community 250"
 Cohesion: 0.08
@@ -2228,8 +2624,8 @@ Cohesion: 0.08
 Nodes (25): compilerOptions, allowImportingTsExtensions, allowSyntheticDefaultImports, baseUrl, esModuleInterop, isolatedModules, jsx, lib (+17 more)
 
 ### Community 255 - "Community 255"
-Cohesion: 0.11
-Nodes (15): analyzeImageAndGenerateStory(), checkImageSafety(), extractTextWithGemini(), generateStory(), getPageStructureGuidelines(), ImageSafetyResult, PhotoStoryParams, StoryGenerationParams (+7 more)
+Cohesion: 0.22
+Nodes (6): extractTextFromImage(), extractTextWithOCRSpace(), OCRProgress, OCRResult, OCRService, terminateOCR()
 
 ### Community 256 - "Community 256"
 Cohesion: 0.08
@@ -2244,16 +2640,16 @@ Cohesion: 0.08
 Nodes (24): After (Handwriting Mode):, Before (Print Mode Only):, code:block1 (Input:  [Photo of handwritten "Hello World"]), code:block2 (Input:  [Photo of handwritten "Hello World"]), code:block3 (HELLO WORLD), code:block4 (Hello World (in cursive)), ✅ DO:, ❌ DON'T: (+16 more)
 
 ### Community 259 - "Community 259"
-Cohesion: 0.10
-Nodes (8): A(), e(), SUPPORT_RESPONSE_TYPE(), SUPPORT_WORD_BREAKING(), Io(), po(), So, uo()
+Cohesion: 0.05
+Nodes (42): 10. Quick Reference, 1. Lottie Animations, 2. GSAP (GreenSock), 3. SVG Animations, 4. 3D CSS Transforms, 5. Particle Effects, 6. Scroll-Driven Animations, 7. Performance Principles (+34 more)
 
 ### Community 260 - "Community 260"
 Cohesion: 0.08
 Nodes (25): background, borderRadius, color, context, fontSize, fontWeight, padding, statusBadge (+17 more)
 
 ### Community 261 - "Community 261"
-Cohesion: 0.08
-Nodes (25): container, overlay, background, border, borderRadius, color, context, fontSize (+17 more)
+Cohesion: 0.12
+Nodes (16): container, overlay, componentMapping, AIAssistantModal, EnhancedPanel, ModalBody, TabBar, TextPanel (+8 more)
 
 ### Community 262 - "Community 262"
 Cohesion: 0.08
@@ -2268,8 +2664,8 @@ Cohesion: 0.08
 Nodes (25): baseClass, componentMapping, CharactersLibraryPage, EditButton, FilterBar, FilterDropdown, GenreBadge, PersonalityBadge (+17 more)
 
 ### Community 265 - "Community 265"
-Cohesion: 0.09
-Nodes (25): background, border, borderRadius, color, context, display, fontSize, fontWeight (+17 more)
+Cohesion: 0.10
+Nodes (20): background, border, borderRadius, color, context, display, fontSize, fontWeight (+12 more)
 
 ### Community 266 - "Community 266"
 Cohesion: 0.19
@@ -2292,8 +2688,8 @@ Cohesion: 0.08
 Nodes (21): After (Advanced Color Picker):, Before (Basic Color Picker):, code:typescript (// Add to existing imports), code:typescript (// Add to existing state), code:typescript (// In your component file or index.css), code:typescript ({/* Advanced Color Picker Modal - Mobile */}), code:typescript ({/* In desktop right panel or mobile toolbar */}), code:typescript (const handleAdvancedColorChange = (color: string, alpha?: nu) (+13 more)
 
 ### Community 271 - "Community 271"
-Cohesion: 0.11
-Nodes (17): e, r, e, n, s, y, b(), C() (+9 more)
+Cohesion: 0.05
+Nodes (40): Build Commands by Framework, 🔴 BUILD VERIFICATION (MANDATORY Before "Done"), 📝 CHECKPOINT (MANDATORY Before Any Mobile Work), code:block1 (🧠 CHECKPOINT:), code:block2 (🧠 CHECKPOINT:), code:block3 (iOS:     44pt × 44pt minimum), code:typescript (const Item = React.memo(({ item }) => <ItemView item={item} ), code:block6 (AI writes code → "Looks good" → User opens Android Studio → ) (+32 more)
 
 ### Community 272 - "Community 272"
 Cohesion: 0.10
@@ -2332,16 +2728,16 @@ Cohesion: 0.23
 Nodes (23): container, container, container, alignment, background, border, borderRadius, borderTop (+15 more)
 
 ### Community 282 - "Community 282"
-Cohesion: 0.09
-Nodes (23): primary, color, context, size, elementStyling, browseButtons, buttonIcons, pageContainer (+15 more)
+Cohesion: 0.17
+Nodes (12): primary, alignment, background, border, borderRadius, color, context, fontSize (+4 more)
 
 ### Community 283 - "Community 283"
-Cohesion: 0.09
-Nodes (19): import_profanity_words(), main(), populate_achievements(), Automatic deployment setup script This runs automatically on Render during depl, Main deployment setup, Import profanity words if export file exists, Populate achievements if not already present, export_profanity_words() (+11 more)
+Cohesion: 0.32
+Nodes (7): import_profanity_words(), main(), populate_achievements(), Automatic deployment setup script This runs automatically on Render during depl, Main deployment setup, Import profanity words if export file exists, Populate achievements if not already present
 
 ### Community 284 - "Community 284"
-Cohesion: 0.09
-Nodes (23): componentMapping, DownloadButton, FilterDropdown, GenreBadge, MetadataBadge, MetadataItem, OfflineStoriesPage, baseClass (+15 more)
+Cohesion: 0.07
+Nodes (28): componentMapping, DownloadButton, FilterBar, FilterDropdown, GenreBadge, MetadataBadge, MetadataItem, OfflineStoriesPage (+20 more)
 
 ### Community 285 - "Community 285"
 Cohesion: 0.09
@@ -2387,6 +2783,10 @@ Nodes (22): compilerOptions, allowImportingTsExtensions, erasableSyntaxOnly, inc
 Cohesion: 0.09
 Nodes (21): Add Explicit Layer Assignment to New Drawing Tools, code:typescript (// After creating any path/shape:), code:typescript (// After any layer operation:), code:typescript (// Hide all layers except target), code:typescript (// Always update, don't check if exists:), 📋 Common Tasks, 📁 File Locations, Force View Update After Layer Changes (+13 more)
 
+### Community 297 - "Community 297"
+Cohesion: 0.05
+Nodes (5): ax(), bx, Tx, wx, xx
+
 ### Community 298 - "Community 298"
 Cohesion: 0.25
 Nodes (4): Bs(), f2(), Or(), rl()
@@ -2416,12 +2816,12 @@ Cohesion: 0.09
 Nodes (22): elementStyling, characterList, pageContainer, resultsCount, searchBar, background, border, color (+14 more)
 
 ### Community 305 - "Community 305"
-Cohesion: 0.16
-Nodes (22): completed, inProgress, locked, icon, iconContainer, achievementItems, color, context (+14 more)
+Cohesion: 0.15
+Nodes (19): completed, inProgress, locked, icon, achievementItems, color, context, size (+11 more)
 
 ### Community 306 - "Community 306"
-Cohesion: 0.13
-Nodes (22): container, alignment, background, border, borderRadius, context, display, padding (+14 more)
+Cohesion: 0.21
+Nodes (14): container, background, border, borderRadius, context, display, padding, position (+6 more)
 
 ### Community 307 - "Community 307"
 Cohesion: 0.10
@@ -2468,12 +2868,12 @@ Cohesion: 0.09
 Nodes (19): AI & Loading, Attribution Template, Button Sounds, code:typescript (import { useSoundEffects } from '../hooks/useSoundEffects';), code:block2 (Sound Effects:), Creation & Drawing Sounds, Duration, File Size Recommendations (+11 more)
 
 ### Community 318 - "Community 318"
-Cohesion: 0.09
-Nodes (21): analyze_image_with_gemini(), check_ai_service_status(), fetch_pollinations_image(), generate_character_with_gemini(), generate_image_with_gemini(), generate_image_with_pollinations(), generate_image_with_replicate(), generate_story_with_gemini() (+13 more)
+Cohesion: 0.07
+Nodes (26): analyze_image_with_gemini(), check_ai_service_status(), fetch_pollinations_image(), generate_character_with_gemini(), generate_image_with_gemini(), generate_image_with_pollinations(), generate_image_with_replicate(), generate_story_with_gemini() (+18 more)
 
 ### Community 320 - "Community 320"
-Cohesion: 0.10
-Nodes (21): color, context, hover, padding, ModalHeader, borderBottom, modalHeader, closeButton (+13 more)
+Cohesion: 0.07
+Nodes (29): background, borderRadius, color, context, display, fontSize, fontWeight, padding (+21 more)
 
 ### Community 321 - "Community 321"
 Cohesion: 0.10
@@ -2492,8 +2892,8 @@ Cohesion: 0.10
 Nodes (21): baseClass, componentMapping, AgeBadge, FilterDropdown, GenreBadge, OnlineStoriesPage, ReadButton, StatItem (+13 more)
 
 ### Community 325 - "Community 325"
-Cohesion: 0.10
-Nodes (21): elementStyling, pageContainer, resultsCount, searchBar, background, border, color, context (+13 more)
+Cohesion: 0.13
+Nodes (19): SearchBar, background, border, borderRadius, padding, shadow, searchBar, background (+11 more)
 
 ### Community 326 - "Community 326"
 Cohesion: 0.10
@@ -2552,12 +2952,8 @@ Cohesion: 0.10
 Nodes (18): After Fix, Alternative: Manual Table Creation, code:bash (cd backend), code:bash (del db.sqlite3), code:bash (python manage.py migrate), code:bash (python manage.py createsuperuser), code:bash (python create_test_users.py), code:bash (sqlite3 db.sqlite3) (+10 more)
 
 ### Community 340 - "Community 340"
-Cohesion: 0.13
-Nodes (7): _0(), a0, dC(), dM(), f1(), g1(), rd
-
-### Community 341 - "Community 341"
-Cohesion: 0.17
-Nodes (3): AndroidTtsVoicesPlugin, MediaNotificationPlugin, Plugin
+Cohesion: 0.05
+Nodes (23): _0(), a0, b2, cC(), d1(), dC(), dM(), f1() (+15 more)
 
 ### Community 342 - "Community 342"
 Cohesion: 0.10
@@ -2572,16 +2968,16 @@ Cohesion: 0.10
 Nodes (20): elementStyling, pageContainer, toolButtons, background, borderRadius, color, context, display (+12 more)
 
 ### Community 345 - "Community 345"
-Cohesion: 0.10
-Nodes (20): pageHeader, context, display, spacing, leftSection, saveIcon, titleGroup, color (+12 more)
+Cohesion: 0.18
+Nodes (11): titleGroup, color, context, fontSize, spacing, color, context, fontSize (+3 more)
 
 ### Community 346 - "Community 346"
-Cohesion: 0.10
-Nodes (20): item, elementStyling, collectionList, pageContainer, pageHeader, resultsCount, searchBar, background (+12 more)
+Cohesion: 0.08
+Nodes (25): color, context, hover, size, spacing, PageHeader, elementStyling, pageContainer (+17 more)
 
 ### Community 347 - "Community 347"
-Cohesion: 0.10
-Nodes (20): color, context, size, color, context, cursor, fontSize, hover (+12 more)
+Cohesion: 0.08
+Nodes (26): background, border, borderRadius, color, context, display, fontSize, hover (+18 more)
 
 ### Community 348 - "Community 348"
 Cohesion: 0.10
@@ -2592,12 +2988,12 @@ Cohesion: 0.10
 Nodes (20): buttons, tabs, stateManagement, background, color, cursor, opacity, removeInteractions (+12 more)
 
 ### Community 350 - "Community 350"
-Cohesion: 0.10
-Nodes (20): background, borderRadius, color, iconColor, transform, primary, shadow, transform (+12 more)
+Cohesion: 0.12
+Nodes (17): background, borderRadius, color, iconColor, transform, primary, active, active (+9 more)
 
 ### Community 351 - "Community 351"
-Cohesion: 0.18
-Nodes (20): container, alignment, background, border, borderBottom, borderRadius, context, display (+12 more)
+Cohesion: 0.16
+Nodes (22): container, color, context, size, alignment, background, border, borderBottom (+14 more)
 
 ### Community 352 - "Community 352"
 Cohesion: 0.11
@@ -2656,8 +3052,8 @@ Cohesion: 0.13
 Nodes (19): header, title, color, context, hover, closeButton, display, icon (+11 more)
 
 ### Community 366 - "Community 366"
-Cohesion: 0.11
-Nodes (19): color, context, hover, size, PageHeader, backButton, saveButton, subtitle (+11 more)
+Cohesion: 0.07
+Nodes (28): color, context, hover, size, PageHeader, pageHeader, context, display (+20 more)
 
 ### Community 367 - "Community 367"
 Cohesion: 0.11
@@ -2672,16 +3068,16 @@ Cohesion: 0.11
 Nodes (19): background, borderRadius, color, context, fontSize, fontWeight, padding, background (+11 more)
 
 ### Community 370 - "Community 370"
-Cohesion: 0.13
-Nodes (19): color, context, hover, size, spacing, title, PageHeader, backButton (+11 more)
+Cohesion: 0.05
+Nodes (40): 1. Run All Verifications (RECOMMENDED), 2. Or Run Individually, 3. Build Verification, 📊 4-PHASE WORKFLOW (BMAD-Inspired), 4. Rule Compliance (Manual Check), 4. Runtime Verification, 5. Phase X Completion Marker, 🟢 ANALYTICAL MODE vs. PLANNING MODE (+32 more)
 
 ### Community 371 - "Community 371"
 Cohesion: 0.11
 Nodes (19): typography, fallback, primary, color, letterSpacing, lineHeight, size, usage (+11 more)
 
 ### Community 372 - "Community 372"
-Cohesion: 0.11
-Nodes (19): color, context, fontSize, fontWeight, color, context, size, supportSection (+11 more)
+Cohesion: 0.20
+Nodes (10): color, context, fontSize, fontWeight, supportSection, actionText, leftContent, display (+2 more)
 
 ### Community 373 - "Community 373"
 Cohesion: 0.11
@@ -2776,8 +3172,8 @@ Cohesion: 0.11
 Nodes (17): 1. **Updated `syncStoryToBackend` Function** (`frontend/src/stores/storyStore.ts`), 2. **Updated AI Story Modal** (`frontend/src/components/creation/AIStoryModal.tsx`), 🎯 AI Story Generation 404 Error - Fix Summary, Benefits, Changes Made:, code:typescript (// Before), code:typescript (// Before), code:block3 (1. User creates AI story) (+9 more)
 
 ### Community 397 - "Community 397"
-Cohesion: 0.14
-Nodes (9): SimpleCollabStartProps, ApiConfigService, createScenePrompt(), EnhancedImageParams, generateEnhancedPollinationsImage(), generateImageVariations(), getPageScenario(), PageScenario (+1 more)
+Cohesion: 0.39
+Nodes (7): createScenePrompt(), EnhancedImageParams, generateEnhancedPollinationsImage(), generateImageVariations(), getPageScenario(), PageScenario, testEnhancedPollinations()
 
 ### Community 398 - "Community 398"
 Cohesion: 0.12
@@ -2803,6 +3199,14 @@ Nodes (16): Architecture, ✅ Benefits, code:typescript (import { ProfilePage } 
 Cohesion: 0.12
 Nodes (16): Accessibility Benefits, Changelog, Community Contributions, Core Functionality, Features, Future Enhancements, Getting Help, License (+8 more)
 
+### Community 405 - "Community 405"
+Cohesion: 0.05
+Nodes (39): 1. Color Theory Fundamentals, 2. The 60-30-10 Rule, 3. Color Psychology - Meaning & Selection, 4. Palette Generation Principles, 5. Context-Based Selection Guide, 6. Dark Mode Principles, 7. Accessibility Guidelines, 8. Color Selection Checklist (+31 more)
+
+### Community 406 - "Community 406"
+Cohesion: 0.05
+Nodes (39): ⛔ AI MOBILE ANTI-PATTERNS (YASAK LİSTESİ), Animation Performance, Architecture Sins, Before Every Screen, Before Release, Before Starting ANY Mobile Project, 📝 CHECKPOINT (MANDATORY Before Any Mobile Work), code:block1 (UNIFY (same on both)          DIVERGE (platform-specific)) (+31 more)
+
 ### Community 407 - "Community 407"
 Cohesion: 0.12
 Nodes (17): context, display, spacing, tools, context, icon, tools, actions (+9 more)
@@ -2812,24 +3216,24 @@ Cohesion: 0.15
 Nodes (17): icon, menu, filterBar, dropdown, color, context, size, icon (+9 more)
 
 ### Community 409 - "Community 409"
-Cohesion: 0.14
-Nodes (17): background, borderColor, context, outline, ring, background, border, borderRadius (+9 more)
+Cohesion: 0.12
+Nodes (19): background, borderColor, context, outline, ring, focus, textArea, background (+11 more)
 
 ### Community 410 - "Community 410"
 Cohesion: 0.12
 Nodes (17): background, borderRadius, color, context, disabled, hover, padding, PageManagementSection (+9 more)
 
 ### Community 411 - "Community 411"
-Cohesion: 0.13
-Nodes (17): color, context, size, buttonIcon, secondary, buttons, secondary, background (+9 more)
+Cohesion: 0.20
+Nodes (12): secondary, secondary, background, borderRadius, color, context, display, fontSize (+4 more)
 
 ### Community 412 - "Community 412"
 Cohesion: 0.24
 Nodes (17): container, container, alignment, background, border, borderRadius, borderTop, context (+9 more)
 
 ### Community 413 - "Community 413"
-Cohesion: 0.13
-Nodes (17): color, context, fontSize, count, display, icon, spacing, storyList (+9 more)
+Cohesion: 0.12
+Nodes (18): color, context, fontSize, count, display, spacing, storyList, metadata (+10 more)
 
 ### Community 414 - "Community 414"
 Cohesion: 0.14
@@ -2908,12 +3312,12 @@ Cohesion: 0.12
 Nodes (16): actions, context, identifier, contentCategories, characters, onlineStories, yourWorks, actions (+8 more)
 
 ### Community 436 - "Community 436"
-Cohesion: 0.12
-Nodes (16): FilterBar, menu, filterBar, dropdown, filterIcon, color, context, size (+8 more)
+Cohesion: 0.22
+Nodes (9): menu, background, border, borderRadius, context, marginTop, padding, position (+1 more)
 
 ### Community 437 - "Community 437"
-Cohesion: 0.16
-Nodes (16): metadata, icon, color, context, size, context, display, spacing (+8 more)
+Cohesion: 0.10
+Nodes (23): metadata, item, icon, collectionList, color, context, size, background (+15 more)
 
 ### Community 438 - "Community 438"
 Cohesion: 0.12
@@ -2972,8 +3376,8 @@ Cohesion: 0.13
 Nodes (15): 1. useTextToSpeech Hook, 2. TTSControls Component, code:typescript (interface UseTextToSpeechReturn {), code:typescript (import { useTextToSpeech } from '../hooks/useTextToSpeech';), code:typescript (interface TTSControlsProps {), code:typescript (import { TTSControls } from '../components/common/TTSControl), code:typescript (<TTSControls), Compact Mode: (+7 more)
 
 ### Community 453 - "Community 453"
-Cohesion: 0.19
-Nodes (14): _, c, d, E(), h(), I, k, L() (+6 more)
+Cohesion: 0.21
+Nodes (13): _, c, d, E(), h(), I, k, L() (+5 more)
 
 ### Community 455 - "Community 455"
 Cohesion: 0.15
@@ -2981,7 +3385,7 @@ Nodes (12): BaseMiddleware, MiddlewareMixin, get_user_from_token(), JWTAuthMiddl
 
 ### Community 456 - "Community 456"
 Cohesion: 0.16
-Nodes (15): TextPanel, borderTop, context, display, flex, gap, height, minHeight (+7 more)
+Nodes (16): ModalFooter, borderBottom, borderTop, context, display, flex, gap, height (+8 more)
 
 ### Community 457 - "Community 457"
 Cohesion: 0.13
@@ -3044,8 +3448,8 @@ Cohesion: 0.14
 Nodes (14): borderColor, context, outline, ring, background, border, borderRadius, context (+6 more)
 
 ### Community 476 - "Community 476"
-Cohesion: 0.14
-Nodes (14): elementStyling, modalBody, modalFooter, modalOverlay, context, display, spacing, mobileLayout (+6 more)
+Cohesion: 0.08
+Nodes (24): elementStyling, modalBody, modalContainer, modalFooter, modalOverlay, context, display, spacing (+16 more)
 
 ### Community 477 - "Community 477"
 Cohesion: 0.14
@@ -3064,8 +3468,8 @@ Cohesion: 0.14
 Nodes (14): traits, borderRadius, fontSize, fontWeight, padding, background, borderRadius, color (+6 more)
 
 ### Community 481 - "Community 481"
-Cohesion: 0.14
-Nodes (14): button, componentMapping, BottomActions, ContentArea, CreateStoryPage, StoryTitleSection, baseClass, baseClass (+6 more)
+Cohesion: 0.08
+Nodes (25): button, componentMapping, BottomActions, ContentArea, CreateStoryPage, StoryTitleSection, baseClass, baseClass (+17 more)
 
 ### Community 482 - "Community 482"
 Cohesion: 0.16
@@ -3088,12 +3492,12 @@ Cohesion: 0.23
 Nodes (14): container, container, SearchBar, background, border, borderRadius, context, display (+6 more)
 
 ### Community 487 - "Community 487"
-Cohesion: 0.15
-Nodes (14): color, context, hover, size, spacing, PageHeader, pageHeader, backButton (+6 more)
+Cohesion: 0.12
+Nodes (19): color, context, hover, size, spacing, PageHeader, backButton, subtitle (+11 more)
 
 ### Community 488 - "Community 488"
-Cohesion: 0.15
-Nodes (14): hover, color, fontSize, fontWeight, iconColor, padding, background, borderRadius (+6 more)
+Cohesion: 0.12
+Nodes (17): hover, color, fontSize, fontWeight, iconColor, padding, background, borderRadius (+9 more)
 
 ### Community 489 - "Community 489"
 Cohesion: 0.14
@@ -3108,8 +3512,8 @@ Cohesion: 0.14
 Nodes (13): Advanced Color Management Features, 🎓 Best Practices, Blending Modes, Color Selection, Components:, Documentation:, 📝 Files Created, 🚀 Future Enhancements (+5 more)
 
 ### Community 493 - "Community 493"
-Cohesion: 0.11
-Nodes (9): get_canvas_state_from_db(), Handle drawing operations with page information for cross-page collaboration, Handle user presence updates (cursor, tool, activity), Handle full canvas snapshot for persistence, Handle request for canvas sync after reconnection, Handle canvas state being sent to a specific user or for autosave, save_canvas_state_to_db(), update_canvas_snapshot() (+1 more)
+Cohesion: 0.09
+Nodes (16): Handle incoming WebSocket messages, Handle incoming WebSocket messages, Handle batched drawing operations to reduce channel load, Handle object transformation, Handle object deletion, Handle live title editing - persist to server draft and broadcast, Handle object transformation, Handle object deletion (+8 more)
 
 ### Community 494 - "Community 494"
 Cohesion: 0.15
@@ -3118,6 +3522,10 @@ Nodes (12): Architecture, code:block1 (┌────────────�
 ### Community 495 - "Community 495"
 Cohesion: 0.15
 Nodes (13): Adding TTS to a New Page, code:tsx (<TTSControls), code:typescript (const { speak, setRate, setVolume, setVoice } = useTextToSpe), code:tsx (<TTSControls), code:typescript (import { TTSControls } from '../components/common/TTSControl), code:typescript (const textToRead = story.pages), Customizing TTS Behavior, For Developers (+5 more)
+
+### Community 496 - "Community 496"
+Cohesion: 0.05
+Nodes (38): 6. Rendering Performance, Animate SVG Wrapper Instead of SVG Element, code:tsx (function LoadingSpinner() {), code:tsx (function ThemeWrapper({ children }: { children: ReactNode })), code:tsx (function ThemeWrapper({ children }: { children: ReactNode })), code:tsx (function ThemeWrapper({ children }: { children: ReactNode })), code:tsx (function Timestamp() {), code:tsx (function Timestamp() {) (+30 more)
 
 ### Community 499 - "Community 499"
 Cohesion: 0.15
@@ -3128,8 +3536,8 @@ Cohesion: 0.15
 Nodes (13): background, border, borderRadius, color, context, display, fontSize, fontWeight (+5 more)
 
 ### Community 501 - "Community 501"
-Cohesion: 0.15
-Nodes (12): accessibility, ariaLabels, escapeKey, modalTrap, readableText, tabNavigation, designSystem, framework (+4 more)
+Cohesion: 0.06
+Nodes (30): accessibility, ariaLabels, escapeKey, modalTrap, readableText, tabNavigation, designSystem, framework (+22 more)
 
 ### Community 502 - "Community 502"
 Cohesion: 0.15
@@ -3156,16 +3564,16 @@ Cohesion: 0.15
 Nodes (13): background, color, context, background, color, context, background, color (+5 more)
 
 ### Community 508 - "Community 508"
-Cohesion: 0.15
-Nodes (13): behavior, context, trigger, behavior, context, trigger, interactionPatterns, canvasEditing (+5 more)
+Cohesion: 0.09
+Nodes (22): behavior, context, locations, behavior, context, trigger, behavior, context (+14 more)
 
 ### Community 509 - "Community 509"
 Cohesion: 0.15
 Nodes (13): avatarBackground, card, page, colorPalette, backgrounds, gamification, primary, levelBadge (+5 more)
 
 ### Community 510 - "Community 510"
-Cohesion: 0.18
-Nodes (13): primary, links, primary, background, borderRadius, color, context, display (+5 more)
+Cohesion: 0.13
+Nodes (17): color, context, size, buttonIcon, primary, buttons, primary, background (+9 more)
 
 ### Community 511 - "Community 511"
 Cohesion: 0.15
@@ -3227,13 +3635,17 @@ Nodes (11): code:typescript (// Step 1: Register), ✨ Congratulations!, 📚 Do
 Cohesion: 0.17
 Nodes (8): Simplified serializer for story lists, StoryListSerializer, Get list of stories - supports filtering by user, published status, etc., Get stories by a specific user, Get user's saved stories, saved_stories(), story_list(), user_stories()
 
+### Community 528 - "Community 528"
+Cohesion: 0.05
+Nodes (37): 10. Anti-Patterns, 11. Reporting Principles, 1. Security Expert Mindset, 2025 Key Changes, 2. OWASP Top 10:2025, 3. Supply Chain Security (A03), 4. Attack Surface Mapping, 5. Risk Prioritization (+29 more)
+
 ### Community 530 - "Community 530"
 Cohesion: 0.17
 Nodes (12): background, border, borderRadius, color, context, display, fontSize, fontWeight (+4 more)
 
 ### Community 531 - "Community 531"
-Cohesion: 0.17
-Nodes (12): neutral, gray100, gray200, gray300, gray400, gray50, gray500, gray600 (+4 more)
+Cohesion: 0.10
+Nodes (21): modal, overlay, textArea, colorPalette, backgrounds, neutral, primary, gray100 (+13 more)
 
 ### Community 532 - "Community 532"
 Cohesion: 0.17
@@ -3244,16 +3656,16 @@ Cohesion: 0.17
 Nodes (12): charactersButton, background, border, borderRadius, color, context, display, fontSize (+4 more)
 
 ### Community 534 - "Community 534"
-Cohesion: 0.23
-Nodes (12): header, pageManagementSection, context, display, spacing, alignment, color, context (+4 more)
+Cohesion: 0.06
+Nodes (34): 3. Server-Side Performance, Authenticate Server Actions Like API Routes, Avoid Duplicate Serialization in RSC Props, code:typescript ('use server'), code:tsx (async function Page() {), code:tsx (export default async function Page() {), code:tsx (async function Header() {), code:tsx (async function Header() {) (+26 more)
 
 ### Community 535 - "Community 535"
-Cohesion: 0.17
-Nodes (12): background, border, borderRadius, color, context, display, fontSize, fontWeight (+4 more)
+Cohesion: 0.08
+Nodes (24): background, border, borderRadius, color, context, display, fontSize, fontWeight (+16 more)
 
 ### Community 536 - "Community 536"
-Cohesion: 0.17
-Nodes (12): neutral, gray100, gray200, gray300, gray400, gray50, gray500, gray600 (+4 more)
+Cohesion: 0.09
+Nodes (22): canvas, editor, page, section, colorPalette, backgrounds, neutral, primary (+14 more)
 
 ### Community 537 - "Community 537"
 Cohesion: 0.17
@@ -3264,8 +3676,8 @@ Cohesion: 0.17
 Nodes (12): neutral, gray100, gray200, gray300, gray400, gray50, gray500, gray600 (+4 more)
 
 ### Community 539 - "Community 539"
-Cohesion: 0.15
-Nodes (12): legalText, pageContainer, alignment, color, context, fontSize, lineHeight, background (+4 more)
+Cohesion: 0.14
+Nodes (14): elementStyling, legalText, links, pageContainer, alignment, color, context, fontSize (+6 more)
 
 ### Community 540 - "Community 540"
 Cohesion: 0.30
@@ -3284,12 +3696,12 @@ Cohesion: 0.17
 Nodes (12): background, borderRadius, color, context, default, fontSize, fontWeight, label (+4 more)
 
 ### Community 544 - "Community 544"
-Cohesion: 0.17
-Nodes (12): background, border, borderRadius, color, context, display, fontSize, hover (+4 more)
+Cohesion: 0.06
+Nodes (35): 10. Component Extraction, 11. Anti-Patterns, 12. Performance Principles, 1. Tailwind v4 Architecture, 2. CSS-Based Configuration, 3. Container Queries (v4 Native), 4. Responsive Design, 5. Dark Mode (+27 more)
 
 ### Community 545 - "Community 545"
-Cohesion: 0.17
-Nodes (12): context, display, spacing, leftStats, rightStats, stat, context, display (+4 more)
+Cohesion: 0.15
+Nodes (13): context, display, spacing, container, leftStats, rightStats, stat, context (+5 more)
 
 ### Community 546 - "Community 546"
 Cohesion: 0.17
@@ -3301,7 +3713,7 @@ Nodes (12): neutral, gray100, gray200, gray300, gray400, gray50, gray500, gray60
 
 ### Community 548 - "Community 548"
 Cohesion: 0.17
-Nodes (12): destructive, primary, secondary, componentMapping, ActionButton, SettingItem, SettingsPage, baseClass (+4 more)
+Nodes (12): componentMapping, SectionHeader, SettingItem, SettingsPage, baseClass, iconClass, titleClass, baseClass (+4 more)
 
 ### Community 549 - "Community 549"
 Cohesion: 0.17
@@ -3368,8 +3780,8 @@ Cohesion: 0.18
 Nodes (10): Common Issues, ✅ Feature Overview, 📱 Mobile Optimization, OCR Mode Workflow, OCR (Optical Character Recognition) Feature, 🔐 Privacy & Security, 🔗 Related Documentation, 🎉 Summary (+2 more)
 
 ### Community 567 - "Community 567"
-Cohesion: 0.27
-Nodes (10): eh(), Fd(), kd(), Ld(), nh(), Qu(), Rd(), rh() (+2 more)
+Cohesion: 0.17
+Nodes (7): ah(), Gd(), hd(), Md(), vc(), Yd(), Zc()
 
 ### Community 568 - "Community 568"
 Cohesion: 0.18
@@ -3384,8 +3796,8 @@ Cohesion: 0.20
 Nodes (9): admin_login(), admin_logout(), generate_admin_token(), Separate Admin Authentication System Independent from regular user authenticati, Generate a separate admin JWT token, Admin logout endpoint, Middleware function to verify admin token     Returns user if valid, None other, Admin-specific login endpoint     Separate from regular user authentication (+1 more)
 
 ### Community 571 - "Community 571"
-Cohesion: 0.20
-Nodes (9): GameAttemptDetailSerializer, GameAttemptSerializer, GameQuestionWithAnswerSerializer, Serializers for Game Models, Serializer for game questions with answers (for review), Serializer for story games, Serializer for game attempts, Detailed serializer with answers (+1 more)
+Cohesion: 0.09
+Nodes (14): main(), GameAnswerSerializer, GameQuestionSerializer, Serializers for Game Models, Serializer for story games, Serializer for game answers, Serializer for game questions (without revealing answers), StoryGameSerializer (+6 more)
 
 ### Community 573 - "Community 573"
 Cohesion: 0.18
@@ -3416,8 +3828,8 @@ Cohesion: 0.18
 Nodes (11): characterInfo, name, type, color, context, fontSize, fontWeight, spacing (+3 more)
 
 ### Community 580 - "Community 580"
-Cohesion: 0.29
-Nodes (11): title, title, title, color, context, fontSize, fontWeight, display (+3 more)
+Cohesion: 0.18
+Nodes (18): icon, title, pageEditorSection, color, context, size, spacing, title (+10 more)
 
 ### Community 581 - "Community 581"
 Cohesion: 0.45
@@ -3448,8 +3860,8 @@ Cohesion: 0.18
 Nodes (10): App Quality, Benefits, Created Files, Documentation, Files Modified/Created, Media Notification for TTS Playback, Modified Files, Overview (+2 more)
 
 ### Community 588 - "Community 588"
-Cohesion: 0.18
-Nodes (11): animations, hoverEffects, keyframes, transitions, opacity, scale, scaleSubtle, appliedTo (+3 more)
+Cohesion: 0.13
+Nodes (15): animations, hoverEffects, keyframes, transitions, appliedTo, css, tailwindClass, opacity (+7 more)
 
 ### Community 589 - "Community 589"
 Cohesion: 0.20
@@ -3495,6 +3907,10 @@ Nodes (9): 📊 Comparison Table, **Hybrid Approach (Best of Both Worlds)**, Nex
 Cohesion: 0.20
 Nodes (9): Automatic Application, Image Generation Anatomy Quality Improvements, 🎓 Key Takeaways, No Code Changes Required, Overview, Quality Checklist, Test Cases, 🧪 Testing Recommendations (+1 more)
 
+### Community 600 - "Community 600"
+Cohesion: 0.06
+Nodes (32): 🤖 Agents (20), Antigravity Kit Architecture, Architecture & Planning, Backend & API, Cloud & Infrastructure, code:plaintext (.agent/), code:plaintext (User Request → Skill Description Match → Load SKILL.md), code:plaintext (skill-name/) (+24 more)
+
 ### Community 602 - "Community 602"
 Cohesion: 0.20
 Nodes (10): 1. Install Package, 2. Get SendGrid API Key, 3. Configure .env, 4. Run Migrations, 5. Test It!, code:bash (python tmp_rovodev_test_email_verification.py), code:bash (cd backend), code:env (SENDGRID_API_KEY=SG.your-key-here) (+2 more)
@@ -3504,16 +3920,16 @@ Cohesion: 0.20
 Nodes (10): primary, background, borderRadius, color, context, fontSize, fontWeight, hover (+2 more)
 
 ### Community 604 - "Community 604"
-Cohesion: 0.20
-Nodes (10): modalContainer, background, borderRadius, context, display, maxHeight, maxWidth, overflow (+2 more)
+Cohesion: 0.06
+Nodes (31): 🚫 AI MOBILE DEFAULTS (FORBIDDEN LIST), Analysis for Every Gesture, 🧪 ANTI-MEMORIZATION TEST, Ask Yourself Before Every Solution, code:block1 (┌───────────────────────────────────────────────────────────), code:block2 (┌───────────────────────────────────────────────────────────), code:block3 (SCREEN: [Screen Name]), code:block4 (┌───────────────────────────────────────────────────────────) (+23 more)
 
 ### Community 605 - "Community 605"
-Cohesion: 0.20
-Nodes (10): context, readOnly, rightPanel, display, height, minHeight, content, enhanced (+2 more)
+Cohesion: 0.10
+Nodes (27): EmptyState, context, readOnly, rightPanel, container, display, height, icon (+19 more)
 
 ### Community 606 - "Community 606"
-Cohesion: 0.20
-Nodes (10): background, borderRadius, color, context, display, fontSize, fontWeight, padding (+2 more)
+Cohesion: 0.06
+Nodes (30): 1. `after()` for Non-Blocking Logic, 1. Eliminating Waterfalls, 2. `connection()` for Dynamic Intent, code:typescript (async function handleRequest(userId: string, skipProcessing:), code:typescript (const [user, posts, comments] = await Promise.all([), code:tsx (async function Page() {), code:tsx (function Page() {), code:tsx (function Page() {) (+22 more)
 
 ### Community 607 - "Community 607"
 Cohesion: 0.20
@@ -3524,20 +3940,20 @@ Cohesion: 0.20
 Nodes (10): useButton, background, border, borderRadius, color, context, fontSize, fontWeight (+2 more)
 
 ### Community 609 - "Community 609"
-Cohesion: 0.20
-Nodes (10): canvas, editor, page, section, colorPalette, backgrounds, primary, purple (+2 more)
+Cohesion: 0.07
+Nodes (29): API Development, API Style Selection, Architecture, Backend Development Architect, Common Anti-Patterns You Avoid, 🛑 CRITICAL: CLARIFY BEFORE CODING (MANDATORY), Database & Data, Database Selection (2025) (+21 more)
 
 ### Community 610 - "Community 610"
-Cohesion: 0.20
-Nodes (9): accessibility, pageNavigation, saveIndicator, stickyElements, textAreas, layoutPatterns, pageStructure, context (+1 more)
+Cohesion: 0.06
+Nodes (35): accessibility, pageNavigation, saveIndicator, stickyElements, textAreas, designSystem, framework, layout (+27 more)
 
 ### Community 611 - "Community 611"
 Cohesion: 0.20
 Nodes (10): stateManagement, storyData, uiStates, canvas, currentPage, pages, title, canvasMode (+2 more)
 
 ### Community 612 - "Community 612"
-Cohesion: 0.24
-Nodes (10): text, background, color, context, fontSize, fontWeight, letterSpacing, padding (+2 more)
+Cohesion: 0.14
+Nodes (16): textDivider, dividers, border, context, position, text, background, color (+8 more)
 
 ### Community 613 - "Community 613"
 Cohesion: 0.20
@@ -3556,8 +3972,8 @@ Cohesion: 0.20
 Nodes (10): star, value, color, context, size, rating, color, context (+2 more)
 
 ### Community 617 - "Community 617"
-Cohesion: 0.20
-Nodes (10): background, border, borderRadius, color, context, fontSize, fontWeight, hover (+2 more)
+Cohesion: 0.07
+Nodes (29): 10. Best Practices, 1. Platform Selection, 2. Pre-Deployment Principles, 3. Deployment Workflow Principles, 4. Post-Deployment Verification, 5. Rollback Principles, 6. Zero-Downtime Deployment, 7. Emergency Procedures (+21 more)
 
 ### Community 618 - "Community 618"
 Cohesion: 0.20
@@ -3647,6 +4063,10 @@ Nodes (9): 🟢 AFTER (Enhanced Implementation), Before vs After Enhancement, co
 Cohesion: 0.22
 Nodes (9): code:bash (# Get your auth token first), code:bash (cd backend), code:python (from storybook.email_service import EmailService), code:bash (# Terminal 1), 🧪 How to Test, **Method 1: UI Test Button (Easiest)**, **Method 2: API Testing (Advanced)**, **Method 3: Python Shell Testing** (+1 more)
 
+### Community 644 - "Community 644"
+Cohesion: 0.07
+Nodes (28): Alert Strategy, Anti-Patterns (What NOT to Do), code:block1 (What are you deploying?), code:block2 (1. PREPARE), Core Philosophy, Decision Tree, Deployment Platform Selection, Deployment Workflow Principles (+20 more)
+
 ### Community 645 - "Community 645"
 Cohesion: 0.22
 Nodes (9): 1. Register User (Modified), 2. Verify Email (New), 3. Resend Code (New), 4. Login (Unchanged), 🌐 API Endpoints, code:http (POST /api/auth/register/), code:http (POST /api/auth/verify-email/), code:http (POST /api/auth/resend-verification/) (+1 more)
@@ -3664,12 +4084,12 @@ Cohesion: 0.22
 Nodes (9): background, borderRadius, color, context, fontSize, fontWeight, hover, padding (+1 more)
 
 ### Community 649 - "Community 649"
-Cohesion: 0.28
-Nodes (9): EmptyState, container, text, alignment, color, context, fontSize, fontWeight (+1 more)
+Cohesion: 0.07
+Nodes (28): 10. Anti-Patterns, 1. MITRE ATT&CK Phases, 2. Reconnaissance Principles, 3. Initial Access Vectors, 4. Privilege Escalation Principles, 5. Defense Evasion Principles, 6. Lateral Movement Principles, 7. Active Directory Attacks (+20 more)
 
 ### Community 650 - "Community 650"
-Cohesion: 0.22
-Nodes (9): modal, overlay, textArea, colorPalette, backgrounds, primary, purple, purpleDark (+1 more)
+Cohesion: 0.07
+Nodes (27): 1. Modular Skill Loading Protocol, 2. Enforcement Protocol, ⚠️ AGENT ROUTING CHECKLIST (MANDATORY BEFORE EVERY CODE/DESIGN RESPONSE), Agents & Skills, Auto-Selection Protocol, 🧹 Clean Code (Global Mandatory), code:markdown (🤖 **Applying knowledge of `@[agent-name]`...**), code:block2 (❌ WRONG: Read agent file → Start coding) (+19 more)
 
 ### Community 651 - "Community 651"
 Cohesion: 0.22
@@ -3680,12 +4100,12 @@ Cohesion: 0.53
 Nodes (9): title, title, title, color, context, fontSize, fontWeight, spacing (+1 more)
 
 ### Community 653 - "Community 653"
-Cohesion: 0.22
-Nodes (8): accessibility, colorContrast, focusRing, semanticHTML, designSystem, framework, name, type
+Cohesion: 0.09
+Nodes (21): accessibility, colorContrast, focusRing, semanticHTML, animations, focus, hover, transitions (+13 more)
 
 ### Community 654 - "Community 654"
-Cohesion: 0.22
-Nodes (9): cardBackground, inputBackground, pageGradient, colorPalette, backgrounds, secondary, orange, orangeDark (+1 more)
+Cohesion: 0.15
+Nodes (13): cardBackground, inputBackground, pageGradient, colorPalette, backgrounds, primary, secondary, purple (+5 more)
 
 ### Community 655 - "Community 655"
 Cohesion: 0.22
@@ -3812,16 +4232,16 @@ Cohesion: 0.25
 Nodes (8): code:bash (cd /opt/render/project/src/backend), code:block11 (📥 Importing profanity words from profanity_words_export.json), code:bash (cat > profanity_words_export.json << 'EOF'), code:bash (scp profanity_words_export.json user@your-render-service:/pa), code:bash (# Add export file to git), Part 4: Import Profanity Words to Render, Step 5: Upload Export File to Render, Step 6: Run Import Script on Render
 
 ### Community 691 - "Community 691"
-Cohesion: 0.43
-Nodes (8): icon, icon, color, context, size, spacing, icon, icon
+Cohesion: 0.07
+Nodes (27): 10. Error Handling, 1. Operator Syntax, 2. File Operations, 3. Process Management, 4. Text Processing, 5. Environment Variables, 6. Network, 7. Script Template (+19 more)
 
 ### Community 692 - "Community 692"
-Cohesion: 0.25
-Nodes (8): layoutPatterns, modalStructure, panelStructure, context, order, consistency, context, pattern
+Cohesion: 0.07
+Nodes (27): 1. Questions Reveal Consequences, 2. Context Before Content, 3. Minimum Viable Questions, 4. Questions Generate Data, Not Assumptions, Authentication, code:markdown (❌ BAD: "What authentication method?"), code:block2 (Before Question:), code:markdown (❌ ASSUMPTION: "User probably wants Stripe for payments") (+19 more)
 
 ### Community 693 - "Community 693"
-Cohesion: 0.25
-Nodes (8): writingTips, behavior, context, emptyState, icon, label, leftPanel, rightPanel
+Cohesion: 0.09
+Nodes (23): behavior, context, icon, label, leftPanel, rightPanel, featureTabs, enhanceStory (+15 more)
 
 ### Community 694 - "Community 694"
 Cohesion: 0.25
@@ -3832,28 +4252,28 @@ Cohesion: 0.25
 Nodes (8): characterType, genre, ownership, query, results, stateManagement, filterStates, searchState
 
 ### Community 696 - "Community 696"
-Cohesion: 0.25
-Nodes (8): elementStyling, contentArea, pageContainer, storyTitleSection, background, context, minHeight, padding
+Cohesion: 0.07
+Nodes (27): 10. Best Practices Checklist, 1. MCP Overview, 2. Server Architecture, 3. Tool Design Principles, 4. Resource Patterns, 5. Error Handling, 6. Multimodal Handling, 7. Security Principles (+19 more)
 
 ### Community 697 - "Community 697"
 Cohesion: 0.25
 Nodes (8): activeIcon, activeItem, container, grid, icon, inactiveIcon, item, BottomNav
 
 ### Community 698 - "Community 698"
-Cohesion: 0.25
-Nodes (8): background, border, borderRadius, context, display, padding, spacing, button
+Cohesion: 0.15
+Nodes (15): background, border, borderRadius, context, display, padding, spacing, socialButtons (+7 more)
 
 ### Community 699 - "Community 699"
-Cohesion: 0.39
-Nodes (8): title, title, alignment, color, context, fontSize, fontWeight, spacing
+Cohesion: 0.14
+Nodes (20): header, alignment, authCard, logoSection, subtitle, title, container, subtitle (+12 more)
 
 ### Community 700 - "Community 700"
-Cohesion: 0.32
-Nodes (8): header, subtitle, subtitle, alignment, color, context, fontSize, spacing
+Cohesion: 0.07
+Nodes (26): Common Anti-Patterns You Avoid, Database Architect, Database Platform Selection (2025), Decision Frameworks, Design Decision Process, Migrations, Modern Database Platforms, Normalization Decision (+18 more)
 
 ### Community 701 - "Community 701"
-Cohesion: 0.32
-Nodes (8): offlineStoryItems, metadata, color, context, fontSize, spacing, leftContent, metadata
+Cohesion: 0.07
+Nodes (26): 4-Phase Debugging Process, After Fix, Anti-Patterns (What NOT to Do), Backend Issues, Before Starting, Binary Search Debugging, Browser Issues, Bug Categories & Investigation Strategy (+18 more)
 
 ### Community 702 - "Community 702"
 Cohesion: 0.25
@@ -3920,8 +4340,8 @@ Cohesion: 0.32
 Nodes (4): extractTextWithGoogleVision(), GoogleCloudVisionOCR, VisionOCRProgress, VisionOCRResult
 
 ### Community 718 - "Community 718"
-Cohesion: 0.25
-Nodes (6): get_active_participant_count(), Handle initiating a save vote, Handle user voting to save, record_vote(), reset_voting(), start_voting()
+Cohesion: 0.20
+Nodes (8): get_active_participant_count(), Handle initiating a save vote, Handle initiating a save vote, Handle user voting to save, Handle user voting to save, record_vote(), reset_voting(), start_voting()
 
 ### Community 719 - "Community 719"
 Cohesion: 0.29
@@ -4020,20 +4440,20 @@ Cohesion: 0.29
 Nodes (7): code:bash (python manage.py shell -c "from storybook.models import Stor), code:bash (python regenerate_word_searches.py), code:bash (python manage.py shell -c "from storybook.models import Stor), Issue: "Build script says 0 stories without games, but I know some are missing", Issue: "Games not being generated for new story", Issue: "I want to regenerate all games anyway", 🐛 Troubleshooting
 
 ### Community 745 - "Community 745"
-Cohesion: 0.29
-Nodes (7): behavior, context, icon, label, leftPanel, rightPanel, enhanceStory
+Cohesion: 0.07
+Nodes (26): ❌ Anti-Patterns (Common Mistakes), 🎓 Best Practices Summary, code:block1 (🐌 Slow page loads / Long Time to Interactive), code:block2 (1️⃣ CRITICAL (Biggest Gains - Do First):), 📑 Content Map, For Debugging Slow Performance:, For New Features:, For Performance Reviews: (+18 more)
 
 ### Community 746 - "Community 746"
-Cohesion: 0.29
-Nodes (7): grammarCheck, behavior, context, icon, label, leftPanel, rightPanel
+Cohesion: 0.07
+Nodes (26): 1. Deep Audit Approach, 2. Testing Pyramid for Web, 3. E2E Test Principles, 4. Playwright Principles, 5. Visual Testing, 6. API Testing Principles, 7. Test Organization, 8. CI Integration (+18 more)
 
 ### Community 747 - "Community 747"
 Cohesion: 0.29
 Nodes (7): completed, completedLight, inProgress, inProgressLight, locked, lockedLight, achievement
 
 ### Community 748 - "Community 748"
-Cohesion: 0.38
-Nodes (7): color, context, fontSize, count, count, downloads, likes
+Cohesion: 0.08
+Nodes (25): 1. Audio Category System, 2. Sound Design Decisions, 3. Music Integration, 4. Adaptive Audio Decisions, 5. 3D Audio Decisions, 6. Platform Considerations, 7. Mix Hierarchy, 8. Anti-Patterns (+17 more)
 
 ### Community 749 - "Community 749"
 Cohesion: 0.29
@@ -4044,16 +4464,16 @@ Cohesion: 0.29
 Nodes (7): lineHeight, neutralColor, positiveColor, size, usage, weight, statChange
 
 ### Community 751 - "Community 751"
-Cohesion: 0.43
-Nodes (7): progressBar, progressBar, background, borderRadius, fill, fillBorderRadius, height
+Cohesion: 0.15
+Nodes (16): progressBar, categoryBadge, difficultyBadge, progressBar, background, borderRadius, color, fontSize (+8 more)
 
 ### Community 752 - "Community 752"
 Cohesion: 0.29
 Nodes (7): componentMapping, StoryReaderPage, TopBar, ViewControls, dark, light, button
 
 ### Community 753 - "Community 753"
-Cohesion: 0.57
-Nodes (7): subtitle, subtitle, subtitle, color, context, fontSize, spacing
+Cohesion: 0.33
+Nodes (10): settingsCards, leftContent, subtitle, subtitle, subtitle, item, color, context (+2 more)
 
 ### Community 754 - "Community 754"
 Cohesion: 0.29
@@ -4168,16 +4588,16 @@ Cohesion: 0.33
 Nodes (6): code:bash (curl https://your-app.onrender.com/api/auth/profile/), code:json ({), code:bash (curl https://your-app.onrender.com/api/profanity/active/), code:bash (curl https://your-app.onrender.com/api/achievements/progress), Part 5: Verify Deployment, Step 7: Test the API Endpoints
 
 ### Community 782 - "Community 782"
-Cohesion: 0.33
-Nodes (6): doNotRules, buttons, colors, layout, modal, tabs
+Cohesion: 0.08
+Nodes (25): Antigravity Built-in Agents, Available Agents, Best Practices, code:block1 (Use the security-auditor agent to review authentication), code:block2 (First, use the explorer-agent to discover project structure.), code:block3 (Use the frontend-specialist to analyze React components.), code:block4 (Resume agent [agentId] and continue with additional requirem), code:block5 (Agents: explorer-agent → [domain-agents] → synthesis) (+17 more)
 
 ### Community 783 - "Community 783"
 Cohesion: 0.53
 Nodes (6): focus, borderColor, context, outline, ring, focus
 
 ### Community 784 - "Community 784"
-Cohesion: 0.33
-Nodes (6): doNotRules, buttons, canvas, colors, layout, pagination
+Cohesion: 0.08
+Nodes (25): Agent Selection Matrix, Available Agents (17 total), ⏸️ CHECKPOINT: User Approval, code:block1 (After PLAN.md is complete, ASK:), code:block2 (□ Security     → security-auditor, penetration-tester), code:block3 (Use the project-planner agent to create PLAN.md), code:block4 (Invoke agents in PARALLEL:), code:block5 (Use the project-planner agent to create PLAN.md:) (+17 more)
 
 ### Community 785 - "Community 785"
 Cohesion: 0.33
@@ -4188,12 +4608,12 @@ Cohesion: 0.33
 Nodes (6): navigation, home, library, profile, settings, social
 
 ### Community 787 - "Community 787"
-Cohesion: 0.47
-Nodes (6): color, context, size, spacing, icon, icon
+Cohesion: 0.08
+Nodes (24): 1. 🧠 BRAINSTORM Mode, 1. 🔭 EXPLORE Mode, 2. ⚡ IMPLEMENT Mode, 2. 🗺️ PLAN-EXECUTE-CRITIC (PEC), 3. 🔍 DEBUG Mode, 3. 🧠 MENTAL MODEL SYNC, 4. 📋 REVIEW Mode, 5. 📚 TEACH Mode (+16 more)
 
 ### Community 788 - "Community 788"
-Cohesion: 0.33
-Nodes (6): pageHeader, subtitle, color, context, fontSize, spacing
+Cohesion: 0.11
+Nodes (19): color, context, size, elementStyling, browseButtons, buttonIcons, offlineStoryItems, pageContainer (+11 more)
 
 ### Community 789 - "Community 789"
 Cohesion: 0.33
@@ -4284,8 +4704,8 @@ Cohesion: 0.33
 Nodes (5): adminHtmlPath, __dirname, distPath, __filename, indexHtmlPath
 
 ### Community 811 - "Community 811"
-Cohesion: 0.40
-Nodes (4): CacheEntry, CacheState, useCacheStore, createCapacitorStorage()
+Cohesion: 0.08
+Nodes (25): 1. Core UX Laws, code:block1 (Decision Time = a + b × log₂(n + 1)), code:block10 (❌ Bad: A 10-page registration form that allows users to brow), code:block11 (❌ Bad: A button that does nothing for 2 seconds after being ), code:block12 (❌ Bad: Rejecting a phone number because the user put a space), code:block13 (❌ Bad: A "Login" button that opens a new page, then email, t), code:block2 (❌ Bad: 15 menu items in one nav), code:block3 (MT = a + b × log₂(1 + D/W)) (+17 more)
 
 ### Community 812 - "Community 812"
 Cohesion: 0.33
@@ -4460,28 +4880,28 @@ Cohesion: 0.40
 Nodes (5): code:bash (python manage.py migrate), code:bash (render shell <your-service-name>), code:block6 (Running migrations:), Part 3: Run Migrations on Render, Step 4: Run Migrations via Render Shell
 
 ### Community 855 - "Community 855"
-Cohesion: 0.40
-Nodes (5): performanceConsiderations, lazyAnalysis, modalAnimation, responsiveReflow, textareaOptimization
+Cohesion: 0.08
+Nodes (25): 3. Cognitive Biases & Behavior, Aesthetic-Usability Effect, Anchoring Bias, Authority Bias, code:block21 (❌ Bad: A silent onboarding process that gives no indication ), code:block22 (❌ Bad: A progress bar that starts at 0% and feels like a lon), code:block23 (❌ Bad: After a 20-minute tax filing process, the app just sa), code:block24 (❌ Bad: A banking app with misaligned text and clashing 1990s) (+17 more)
 
 ### Community 856 - "Community 856"
-Cohesion: 0.40
-Nodes (5): designSystem, framework, layout, name, type
+Cohesion: 0.08
+Nodes (23): Anti-Patterns, Bundle Size, Caching, code:block1 (What's slow?), Core Philosophy, Core Web Vitals Targets (2025), CSS, Images (+15 more)
 
 ### Community 857 - "Community 857"
-Cohesion: 0.40
-Nodes (5): iconColorSystem, canvas, context, pageEditor, pageManagement
+Cohesion: 0.08
+Nodes (23): 1. Art Style Selection, 2. Asset Pipeline Decisions, 2D Pipeline, 2D Resolution by Platform, 3. Color Theory Decisions, 3D Pipeline, 4. Animation Principles, 5. Resolution & Scale Decisions (+15 more)
 
 ### Community 858 - "Community 858"
-Cohesion: 0.40
-Nodes (5): saving, behavior, context, feedback, trigger
+Cohesion: 0.08
+Nodes (23): 10. Script Template, 1. Operator Syntax Rules, 2. Unicode/Emoji Restriction, 3. Null Check Patterns, 4. String Interpolation, 5. Error Handling, 6. File Paths, 7. Array Operations (+15 more)
 
 ### Community 859 - "Community 859"
-Cohesion: 0.40
-Nodes (5): responsiveConsiderations, bottomActions, contentWidth, mobile, stickyElements
+Cohesion: 0.08
+Nodes (23): 10. Anti-Patterns, 1. Testing Pyramid, 2. AAA Pattern, 3. Test Type Selection, 4. Unit Test Principles, 5. Integration Test Principles, 6. Mocking Principles, 7. Test Organization (+15 more)
 
 ### Community 860 - "Community 860"
-Cohesion: 0.40
-Nodes (5): sectionPattern, content, context, header, structure
+Cohesion: 0.09
+Nodes (22): Always, Anti-Patterns, Attack Surface Categories, By OWASP Top 10 (2025), By Phase, By Vector, code:block1 (1. PRE-ENGAGEMENT), Core Philosophy (+14 more)
 
 ### Community 861 - "Community 861"
 Cohesion: 0.40
@@ -4496,8 +4916,8 @@ Cohesion: 0.40
 Nodes (5): StatCard, baseClass, iconClass, labelClass, valueClass
 
 ### Community 864 - "Community 864"
-Cohesion: 0.40
-Nodes (5): doNotRules, borders, colors, gradients, shadows
+Cohesion: 0.09
+Nodes (22): Anti-Patterns (AVOID), Brainstorming & Communication Protocol, code:block1 (1. Parse request → Extract domain, features, scale indicator), code:markdown (### [PRIORITY] **[DECISION POINT]**), code:block3 (1. Acknowledge the error), code:block4 (1. Success confirmation (celebrate briefly)), Communication Principles, Completion Message (PRINCIPLE-BASED) (+14 more)
 
 ### Community 865 - "Community 865"
 Cohesion: 0.40
@@ -4596,8 +5016,8 @@ Cohesion: 0.40
 Nodes (4): name, private, type, version
 
 ### Community 889 - "Community 889"
-Cohesion: 0.40
-Nodes (3): generateImageHF(), STYLE_MODELS, testHuggingFaceAPI()
+Cohesion: 0.19
+Nodes (5): generateStoryWithGroq(), GroqGenerationConfig, generateImageHF(), STYLE_MODELS, testHuggingFaceAPI()
 
 ### Community 890 - "Community 890"
 Cohesion: 0.50
@@ -4808,36 +5228,36 @@ Cohesion: 0.50
 Nodes (3): Script to seed the database with initial profanity words Run this after running, Seed the database with initial profanity words, seed_profanity_words()
 
 ### Community 945 - "Community 945"
-Cohesion: 0.50
-Nodes (4): behavior, context, locations, aiAssistance
+Cohesion: 0.09
+Nodes (22): 2. Bundle Size Optimization, Avoid Barrel File Imports, code:tsx (import { Check, X, Menu } from 'lucide-react'), code:tsx (function FlagsProvider({ children, flags }: Props) {), code:tsx (import Check from 'lucide-react/dist/esm/icons/check'), code:js (// next.config.js - use optimizePackageImports), code:tsx (function AnimationPlayer({ enabled, setEnabled }: { enabled:), code:tsx (import { Analytics } from '@vercel/analytics/react') (+14 more)
 
 ### Community 946 - "Community 946"
-Cohesion: 0.50
-Nodes (4): progressContainer, context, minWidth, spacing
+Cohesion: 0.09
+Nodes (21): Antigravity Skills, code:block1 (my-skill/), code:bash (mkdir -p .agent/skills/code-review), code:markdown (---), code:python (import time), code:bash (mkdir -p .agent/skills/license-header-adder/resources), code:block6 (/*), code:markdown (---) (+13 more)
 
 ### Community 947 - "Community 947"
-Cohesion: 0.50
-Nodes (4): animations, focus, hover, transitions
+Cohesion: 0.09
+Nodes (21): 1. README Structure, 2. API Documentation Structure, 3. Code Comment Guidelines, 4. Changelog Template (Keep a Changelog), 5. Architecture Decision Record (ADR), 6. AI-Friendly Documentation (2025), 7. Structure Principles, code:markdown (# Project Name) (+13 more)
 
 ### Community 948 - "Community 948"
-Cohesion: 0.50
-Nodes (4): primary, purple, purpleDark, purpleLight
+Cohesion: 0.09
+Nodes (21): 1. Framework Selection, 2. WebGPU Adoption, 3. Performance Principles, 4. Asset Strategy, 5. PWA for Games, 6. Audio Handling, 7. Anti-Patterns, Benefits (+13 more)
 
 ### Community 949 - "Community 949"
-Cohesion: 0.50
-Nodes (4): responsiveBreakpoints, desktop, mobile, tablet
+Cohesion: 0.09
+Nodes (21): 4. Client-Side Data Fetching, code:tsx (function useKeyboardShortcut(key: string, callback: () => vo), code:typescript (const VERSION = 'v2'), code:typescript (// User object has 20+ fields, only store what UI needs), code:tsx (import useSWRSubscription from 'swr/subscription'), code:typescript (useEffect(() => {), code:typescript (useEffect(() => {), code:tsx (function UserList() {) (+13 more)
 
 ### Community 950 - "Community 950"
-Cohesion: 0.50
-Nodes (4): border, context, position, line
+Cohesion: 0.10
+Nodes (20): 1. Rendering Pipeline, 2. Shader Principles, 3. 3D Physics, 3D Game Development, 4. Camera Systems, 5. Lighting, 6. Level of Detail (LOD), 7. Anti-Patterns (+12 more)
 
 ### Community 951 - "Community 951"
 Cohesion: 0.50
 Nodes (4): primary, purple, purpleDark, purpleLight
 
 ### Community 952 - "Community 952"
-Cohesion: 0.50
-Nodes (4): SectionHeader, baseClass, iconClass, titleClass
+Cohesion: 0.10
+Nodes (20): Anti-Patterns, Before Any Review, Code Patterns (Red Flags), code:block1 (1. UNDERSTAND), code:block2 (Is it actively exploited (EPSS >0.5)?), code:bash (python scripts/security_scan.py <project_path> --output summ), Configuration (A02), Core Philosophy (+12 more)
 
 ### Community 953 - "Community 953"
 Cohesion: 0.50
@@ -4964,8 +5384,8 @@ Cohesion: 0.50
 Nodes (4): Media Notification, Reliability, User Experience Improvements, Visual Feedback
 
 ### Community 986 - "Community 986"
-Cohesion: 0.50
-Nodes (4): appliedTo, css, tailwindClass, bounce
+Cohesion: 0.10
+Nodes (20): 1. Engine Selection, 2. Platform Features, 3. Controller Support, 4. Performance Optimization, 5. Engine-Specific Principles, 6. Anti-Patterns, code:block1 (What are you building?), code:block2 (Map ACTIONS, not buttons:) (+12 more)
 
 ### Community 988 - "Community 988"
 Cohesion: 0.67
@@ -5151,25 +5571,1381 @@ Nodes (3): 5. Comprehensive Cleanup, code:typescript (const stop = useCallback(a
 Cohesion: 0.67
 Nodes (3): After, Before, Performance Impact
 
+### Community 1054 - "Community 1054"
+Cohesion: 0.50
+Nodes (3): finalize_story(), Handle finalizing collaborative story after vote initiator saves with genres, Handle finalizing collaborative story after vote initiator saves with genres
+
+### Community 1292 - "Community 1292"
+Cohesion: 0.10
+Nodes (20): 1. The Game Loop, 2. Pattern Selection Matrix, 3. Input Abstraction, 4. Performance Budget (60 FPS = 16.67ms), 5. AI Selection by Complexity, 6. Collision Strategy, Anti-Patterns (Universal), code:block1 (INPUT  → Read player actions) (+12 more)
+
+### Community 1293 - "Community 1293"
+Cohesion: 0.10
+Nodes (20): 1. Core Concepts, 2. When to Use i18n, 3. Implementation Patterns, 4. File Structure, 5. Best Practices, 6. Common Issues, 7. RTL Support, 8. Checklist (+12 more)
+
+### Community 1294 - "Community 1294"
+Cohesion: 0.10
+Nodes (20): 1. Process Management Principles, 2. Monitoring Principles, 3. Log Management Principles, 4. Scaling Decisions, 5. Health Check Principles, 6. Security Principles, 7. Troubleshooting Priority, 8. Anti-Patterns (+12 more)
+
+### Community 1295 - "Community 1295"
+Cohesion: 0.14
+Nodes (16): CustomDropdown(), TTSControls(), TTSControlsProps, MediaNotification, MediaNotificationPlugin, useMediaNotification(), UseMediaNotificationOptions, TextToSpeechOptions (+8 more)
+
+### Community 1296 - "Community 1296"
+Cohesion: 0.15
+Nodes (15): BM25, detect_domain(), _load_csv(), BM25 ranking algorithm for text search, Lowercase, split, remove punctuation, filter short words, Build BM25 index from documents, Score all documents against query, Load CSV and return list of dicts (+7 more)
+
+### Community 1297 - "Community 1297"
+Cohesion: 0.10
+Nodes (19): 1. Core Loop Design, 2. Game Design Document (GDD), 3. Player Psychology, 4. Difficulty Balancing, 5. Progression Design, 6. Anti-Patterns, Balancing Strategies, code:block1 (Every game needs a fun 30-second loop:) (+11 more)
+
+### Community 1298 - "Community 1298"
+Cohesion: 0.10
+Nodes (19): 1. Core Web Vitals, 2. Profiling Workflow, 3. Bundle Analysis, 4. Runtime Profiling, 5. Common Bottlenecks, 6. Quick Win Priorities, 7. Anti-Patterns, By Symptom (+11 more)
+
+### Community 1299 - "Community 1299"
+Cohesion: 0.10
+Nodes (19): Async Programming & Concurrency, Behavioral Traits, Capabilities, Do not use this skill when, Error Handling & Safety, Example Interactions, Instructions, Knowledge Base (+11 more)
+
+### Community 1300 - "Community 1300"
+Cohesion: 0.10
+Nodes (19): 10. AI-Augmented TDD, 1. The TDD Cycle, 2. The Three Laws of TDD, 3. RED Phase Principles, 4. GREEN Phase Principles, 5. REFACTOR Phase Principles, 6. AAA Pattern, 7. When to Use TDD (+11 more)
+
+### Community 1301 - "Community 1301"
+Cohesion: 0.10
+Nodes (13): check_story_games(), complete_game(), game_attempt_detail(), generate_games_for_story(), my_game_stats(), API Views for Educational Games, Submit an answer for a question in a game attempt, Complete a game attempt and get results (+5 more)
+
+### Community 1302 - "Community 1302"
+Cohesion: 0.11
+Nodes (18): Anti-Patterns, code:block1 (What type of game?), code:block2 (Every game has this cycle:), Core Game Development Principles, Core Philosophy, Design Pattern Selection, Engine Selection Principles, Game Developer Agent (+10 more)
+
+### Community 1303 - "Community 1303"
+Cohesion: 0.11
+Nodes (18): AAA Pattern, Anti-Patterns, code:block1 (/\          E2E (Few)), code:block2 (🔴 RED    → Write failing test), Core Philosophy, Coverage Strategy, Deep Audit Approach, Discovery (+10 more)
+
+### Community 1304 - "Community 1304"
+Cohesion: 0.11
+Nodes (18): 1. Architecture Selection, 2. Synchronization Principles, 3. Network Optimization, 4. Security Principles, 5. Matchmaking, 6. Anti-Patterns, Anti-Cheat, Bandwidth Reduction (+10 more)
+
+### Community 1305 - "Community 1305"
+Cohesion: 0.16
+Nodes (9): main(), PerformanceChecker, Check for data fetching in useEffect (Section 4), Check for missing React.memo, useMemo, useCallback (Section 5), Check for unoptimized images (Section 6), Generate final report, Check for sequential await patterns (Section 1), Check for barrel imports (Section 2) (+1 more)
+
+### Community 1306 - "Community 1306"
+Cohesion: 0.12
+Nodes (17): populate_achievements(), Script to populate achievements on Render deployment Run this after deployment, Populate achievements from JSON file, open, main(), Validate no hardcoded secrets (OWASP A04).     Checks: API keys, tokens, passwo, Validate dangerous code patterns (OWASP A05).     Checks: Injection risks, XSS,, Validate security configuration (OWASP A02).     Checks: Security headers, CORS (+9 more)
+
+### Community 1307 - "Community 1307"
+Cohesion: 0.13
+Nodes (13): get_friends(), get_online_friends(), mark_notification_read(), WebSocket consumer for real-time notifications and user presence Optimized for, Handle WebSocket connection with memory-efficient checks, Broadcast online/offline status to all friends, Broadcast online/offline status to all friends, Send the current online status of all friends to the newly connected user. (+5 more)
+
+### Community 1308 - "Community 1308"
+Cohesion: 0.11
+Nodes (17): 1. Sprite Systems, 2. Tilemap Design, 2D Game Development, 3. 2D Physics, 4. Camera Systems, 5. Genre Patterns, 6. Anti-Patterns, Animation Principles (+9 more)
+
+### Community 1309 - "Community 1309"
+Cohesion: 0.11
+Nodes (17): Animation Patterns (Framer Motion), Best Practices (Modern), code:block1 (project-name/), code:typescript (// next.config.ts), code:typescript (// src/app/layout.tsx), code:bash (npx create-next-app@latest my-site --typescript --tailwind -), code:bash (npm install framer-motion lucide-react clsx tailwind-merge), code:css (@import "tailwindcss";) (+9 more)
+
+### Community 1310 - "Community 1310"
+Cohesion: 0.11
+Nodes (17): 1. Platform Selection, 2. Comfort Principles, 3. Performance Requirements, 4. Interaction Principles, 5. Spatial Design, 6. Anti-Patterns, AR Platforms, Comfort Settings (+9 more)
+
+### Community 1311 - "Community 1311"
+Cohesion: 0.11
+Nodes (17): 1. The `use cache` Directive, 2. Using `cacheLife`, 3. On-Demand Invalidation with `cacheTag`, 4. Partial Pre-Rendering (PPR), Cache Components: `use cache` & `cacheLife`, code:tsx (// Good: Granular function caching), code:tsx (import { cacheLife } from 'next/cache'), code:tsx (import { cacheTag } from 'next/cache') (+9 more)
+
+### Community 1312 - "Community 1312"
+Cohesion: 0.11
+Nodes (17): A01: Broken Access Control, A02: Cryptographic Failures, A03: Injection, A04: Insecure Design, A05: Security Misconfiguration, A06: Vulnerable Components, A07: Authentication Failures, A08: Integrity Failures (+9 more)
+
+### Community 1313 - "Community 1313"
+Cohesion: 0.11
+Nodes (17): code:block1 (/deploy            - Interactive deployment wizard), code:markdown (## 🚀 Pre-Deploy Checklist), code:block3 (┌─────────────────┐), code:markdown (## 🚀 Deployment Complete), code:markdown (## ❌ Deployment Failed), code:block6, code:block7 (/deploy), /deploy - Production Deployment (+9 more)
+
+### Community 1314 - "Community 1314"
+Cohesion: 0.11
+Nodes (17): Behavior, code:block1 (/test                - Run all tests), code:markdown (## 🧪 Tests: [Target]), code:block3 (🧪 Running tests...), code:block4 (/test src/services/auth.service.ts), code:typescript (describe('AuthService', () => {), Examples, For Test Execution (+9 more)
+
+### Community 1315 - "Community 1315"
+Cohesion: 0.12
+Nodes (16): 1. Product Requirement Document (PRD) Schema, 2. Feature Kickoff, Acceptance Criteria (Gherkin-style preferred), Anti-Patterns (What NOT to do), code:markdown (# [Feature Name] PRD), Core Philosophy, 🤝 Interaction with Other Agents, 📝 Output Formats (+8 more)
+
+### Community 1316 - "Community 1316"
+Cohesion: 0.17
+Nodes (16): _detect_page_type(), format_ascii_box(), format_markdown(), format_master_md(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides(), persist_design_system() (+8 more)
+
+### Community 1317 - "Community 1317"
+Cohesion: 0.12
+Nodes (16): AI & LLM Review Patterns (2025), Anti-Patterns to Flag, Code Quality, Code Review Checklist, code:markdown (// ❌ Vague prompt in code), code:typescript (// ❌ Magic numbers), code:block3 (// Blocking issues use 🔴), Correctness (+8 more)
+
+### Community 1318 - "Community 1318"
+Cohesion: 0.12
+Nodes (16): 1. What is GEO?, 2. AI Engine Landscape, 3. RAG Retrieval Factors, 4. Content That Gets Cited, 5. GEO Content Checklist, 6. Entity Building, 7. AI Crawler Access, 8. Measurement (+8 more)
+
+### Community 1319 - "Community 1319"
+Cohesion: 0.12
+Nodes (16): 1. Small, Focused Tasks, 2. Clear Verification, 3. Logical Ordering, 4. Dynamic Naming in Project Root, code:block1 (# [Task Name]), Notes, Overview, Plan Structure (Flexible, Not Fixed!) (+8 more)
+
+### Community 1320 - "Community 1320"
+Cohesion: 0.12
+Nodes (16): 4-Phase Debugging Process, Anti-Patterns, code:markdown (## Reproduction Steps), code:markdown (## Isolation Questions), code:markdown (## Root Cause Analysis), code:markdown (## Fix Verification), code:markdown (## Before Starting), code:bash (# Recent changes) (+8 more)
+
+### Community 1321 - "Community 1321"
+Cohesion: 0.12
+Nodes (16): games, story_title, games, story_title, games, story_title, games, story_title (+8 more)
+
+### Community 1322 - "Community 1322"
+Cohesion: 0.12
+Nodes (17): 3. Flutter Performance, code:dart (// ❌ WRONG: setState rebuilds ENTIRE widget tree), code:dart (// ✅ CORRECT: const prevents rebuilds), code:dart (// ❌ setState rebuilds whole tree), code:dart (// ❌ WRONG: Reading entire provider in build), code:dart (// ❌ WRONG: ListView without builder (renders all)), code:dart (// ❌ WRONG: No caching, full resolution), code:dart (class MyWidget extends StatefulWidget {) (+9 more)
+
+### Community 1323 - "Community 1323"
+Cohesion: 0.16
+Nodes (9): DesignSystemGenerator, Select best matching result based on priority keywords., Extract results list from search result dict., Generate complete design system recommendation., Generates design system recommendations from aggregated searches., Load reasoning rules from CSV., Execute searches across multiple domains., Find matching reasoning rule for a category. (+1 more)
+
+### Community 1324 - "Community 1324"
+Cohesion: 0.12
+Nodes (15): 1. Product Brief / PRD, 1. Requirements Elicitation, 2. User Story Creation, 2. Visual Roadmap, 3. Scope Management, 4. Backlog Refinement & Prioritization, Anti-Patterns (What NOT to do), Core Philosophy (+7 more)
+
+### Community 1325 - "Community 1325"
+Cohesion: 0.12
+Nodes (15): Best Practices, code:block1 (project-name/), code:bash (npx nuxi@latest init my-app), code:bash (npm install @pinia/nuxt @prisma/client zod), code:bash (npm install tailwindcss @tailwindcss/vite), code:ts (import tailwindcss from '@tailwindcss/vite'), code:css (@import "tailwindcss";), code:bash (npm run dev) (+7 more)
+
+### Community 1326 - "Community 1326"
+Cohesion: 0.12
+Nodes (15): Agent → Script Mapping, AI Coding Style, Anti-Patterns (DON'T), 🔴 Before Editing ANY File (THINK FIRST!), Clean Code - Pragmatic AI Coding Standards, Code Structure, code:block1 (File to edit: UserService.ts), code:markdown (## Script Results: [script_name.py]) (+7 more)
+
+### Community 1327 - "Community 1327"
+Cohesion: 0.12
+Nodes (15): 1. The Toolset, 2. Common Debugging Workflows, 3. Platform-Specific Nightmares, 🚫 AI DEBUGGING ANTI-PATTERNS, Android, 🌐 "API Request Failed" (Network), code:block1 (Web Debugging:      Mobile Debugging:), 📝 DEBUGGING CHECKLIST (+7 more)
+
+### Community 1328 - "Community 1328"
+Cohesion: 0.12
+Nodes (15): 8. Advanced Patterns, code:tsx (function Comp() {), code:tsx (let didInit = false), code:tsx (function useWindowEvent(event: string, handler: (e) => void)), code:tsx (function useWindowEvent(event: string, handler: (e) => void)), code:tsx (import { useEffectEvent } from 'react'), code:tsx (function SearchInput({ onSearch }: { onSearch: (q: string) =), code:tsx (import { useEffectEvent } from 'react';) (+7 more)
+
+### Community 1329 - "Community 1329"
+Cohesion: 0.12
+Nodes (16): 🚫 ABSOLUTE RULE: NO STANDARD/CLICHÉ DESIGNS, ⚠️ ASK BEFORE ASSUMING (Context-Aware), code:markdown (🎨 DESIGN COMMITMENT: [RADICAL STYLE NAME]), code:block4 (🎨 DESIGN COMMITMENT (ANTI-SAFE HARBOR):), 🧠 DEEP DESIGN THINKING (MANDATORY - BEFORE ANY DESIGN), 🎨 DESIGN COMMITMENT (REQUIRED OUTPUT), 📐 LAYOUT DIVERSIFICATION MANDATE (REQUIRED), ⛔ NO DEFAULT UI LIBRARIES (+8 more)
+
+### Community 1330 - "Community 1330"
+Cohesion: 0.15
+Nodes (15): api_authentication_required(), jwt_or_session_required(), jwt_required(), parent_or_teacher_required(), parent_required(), Custom decorators for JWT and session authentication, Decorator that checks if the authenticated user has one of the allowed user type, Decorator that allows both JWT and session authentication.     Useful for API en (+7 more)
+
+### Community 1331 - "Community 1331"
+Cohesion: 0.12
+Nodes (15): 1. Current Architecture & Limitations, 2. Phase 1: Backend Optimization (Redis Integration), 3. Phase 2: Frontend Optimization (Throttling & Batching), 4. Phase 3: Advanced State Synchronization (Optional but Recommended), 5. Summary Checklist for Implementation, code:python (# backend/storybookapi/settings.py), code:typescript (// Example Implementation), code:typescript (// Example Payload Structure) (+7 more)
+
+### Community 1332 - "Community 1332"
+Cohesion: 0.12
+Nodes (16): 2. React Native Performance, Animation Performance, code:javascript (// ❌ NEVER DO THIS - AI's favorite mistake), code:javascript (// ✅ CORRECT: All optimizations applied), code:javascript (// Consider FlashList for better performance), code:javascript (// ❌ JS-driven animation (blocks JS thread)), code:javascript (// For animations native driver can't handle, use Reanimated), code:javascript (// ❌ Memory leak: uncleared interval) (+8 more)
+
+### Community 1333 - "Community 1333"
+Cohesion: 0.13
+Nodes (14): 1. Static Analysis, 2. The "Strangler Fig" Pattern, 📝 Archaeologist's Report Format, Code Archaeologist, code:markdown (# 🏺 Artifact Analysis: [Filename]), Core Philosophy, 🕵️ Excavation Toolkit, 🤝 Interaction with Other Agents (+6 more)
+
+### Community 1334 - "Community 1334"
+Cohesion: 0.13
+Nodes (14): 1. The Smoke Suite (P0), 2. The Regression Suite (P1), 3. Visual Regression, 🤖 Automating the "Unhappy Path", Browser Automation, CI/CD, 📜 Coding Standards for Tests, Core Philosophy (+6 more)
+
+### Community 1335 - "Community 1335"
+Cohesion: 0.13
+Nodes (14): code:block1 (project-name/), code:bash (npx create-next-app@latest {{name}} --typescript --eslint), code:bash (npm install next-auth@beta stripe resend @prisma/client), code:css (@import "tailwindcss";), code:bash (npx prisma db push), code:bash (npm run stripe:listen), code:bash (npm run dev), Database Schema (+6 more)
+
+### Community 1336 - "Community 1336"
+Cohesion: 0.13
+Nodes (14): 1. Platform Considerations, 2. Touch Input Principles, 3. Performance Targets, 4. App Store Requirements, 5. Monetization Models, 6. Anti-Patterns, Android (Google Play), Battery Optimization (+6 more)
+
+### Community 1337 - "Community 1337"
+Cohesion: 0.13
+Nodes (14): 5. Re-render Optimization, Overview, Rule 5.10: Use Lazy State Initialization, Rule 5.11: Use Transitions for Non-Urgent Updates, Rule 5.12: Use useRef for Transient Values, Rule 5.1: Calculate Derived State During Rendering, Rule 5.2: Defer State Reads to Usage Point, Rule 5.3: Do not wrap a simple expression with a primitive result type in useMemo (+6 more)
+
+### Community 1338 - "Community 1338"
+Cohesion: 0.13
+Nodes (14): 7. JavaScript Performance, Overview, Rule 7.10: Use Loop for Min/Max Instead of Sort, Rule 7.11: Use Set/Map for O(1) Lookups, Rule 7.12: Use toSorted() Instead of sort() for Immutability, Rule 7.1: Avoid Layout Thrashing, Rule 7.2: Build Index Maps for Repeated Lookups, Rule 7.3: Cache Property Access in Loops (+6 more)
+
+### Community 1339 - "Community 1339"
+Cohesion: 0.13
+Nodes (14): 1. E-E-A-T Framework, 2. Core Web Vitals, 3. Technical SEO Principles, 4. Content SEO Principles, 5. Schema Markup Types, 6. AI Content Guidelines, 7. Ranking Factors (Prioritized), 8. Measurement (+6 more)
+
+### Community 1341 - "Community 1341"
+Cohesion: 0.19
+Nodes (3): J(), W(), z()
+
+### Community 1342 - "Community 1342"
+Cohesion: 0.13
+Nodes (15): 2. Visual Perception (Gestalt Principles), code:block14 (❌ Bad: Large, equal gaps between every line of text in a for), code:block15 (❌ Bad: Some links are blue, some are green, and some are jus), code:block16 (❌ Bad: A list of news articles where the text and image of d), code:block17 (❌ Bad: A 3-step setup where the numbers "1", "2", and "3" ar), code:block18 (❌ Bad: A hyper-realistic 3D illustration of a file folder fo), code:block19 (❌ Bad: A popup window that has no shadow or border, blending), code:block20 (❌ Bad: A homepage with 5 buttons of the same size and color.) (+7 more)
+
+### Community 1343 - "Community 1343"
+Cohesion: 0.14
+Nodes (13): Advanced Exploration Modes, 🔍 Audit Mode, Code Patterns, Discovery Flow, Explorer Agent - Advanced Discovery & Research, 🧪 Feasibility Mode, Interactivity Rules:, 🗺️ Mapping Mode (+5 more)
+
+### Community 1344 - "Community 1344"
+Cohesion: 0.27
+Nodes (13): check_script_exists(), Colors, main(), print_error(), print_header(), print_step(), print_success(), print_summary() (+5 more)
+
+### Community 1345 - "Community 1345"
+Cohesion: 0.14
+Nodes (13): Best Practices (2026 Standards), code:block1 (project-name/), code:bash (npx create-next-app@latest my-app --typescript --tailwind --), code:bash (npm install prisma @prisma/client zod), code:css (@import "tailwindcss";), code:bash (npx prisma init), code:bash (npm run dev --turbo), Directory Structure (+5 more)
+
+### Community 1346 - "Community 1346"
+Cohesion: 0.14
+Nodes (13): code:block1 (/preview           - Show current status), code:block2 (/preview start), code:block3 (/preview), code:block4 (/preview start), code:bash (python .agent/scripts/auto_preview.py start [port]), Commands, Port Conflict, /preview - Preview Management (+5 more)
+
+### Community 1347 - "Community 1347"
+Cohesion: 0.15
+Nodes (12): API Documentation Principles, Code Comment Principles, code:block1 (What needs documenting?), Core Philosophy, Decision Tree, Documentation Principles, Documentation Type Selection, Documentation Writer (+4 more)
+
+### Community 1348 - "Community 1348"
+Cohesion: 0.15
+Nodes (12): Best Practices (Updated), code:block1 (project-name/), code:bash (npx create-expo-app@latest my-app --template default), code:bash (npx expo install expo-router react-native-safe-area-context ), code:bash (npm install nativewind tailwindcss react-native-reanimated), code:bash (npx expo start -c), Directory Structure, Key Packages & Purpose (+4 more)
+
+### Community 1349 - "Community 1349"
+Cohesion: 0.17
+Nodes (11): Content SEO Checklist, Content That Gets Cited, Core Philosophy, Core Web Vitals Targets, E-E-A-T Framework, GEO Checklist, SEO Specialist, SEO vs GEO (+3 more)
+
+### Community 1350 - "Community 1350"
+Cohesion: 0.33
+Nodes (11): Colors, main(), print_error(), print_final_report(), print_header(), print_step(), print_success(), print_warning() (+3 more)
+
+### Community 1351 - "Community 1351"
+Cohesion: 0.17
+Nodes (11): API Security Testing, Authentication Testing, Authorization Testing, BOLA/IDOR Testing, GraphQL Security, Input Validation Testing, JWT Testing, OWASP API Security Top 10 (+3 more)
+
+### Community 1352 - "Community 1352"
+Cohesion: 0.17
+Nodes (11): 10. Decision Process Summary, 1. Constraint Analysis (ALWAYS FIRST), Audience → Design Approach, code:block10 (For EVERY design task:), code:block11 (1. DESIGN   → Read frontend-design principles ← YOU ARE HERE), Frontend Design System, Post-Design Workflow, Reference Files (+3 more)
+
+### Community 1353 - "Community 1353"
+Cohesion: 0.17
+Nodes (11): 3. Trust Building System, 7. Emotion Color Mapping, 8. Psychology Checklist, Before Launch, code:block37 (┌────────────────────────────────────────────────────┐), code:css (/* Trust badge styling */), code:block52 (┌────────────────────────────────────────────────────┐), Trust-Building CSS Patterns (+3 more)
+
+### Community 1354 - "Community 1354"
+Cohesion: 0.17
+Nodes (12): neutral, gray100, gray200, gray300, gray400, gray50, gray500, gray600 (+4 more)
+
+### Community 1355 - "Community 1355"
+Cohesion: 0.23
+Nodes (9): analyzeImageAndGenerateStory(), checkImageSafety(), extractTextWithGemini(), generateStory(), getPageStructureGuidelines(), ImageSafetyResult, PhotoStoryParams, StoryGenerationParams (+1 more)
+
+### Community 1356 - "Community 1356"
+Cohesion: 0.18
+Nodes (10): Common Anti-Patterns You Avoid, Design Decision Process (For UI/UX Tasks), Phase 1: Constraint Analysis (ALWAYS FIRST), Quality Control Loop (MANDATORY), Review Checklist, Senior Frontend Architect, 🎭 Spirit Over Checklist (NO SELF-DECEPTION), When You Should Be Used (+2 more)
+
+### Community 1357 - "Community 1357"
+Cohesion: 0.18
+Nodes (10): Agent States, Available Agents, Best Practices, 🔴 Checkpoint Summary (CRITICAL), Integration with Built-in Agents, Orchestrator - Native Multi-Agent Coordination, 🛑 PHASE 0: QUICK CONTEXT CHECK, 📑 Quick Navigation (+2 more)
+
+### Community 1358 - "Community 1358"
+Cohesion: 0.18
+Nodes (10): Best Practices, CLI Design Principles, CLI Tool Template, code:block1 (project-name/), code:bash (npm login), Directory Structure, Key Components, Publishing (+2 more)
+
+### Community 1359 - "Community 1359"
+Cohesion: 0.18
+Nodes (10): 4. Response Format, code:markdown (💡 **Tip**: I am configured with automatic specialist agent s), code:javascript (// Pseudo-code for decision tree), code:markdown (🤖 **Applying knowledge of `@security-auditor` + `@backend-sp), Core Principle, Intelligent Agent Routing, Optional: First-Time Explanation, Summary (+2 more)
+
+### Community 1360 - "Community 1360"
+Cohesion: 0.25
+Nodes (10): generate_section_file(), group_rules_by_section(), main(), parse_frontmatter(), parse_rule_file(), Group all rules by their section prefix, Generate a merged section file, Main conversion function (+2 more)
+
+### Community 1361 - "Community 1361"
+Cohesion: 0.18
+Nodes (10): After Planning, code:block1 (CONTEXT:), code:block2 ([OK] Plan created: docs/PLAN-{slug}.md), code:block3 (/plan e-commerce site with cart), 🔴 CRITICAL RULES, Expected Output, Naming Examples, /plan - Project Planning Mode (+2 more)
+
+### Community 1362 - "Community 1362"
+Cohesion: 0.18
+Nodes (11): 6. Material Components, Buttons, Cards, Chips, code:block13 (Button Types:), code:block14 (FAB Types:), code:block15 (Card Types:), code:block16 (Types:) (+3 more)
+
+### Community 1363 - "Community 1363"
+Cohesion: 0.18
+Nodes (11): 7. Android-Specific Patterns, Bottom Sheets, code:block18 (Position: Bottom, above navigation), code:block19 (Types:), code:block20 (Types:), code:block21 (Android uses SwipeRefreshLayout pattern:), code:block22 (Every touchable element needs ripple:), Dialogs (+3 more)
+
+### Community 1364 - "Community 1364"
+Cohesion: 0.20
+Nodes (9): Best Practices, Chrome Extension Template, code:block1 (project-name/), Development Tips, Directory Structure, Manifest V3 Concepts, Permissions, Setup Steps (+1 more)
+
+### Community 1365 - "Community 1365"
+Cohesion: 0.20
+Nodes (9): Best Practices, Build Targets, code:block1 (project-name/), Directory Structure, Electron Desktop App Template, Key Concepts, Process Model, Setup Steps (+1 more)
+
+### Community 1366 - "Community 1366"
+Cohesion: 0.20
+Nodes (9): Best Practices, code:block1 (project-name/), Common Commands, Directory Structure, Key Concepts, Setup Steps, Tech Stack, Turbo Pipeline (+1 more)
+
+### Community 1367 - "Community 1367"
+Cohesion: 0.20
+Nodes (9): code:block1 (When to normalize (separate tables):), code:block2 (For every table:), code:block3 (├── CASCADE → Delete children with parent), Foreign Key ON DELETE, Normalization Decision, Primary Key Selection, Relationship Types, Schema Design Principles (+1 more)
+
+### Community 1368 - "Community 1368"
+Cohesion: 0.29
+Nodes (9): check_hardcoded_strings(), check_locale_completeness(), find_locale_files(), flatten_keys(), main(), Flatten nested dict keys., Check for hardcoded strings in code files., Find translation/locale files. (+1 more)
+
+### Community 1369 - "Community 1369"
+Cohesion: 0.20
+Nodes (9): 6. Error Handling for Mobile, 🚫 AI MOBILE BACKEND ANTI-PATTERNS, code:block1 (Mobile clients are DIFFERENT from web clients:), code:json ({), Error Categories, 🧠 MOBILE BACKEND MINDSET, Mobile Backend Patterns, Mobile-Specific Error Format (+1 more)
+
+### Community 1370 - "Community 1370"
+Cohesion: 0.20
+Nodes (9): Behavior, code:markdown (## 🔍 Debug: [Issue]), code:block2, code:block3 (/debug login not working), /debug - Systematic Problem Investigation, Examples, Key Principles, Output Format (+1 more)
+
+### Community 1371 - "Community 1371"
+Cohesion: 0.20
+Nodes (10): code:block10 (1. explorer-agent → Map affected areas), code:markdown (## Orchestration Report), code:bash (# 1. Check for PLAN.md), code:block9 (What domains does this task touch?), Orchestration Workflow, 🔴 STEP 0: PRE-FLIGHT CHECKS (MANDATORY), Step 1: Task Analysis, Step 2: Agent Selection (+2 more)
+
+### Community 1372 - "Community 1372"
+Cohesion: 0.20
+Nodes (9): 1. The Current Architecture (Beta Phase), 2. Roadmap: How to Properly Solve Concurrency Issues, Phase 1: Implement Backend Message Queuing (Recommended), Phase 2: Enterprise API Tiers & Load Balancing, Phase 3: Proxying Image Generation, PixelTales: Concurrency & Scaling Architecture, Summary for Beta Launch, The Bottleneck: API Rate Limits (Error 429) (+1 more)
+
+### Community 1373 - "Community 1373"
+Cohesion: 0.20
+Nodes (10): background, border, borderRadius, color, context, fontSize, fontWeight, hover (+2 more)
+
+### Community 1374 - "Community 1374"
+Cohesion: 0.20
+Nodes (10): code:text (User: "Create a dark mode toggle button"), code:text (User: "Review the authentication flow for vulnerabilities"), code:text (User: "Build a chat application with real-time notifications), code:text (User: "Login is not working, getting 401 error"), Test 1: Simple Frontend Task, Test 2: Security Task, Test 3: Complex Multi-Domain, Test 4: Bug Fix (+2 more)
+
+### Community 1375 - "Community 1375"
+Cohesion: 0.20
+Nodes (10): 5. Android Navigation Patterns, Back Navigation, Bottom Navigation, code:block10 (Types:), code:block11 (┌───────┬─────────────────────────────┐), code:block12 (Android provides system back:), code:block9 (┌─────────────────────────────────────┐), Navigation Components (+2 more)
+
+### Community 1376 - "Community 1376"
+Cohesion: 0.22
+Nodes (8): code:block1 (Request: "add payment system"), code:block2 (1. Analyze existing project), code:block3 (1. Detect error), Error Handling, Feature Analysis, Feature Building, Iterative Enhancement Process, Recovery Strategy
+
+### Community 1377 - "Community 1377"
+Cohesion: 0.22
+Nodes (8): Astro Static Site Template, Best Practices, code:block1 (project-name/), Deployment, Directory Structure, Key Concepts, Setup Steps, Tech Stack
+
+### Community 1378 - "Community 1378"
+Cohesion: 0.22
+Nodes (8): API Response Format, Best Practices, code:block1 (project-name/), Directory Structure, Express.js API Template, Middleware Stack, Setup Steps, Tech Stack
+
+### Community 1379 - "Community 1379"
+Cohesion: 0.22
+Nodes (8): Architecture Layers, Best Practices, code:block1 (project_name/), Directory Structure, Flutter App Template, Key Packages, Setup Steps, Tech Stack
+
+### Community 1380 - "Community 1380"
+Cohesion: 0.22
+Nodes (8): API Structure, Best Practices, code:block1 (project-name/), Directory Structure, FastAPI API Template, Key Concepts, Setup Steps, Tech Stack
+
+### Community 1381 - "Community 1381"
+Cohesion: 0.22
+Nodes (8): 1. Mobile Typography Fundamentals, 9. Typography Checklist, Before Any Text Design, Before Release, code:block1 (DESKTOP:                        MOBILE:), Mobile Type Rules, Mobile Typography Reference, Why Mobile Type is Different
+
+### Community 1382 - "Community 1382"
+Cohesion: 0.22
+Nodes (8): 10. Android Checklist, 1. Material Design 3 Philosophy, Android Platform Guidelines, Before Android Release, Before Every Android Screen, code:block1 (MATERIAL AS METAPHOR:), Core Material Principles, Material Design Values
+
+### Community 1383 - "Community 1383"
+Cohesion: 0.22
+Nodes (8): 10. iOS Checklist, 1. Human Interface Guidelines Philosophy, Before Every iOS Screen, Before iOS Release, code:block1 (CLARITY:), Core Apple Design Principles, iOS Design Values, iOS Platform Guidelines
+
+### Community 1384 - "Community 1384"
+Cohesion: 0.22
+Nodes (7): export_profanity_words(), Export profanity words from local database to JSON file Run: python export_prof, Export all profanity words to JSON file, get_summary(), Run Lighthouse audit on URL., Generate summary based on scores., run_lighthouse()
+
+### Community 1385 - "Community 1385"
+Cohesion: 0.22
+Nodes (8): code:block1 (https://raw.githubusercontent.com/vercel-labs/web-interface-), code:block2 (1. DESIGN   → Read frontend-design principles), Design Workflow, Guidelines Source, How It Works, Related Skills, Usage, Web Interface Guidelines
+
+### Community 1386 - "Community 1386"
+Cohesion: 0.22
+Nodes (8): Behavior, /brainstorm - Structured Idea Exploration, code:markdown (## 🧠 Brainstorm: [Topic]), code:block2 (/brainstorm authentication system), Examples, Key Principles, Output Format, Purpose
+
+### Community 1387 - "Community 1387"
+Cohesion: 0.22
+Nodes (9): Agent Chaining with Context, code:block4 (Use the security-auditor agent to review authentication impl), code:block5 (First, use the explorer-agent to map the codebase structure.), code:block6 (Use the frontend-specialist to analyze React components,), code:block7 (Resume agent [agentId] and continue with the updated require), Multiple Agents (Sequential), Native Agent Invocation Protocol, Resume Previous Agent (+1 more)
+
+### Community 1388 - "Community 1388"
+Cohesion: 0.22
+Nodes (9): downloadButton, background, borderRadius, color, context, fontSize, fontWeight, hover (+1 more)
+
+### Community 1389 - "Community 1389"
+Cohesion: 0.22
+Nodes (9): 6. User Persona Quick Reference, Baby Boomers (Born 1946-1964), code:block48 (CHARACTERISTICS:), code:block49 (CHARACTERISTICS:), code:block50 (CHARACTERISTICS:), code:block51 (CHARACTERISTICS:), Gen X (Born 1965-1980), Gen Z (Born 1997-2012) (+1 more)
+
+### Community 1390 - "Community 1390"
+Cohesion: 0.22
+Nodes (9): 2. System Fonts, Android: Roboto Family, code:block2 (San Francisco (SF) Family:), code:block3 (Roboto Family:), code:block4 (✅ USE system fonts when:), code:block5 (If using custom fonts:), Custom Font Considerations, iOS: SF Pro Family (+1 more)
+
+### Community 1391 - "Community 1391"
+Cohesion: 0.22
+Nodes (9): 9. Android Accessibility, code:block25 (Every interactive element needs:), code:block26 (MANDATORY: 48dp × 48dp minimum), code:block27 (Android supports font scaling:), code:kotlin (// Check motion preference), Font Scaling, Reduce Motion, TalkBack Requirements (+1 more)
+
+### Community 1392 - "Community 1392"
+Cohesion: 0.22
+Nodes (9): 6. iOS Components, Buttons, code:block10 (Button Styles (UIKit/SwiftUI):), code:block11 (List Styles:), code:block12 (iOS Text Field Anatomy:), code:block13 (When to Use:), Lists & Tables, Segmented Controls (+1 more)
+
+### Community 1393 - "Community 1393"
+Cohesion: 0.22
+Nodes (9): 7. iOS Specific Patterns, code:block14 (Native UIRefreshControl behavior:), code:block15 (iOS swipe actions:), code:block16 (Long press → Context menu appears), code:block17 (iOS 15+ Sheets:), Context Menus, Pull to Refresh, Sheets & Half-Sheets (+1 more)
+
+### Community 1394 - "Community 1394"
+Cohesion: 0.22
+Nodes (9): 1. Fitts' Law for Touch, Application Rules, code:block1 (DESKTOP (Mouse/Trackpad):), code:block2 (Touch acquisition time = a + b × log₂(1 + D/W)), code:block3 (┌─────────────────────────────────────┐), Fitts' Law Formula Adapted, Minimum Touch Target Sizes, The Fundamental Difference (+1 more)
+
+### Community 1395 - "Community 1395"
+Cohesion: 0.25
+Nodes (7): args, command, mcpServers, context7, shadcn, args, command
+
+### Community 1396 - "Community 1396"
+Cohesion: 0.54
+Nodes (7): get_project_root(), get_start_command(), is_running(), main(), start_server(), status_server(), stop_server()
+
+### Community 1397 - "Community 1397"
+Cohesion: 0.25
+Nodes (7): code:block1 (✅ Good fit:), code:block2 (Principles:), code:block3 (Protect against:), GraphQL Principles, Schema Design Principles, Security Considerations, When to Use
+
+### Community 1398 - "Community 1398"
+Cohesion: 0.25
+Nodes (7): code:block1 (Choose one:), code:block2 (Include:), Common Patterns, Error Response, Pagination Types, Response Format Principles, Selection Questions
+
+### Community 1399 - "Community 1399"
+Cohesion: 0.36
+Nodes (7): check_api_code(), check_openapi_spec(), find_api_files(), main(), Find API-related files., Check OpenAPI/Swagger specification., Check API code for common issues.
+
+### Community 1400 - "Community 1400"
+Cohesion: 0.25
+Nodes (7): ❌ Anti-Patterns, API Patterns, 📑 Content Map, ✅ Decision Checklist, 🔗 Related Skills, Script, 🎯 Selective Reading Rule
+
+### Community 1401 - "Community 1401"
+Cohesion: 0.25
+Nodes (7): code:block1 (✅ Perfect fit:), code:block2 (Why tRPC:), code:block3 (Common setups:), Integration Patterns, Key Benefits, tRPC Principles, When to Use
+
+### Community 1402 - "Community 1402"
+Cohesion: 0.25
+Nodes (7): code:block1 (project-name/), code:json ({), Next.js Full-Stack Structure (2026+ Next.js 16 Optimized), Path Aliases (tsconfig.json), Project Scaffolding, Structure Principles, When to Use What
+
+### Community 1403 - "Community 1403"
+Cohesion: 0.25
+Nodes (7): Architecture Examples, code:yaml (Requirements:), code:yaml (Requirements:), code:yaml (Requirements:), Example 1: MVP E-commerce (Solo Developer), Example 2: SaaS Product (5-10 Developers), Example 3: Enterprise (100K+ Users)
+
+### Community 1404 - "Community 1404"
+Cohesion: 0.25
+Nodes (7): ADR Storage, ADR Template, code:markdown (## Architecture Decision Record), code:markdown (# ADR-[XXX]: [Decision Title]), code:block3 (docs/), Decision Framework, Trade-off Analysis & ADR
+
+### Community 1405 - "Community 1405"
+Cohesion: 0.25
+Nodes (7): code:block1 (For zero-downtime changes:), Migration Philosophy, Migration Principles, Neon (Serverless PostgreSQL), Safe Migration Strategy, Serverless Databases, Turso (Edge SQLite)
+
+### Community 1406 - "Community 1406"
+Cohesion: 0.25
+Nodes (7): 1. Master Decision Tree, 2. Audience Decision Tree, code:block1 (┌───────────────────────────────────────────────────────────), code:block2 (TARGET AUDIENCE), Decision Trees & Context Templates, ⚠️ How to Use This File, Who is your target user?
+
+### Community 1407 - "Community 1407"
+Cohesion: 0.25
+Nodes (7): 10. Typography Selection Checklist, 7. Letter Spacing (Tracking), Adjustment Guidelines, Anti-Patterns, code:block11 (Large text (headings): tighter tracking), Principles, Typography System Reference
+
+### Community 1408 - "Community 1408"
+Cohesion: 0.36
+Nodes (7): check_page(), find_web_pages(), is_page_file(), main(), Check a single web page for GEO elements., Check if this file is likely a public-facing page., Find public-facing web pages only.
+
+### Community 1409 - "Community 1409"
+Cohesion: 0.25
+Nodes (7): Error Handling, Lint and Validate Skill, Node.js / TypeScript, Procedures by Ecosystem, Python, Scripts, The Quality Loop
+
+### Community 1410 - "Community 1410"
+Cohesion: 0.25
+Nodes (7): 10. Navigation Checklist, 1. Navigation Selection Decision Tree, Before Every Screen, Before Navigation Architecture, Before Release, code:block1 (WHAT TYPE OF APP?), Mobile Navigation Reference
+
+### Community 1411 - "Community 1411"
+Cohesion: 0.36
+Nodes (7): check_page(), find_pages(), is_page_file(), main(), Check if this file is likely a public-facing page., Find page files to check., Check a single page for SEO issues.
+
+### Community 1412 - "Community 1412"
+Cohesion: 0.25
+Nodes (7): Caution, code:block1 ("To add admin panel:), code:block2 (/enhance add dark mode), /enhance - Update Application, Steps:, Task, Usage Examples
+
+### Community 1414 - "Community 1414"
+Cohesion: 0.29
+Nodes (3): dv, Jp(), kT
+
+### Community 1415 - "Community 1415"
+Cohesion: 0.25
+Nodes (8): selected, color, context, display, fontSize, fontWeight, padding, spacing
+
+### Community 1416 - "Community 1416"
+Cohesion: 0.25
+Nodes (8): 2. Font Pairing Principles, Avoid, code:block3 (Contrast + Harmony:), code:block4 (When pairing, compare:), Pairing Strategies, Safe Pairing Patterns, What Makes Fonts Work Together, What to Look For
+
+### Community 1417 - "Community 1417"
+Cohesion: 0.25
+Nodes (8): 4. Cognitive Load Management, code:css (/* Visual noise → Clean */), code:html (<!-- Overwhelming -->), code:html (<!-- Hide complexity until needed -->), code:block42 (✅ Standard navigation placement), code:html (<!-- Don't make users remember -->), Reduction Strategies, Three Types of Cognitive Load
+
+### Community 1418 - "Community 1418"
+Cohesion: 0.25
+Nodes (8): 4. Gradient Principles, code:block7 (Good Gradient Rules:), code:css (.gradient {), code:block9 (Multiple radial gradients overlapped:), Creating Harmonious Gradients, Gradient Syntax Pattern, Mesh Gradients, Types and When to Use
+
+### Community 1419 - "Community 1419"
+Cohesion: 0.25
+Nodes (8): code:markdown (🤖 **Applying knowledge of `@frontend-specialist`...**), code:text (User: "Use @backend-specialist to review this"), DO NOT announce "I'm analyzing your request...", Implementation Rules, Rule 1: Silent Analysis, Rule 2: Inform Agent Selection, Rule 3: Seamless Experience, Rule 4: Override Capability
+
+### Community 1420 - "Community 1420"
+Cohesion: 0.25
+Nodes (8): 3. Dark Mode Design, code:block5 (Users enable dark mode for:), code:block6 (LIGHT MODE                      DARK MODE), code:block7 (DON'T just invert colors:), Color Inversion Rules, Dark Mode Benefits, Dark Mode Color Strategy, Text Colors in Dark Mode
+
+### Community 1421 - "Community 1421"
+Cohesion: 0.25
+Nodes (8): 4. Animation Performance (Both Platforms), Animation Timing Guide, code:block18 (Human eye detects:), code:block19 (GPU-ACCELERATED (FAST):          CPU-BOUND (SLOW):), code:javascript (// React Native Reanimated), GPU vs CPU Animation, Spring Physics, The 60fps Imperative
+
+### Community 1422 - "Community 1422"
+Cohesion: 0.25
+Nodes (8): 3. Material Color System, code:block4 (Android 12+ Dynamic Color:), code:block5 (Surface Colors:), code:block6 (Material Dark Theme:), Dark Theme, Dynamic Color (Material You), Error, Warning, Success Colors, Semantic Color Roles
+
+### Community 1423 - "Community 1423"
+Cohesion: 0.25
+Nodes (8): 5. iOS Navigation Patterns, code:block8 (┌─────────────────────────────────────┐), code:block9 (┌─────────────────────────────────────┐), Gestures, Modal Presentations, Navigation Bar Guidelines, Navigation Types, Tab Bar Guidelines
+
+### Community 1424 - "Community 1424"
+Cohesion: 0.25
+Nodes (8): 2. Thumb Zone Anatomy, code:block4 (Research shows: 49% of users hold phone one-handed.), code:block5 (Right hand holding phone:), code:block6 (On large phones, top 40% becomes "dead zone" for one-handed ), Large Phone Considerations (>6"), One-Handed Phone Usage, Placement Guidelines, Thumb Arc (Right-Handed User)
+
+### Community 1425 - "Community 1425"
+Cohesion: 0.25
+Nodes (8): 5. Haptic Feedback Patterns, Android Haptic Types, code:block11 (Haptics provide:), code:block12 (✅ DO use haptics for:), Haptic Intensity Mapping, Haptic Usage Guidelines, iOS Haptic Types, Why Haptics Matter
+
+### Community 1426 - "Community 1426"
+Cohesion: 0.25
+Nodes (8): 6. Mobile Cognitive Load, code:block13 (1. ONE PRIMARY ACTION per screen), code:block14 (Desktop: 7±2 items in working memory), code:block15 (More choices = slower decisions), Hick's Law for Mobile, How Mobile Differs from Desktop, Miller's Law for Mobile, Reducing Mobile Cognitive Load
+
+### Community 1427 - "Community 1427"
+Cohesion: 0.25
+Nodes (8): Avoid Layout Thrashing, code:typescript (function updateElementStyles(element: HTMLElement) {), code:typescript (function layoutThrashing(element: HTMLElement) {), code:typescript (function updateElementStyles(element: HTMLElement) {), code:typescript (function avoidThrashing(element: HTMLElement) {), code:css (.highlighted-box {), code:typescript (function updateElementStyles(element: HTMLElement) {), code:tsx (// Incorrect: interleaving style changes with layout queries)
+
+### Community 1428 - "Community 1428"
+Cohesion: 0.57
+Nodes (6): analyze_package_json(), count_files(), detect_features(), get_project_root(), main(), print_status()
+
+### Community 1429 - "Community 1429"
+Cohesion: 0.29
+Nodes (6): code:block1 (Protect against:), code:block2 (Include in headers:), Rate Limiting Principles, Response Headers, Strategy Selection, Why Rate Limit
+
+### Community 1430 - "Community 1430"
+Cohesion: 0.29
+Nodes (6): App Builder - Application Building Orchestrator, code:block1 (User: "Make an Instagram clone with photo sharing and likes"), 🔗 Related Agents, 🎯 Selective Reading Rule, 📦 Templates (13), Usage Example
+
+### Community 1431 - "Community 1431"
+Cohesion: 0.29
+Nodes (6): API Patterns, Architecture Patterns Reference, Data Access Patterns, Distributed System Patterns, Domain Logic Patterns, Simplicity Principle
+
+### Community 1432 - "Community 1432"
+Cohesion: 0.29
+Nodes (6): code:block1 (Index these:), code:block2 (Order matters for composite indexes:), Composite Index Principles, Index Type Selection, Indexing Principles, When to Create Indexes
+
+### Community 1433 - "Community 1433"
+Cohesion: 0.29
+Nodes (6): code:block1 (What is N+1?), code:block2 (Before optimizing:), N+1 Problem, Optimization Priorities, Query Analysis Mindset, Query Optimization
+
+### Community 1434 - "Community 1434"
+Cohesion: 0.29
+Nodes (6): 10. Animation Decision Checklist, 7. Hover Effects Principles, Animation Guidelines Reference, Anti-Patterns, Matching Effect to Action, Principles
+
+### Community 1435 - "Community 1435"
+Cohesion: 0.29
+Nodes (6): 1. The Mobile Performance Mindset, code:block1 (DESKTOP:                          MOBILE:), code:block2 (Every frame must complete in:), Mobile Performance Reference, Performance Budget Concept, Why Mobile Performance is Different
+
+### Community 1437 - "Community 1437"
+Cohesion: 0.29
+Nodes (6): 10. Decision Checklist, 11. Anti-Patterns to Avoid, ✅ DO:, ❌ DON'T:, ⚠️ How to Use This Skill, Python Patterns
+
+### Community 1438 - "Community 1438"
+Cohesion: 0.29
+Nodes (6): Before Starting, code:block1 (/create blog site), /create - Create Application, Steps:, Task, Usage Examples
+
+### Community 1439 - "Community 1439"
+Cohesion: 0.29
+Nodes (6): code:block1 (=== Project Status ===), Example Output, /status - Show Status, Task, Technical, What It Shows
+
+### Community 1440 - "Community 1440"
+Cohesion: 0.29
+Nodes (7): 🔴 AGENT BOUNDARY ENFORCEMENT (CRITICAL), code:block2 (WHEN agent is about to write a file:), code:block3 (❌ WRONG:), Enforcement Protocol, Example Violation, File Type Ownership, Strict Boundaries
+
+### Community 1442 - "Community 1442"
+Cohesion: 0.57
+Nodes (7): iconContainer, background, borderRadius, context, padding, iconContainer, iconContainer
+
+### Community 1443 - "Community 1443"
+Cohesion: 0.29
+Nodes (7): 10. Complexity Estimation, code:block13 (Simple landing page), code:block14 (Multi-page site), code:block15 (Full SaaS application), Large Projects (Weeks), Medium Projects (Days), Quick Projects (Hours)
+
+### Community 1444 - "Community 1444"
+Cohesion: 0.29
+Nodes (7): 5. E-commerce Guidelines {#e-commerce}, code:block5 (E-commerce typically needs:), code:block6 (┌────────────────────────────────────────────────────┐), Color Thinking:, Key Principles (Not Fixed Rules), Layout Principles:, Psychology to Apply:
+
+### Community 1445 - "Community 1445"
+Cohesion: 0.29
+Nodes (7): 6. SaaS Dashboard Guidelines {#saas}, code:block7 (Dashboard typically needs:), code:block8 (Consider these patterns (not mandated):), Color Thinking:, Key Principles, Layout Principles:, Psychology to Apply:
+
+### Community 1446 - "Community 1446"
+Cohesion: 0.29
+Nodes (7): 7. Landing Page Guidelines {#landing-page}, code:block10 (┌────────────────────────────────────────────────────┐), code:block9 (Landing page typically needs:), Color Thinking:, Key Principles, Psychology to Apply:, Structure Principles:
+
+### Community 1447 - "Community 1447"
+Cohesion: 0.29
+Nodes (7): 8. Portfolio Guidelines {#portfolio}, code:block11 (Portfolio is personal - many options:), code:block12 (┌────────────────────────────────────────────────────┐), Color Thinking:, Key Principles, Psychology to Apply:, Structure Principles:
+
+### Community 1448 - "Community 1448"
+Cohesion: 0.29
+Nodes (7): 6. Visual Effects Principles, code:block6 (Key properties:), code:block7 (Elevation concept:), code:block8 (Harmonious gradients:), Glassmorphism (When Appropriate), Gradient Usage, Shadow Hierarchy
+
+### Community 1449 - "Community 1449"
+Cohesion: 0.29
+Nodes (7): 1. Modular Scale Principles, Choosing Base Size, code:block1 (A mathematical relationship between font sizes:), code:block2 (Given: base = YOUR_BASE_SIZE, ratio = YOUR_RATIO), Common Ratios and When to Use, Generate Your Scale, What is a Modular Scale?
+
+### Community 1450 - "Community 1450"
+Cohesion: 0.29
+Nodes (7): 2. Emotional Design (Don Norman), code:block33 (┌───────────────────────────────────────────────────────────), code:css (/* Beautiful first impression */), code:javascript (// Instant feedback), code:html (<!-- Brand story and values -->), Designing for Each Level, Three Levels of Processing
+
+### Community 1451 - "Community 1451"
+Cohesion: 0.29
+Nodes (7): 5. Persuasive Design (Ethical), code:html (<!-- Pre-select the recommended option -->), code:html (<!-- Show original price to frame discount -->), code:html (<!-- Real-time activity -->), code:html (<!-- Show progress to encourage completion -->), Ethical Persuasion Techniques, Nudge Patterns
+
+### Community 1452 - "Community 1452"
+Cohesion: 0.29
+Nodes (7): 1. Glassmorphism Principles, code:block1 (Key Properties:), code:css (.glass {), The Pattern (Customize Values), What Makes Glassmorphism Work, When NOT to Use, When to Use Glassmorphism
+
+### Community 1453 - "Community 1453"
+Cohesion: 0.29
+Nodes (7): 2. Neomorphism Principles, Accessibility Warning, code:block3 (Key Concept: Soft, extruded elements using DUAL shadows), code:css (.neo-raised {), The Pattern, What Makes Neomorphism Work, When to Use
+
+### Community 1454 - "Community 1454"
+Cohesion: 0.29
+Nodes (7): 3. Shadow Hierarchy Principles, code:block5 (Higher elevation = larger shadow), code:css (box-shadow: OFFSET-X OFFSET-Y BLUR SPREAD COLOR;), Concept: Shadows Indicate Elevation, Dark Mode Shadows, Principles for Natural Shadows, Shadow Properties to Adjust
+
+### Community 1455 - "Community 1455"
+Cohesion: 0.29
+Nodes (7): 5. Border Effects Principles, Animated Borders, code:block10 (Technique: Pseudo-element with gradient background), code:block11 (Technique: Rotating gradient or conic sweep), code:css (/* Multiple box-shadows create glow */), Glow Borders, Gradient Borders
+
+### Community 1456 - "Community 1456"
+Cohesion: 0.29
+Nodes (7): 6. Glow Effects Principles, code:css (text-shadow:), code:css (box-shadow:), code:css (@keyframes glow-pulse {), Element Glow, Pulsing Glow Animation, Text Glow
+
+### Community 1457 - "Community 1457"
+Cohesion: 0.29
+Nodes (7): 8. Modern CSS Techniques, code:block19 (Instead of viewport breakpoints:), code:block20 (Parent styling based on children:), code:block21 (Animation progress tied to scroll:), Container Queries (Concept), :has() Selector (Concept), Scroll-Driven Animations (Concept)
+
+### Community 1458 - "Community 1458"
+Cohesion: 0.29
+Nodes (7): 9. Performance Principles, code:block22 (CHEAP to animate (GPU):), code:css (/* Use sparingly, only for heavy animations */), code:css (@media (prefers-reduced-motion: reduce) {), GPU-Accelerated Properties, Reduced Motion, will-change Usage
+
+### Community 1459 - "Community 1459"
+Cohesion: 0.29
+Nodes (7): Case 1: Generic Question, Case 2: Extremely Vague Request, Case 3: Contradictory Patterns, code:text (User: "How does React work?"), code:text (User: "Make it better"), code:text (User: "Add mobile support to the web app"), Edge Cases
+
+### Community 1460 - "Community 1460"
+Cohesion: 0.29
+Nodes (7): 1. Push Notifications, Anti-Patterns, code:block2 (┌───────────────────────────────────────────────────────────), code:block3 (TOKEN LIFECYCLE:), Platform Architecture, Push Types, Token Management
+
+### Community 1461 - "Community 1461"
+Cohesion: 0.29
+Nodes (7): 7. Media & Binary Handling, Chunked Upload (Large Files), code:block13 (CLIENT REQUEST:), code:block14 (UPLOAD FLOW:), code:block15 (REQUIREMENTS:), Image Optimization, Streaming Audio/Video
+
+### Community 1462 - "Community 1462"
+Cohesion: 0.29
+Nodes (7): 8. Security for Mobile, code:block16 (VERIFY REAL DEVICE (not emulator/bot):), code:block17 (CLIENT:), code:block18 (MOBILE-SPECIFIC LIMITS:), Device Attestation, Rate Limiting, Request Signing
+
+### Community 1463 - "Community 1463"
+Cohesion: 0.29
+Nodes (7): 10. Quick Reference, code:block19 (True black (OLED max savings): #000000), code:block20 (Primary:   #E0E0E0 to #ECECEC), code:block21 (Small text:  4.5:1 (minimum)), Contrast Ratios, Dark Mode Backgrounds, Text on Dark
+
+### Community 1464 - "Community 1464"
+Cohesion: 0.29
+Nodes (7): 2. OLED Considerations, Battery Savings with OLED, code:block2 (LCD (Liquid Crystal Display):), code:block3 (Color energy consumption (relative):), code:block4 (#000000 (True Black):), How OLED Differs, True Black vs Near Black
+
+### Community 1465 - "Community 1465"
+Cohesion: 0.29
+Nodes (7): 6. Dynamic Color (Android), code:block12 (Android 12+ Dynamic Color:), code:kotlin (// Jetpack Compose), code:block14 (When dynamic color unavailable:), Fallback Colors, Material You, Supporting Dynamic Color
+
+### Community 1466 - "Community 1466"
+Cohesion: 0.29
+Nodes (7): 7. Color Accessibility, code:block15 (~8% of men, ~0.5% of women are colorblind), code:block16 (Use these to verify:), code:block17 (WCAG Guidelines:), Colorblind Considerations, Contrast Testing Tools, Sufficient Contrast
+
+### Community 1467 - "Community 1467"
+Cohesion: 0.29
+Nodes (7): 2. Tab Bar Navigation, code:block2 (✅ USE Tab Bar when:), code:block3 (iOS Tab Bar:), code:block4 (RULE: Each tab maintains its own navigation stack.), Tab Bar Best Practices, Tab State Preservation, When to Use
+
+### Community 1468 - "Community 1468"
+Cohesion: 0.29
+Nodes (7): 6. Deep Linking, code:block11 (Deep links enable:), code:block12 (Scheme://host/path?params), code:block13 (1. FULL STACK CONSTRUCTION), Deep Link Navigation Rules, URL Structure, Why Deep Links from Day One
+
+### Community 1469 - "Community 1469"
+Cohesion: 0.29
+Nodes (7): 8. Transition Animations, code:block16 (iOS Transitions:), code:block17 (When to custom:), code:block18 (Connect elements between screens:), Custom Transitions, Platform Defaults, Shared Element Transitions
+
+### Community 1470 - "Community 1470"
+Cohesion: 0.29
+Nodes (7): 9. Quick Reference Card, Animation Targets, code:javascript (// List: Always use), code:dart (// Widgets: Always const), code:block31 (Transform/Opacity only ← What to animate), Flutter Essentials, React Native Essentials
+
+### Community 1471 - "Community 1471"
+Cohesion: 0.29
+Nodes (7): 10. Quick Reference, code:block17 (// iOS), code:block18 (Body:       14-16pt/sp (16 preferred)), code:block19 (Headings:  1.1-1.3), Line Height, Minimum Sizes, Typography Tokens
+
+### Community 1472 - "Community 1472"
+Cohesion: 0.29
+Nodes (7): 4. Dynamic Type / Text Scaling, Android Text Scaling (MANDATORY), code:swift (// ❌ WRONG: Fixed size (doesn't scale)), code:block8 (ALWAYS use sp for text:), code:block9 (Problems at large text sizes:), iOS Dynamic Type (MANDATORY), Scaling Challenges
+
+### Community 1473 - "Community 1473"
+Cohesion: 0.29
+Nodes (7): 2. Android Typography, code:block2 (Android System Fonts:), code:block3 (sp = Scale-independent pixels), Font Weight Usage, Material Type Scale, Roboto Font Family, Scalable Pixels (sp)
+
+### Community 1474 - "Community 1474"
+Cohesion: 0.29
+Nodes (7): 2. iOS Typography, code:block2 (iOS System Fonts:), code:swift (// ❌ WRONG: Fixed font size), Dynamic Type Support (MANDATORY), Font Weight Usage, iOS Type Scale (Dynamic Type), SF Pro Font Family
+
+### Community 1475 - "Community 1475"
+Cohesion: 0.29
+Nodes (7): 9. iOS Accessibility, code:block20 (Every interactive element needs:), code:block21 (MANDATORY: Support Dynamic Type), code:block22 (Respect motion preferences:), Dynamic Type Scaling, Reduce Motion, VoiceOver Requirements
+
+### Community 1476 - "Community 1476"
+Cohesion: 0.29
+Nodes (7): 10. Quick Reference Card, code:block20 (iOS        Android     WCAG), code:block21 (TOP:      Navigation, settings, back (infrequent)), code:block22 (Light:    Selection, toggle, minor), Haptic Selection, Thumb Zone Actions, Touch Target Sizes
+
+### Community 1477 - "Community 1477"
+Cohesion: 0.29
+Nodes (7): 4. Gesture Psychology, code:block10 (Swipe actions need visual hints:), code:block9 (Problem: Gestures are INVISIBLE.), Common Gesture Conventions, Gesture Affordance Design, Gesture Discoverability Problem, Platform Gesture Differences
+
+### Community 1478 - "Community 1478"
+Cohesion: 0.29
+Nodes (7): 3. Type Hints Strategy, code:block4 (Always type:), code:python (# These are patterns, understand them:), code:block6 (When to use Pydantic:), Common Type Patterns, Pydantic for Validation, When to Type
+
+### Community 1479 - "Community 1479"
+Cohesion: 0.29
+Nodes (7): 6. FastAPI Principles, async def vs def in FastAPI, code:block11 (Use async def when:), code:block12 (Use dependencies for:), code:python (# FastAPI + Pydantic are tightly integrated:), Dependency Injection, Pydantic v2 Integration
+
+### Community 1480 - "Community 1480"
+Cohesion: 0.29
+Nodes (5): Handle drawing operations with page information for cross-page collaboration, Handle drawing operations with page information for cross-page collaboration, Handle full canvas snapshot for persistence, Handle full canvas snapshot for persistence, update_canvas_snapshot()
+
+### Community 1481 - "Community 1481"
+Cohesion: 0.33
+Nodes (5): API Style Selection (2025), code:block1 (Who are the API consumers?), Comparison, Decision Tree, Selection Questions
+
+### Community 1482 - "Community 1482"
+Cohesion: 0.33
+Nodes (5): API Documentation Principles, code:block1 (Include:), code:block2 (Essentials:), Good Documentation Has, OpenAPI/Swagger Essentials
+
+### Community 1483 - "Community 1483"
+Cohesion: 0.33
+Nodes (5): code:block1 (Principles:), HTTP Method Selection, Resource Naming Rules, REST Principles, Status Code Selection
+
+### Community 1484 - "Community 1484"
+Cohesion: 0.33
+Nodes (5): code:block1 (START: What's your MAIN concern?), Main Decision Tree, Pattern Selection Guidelines, Red Flags (Anti-patterns), The 3 Questions (Before ANY Pattern)
+
+### Community 1485 - "Community 1485"
+Cohesion: 0.33
+Nodes (5): Architecture Decision Framework, Core Principle, 🔗 Related Skills, 🎯 Selective Reading Rule, Validation Checklist
+
+### Community 1486 - "Community 1486"
+Cohesion: 0.33
+Nodes (5): code:block1 (What are your requirements?), Comparison, Database Selection (2025), Decision Tree, Questions to Ask
+
+### Community 1487 - "Community 1487"
+Cohesion: 0.47
+Nodes (5): find_schema_files(), main(), Find database schema files., Validate Prisma schema file., validate_prisma_schema()
+
+### Community 1488 - "Community 1488"
+Cohesion: 0.33
+Nodes (5): Anti-Patterns, ⚠️ Core Principle, Database Design, Decision Checklist, 🎯 Selective Reading Rule
+
+### Community 1489 - "Community 1489"
+Cohesion: 0.47
+Nodes (5): check_accessibility(), find_html_files(), main(), Find all HTML/JSX/TSX files., Check a single file for accessibility issues.
+
+### Community 1490 - "Community 1490"
+Cohesion: 0.47
+Nodes (5): detect_project_type(), main(), Detect project type and available linters., Run a single linter and return results., run_linter()
+
+### Community 1491 - "Community 1491"
+Cohesion: 0.47
+Nodes (5): check_python_coverage(), check_typescript_coverage(), main(), Check TypeScript type coverage., Check Python type hints coverage.
+
+### Community 1492 - "Community 1492"
+Cohesion: 0.47
+Nodes (5): detect_test_framework(), main(), Detect test framework and commands., Run tests and return results., run_tests()
+
+### Community 1493 - "Community 1493"
+Cohesion: 0.33
+Nodes (6): Next.js (App Router), Performance Optimization, React Ecosystem, Styling & Design, TypeScript, Your Expertise Areas
+
+### Community 1494 - "Community 1494"
+Cohesion: 0.33
+Nodes (6): genre, borderRadius, context, fontSize, fontWeight, padding
+
+### Community 1495 - "Community 1495"
+Cohesion: 0.33
+Nodes (6): 2. Easing Principles, code:block2 (Easing = how speed changes over time), code:css (/* Entering view = ease-out (decelerate) */), The Pattern, What Easing Does, When to Use Each
+
+### Community 1496 - "Community 1496"
+Cohesion: 0.33
+Nodes (6): 3. Micro-Interaction Principles, Button States, code:block4 (Purpose of micro-interactions:), code:block5 (Hover → slight visual change (lift, color, scale)), Principles, What Makes Good Micro-Interactions
+
+### Community 1497 - "Community 1497"
+Cohesion: 0.33
+Nodes (6): 4. Loading States Principles, code:block6 (Purpose: Reduce perceived wait time), code:block7 (When to show progress:), Progress Indicators, Skeleton Screens, Types by Context
+
+### Community 1498 - "Community 1498"
+Cohesion: 0.33
+Nodes (6): 5. Page Transitions Principles, code:block8 (Simple rule: exit fast, enter slower), code:block9 (Navigation direction = animation direction), Common Patterns, Direction Matching, Transition Strategy
+
+### Community 1499 - "Community 1499"
+Cohesion: 0.33
+Nodes (6): 6. Scroll Animation Principles, Animation Properties, code:block10 (Content appears as user scrolls:), Performance, Progressive Reveal, Trigger Points
+
+### Community 1500 - "Community 1500"
+Cohesion: 0.33
+Nodes (6): 8. Feedback Animation Principles, code:block11 (Celebrate appropriately:), code:block12 (Draw attention without panic:), Error States, Success States, Timing
+
+### Community 1501 - "Community 1501"
+Cohesion: 0.33
+Nodes (6): 9. Performance Principles, code:block13 (GPU-accelerated (FAST):), code:css (@media (prefers-reduced-motion: reduce) {), Optimization Strategies, Respecting User Preferences, What's Cheap to Animate
+
+### Community 1502 - "Community 1502"
+Cohesion: 0.33
+Nodes (6): 3. Layout Principles, 8-Point Grid Concept, code:block2 (Use for proportional harmony:), code:block3 (All spacing and sizing in multiples of 8:), Golden Ratio (φ = 1.618), Key Sizing Principles
+
+### Community 1503 - "Community 1503"
+Cohesion: 0.33
+Nodes (6): 4. Line Length Principles, code:block6 (The sweet spot: 45-75 characters per line), code:css (/* Character-based (recommended) */), Context Adjustments, How to Measure, Optimal Reading Width
+
+### Community 1504 - "Community 1504"
+Cohesion: 0.33
+Nodes (6): 5. Responsive Typography Principles, code:block8 (Fixed sizes don't scale well:), code:css (/* Syntax: clamp(MIN, PREFERRED, MAX) */), Fluid Typography (clamp), Scaling Strategy, The Problem
+
+### Community 1505 - "Community 1505"
+Cohesion: 0.33
+Nodes (6): 7. Overlay Techniques, code:block16 (Purpose: Improve text readability over images), code:css (.overlay::after {), code:css (/* Blend mode or layered gradient */), Colored Overlay, Gradient Overlay on Images
+
+### Community 1506 - "Community 1506"
+Cohesion: 0.33
+Nodes (6): 2. Offline Sync & Conflict Resolution, code:block4 (WHAT TYPE OF DATA?), code:block5 (CLIENT SIDE:), Conflict Resolution Strategies, Sync Queue Pattern, Sync Strategy Selection
+
+### Community 1507 - "Community 1507"
+Cohesion: 0.33
+Nodes (6): 3. Mobile API Optimization, Batch Requests, code:block6 (OFFSET (Bad for mobile):), code:block7 (Instead of:), Pagination: Cursor vs Offset, Response Size Reduction
+
+### Community 1508 - "Community 1508"
+Cohesion: 0.33
+Nodes (6): 5. Semantic Colors, code:block10 (NEVER use semantic colors for:), code:block11 (Error states need:), Consistent Meaning, Error State Colors, Semantic Color Rules
+
+### Community 1509 - "Community 1509"
+Cohesion: 0.33
+Nodes (6): 3. Stack Navigation, Back Button Handling, code:block5 (Stack metaphor: Cards stacked on top of each other), code:block6 (iOS:), Core Concepts, Stack Navigation Patterns
+
+### Community 1510 - "Community 1510"
+Cohesion: 0.33
+Nodes (6): 5. Modal Navigation, code:block10 (Users expect to dismiss modals by:), code:block9 (PUSH (Stack):                    MODAL:), Modal Dismissal, Modal Types, Modal vs Push
+
+### Community 1511 - "Community 1511"
+Cohesion: 0.33
+Nodes (6): 5. Memory Management, code:block21 (Image memory = width × height × 4 bytes (RGBA)), code:block22 (React Native:), Common Memory Leaks, Image Memory, Memory Profiling
+
+### Community 1512 - "Community 1512"
+Cohesion: 0.33
+Nodes (6): 6. Battery Optimization, Background Task Guidelines, Battery Drain Sources, code:block23 (OLED screens: Black pixels = OFF = 0 power), code:block24 (iOS:), OLED Battery Saving
+
+### Community 1513 - "Community 1513"
+Cohesion: 0.33
+Nodes (6): 8. Performance Testing, code:block27 (⚠️ NEVER trust only:), code:markdown (## During Development), Performance Monitoring Checklist, Test on Real Devices, What to Test
+
+### Community 1514 - "Community 1514"
+Cohesion: 0.33
+Nodes (6): 5. Typography Accessibility, code:block10 (Normal text (< 18pt or < 14pt bold):), code:block11 (WCAG Success Criterion 1.4.12:), Contrast Requirements (WCAG), Line Height for Accessibility, Minimum Sizes
+
+### Community 1515 - "Community 1515"
+Cohesion: 0.33
+Nodes (6): 6. Dark Mode Typography, code:block12 (Light Mode:               Dark Mode:), code:block13 (Dark mode text appears thinner due to halation), Color Adjustments, Dark Mode Hierarchy, Weight in Dark Mode
+
+### Community 1516 - "Community 1516"
+Cohesion: 0.33
+Nodes (6): 4. Android Layout & Spacing, Canonical Layouts, code:block7 (Android uses 8dp baseline grid:), code:block8 (Window Size Classes:), Layout Grid, Responsive Layout
+
+### Community 1517 - "Community 1517"
+Cohesion: 0.33
+Nodes (6): 8. Material Symbols, code:block23 (Material Symbols: Google's icon library), code:block24 (Icon States:), Icon Sizes, States, Usage Guidelines
+
+### Community 1518 - "Community 1518"
+Cohesion: 0.33
+Nodes (6): 3. iOS Color System, code:block4 (Use semantic colors for automatic dark mode:), code:block5 (iOS Dark Mode is not inverted light mode:), Dark Mode Considerations, System Accent Colors, System Colors (Semantic)
+
+### Community 1519 - "Community 1519"
+Cohesion: 0.33
+Nodes (6): 4. iOS Layout & Spacing, code:block6 (┌─────────────────────────────────────┐), code:block7 (iPhone Grid (Standard):), iOS Grid System, Safe Areas, Standard Margins & Padding
+
+### Community 1520 - "Community 1520"
+Cohesion: 0.33
+Nodes (6): 8. SF Symbols, code:block18 (SF Symbols: Apple's icon library (5000+ icons)), code:swift (// SwiftUI), Symbol Best Practices, Symbol Configurations, Usage Guidelines
+
+### Community 1521 - "Community 1521"
+Cohesion: 0.33
+Nodes (6): 3. Touch vs Click Psychology, code:block7 (Tap → Immediate visual change (< 50ms)), code:block8 (Problem: Finger occludes target during tap), Expectation Differences, The "Fat Finger" Problem, Touch Feedback Requirements
+
+### Community 1522 - "Community 1522"
+Cohesion: 0.33
+Nodes (6): 7. Touch Accessibility, Accessible Touch Patterns, code:block16 (Users with motor impairments may:), code:block17 (WCAG 2.2 Success Criterion 2.5.8:), Motor Impairment Considerations, Touch Target Spacing (A11y)
+
+### Community 1523 - "Community 1523"
+Cohesion: 0.33
+Nodes (6): 8. Emotion in Touch, code:block18 (What makes touch feel "premium":), code:block19 (Trust signals in touch interactions:), Emotional Touch Feedback, The Premium Feel, Trust Building Through Touch
+
+### Community 1524 - "Community 1524"
+Cohesion: 0.33
+Nodes (6): 2. Async vs Sync Decision, Async Library Selection, code:block2 (async def is better when:), code:block3 (I/O-bound → async (waiting for external)), The Golden Rule, When to Use Async
+
+### Community 1525 - "Community 1525"
+Cohesion: 0.33
+Nodes (6): 9. Testing Principles, Async Testing, code:python (# Use pytest-asyncio for async tests), code:block18 (Common fixtures:), Fixtures Strategy, Testing Strategy
+
+### Community 1526 - "Community 1526"
+Cohesion: 0.33
+Nodes (5): delete_page_from_draft(), is_anyone_on_page(), Handle deleting a page, Handle deleting a page, resolve_page_index_from_id()
+
+### Community 1527 - "Community 1527"
+Cohesion: 0.40
+Nodes (4): Authentication Patterns, code:block1 (Important:), JWT Principles, Selection Guide
+
+### Community 1528 - "Community 1528"
+Cohesion: 0.40
+Nodes (4): code:block1 (Consider:), Decision Factors, Versioning Philosophy, Versioning Strategies
+
+### Community 1529 - "Community 1529"
+Cohesion: 0.40
+Nodes (4): Agent Coordination, Agent Pipeline, code:block1 (┌───────────────────────────────────────────────────────────), Execution Order
+
+### Community 1530 - "Community 1530"
+Cohesion: 0.40
+Nodes (4): code:block1 (1. Tokenize user request), Detection Process, Keyword Matrix, Project Type Detection
+
+### Community 1531 - "Community 1531"
+Cohesion: 0.40
+Nodes (4): Alternative Options, code:yaml (Frontend:), Default Stack (Web App - 2026), Tech Stack Selection (2026)
+
+### Community 1532 - "Community 1532"
+Cohesion: 0.40
+Nodes (4): code:block1 (MVP              SaaS           Enterprise), Context Discovery, Project Classification Matrix, Question Hierarchy (Ask User FIRST)
+
+### Community 1533 - "Community 1533"
+Cohesion: 0.40
+Nodes (4): code:block1 (What's the context?), Comparison, Decision Tree, ORM Selection (2025)
+
+### Community 1534 - "Community 1534"
+Cohesion: 0.40
+Nodes (4): 9. Color System Checklist, Before Choosing Colors, Before Release, Mobile Color System Reference
+
+### Community 1535 - "Community 1535"
+Cohesion: 0.40
+Nodes (4): 9. Touch Psychology Checklist, Before Every Screen, Before Release, Touch Psychology Reference
+
+### Community 1536 - "Community 1536"
+Cohesion: 0.40
+Nodes (4): Run basic accessibility check., Run basic browser test on URL., run_accessibility_check(), run_basic_test()
+
+### Community 1537 - "Community 1537"
+Cohesion: 0.40
+Nodes (5): 🔴 CHECKPOINT 1: Plan Verification (MANDATORY), 🔴 CHECKPOINT 2: Project Type Routing, code:block1 (Before I coordinate the agents, I need to understand your re), 🛑 CRITICAL: CLARIFY BEFORE ORCHESTRATING, How to Clarify:
+
+### Community 1538 - "Community 1538"
+Cohesion: 0.40
+Nodes (5): code:block12 (🔴 STEP 0: Pre-flight Check), code:block13 (❌ SKIP Step 0 check), code:block14 (🔴 STEP 0: Pre-flight Check), Example Orchestration, ❌ WRONG Example (Plan Missing)
+
+### Community 1540 - "Community 1540"
+Cohesion: 0.40
+Nodes (5): game_type, id, questions, games_data, 382
+
+### Community 1541 - "Community 1541"
+Cohesion: 0.60
+Nodes (5): icon, color, context, size, icon
+
+### Community 1542 - "Community 1542"
+Cohesion: 0.40
+Nodes (5): 1. Duration Principles, Choosing Duration, code:block1 (Factors that determine animation speed:), Duration Ranges by Purpose, What Affects Timing
+
+### Community 1543 - "Community 1543"
+Cohesion: 0.40
+Nodes (5): 9. Pre-Design Checklists, Before Choosing Colors, Before Delivery, Before Finalizing Layout, Before Starting ANY Design
+
+### Community 1544 - "Community 1544"
+Cohesion: 0.40
+Nodes (5): 2. UX Psychology Principles, code:block1 (VISCERAL (instant)  → First impression: colors, imagery, ove), Core Laws (Internalize These), Emotional Design Levels, Trust Building
+
+### Community 1545 - "Community 1545"
+Cohesion: 0.40
+Nodes (5): 4. Color Principles, 60-30-10 Rule, code:block4 (60% → Primary/Background (calm, neutral base)), Color Psychology (For Decision Making), Selection Process
+
+### Community 1546 - "Community 1546"
+Cohesion: 0.40
+Nodes (5): 5. Next.js 16+ Modern Form Patterns, code:tsx (import Form from 'next/form'), Implementation Example (Search Bar), The `<Form>` Component Advantage, When to use `<Form>` vs. standard `<form>`:
+
+### Community 1547 - "Community 1547"
+Cohesion: 0.40
+Nodes (5): 5. Typography Principles, code:block5 (Contrast + Harmony:), Pairing Concept, Readability Rules, Scale Selection
+
+### Community 1548 - "Community 1548"
+Cohesion: 0.40
+Nodes (5): 7. Animation Principles, code:block9 (Duration based on:), Easing Selection, Performance, Timing Concept
+
+### Community 1549 - "Community 1549"
+Cohesion: 0.40
+Nodes (5): 3. Line Height Principles, Adjustment Factors, code:block5 (Line height depends on:), Guidelines by Context, The Relationship
+
+### Community 1550 - "Community 1550"
+Cohesion: 0.40
+Nodes (5): 6. Weight and Emphasis Principles, Avoid, code:block10 (Good contrast = skip at least 2 weight levels), Creating Contrast, Semantic Weight Usage
+
+### Community 1551 - "Community 1551"
+Cohesion: 0.40
+Nodes (5): 8. Hierarchy Principles, code:block12 (Ways to create hierarchy:), Testing Hierarchy, Typical Hierarchy, Visual Hierarchy Through Type
+
+### Community 1552 - "Community 1552"
+Cohesion: 0.40
+Nodes (5): 9. Readability Psychology, Chunking for Comprehension, code:block13 (Users scan in F-pattern:), Cognitive Ease, F-Pattern Reading
+
+### Community 1553 - "Community 1553"
+Cohesion: 0.40
+Nodes (5): 1. Request Analysis, 2. Agent Selection Matrix, 3. Automatic Routing Protocol, code:mermaid (graph TD), How It Works
+
+### Community 1554 - "Community 1554"
+Cohesion: 0.40
+Nodes (5): 4. App Versioning, code:block8 (GET /api/app-config), code:block9 (CLIENT VERSION vs MINIMUM VERSION:), Version Check Endpoint, Version Comparison Logic
+
+### Community 1555 - "Community 1555"
+Cohesion: 0.40
+Nodes (5): 5. Authentication for Mobile, code:block10 (ACCESS TOKEN:), code:block11 (REQUEST FLOW:), Silent Re-authentication, Token Strategy
+
+### Community 1556 - "Community 1556"
+Cohesion: 0.40
+Nodes (5): 9. Monitoring & Analytics, code:block19 (Every mobile request should include:), code:block20 (FOR EACH REQUEST:), Required Headers from Mobile, What to Log
+
+### Community 1557 - "Community 1557"
+Cohesion: 0.40
+Nodes (5): Authentication, Before API Design, For Every Endpoint, 📝 MOBILE BACKEND CHECKLIST, Push Notifications
+
+### Community 1558 - "Community 1558"
+Cohesion: 0.40
+Nodes (5): 4. Outdoor Visibility, code:block8 (Screen visibility outdoors:), code:block9 (For outdoor visibility:), High Contrast Strategies, The Sunlight Problem
+
+### Community 1559 - "Community 1559"
+Cohesion: 0.40
+Nodes (5): 4. Drawer Navigation, code:block7 (✅ USE Drawer when:), code:block8 (Modal Drawer:), Drawer Patterns, When to Use
+
+### Community 1560 - "Community 1560"
+Cohesion: 0.40
+Nodes (5): 7. Navigation State Persistence, code:block14 (SHOULD persist:), code:javascript (// React Navigation - State Persistence), Implementation, What to Persist
+
+### Community 1561 - "Community 1561"
+Cohesion: 0.40
+Nodes (5): 7. Network Performance, code:block25 (┌──────────────┐), code:block26 (BATCH: Combine multiple requests into one), Offline-First Architecture, Request Optimization
+
+### Community 1562 - "Community 1562"
+Cohesion: 0.40
+Nodes (5): 3. Type Scale, Android Type Scale (Material 3), code:block6 (If creating custom scale, use modular ratio:), Creating Custom Scale, iOS Type Scale (Built-in)
+
+### Community 1563 - "Community 1563"
+Cohesion: 0.40
+Nodes (5): 8. Font Loading & Performance, code:block15 (Font file sizes matter on mobile:), code:block16 (1. SYSTEM FONT FALLBACK), Font File Optimization, Loading Strategy
+
+### Community 1564 - "Community 1564"
+Cohesion: 0.40
+Nodes (5): Cache Storage API Calls, code:typescript (function getTheme() {), code:typescript (const storageCache = new Map<string, string | null>()), code:typescript (let cookieCache: Record<string, string> | null = null), code:typescript (window.addEventListener('storage', (e) => {)
+
+### Community 1565 - "Community 1565"
+Cohesion: 0.40
+Nodes (5): code:typescript (interface Project {), code:typescript (function getOldestAndNewest(projects: Project[]) {), code:typescript (function getLatestProject(projects: Project[]) {), code:typescript (const numbers = [5, 2, 8, 1, 9]), Use Loop for Min/Max Instead of Sort
+
+### Community 1566 - "Community 1566"
+Cohesion: 0.40
+Nodes (5): 1. Framework Selection (2025), code:block1 (What are you building?), Comparison Principles, Decision Tree, Selection Questions to Ask:
+
+### Community 1567 - "Community 1567"
+Cohesion: 0.40
+Nodes (5): 4. Project Structure Principles, code:block7 (Small project / Script:), code:block8 (Organize by feature or layer:), FastAPI Structure Principles, Structure Selection
+
+### Community 1568 - "Community 1568"
+Cohesion: 0.40
+Nodes (5): 5. Django Principles (2025), code:block10 (Model design:), code:block9 (Django supports async:), Django Async (Django 5.0+), Django Best Practices
+
+### Community 1569 - "Community 1569"
+Cohesion: 0.40
+Nodes (5): 8. Error Handling Principles, code:block15 (In FastAPI:), code:block16 (Include:), Error Response Philosophy, Exception Strategy
+
+### Community 1570 - "Community 1570"
+Cohesion: 0.40
+Nodes (3): Send vote result notification, Send vote result notification, Send advanced text edit update to client
+
+### Community 1571 - "Community 1571"
+Cohesion: 0.40
+Nodes (3): ViewSet for accessing story games, Allow anyone to browse games, but require auth to play, StoryGameViewSet
+
+### Community 1572 - "Community 1572"
+Cohesion: 0.50
+Nodes (3): Project Templates, 🎯 Selective Reading Rule, Usage
+
+### Community 1573 - "Community 1573"
+Cohesion: 0.50
+Nodes (3): 10. Effect Selection Checklist, Anti-Patterns, Visual Effects Reference
+
+### Community 1574 - "Community 1574"
+Cohesion: 0.50
+Nodes (4): Code Quality, Component Development, Performance Optimization, What You Do
+
+### Community 1575 - "Community 1575"
+Cohesion: 0.50
+Nodes (4): Design Process, Quality Control, 📑 Quick Navigation, Technical Implementation
+
+### Community 1577 - "Community 1577"
+Cohesion: 0.50
+Nodes (3): import_profanity_words(), Import profanity words from JSON file to database Run: python import_profanity_, Import profanity words from JSON file
+
+### Community 1578 - "Community 1578"
+Cohesion: 0.50
+Nodes (4): game_type, id, questions, 383
+
+### Community 1579 - "Community 1579"
+Cohesion: 0.50
+Nodes (4): game_type, id, questions, 386
+
+### Community 1580 - "Community 1580"
+Cohesion: 0.50
+Nodes (4): game_type, id, questions, 388
+
+### Community 1581 - "Community 1581"
+Cohesion: 0.50
+Nodes (4): game_type, id, questions, 389
+
+### Community 1582 - "Community 1582"
+Cohesion: 0.50
+Nodes (4): game_type, id, questions, 391
+
+### Community 1583 - "Community 1583"
+Cohesion: 0.50
+Nodes (4): game_type, id, questions, 392
+
+### Community 1584 - "Community 1584"
+Cohesion: 0.50
+Nodes (4): game_type, id, questions, 394
+
+### Community 1585 - "Community 1585"
+Cohesion: 0.50
+Nodes (4): game_type, id, questions, 395
+
+### Community 1586 - "Community 1586"
+Cohesion: 0.50
+Nodes (4): game_type, id, questions, 466
+
+### Community 1587 - "Community 1587"
+Cohesion: 0.50
+Nodes (4): game_type, id, questions, 467
+
+### Community 1588 - "Community 1588"
+Cohesion: 0.50
+Nodes (4): game_type, id, questions, 468
+
+### Community 1589 - "Community 1589"
+Cohesion: 0.50
+Nodes (4): game_type, id, questions, 469
+
+### Community 1590 - "Community 1590"
+Cohesion: 0.50
+Nodes (4): game_type, id, questions, 470
+
+### Community 1591 - "Community 1591"
+Cohesion: 0.50
+Nodes (4): game_type, id, questions, 494
+
+### Community 1592 - "Community 1592"
+Cohesion: 0.50
+Nodes (4): destructive, primary, secondary, ActionButton
+
+### Community 1593 - "Community 1593"
+Cohesion: 0.50
+Nodes (4): color, context, size, helpCenter
+
+### Community 1594 - "Community 1594"
+Cohesion: 0.50
+Nodes (4): 3. Color Selection Decision Tree, code:block3 (WHAT EMOTION/ACTION DO YOU WANT?), Instead of fixed hex codes, use this process:, The Process:
+
+### Community 1595 - "Community 1595"
+Cohesion: 0.50
+Nodes (4): 8. "Wow Factor" Checklist, Emotional Triggers, Premium Indicators, Trust Builders
+
+### Community 1596 - "Community 1596"
+Cohesion: 0.50
+Nodes (4): 9. Anti-Patterns (What NOT to Do), ❌ AI Tendency Patterns (AVOID!), ❌ Dark Patterns (Unethical), ❌ Lazy Design Indicators
+
+### Community 1597 - "Community 1597"
+Cohesion: 0.50
+Nodes (4): code:text (Example: "Create a secure login system with dark mode UI"), Domain Detection Rules, Multi-Domain Tasks (Auto-invoke Orchestrator), Single-Domain Tasks (Auto-invoke Single Agent)
+
+### Community 1598 - "Community 1598"
+Cohesion: 0.50
+Nodes (4): COMPLEX (Orchestrator required), Complexity Assessment, MODERATE (2-3 agents), SIMPLE (Direct agent invocation)
+
+### Community 1599 - "Community 1599"
+Cohesion: 0.50
+Nodes (4): Integration with Existing Workflows, With GEMINI.md Rules, With /orchestrate Command, With Socratic Gate
+
+### Community 1600 - "Community 1600"
+Cohesion: 0.50
+Nodes (4): 1. Mobile Color Fundamentals, code:block1 (DESKTOP:                           MOBILE:), Mobile Color Priorities, Why Mobile Color is Different
+
+### Community 1601 - "Community 1601"
+Cohesion: 0.50
+Nodes (4): 8. Color Anti-Patterns, ❌ AI Color Mistakes, code:block18 (AI tends to:), ❌ Common Mistakes
+
+### Community 1602 - "Community 1602"
+Cohesion: 0.50
+Nodes (4): 9. Navigation Anti-Patterns, ❌ AI Navigation Mistakes, code:block19 (AI tends to:), ❌ Navigation Sins
+
+### Community 1603 - "Community 1603"
+Cohesion: 0.50
+Nodes (4): 7. Typography Anti-Patterns, ❌ AI Typography Mistakes, code:block14 (AI tends to:), ❌ Common Mistakes
+
+### Community 1604 - "Community 1604"
+Cohesion: 0.50
+Nodes (4): code:tsx (useEffect(() => {), code:tsx (useEffect(() => {), code:tsx (// Incorrect: runs on width=767, 766, 765...), Narrow Effect Dependencies
+
+### Community 1605 - "Community 1605"
+Cohesion: 0.50
+Nodes (4): Cache Repeated Function Calls, code:typescript (function ProjectList({ projects }: { projects: Project[] }) ), code:typescript (// Module-level cache), code:typescript (let isLoggedInCache: boolean | null = null)
+
+### Community 1606 - "Community 1606"
+Cohesion: 0.50
+Nodes (4): code:tsx (function Highlighter({ text, query }: Props) {), code:tsx (const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/), code:typescript (const regex = /foo/g), Hoist RegExp Creation
+
+### Community 1607 - "Community 1607"
+Cohesion: 0.50
+Nodes (4): code:typescript (function UserList({ users }: { users: User[] }) {), code:typescript (function UserList({ users }: { users: User[] }) {), code:typescript (// Fallback for older browsers), Use toSorted() Instead of sort() for Immutability
+
+### Community 1608 - "Community 1608"
+Cohesion: 0.50
+Nodes (4): 7. Background Tasks, code:block14 (FastAPI BackgroundTasks:), Selection Guide, When to Use Each
+
+### Community 1609 - "Community 1609"
+Cohesion: 0.50
+Nodes (3): add_page_to_draft(), Handle adding a new page, Handle adding a new page
+
+### Community 1610 - "Community 1610"
+Cohesion: 0.50
+Nodes (3): get_page_viewers(), Handle request for page viewer information, Handle request for page viewer information
+
+### Community 1611 - "Community 1611"
+Cohesion: 0.50
+Nodes (3): get_canvas_state_from_db(), Handle request for canvas sync after reconnection, Handle request for canvas sync after reconnection
+
+### Community 1613 - "Community 1613"
+Cohesion: 0.67
+Nodes (3): 1. THE MODERN CLICHÉ SCAN (ANTI-SAFE HARBOR), 2. TOPOLOGICAL HYPOTHESIS, 🧠 DEEP DESIGN THINKING (PHASE 1 - MANDATORY)
+
+### Community 1614 - "Community 1614"
+Cohesion: 0.67
+Nodes (3): Architecture Decisions, Component Design Decisions, Decision Framework
+
+### Community 1615 - "Community 1615"
+Cohesion: 0.67
+Nodes (3): Conflict Resolution, Disagreement Between Agents, Same File Edits
+
+### Community 1617 - "Community 1617"
+Cohesion: 0.67
+Nodes (3): 4. Typography Decision Tree, code:block4 (WHAT'S THE CONTENT TYPE?), Selection Process:
+
+### Community 1618 - "Community 1618"
+Cohesion: 0.67
+Nodes (3): ⚠️ CRITICAL: ASK BEFORE ASSUMING (MANDATORY), ⛔ DEFAULT TENDENCIES TO AVOID (ANTI-SAFE HARBOR):, When User Prompt is Vague, ASK:
+
+### Community 1619 - "Community 1619"
+Cohesion: 0.67
+Nodes (3): code:markdown (## DEBUG: Intelligent Routing), Debugging Agent Selection, Enable Debug Mode (for development)
+
+### Community 1620 - "Community 1620"
+Cohesion: 0.67
+Nodes (3): Performance Considerations, Response Time, Token Usage
+
+### Community 1621 - "Community 1621"
+Cohesion: 0.67
+Nodes (3): Calculate Derived State During Rendering, code:tsx (function Form() {), code:tsx (function Form() {)
+
+### Community 1622 - "Community 1622"
+Cohesion: 0.67
+Nodes (3): code:tsx (const UserAvatar = memo(function UserAvatar({ user }: { user), code:tsx (function Profile({ user, loading }: Props) {), Extract to Memoized Components
+
+### Community 1623 - "Community 1623"
+Cohesion: 0.67
+Nodes (3): code:tsx (function Form() {), code:tsx (function Form() {), Put Interaction Logic in Event Handlers
+
+### Community 1624 - "Community 1624"
+Cohesion: 0.67
+Nodes (3): code:tsx (function Sidebar() {), code:tsx (function Sidebar() {), Subscribe to Derived State
+
+### Community 1625 - "Community 1625"
+Cohesion: 0.67
+Nodes (3): code:tsx (function TodoList() {), code:tsx (function TodoList() {), Use Functional setState Updates
+
+### Community 1626 - "Community 1626"
+Cohesion: 0.67
+Nodes (3): code:tsx (function FilteredList({ items }: { items: Item[] }) {), code:tsx (function FilteredList({ items }: { items: Item[] }) {), Use Lazy State Initialization
+
+### Community 1627 - "Community 1627"
+Cohesion: 0.67
+Nodes (3): code:tsx (function ScrollTracker() {), code:tsx (import { startTransition } from 'react'), Use Transitions for Non-Urgent Updates
+
+### Community 1628 - "Community 1628"
+Cohesion: 0.67
+Nodes (3): code:tsx (function Tracker() {), code:tsx (function Tracker() {), Use useRef for Transient Values
+
+### Community 1629 - "Community 1629"
+Cohesion: 0.67
+Nodes (3): code:tsx (function ShareButton({ chatId }: { chatId: string }) {), code:tsx (function ShareButton({ chatId }: { chatId: string }) {), Defer State Reads to Usage Point
+
+### Community 1630 - "Community 1630"
+Cohesion: 0.67
+Nodes (3): code:tsx (function Header({ user, notifications }: Props) {), code:tsx (function Header({ user, notifications }: Props) {), Do not wrap a simple expression with a primitive result type in useMemo
+
+### Community 1631 - "Community 1631"
+Cohesion: 0.67
+Nodes (3): code:tsx (const UserAvatar = memo(function UserAvatar({ onClick = () =), code:tsx (const NOOP = () => {};), Extract Default Non-primitive Parameter Value from Memoized Component to Constant
+
+### Community 1632 - "Community 1632"
+Cohesion: 0.67
+Nodes (3): Build Index Maps for Repeated Lookups, code:typescript (function processOrders(orders: Order[], users: User[]) {), code:typescript (function processOrders(orders: Order[], users: User[]) {)
+
+### Community 1633 - "Community 1633"
+Cohesion: 0.67
+Nodes (3): Cache Property Access in Loops, code:typescript (for (let i = 0; i < arr.length; i++) {), code:typescript (const value = obj.config.settings.value)
+
+### Community 1634 - "Community 1634"
+Cohesion: 0.67
+Nodes (3): code:typescript (const admins = users.filter(u => u.isAdmin)), code:typescript (const admins: User[] = []), Combine Multiple Array Iterations
+
+### Community 1635 - "Community 1635"
+Cohesion: 0.67
+Nodes (3): code:typescript (function hasChanges(current: string[], original: string[]) {), code:typescript (function hasChanges(current: string[], original: string[]) {), Early Length Check for Array Comparisons
+
+### Community 1636 - "Community 1636"
+Cohesion: 0.67
+Nodes (3): code:typescript (function validateUsers(users: User[]) {), code:typescript (function validateUsers(users: User[]) {), Early Return from Functions
+
+### Community 1637 - "Community 1637"
+Cohesion: 0.67
+Nodes (3): code:typescript (const allowedIds = ['a', 'b', 'c', ...]), code:typescript (const allowedIds = new Set(['a', 'b', 'c', ...])), Use Set/Map for O(1) Lookups
+
 ## Knowledge Gaps
-- **9261 isolated node(s):** `config`, `typescript`, `@capacitor-community/safe-area`, `@capacitor-community/text-to-speech`, `@capacitor/android` (+9256 more)
+- **11464 isolated node(s):** `config`, `typescript`, `@capacitor-community/safe-area`, `@capacitor-community/text-to-speech`, `@capacitor/android` (+11459 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **234 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **290 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `r()` connect `Community 1` to `Community 0`, `Community 36`, `Community 8`, `Community 9`, `Community 110`, `Community 271`, `Community 17`, `Community 20`, `Community 157`, `Community 23`, `Community 24`, `Community 57`, `Community 381`?**
-  _High betweenness centrality (0.010) - this node is a cross-community bridge._
-- **Why does `convertImageToDataUrl()` connect `Community 15` to `Community 13`, `Community 110`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
-- **Why does `useToastContext()` connect `Community 26` to `Community 10`, `Community 11`, `Community 14`?**
+- **Why does `r()` connect `Community 1` to `Community 0`, `Community 36`, `Community 8`, `Community 9`, `Community 110`, `Community 20`, `Community 53`, `Community 23`, `Community 57`, `Community 381`?**
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+- **Why does `convertImageToDataUrl()` connect `Community 15` to `Community 21`, `Community 110`?**
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+- **Why does `useToastContext()` connect `Community 26` to `Community 11`, `Community 14`?**
   _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **What connects `config`, `typescript`, `@capacitor-community/safe-area` to the rest of the system?**
-  _9759 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _12168 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.010587170021592254 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.011307718233906302 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.01598721023181455 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.016083033334891767 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
   _Cohesion score 0.08793103448275862 - nodes in this community are weakly interconnected._

@@ -520,6 +520,7 @@ class CollaborationSession(models.Model):
     voting_data = models.JSONField(default=dict, blank=True)  # Store voting state {user_id: True/False}
     last_autosave = models.DateTimeField(null=True, blank=True)  # Track last auto-save time
     operation_count = models.IntegerField(default=0)  # Count operations since last save
+    story_id = models.PositiveIntegerField(null=True, blank=True)  # Linked backend Story ID for shared identity
     
     class Meta:
         ordering = ['-created_at']

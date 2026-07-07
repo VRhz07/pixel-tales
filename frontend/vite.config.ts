@@ -71,9 +71,10 @@ export default defineConfig({
     port: 3000,
     strictPort: false, // If 3000 is taken, try next available port
     host: '0.0.0.0', // Allow network access from any IP
+    allowedHosts: true, // Allow Pinggy and other tunnel hosts
     proxy: {
       '/api': {
-        target: 'http://localhost:8000', // Backend API
+        target: 'http://127.0.0.1:8000', // Backend API
         changeOrigin: true,
         secure: false,
         configure: (proxy) => {
@@ -82,6 +83,35 @@ export default defineConfig({
           // the whole dev server.
           proxy.on('error', (err: any) => {
             console.warn('Proxy error (likely client disconnect):', err.code);
+          });
+        },
+      },
+      '/ws': {
+        target: 'ws://127.0.0.1:8000',
+        ws: true,
+        changeOrigin: true,
+        secure: false,
+        configure: (proxy) => {
+          proxy.on('error', (err: any) => {
+            console.warn('[Proxy WS Error] code:', err.code, 'message:', err.message);
+          });
+          proxy.on('proxyReqWs', (proxyReq, req: any, socket, options, head) => {
+            console.log('[Proxy WS Req] Path:', req.url);
+            console.log('[Proxy WS Req] Origin header:', req.headers['origin']);
+            console.log('[Proxy WS Req] Host header:', req.headers['host']);
+            console.log('[Proxy WS Req] Connection header:', req.headers['connection']);
+            console.log('[Proxy WS Req] Upgrade header:', req.headers['upgrade']);
+            console.log('[Proxy WS Req] Pinggy Headers (if any):', {
+              'x-forwarded-for': req.headers['x-forwarded-for'],
+              'x-forwarded-proto': req.headers['x-forwarded-proto'],
+              'x-forwarded-host': req.headers['x-forwarded-host']
+            });
+          });
+          proxy.on('open', (proxySocket) => {
+            console.log('[Proxy WS] Connection opened to target backend');
+          });
+          proxy.on('close', (res, socket, head) => {
+            console.log('[Proxy WS] Connection closed');
           });
         },
       },

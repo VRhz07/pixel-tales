@@ -29,6 +29,7 @@ interface SessionDetails {
   participant_count: number;
   can_join: boolean;
   is_lobby_open: boolean;
+  story_id?: number;
   story_draft?: any;
   story_title?: string;
   participants: Array<{

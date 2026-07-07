@@ -56,18 +56,31 @@ class NotificationWebSocketService {
       // Get WebSocket URL from dynamic API config (Developer Mode support)
       const { apiConfigService } = await import('./apiConfig.service');
       const apiUrl = apiConfigService.getApiUrl();
-      const wsProtocol = apiUrl.startsWith('https') ? 'wss' : 'ws';
-      const wsHost = apiUrl.replace('http://', '').replace('https://', '').replace('/api', '');
+      let wsProtocol = apiUrl.startsWith('https') ? 'wss' : 'ws';
+      let wsHost = apiUrl.replace('http://', '').replace('https://', '').replace('/api', '');
+
+      // Support mobile browsers and tunnels (e.g. Pinggy, local IP access) by routing WS
+      // through the current browsing host if the configured API is pointing to localhost.
+      if (typeof window !== 'undefined' && !window.location.protocol.startsWith('capacitor')) {
+        const isLocalHost = wsHost.startsWith('localhost') || wsHost.startsWith('127.0.0.1');
+        if (isLocalHost && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          wsHost = window.location.host;
+          wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        }
+      }
+
       const wsUrl = `${wsProtocol}://${wsHost}/ws/notifications/?token=${token}`;
 
       console.log('🔔 Connecting to notification WebSocket...');
       console.log('🔔 WebSocket URL:', wsUrl.replace(token, '***TOKEN***'));
 
       try {
+        let isConnected = false;
         this.ws = new WebSocket(wsUrl);
 
         this.ws.onopen = () => {
           console.log('🔔 Notification WebSocket connected');
+          isConnected = true;
           this.isConnecting = false;
           this.reconnectAttempts = 0;
           
@@ -99,7 +112,9 @@ class NotificationWebSocketService {
         this.ws.onerror = (error) => {
           console.error('🔔 Notification WebSocket error:', error);
           this.isConnecting = false;
-          reject(error);
+          if (!isConnected) {
+            reject(new Error('Notification WebSocket connection failed.'));
+          }
         };
 
         this.ws.onclose = (event) => {
@@ -110,6 +125,13 @@ class NotificationWebSocketService {
 
           if (this.handlers.onDisconnect) {
             this.handlers.onDisconnect();
+          }
+
+          if (!isConnected) {
+            let closeReason = 'Connection closed by server';
+            if (event.code === 4001) closeReason = 'Too many active sessions/connections for this user';
+            reject(new Error(`Failed to connect to notification server: ${closeReason} (Code: ${event.code})`));
+            return;
           }
 
           // Attempt to reconnect if not a normal closure

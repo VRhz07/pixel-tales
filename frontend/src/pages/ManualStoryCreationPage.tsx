@@ -8,6 +8,7 @@ import { VoiceFilteredInput } from '../components/common/VoiceFilteredInput';
 import { VoiceFilteredTextarea } from '../components/common/VoiceFilteredTextarea';
 import { collaborationService } from '../services/collaborationService';
 import { getCollaborationSession } from '../services/collaborationApi';
+import { storyApiService } from '../services/storyApiService';
 import { apiConfigService } from '../services/apiConfig.service';
 import { CollaborationInviteModal } from '../components/collaboration/CollaborationInviteModal';
 import { ActiveSessionInviteModal } from '../components/collaboration/ActiveSessionInviteModal';
@@ -616,6 +617,7 @@ const ManualStoryCreationPage: React.FC = () => {
            const canvasData = message.canvas_data || {};
            
            const serverPages: any[] = Array.isArray(draft.pages) ? draft.pages : [];
+           const serverLen = serverPages.length;
            
            if (collaborationService.shouldApplyInitialDraft()) {
              if (draft.title) {
@@ -637,8 +639,7 @@ const ManualStoryCreationPage: React.FC = () => {
              
              if (currentStory) {
                const localLen = currentStory.pages.length;
-               const serverLen = serverPages.length;
-     
+       
                // Add missing local pages to match server length
                if (serverLen > localLen) {
                  for (let i = localLen; i < serverLen; i++) {
@@ -657,7 +658,7 @@ const ManualStoryCreationPage: React.FC = () => {
                  console.warn('Local has more pages than server; skipping deletion. Consider reconciling later.', { localLen, serverLen });
                }
              }
-     
+      
              // Apply text for each page from server draft
              const applyLen = Math.min(useStoryStore.getState().getStory(currentStory.id)?.pages.length || 0, serverLen);
              for (let i = 0; i < applyLen; i++) {
@@ -670,9 +671,9 @@ const ManualStoryCreationPage: React.FC = () => {
                  }
                }
              }
-            } else {
-              console.log('Skipping init draft overwrite (title + pages) — already synced this session, trusting live local state');
-            }
+           } else {
+             console.log('Skipping init draft overwrite (title + pages) — already synced this session, trusting live local state');
+           }
             
             // Load canvas data for all pages and cover
       console.log('📦 Loading canvas data from server:', canvasData);
@@ -1695,7 +1696,7 @@ const ManualStoryCreationPage: React.FC = () => {
       textEditTimeoutRef.current = setTimeout(() => {
         const targetPage = currentStory?.pages[pageIndex];
         const pid = targetPage ? targetPage.id : pageIndex;
-        console.log('📤 Sending text update for page', pageIndex, 'id', pid);
+        console.log('Sending text_edit:', pid, newText, pageIndex);
         collaborationService.sendTextEdit(pid, newText, pageIndex);
       }, 500); // Debounce for 500ms
     }
@@ -1769,7 +1770,7 @@ const ManualStoryCreationPage: React.FC = () => {
     }
   };
 
-  // Collaboration handlers
+   // Collaboration handlers
   const handleSessionCreated = (sessionId: string) => {
     console.log('Collaboration session created:', sessionId);
     
@@ -1789,6 +1790,17 @@ const ManualStoryCreationPage: React.FC = () => {
     // Host starts collaborating immediately - NO LOBBY for host
     setShowLobby(false);
     setIsCollaborating(true);
+    
+    // Automatically sync story to backend and link it to the session
+    // so participants can load the same backend story with stable IDs
+    setTimeout(async () => {
+      try {
+        const backendId = await useStoryStore.getState().syncStoryToBackend(story.id, sessionId);
+        console.log('Host story synced and linked to session:', backendId);
+      } catch (err) {
+        console.warn('Failed to sync host story to backend:', err);
+      }
+    }, 0);
     
     // Automatically start the session for participants
     const token = localStorage.getItem('access_token');
@@ -1861,7 +1873,7 @@ const ManualStoryCreationPage: React.FC = () => {
       console.log('✅ Host session started, now collaborating');
     } catch (err) {
       console.error('Failed to start host session:', err);
-      alert('Failed to start collaboration session');
+      alert(`Failed to start collaboration session: ${(err as any)?.message || err || 'Unknown error'}`);
     }
   };
 
@@ -1921,10 +1933,30 @@ const ManualStoryCreationPage: React.FC = () => {
       
       // CRITICAL FIX: Always create story immediately for participants to prevent "Loading story..." screen
       if (!currentStory && !hasCreatedStory.current) {
-        const newStory = createStory(sessionData.story_title || 'Collaborative Story');
-        setStoryTitle(newStory.title);
-        setCurrentStory(newStory);
-        hasCreatedStory.current = true;
+        if (sessionData.story_id) {
+          console.log('Loading existing host story:', sessionData.story_id);
+          try {
+            const serverStory = await storyApiService.getStory(sessionData.story_id.toString());
+            const localStory = storyApiService.convertFromApiFormat(serverStory);
+            useStoryStore.getState().addStory(localStory);
+            setCurrentStory(localStory);
+            setStoryTitle(localStory.title);
+            collaborationService.setCurrentStoryId(localStory.id);
+            hasCreatedStory.current = true;
+          } catch (error) {
+            console.error('Failed to load host story, falling back to local creation:', error);
+            const newStory = createStory(sessionData.story_title || 'Collaborative Story');
+            setStoryTitle(newStory.title);
+            setCurrentStory(newStory);
+            hasCreatedStory.current = true;
+            collaborationService.setCurrentStoryId(newStory.id);
+          }
+        } else {
+          const newStory = createStory(sessionData.story_title || 'Collaborative Story');
+          setStoryTitle(newStory.title);
+          setCurrentStory(newStory);
+          hasCreatedStory.current = true;
+        }
       }
       
       if (sessionAlreadyStarted || bypassLobby) {
@@ -1952,7 +1984,7 @@ const ManualStoryCreationPage: React.FC = () => {
       }
     } catch (err) {
       console.error('Failed to join session:', err);
-      alert('Failed to join collaboration session');
+      alert(`Failed to join collaboration session: ${(err as any)?.message || err || 'Unknown error'}`);
     }
   };
 
@@ -2757,37 +2789,32 @@ const ManualStoryCreationPage: React.FC = () => {
     );
   }
   
-  // If still no story, show a brief loading state
-  // CRITICAL FIX: In collaboration mode, force-create story if it doesn't exist
-  if (!currentStory) {
-    const storeState = useStoryStore.getState();
-    const storyInStore = storeState.currentStory;
-    
-    if (isCollaborating) {
-      // Try to restore from store first before creating emergency story
+  useEffect(() => {
+    if (!currentStory && isCollaborating && !collabSessionId) {
+      const storeState = useStoryStore.getState();
+      const storyInStore = storeState.currentStory;
+      
       if (storyInStore) {
         setCurrentStory(storyInStore);
-        // Don't return - let component re-render with restored story
       } else {
-        // Immediately create story to prevent UI block
         const emergencyStory = createStory(storyTitle || 'Collaborative Story');
         setCurrentStory(emergencyStory);
         hasCreatedStory.current = true;
-        // Don't return - let the component render with the new story
       }
-    } else {
-      // Only show loading for non-collaboration mode
-      return (
-        <div className="create-story-page">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading story...</p>
-            </div>
+    }
+  }, [currentStory, isCollaborating, storyTitle, collabSessionId]);
+
+  if (!currentStory) {
+    return (
+      <div className="create-story-page">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading story...</p>
           </div>
         </div>
-      );
-    }
+      </div>
+    );
   }
 
   return (
@@ -3115,11 +3142,11 @@ const ManualStoryCreationPage: React.FC = () => {
               <ChevronPrevIcon className="h-4 w-4" />
             </button>
             <span className="page-management-compact-info">
-              Page {currentPageIndex + 1} of {currentStory.pages.length}
+              Page {currentPageIndex + 1} of {currentStory?.pages?.length ?? 0}
             </span>
             <button 
               onClick={goToNextPage}
-              disabled={currentPageIndex === currentStory.pages.length - 1}
+              disabled={!currentStory?.pages?.length || currentPageIndex === currentStory.pages.length - 1}
               className="page-management-compact-button"
             >
               <ChevronNextIcon className="h-4 w-4" />
@@ -3128,7 +3155,7 @@ const ManualStoryCreationPage: React.FC = () => {
               <PlusIcon className="h-4 w-4" />
               Add
             </button>
-            {currentStory.pages.length > 1 && (
+            {currentStory?.pages?.length > 1 && (
               <button onClick={handleDeletePage} className="page-management-compact-delete-button">
                 <TrashIcon className="h-4 w-4" />
                 Delete

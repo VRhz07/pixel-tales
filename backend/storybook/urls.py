@@ -141,6 +141,7 @@ urlpatterns = [
     path('collaborate/invites/list/', views.get_collaboration_invites_new, name='get_collaboration_invites_new'),
     path('collaborate/invites/<int:invite_id>/respond/', views.respond_to_collaboration_invite_new, name='respond_to_collaboration_invite_new'),
     path('collaborate/sessions/user/', views.get_user_sessions, name='get_user_sessions'),
+    path('collaborate/sessions/<str:session_id>/story/', views.update_session_story_id, name='update_session_story_id'),
     path('collaborate/stories/', views.get_collaborative_stories, name='get_collaborative_stories'),
     path('stories/<int:story_id>/publish-collaborative/', views.publish_collaborative_story, name='publish_collaborative_story'),
     

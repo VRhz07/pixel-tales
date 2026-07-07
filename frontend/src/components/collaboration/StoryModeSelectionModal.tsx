@@ -200,7 +200,7 @@ export const StoryModeSelectionModal: React.FC<StoryModeSelectionModalProps> = (
       setMode('waiting');
     } catch (err) {
       console.error('Failed to invite friend:', err);
-      setError('Failed to send invitation');
+      setError((err as any)?.message || 'Failed to send invitation');
     } finally {
       setLoading(false);
     }
@@ -232,7 +232,7 @@ export const StoryModeSelectionModal: React.FC<StoryModeSelectionModalProps> = (
         onClose();
       } catch (err) {
         console.error('Failed to start collaboration session:', err);
-        setError('Failed to start session');
+        setError((err as any)?.message || 'Failed to start session');
       } finally {
         setLoading(false);
       }

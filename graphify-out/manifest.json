@@ -995,8 +995,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\backend\\storybook\\ai_proxy_views.py": {
-    "mtime": 1768733780.4826221,
-    "ast_hash": "3d3c8e080e969bec4bbaa14c75333cdf",
+    "mtime": 1782353208.2049687,
+    "ast_hash": "018052e0c579c3d9e8502561d6957f48",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\backend\\storybook\\apps.py": {
@@ -1005,8 +1005,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\backend\\storybook\\consumers.py": {
-    "mtime": 1767658178.5570462,
-    "ast_hash": "38c7bc3632aa83087b4f20f0863964f4",
+    "mtime": 1782956019.5670116,
+    "ast_hash": "e6c8bca81b05e0742710c192f0df93e8",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\backend\\storybook\\cors_middleware.py": {
@@ -1035,8 +1035,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\backend\\storybook\\jwt_auth.py": {
-    "mtime": 1774329119.8309412,
-    "ast_hash": "f5aeea66130fa1b29967e4927243f850",
+    "mtime": 1782908268.4855344,
+    "ast_hash": "9e7fb091ebc81ed77b0719959f170ca4",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\backend\\storybook\\jwt_decorators.py": {
@@ -1055,8 +1055,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\backend\\storybook\\notification_consumer.py": {
-    "mtime": 1767919261.8831105,
-    "ast_hash": "32dde6341a5e5cd67bfe25024be5f26d",
+    "mtime": 1782955920.7055497,
+    "ast_hash": "fe4157e839b9eb26f86d04ecc9651e85",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\backend\\storybook\\notification_views.py": {
@@ -1100,8 +1100,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\backend\\storybook\\views.py": {
-    "mtime": 1768641438.3314948,
-    "ast_hash": "05caaa1665f21e501a9adb4de7735f28",
+    "mtime": 1782956019.5558445,
+    "ast_hash": "db39bf8adc28f2fc1883abfc8449163a",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\backend\\storybook\\xp_service.py": {
@@ -1305,8 +1305,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\backend\\storybookapi\\settings.py": {
-    "mtime": 1772674645.4758673,
-    "ast_hash": "4a64d55de1e37cfaa82e7f7667ccf8e9",
+    "mtime": 1782955435.0468755,
+    "ast_hash": "a5d756a1062f8ebab92fe14ea2eeacbc",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\backend\\storybookapi\\urls.py": {
@@ -1330,8 +1330,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\package.json": {
-    "mtime": 1768990435.797892,
-    "ast_hash": "4778e619f50ebefb8700dcaa70cd4eb3",
+    "mtime": 1782264382.9477718,
+    "ast_hash": "0247d2af6f7ff6900b81aa3b9b0cfab0",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\postcss.config.js": {
@@ -1375,8 +1375,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\vite.config.admin.js": {
-    "mtime": 1766303964.3941584,
-    "ast_hash": "9b39f691499a69e4f4d14d5eb12a7e4e",
+    "mtime": 1782266906.0263433,
+    "ast_hash": "a51b5aadbc8cf6b9b74ce12b04397ada",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\vite.config.admin.ts": {
@@ -1385,13 +1385,13 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\vite.config.d.ts": {
-    "mtime": 1764597681.4978743,
-    "ast_hash": "9fcf75521f4c43fd8b75300e0f63b867",
+    "mtime": 1782266905.993247,
+    "ast_hash": "b18e8a6874a901d6ecd8e0cbb7a7a6d6",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\vite.config.js": {
-    "mtime": 1764597681.5028732,
-    "ast_hash": "a4c063f2bfec246f84768189c0ce80ab",
+    "mtime": 1782266905.984417,
+    "ast_hash": "0acc234c1a87280f05f06d00ed3af0f9",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\vite.config.ts": {
@@ -1495,8 +1495,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\App.tsx": {
-    "mtime": 1768991266.3161254,
-    "ast_hash": "8caa7d795dedf7dfddcd2461589e2e43",
+    "mtime": 1782957827.4565473,
+    "ast_hash": "48994c5ca27933a09b459b917c98412e",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\main.admin.tsx": {
@@ -1605,8 +1605,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\auth\\ForgotPasswordModal.tsx": {
-    "mtime": 1764597842.6597273,
-    "ast_hash": "ba566c6bb432c1aad2525adf42bf08a6",
+    "mtime": 1782908855.2316277,
+    "ast_hash": "a9697d783db111868d208777e1ce44b5",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\auth\\FormInput.tsx": {
@@ -1700,8 +1700,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\canvas\\PaperDrawingEngine.ts": {
-    "mtime": 1764597842.765728,
-    "ast_hash": "6c0e6f93a12c7ab31000f7776d746c1e",
+    "mtime": 1782953232.487832,
+    "ast_hash": "210bf84b5752f8fd21cbe6d67c0e8f80",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\canvas\\RealtimePreviewCanvas.tsx": {
@@ -1780,8 +1780,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\collaboration\\StoryModeSelectionModal.tsx": {
-    "mtime": 1767620081.666337,
-    "ast_hash": "47f85f802e902c272777fcb06badfe4d",
+    "mtime": 1782957239.3938117,
+    "ast_hash": "bf67dc94dafa80df05dc308dadf443bb",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\collaboration\\UserCursor.tsx": {
@@ -1830,8 +1830,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\common\\TTSControls.tsx": {
-    "mtime": 1766303775.5080945,
-    "ast_hash": "031079fd57a94dc6f2d36ecfe6d27224",
+    "mtime": 1782855761.4364598,
+    "ast_hash": "81d3fda25c7c862c5ecccb99cf83da15",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\common\\VoiceFilteredInput.tsx": {
@@ -1860,8 +1860,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\creation\\AIStoryModal.tsx": {
-    "mtime": 1769218291.2535677,
-    "ast_hash": "fd8002a4563690facfafb7390e14e910",
+    "mtime": 1782853694.3602114,
+    "ast_hash": "145f23cc7fe11292bdf976c738a018af",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\creation\\AIWritingAssistantModal.tsx": {
@@ -1895,8 +1895,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\creation\\PhotoStoryModal.tsx": {
-    "mtime": 1769218291.443913,
-    "ast_hash": "dfd23e4703eb9f547b5bfb1f1f533474",
+    "mtime": 1782268293.1169388,
+    "ast_hash": "f2fd7f482892b384edae4415420f18bf",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\creation\\StoryCreationModal.tsx": {
@@ -1960,8 +1960,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\pages\\HomePage.tsx": {
-    "mtime": 1768073649.7864282,
-    "ast_hash": "cdada71961392ae6a823be4d0ee69547",
+    "mtime": 1782957272.0026832,
+    "ast_hash": "c45a6307890ac05c9bec12efcc43c91d",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\pages\\LibraryPage.tsx": {
@@ -1975,8 +1975,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\pages\\PrivateLibraryPage.tsx": {
-    "mtime": 1768127236.0754883,
-    "ast_hash": "eb24994d023bc787fde9819acc9189af",
+    "mtime": 1782182518.9945645,
+    "ast_hash": "f4c980cc9d8ab7832ec772f2904dcbdf",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\components\\pages\\ProfilePage.tsx": {
@@ -2230,8 +2230,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\hooks\\useTextToSpeech.ts": {
-    "mtime": 1767667686.2566612,
-    "ast_hash": "fe38d112f75c8964c17e59c03fc4fa29",
+    "mtime": 1782855772.1495504,
+    "ast_hash": "143229eb8c282eacf5e3d696ff8c1dcf",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\hooks\\useTextToSpeechWithNotification.ts": {
@@ -2250,8 +2250,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\pages\\CanvasDrawingPage.tsx": {
-    "mtime": 1768991426.8971145,
-    "ast_hash": "bee7e5478fd36a771c632f85adee635d",
+    "mtime": 1782953257.7661486,
+    "ast_hash": "66d55dbbb898f5cd183e7076a0fcae5a",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\pages\\CharactersLibraryPage.tsx": {
@@ -2260,8 +2260,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\pages\\CollaborationWaitingPage.tsx": {
-    "mtime": 1764597843.3482983,
-    "ast_hash": "d30051ca1a727663ff337170bd9af83f",
+    "mtime": 1782957814.2373729,
+    "ast_hash": "e2ca5cd639dad4ff90a298514e6390d6",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\pages\\CoverImageCanvasPage.tsx": {
@@ -2320,8 +2320,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\pages\\StoryReaderPage.tsx": {
-    "mtime": 1768096871.408073,
-    "ast_hash": "c7c179eacb4595094fa2c7b62ac3c7b1",
+    "mtime": 1782357040.0011425,
+    "ast_hash": "46b37d7e35901a6543708dc554669c86",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\pages\\TeacherDashboardPage.tsx": {
@@ -2360,12 +2360,12 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\services\\api.ts": {
-    "mtime": 1768215002.595436,
-    "ast_hash": "2db8b384886e310b701c428db0a29613",
+    "mtime": 1782181570.282827,
+    "ast_hash": "c75a6c17b0e8bd30509160a17279e232",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\services\\apiConfig.service.ts": {
-    "mtime": 1768214367.5418468,
+    "mtime": 1782905956.6191907,
     "ast_hash": "4873004270528a71b9f3b372ead16279",
     "semantic_hash": ""
   },
@@ -2380,8 +2380,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\services\\collaborationService.ts": {
-    "mtime": 1767623352.7764637,
-    "ast_hash": "909285aa3c39853bb4924dee06a078a9",
+    "mtime": 1782953150.6102529,
+    "ast_hash": "1adf2a3f3f8ed8bf909b7bfbfa17a05a",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\services\\enhancedPollinationsService.ts": {
@@ -2405,8 +2405,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\services\\geminiService.ts": {
-    "mtime": 1768132002.9580612,
-    "ast_hash": "d4b58c77d3eecbd0c842151780be9446",
+    "mtime": 1782351641.0397444,
+    "ast_hash": "7eb9eb3a35cf8e7ec275a836127023d2",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\services\\googleCloudVisionOCR.ts": {
@@ -2420,8 +2420,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\services\\imageGenerationService.ts": {
-    "mtime": 1769218291.6366296,
-    "ast_hash": "3196242a4a48192d48b7ecd9225ef0da",
+    "mtime": 1782353177.0314572,
+    "ast_hash": "d62a2d7ef91fbd4b5cae8d7ac1654e04",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\services\\imageVariety.ts": {
@@ -2445,8 +2445,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\services\\notificationWebSocket.ts": {
-    "mtime": 1767920024.467471,
-    "ast_hash": "49e71eeb0760c73413c534bc0ab75dba",
+    "mtime": 1782954981.0915725,
+    "ast_hash": "e2124943d72a6388a84bd49de1839696",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\services\\ocrProxyService.ts": {
@@ -2555,8 +2555,8 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\stores\\storyStore.ts": {
-    "mtime": 1768129784.851536,
-    "ast_hash": "dca78e4cbe8d1f1f2dbcfd5c6bf0644a",
+    "mtime": 1782354098.3770623,
+    "ast_hash": "c0772c4ed99e7024b71bb66da9fb6bca",
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\stores\\themeStore.ts": {
@@ -2595,7 +2595,7 @@
     "semantic_hash": ""
   },
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\utils\\imageCache.ts": {
-    "mtime": 1768062536.2555985,
+    "mtime": 1782853694.2756174,
     "ast_hash": "24a066e9bd7eba9a827edf566f253e74",
     "semantic_hash": ""
   },
@@ -4542,6 +4542,931 @@
   "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\public\\sounds\\warning.mp3": {
     "mtime": 1764597842.285184,
     "ast_hash": "89afc09ea6578ecec29a88e14efafe7e",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\mcp_config.json": {
+    "mtime": 1778556445.869591,
+    "ast_hash": "0517a8d869401cfa5b090c1b2923f0df",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\.shared\\ui-ux-pro-max\\scripts\\core.py": {
+    "mtime": 1778556445.8381665,
+    "ast_hash": "4ddd77a3d3079dfeb9dcf4e236d26591",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\.shared\\ui-ux-pro-max\\scripts\\design_system.py": {
+    "mtime": 1778556445.8392615,
+    "ast_hash": "5b7a5311730aead50b242164e6f95858",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\.shared\\ui-ux-pro-max\\scripts\\search.py": {
+    "mtime": 1778556445.8407533,
+    "ast_hash": "180cebd223a104a86ab27a93946773c1",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\scripts\\auto_preview.py": {
+    "mtime": 1778556445.8740075,
+    "ast_hash": "0dbf0f67de5ad5df17a5169f38283e8f",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\scripts\\checklist.py": {
+    "mtime": 1778556445.8752959,
+    "ast_hash": "c8bfa292f66c63fcea51c17b09e16175",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\scripts\\session_manager.py": {
+    "mtime": 1778556445.8763323,
+    "ast_hash": "4b16518fc44137739f35e422e3c49829",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\scripts\\verify_all.py": {
+    "mtime": 1778556445.87842,
+    "ast_hash": "89409e8fb7acc4c1aa6083abb3011520",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\api-patterns\\scripts\\api_validator.py": {
+    "mtime": 1778556445.8916833,
+    "ast_hash": "efc1358746a9f52b5b0951e86c99100c",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\database-design\\scripts\\schema_validator.py": {
+    "mtime": 1778556445.9680939,
+    "ast_hash": "2bc362c167358d81f8ca50d2cd06af0d",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\frontend-design\\scripts\\accessibility_checker.py": {
+    "mtime": 1778556445.9834023,
+    "ast_hash": "22bc6ca12818d3030b50f96a10d49511",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\frontend-design\\scripts\\ux_audit.py": {
+    "mtime": 1778556445.984428,
+    "ast_hash": "49a9bd62a26519ae6d2b9c27fb92e5fe",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\geo-fundamentals\\scripts\\geo_checker.py": {
+    "mtime": 1778556446.0133028,
+    "ast_hash": "e75151ba28a9453d153d7db560e856b3",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\i18n-localization\\scripts\\i18n_checker.py": {
+    "mtime": 1778556446.0173018,
+    "ast_hash": "d4cfa7be27379e00befaec46488aa87b",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\lint-and-validate\\scripts\\lint_runner.py": {
+    "mtime": 1778556446.0233011,
+    "ast_hash": "8d8346f7b4e714e192ffa616ba653380",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\lint-and-validate\\scripts\\type_coverage.py": {
+    "mtime": 1778556446.0243025,
+    "ast_hash": "439538331c87d51f5da3dd62fa11a599",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mobile-design\\scripts\\mobile_audit.py": {
+    "mtime": 1778556446.0456173,
+    "ast_hash": "8a7a2483f90d406ca022d2c6a5447973",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\nextjs-react-expert\\scripts\\convert_rules.py": {
+    "mtime": 1778556446.062617,
+    "ast_hash": "bd9d00cf3b49dde0c83a81506e54b9a0",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\nextjs-react-expert\\scripts\\react_performance_checker.py": {
+    "mtime": 1778556446.0646176,
+    "ast_hash": "7ba2a6f05dcc51d0a1bfd2a2514791fc",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\performance-profiling\\scripts\\lighthouse_audit.py": {
+    "mtime": 1778556446.07162,
+    "ast_hash": "2405d35821970bf6723454e83dc7a036",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\seo-fundamentals\\scripts\\seo_checker.py": {
+    "mtime": 1778556446.085619,
+    "ast_hash": "3b43bf5f80d4a5a096fb490e253cfe71",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\testing-patterns\\scripts\\test_runner.py": {
+    "mtime": 1778556446.0978305,
+    "ast_hash": "349a3b617a16fec217f4834d223648fd",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\vulnerability-scanner\\scripts\\security_scan.py": {
+    "mtime": 1778556446.1048315,
+    "ast_hash": "a221702f6614f129500dc6741c57ac0d",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\webapp-testing\\scripts\\playwright_runner.py": {
+    "mtime": 1778556446.110142,
+    "ast_hash": "e23636ac52d35694b4964444e2bceb8c",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\backend\\extract_data.py": {
+    "mtime": 1782182006.1180637,
+    "ast_hash": "af701fee35d1e7c35cac6f10c0f97168",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\public\\data\\bundled_games.json": {
+    "mtime": 1782182095.5025632,
+    "ast_hash": "b2c780f260be49d6a0d3a172ebbb14a9",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\public\\data\\bundled_stories.json": {
+    "mtime": 1782182095.494257,
+    "ast_hash": "eb512056ea8e3bdfbf598629fb3108b6",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\services\\groqService.ts": {
+    "mtime": 1782353093.5089881,
+    "ast_hash": "3d692b8bfbbe47a219320473864e7535",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\frontend\\src\\services\\offlineFallback.service.ts": {
+    "mtime": 1782182476.333024,
+    "ast_hash": "128bd0f1108b4b6385dce00f289dd5c8",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\ai prompt fix.txt": {
+    "mtime": 1782353030.3254864,
+    "ast_hash": "878c658e546dda61e5011da34807672e",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\CONCURRENCY_SCALING.md": {
+    "mtime": 1782268312.065699,
+    "ast_hash": "5bffefbd884e908b367d584131ca2883",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\Groq pollinations combo for story geenration.txt": {
+    "mtime": 1782265019.3296113,
+    "ast_hash": "91858c6343cfb21141faff029bf78403",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\poliinations ai speed.txt": {
+    "mtime": 1782791441.9179885,
+    "ast_hash": "b6af1d401b488375ea4bbf0b54c7849b",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\ARCHITECTURE.md": {
+    "mtime": 1778556445.8422306,
+    "ast_hash": "fdbeb13056367669d912e832defba56a",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\backend-specialist.md": {
+    "mtime": 1778556445.8447852,
+    "ast_hash": "27b561b14ba5116529339003b20e39d5",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\code-archaeologist.md": {
+    "mtime": 1778556445.8457918,
+    "ast_hash": "8c9cd7b03b1e71a8c14611566442d159",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\database-architect.md": {
+    "mtime": 1778556445.846805,
+    "ast_hash": "b5eb5c9bd10847371f8fd95fe4ed8880",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\debugger.md": {
+    "mtime": 1778556445.8478153,
+    "ast_hash": "8426f8e923ab2387f38084e06c002850",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\devops-engineer.md": {
+    "mtime": 1778556445.8488789,
+    "ast_hash": "25c73013bb921ec5533d49fe43839bd7",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\documentation-writer.md": {
+    "mtime": 1778556445.8513608,
+    "ast_hash": "e8c57f13335607d56076f3947fac4818",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\explorer-agent.md": {
+    "mtime": 1778556445.8523943,
+    "ast_hash": "25af8766c59e471e1bacc21e16c610d6",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\frontend-specialist.md": {
+    "mtime": 1778556445.8534029,
+    "ast_hash": "649b189ab52a0e9565b625d3e47f1632",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\game-developer.md": {
+    "mtime": 1778556445.8546298,
+    "ast_hash": "d1d9d2145644ca942f05ef94f7b8b3d8",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\mobile-developer.md": {
+    "mtime": 1778556445.8558638,
+    "ast_hash": "7ef81601b1bc486de58bcf7214db2984",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\orchestrator.md": {
+    "mtime": 1778556445.8570125,
+    "ast_hash": "f11084a5670b7f4c0d0d13e8641cec83",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\penetration-tester.md": {
+    "mtime": 1778556445.8581624,
+    "ast_hash": "344fea79e0c43a035bdd6567dfba0a9e",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\performance-optimizer.md": {
+    "mtime": 1778556445.8595583,
+    "ast_hash": "28ed7c5f86220ff1f71ad40b78b6898e",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\product-manager.md": {
+    "mtime": 1778556445.8607504,
+    "ast_hash": "bfedcc5064cdbf3c2dd74658f6319f0d",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\product-owner.md": {
+    "mtime": 1778556445.862203,
+    "ast_hash": "4a6c1abc965c724074ed954ab8b6fe5b",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\project-planner.md": {
+    "mtime": 1778556445.8634875,
+    "ast_hash": "6c0243b709763e580a86466a7f6f38d8",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\qa-automation-engineer.md": {
+    "mtime": 1778556445.8655198,
+    "ast_hash": "24c70ae922fb93b5ef79e915971ab7a2",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\security-auditor.md": {
+    "mtime": 1778556445.8665464,
+    "ast_hash": "685eacab2bd9bb5d23f76f395eece321",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\seo-specialist.md": {
+    "mtime": 1778556445.867556,
+    "ast_hash": "a8900eeda067666aec4e1420443d5264",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\agents\\test-engineer.md": {
+    "mtime": 1778556445.868582,
+    "ast_hash": "97ec1943c720084ae26df810b1294a7a",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\rules\\GEMINI.md": {
+    "mtime": 1778556445.871864,
+    "ast_hash": "c055d1e3abfde872a012fb2918f15afd",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\doc.md": {
+    "mtime": 1778556445.972093,
+    "ast_hash": "1c2cd4b41967f2b0a6a52e9c1b2e22e1",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\api-patterns\\api-style.md": {
+    "mtime": 1778556445.883026,
+    "ast_hash": "344040fe60482b585932c8c7ac436db2",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\api-patterns\\auth.md": {
+    "mtime": 1778556445.8840346,
+    "ast_hash": "30ecfa07b6c339decb37ad76062b316a",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\api-patterns\\documentation.md": {
+    "mtime": 1778556445.8850412,
+    "ast_hash": "fccf2500652b8b556c763bdad36c3fb4",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\api-patterns\\graphql.md": {
+    "mtime": 1778556445.886434,
+    "ast_hash": "5d74792502426860410d930502f1af46",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\api-patterns\\rate-limiting.md": {
+    "mtime": 1778556445.8874426,
+    "ast_hash": "801efd440cc5b640ab215f031383aa64",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\api-patterns\\response.md": {
+    "mtime": 1778556445.88845,
+    "ast_hash": "4c371c869d8c6b7b248e022ae2a99911",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\api-patterns\\rest.md": {
+    "mtime": 1778556445.889506,
+    "ast_hash": "d952c8bd331f51400c3bf1cef57aad96",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\api-patterns\\security-testing.md": {
+    "mtime": 1778556445.8926823,
+    "ast_hash": "4e0ba12a8061446a792676ccf7b1ee8c",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\api-patterns\\SKILL.md": {
+    "mtime": 1778556445.8807309,
+    "ast_hash": "82eb4fe33b3ed3c42e7633372a79314d",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\api-patterns\\trpc.md": {
+    "mtime": 1778556445.893686,
+    "ast_hash": "08f4ce4eb2b8cd421687610ea2331c1c",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\api-patterns\\versioning.md": {
+    "mtime": 1778556445.8946848,
+    "ast_hash": "c0dcf556c803d959235a14b76653bd06",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\agent-coordination.md": {
+    "mtime": 1778556445.8986862,
+    "ast_hash": "7bc8ac1427406a4458a291e0f18428fa",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\feature-building.md": {
+    "mtime": 1778556445.899685,
+    "ast_hash": "0f18b9ec8fa63806fdca1820c4f0474c",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\project-detection.md": {
+    "mtime": 1778556445.9006848,
+    "ast_hash": "c44c0fefc239cca0bf2ecd307bb2ab98",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\scaffolding.md": {
+    "mtime": 1778556445.9016838,
+    "ast_hash": "f93dfe717d640fc7eeeb93b5b4417581",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\SKILL.md": {
+    "mtime": 1778556445.8966842,
+    "ast_hash": "f88d72b98397df0227ee17c6768aa099",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\tech-stack.md": {
+    "mtime": 1778556445.9026837,
+    "ast_hash": "a7a23fd610e181952c76b182e244ed2a",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\templates\\SKILL.md": {
+    "mtime": 1778556445.9046845,
+    "ast_hash": "00470bd70ca645e169ea7882adb41ed3",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\templates\\astro-static\\TEMPLATE.md": {
+    "mtime": 1778556445.9070015,
+    "ast_hash": "95aa19b405fd10e423dc30bef5138cc1",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\templates\\chrome-extension\\TEMPLATE.md": {
+    "mtime": 1778556445.9090047,
+    "ast_hash": "9cdeaa662a4834e00a68876e91b1a2d6",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\templates\\cli-tool\\TEMPLATE.md": {
+    "mtime": 1778556445.911004,
+    "ast_hash": "734e996b7ff6fd560d209aa58a7cb373",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\templates\\electron-desktop\\TEMPLATE.md": {
+    "mtime": 1778556445.9130044,
+    "ast_hash": "a0ad79cb83bd50aa680767228e811fee",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\templates\\express-api\\TEMPLATE.md": {
+    "mtime": 1778556445.9150033,
+    "ast_hash": "68c41e30c69d7db2183fb123a28d85de",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\templates\\flutter-app\\TEMPLATE.md": {
+    "mtime": 1778556445.9170043,
+    "ast_hash": "da677540a605167b8b88a01defd469ac",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\templates\\monorepo-turborepo\\TEMPLATE.md": {
+    "mtime": 1778556445.9190042,
+    "ast_hash": "5d932dede8e1d737437e4fb5c41beb59",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\templates\\nextjs-fullstack\\TEMPLATE.md": {
+    "mtime": 1778556445.9212368,
+    "ast_hash": "656f206b900ab797a716e9f4b3b64162",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\templates\\nextjs-saas\\TEMPLATE.md": {
+    "mtime": 1778556445.9232454,
+    "ast_hash": "beec11ca4795f320cd23b26e4b6c1546",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\templates\\nextjs-static\\TEMPLATE.md": {
+    "mtime": 1778556445.9252465,
+    "ast_hash": "fe069bd859ee49ef5a022eca881d2708",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\templates\\nuxt-app\\TEMPLATE.md": {
+    "mtime": 1778556445.927508,
+    "ast_hash": "61c5ec52528114300dd9ab9a46f50578",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\templates\\python-fastapi\\TEMPLATE.md": {
+    "mtime": 1778556445.9295928,
+    "ast_hash": "4def9ff95df7e4032e0a3363d59491ab",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\app-builder\\templates\\react-native-app\\TEMPLATE.md": {
+    "mtime": 1778556445.9307923,
+    "ast_hash": "82d416872f256d59c782eed0cd959844",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\architecture\\context-discovery.md": {
+    "mtime": 1778556445.9352257,
+    "ast_hash": "64d25a1f9ce03293648a71438f4383d2",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\architecture\\examples.md": {
+    "mtime": 1778556445.9362278,
+    "ast_hash": "51b79a0221fe08ca80947c25a4c640a1",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\architecture\\pattern-selection.md": {
+    "mtime": 1778556445.9382288,
+    "ast_hash": "aaf9e0a67f66e2ee301b08b7d3725416",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\architecture\\patterns-reference.md": {
+    "mtime": 1778556445.9392254,
+    "ast_hash": "818bdd3cf4cf5588007e3c7eefe4865c",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\architecture\\SKILL.md": {
+    "mtime": 1778556445.9332235,
+    "ast_hash": "16632ac6cdff212788ff7d65463d81b8",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\architecture\\trade-off-analysis.md": {
+    "mtime": 1778556445.9412258,
+    "ast_hash": "be16c350dce9432ada96330846b931ef",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\bash-linux\\SKILL.md": {
+    "mtime": 1778556445.943227,
+    "ast_hash": "f0cd32cc6df77d59cbbd89918f5d88bc",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\behavioral-modes\\SKILL.md": {
+    "mtime": 1778556445.9462264,
+    "ast_hash": "21e30ac86c6f9cc6dd734eeeac710338",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\brainstorming\\dynamic-questioning.md": {
+    "mtime": 1778556445.9502268,
+    "ast_hash": "f2c146fa2ab73a11b71bc8f0f37b3448",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\brainstorming\\SKILL.md": {
+    "mtime": 1778556445.948227,
+    "ast_hash": "1f2e987797293b07d52c66079107bcf6",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\clean-code\\SKILL.md": {
+    "mtime": 1778556445.953227,
+    "ast_hash": "ea829cde38ebac3ab54644a1f0bc7354",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\code-review-checklist\\SKILL.md": {
+    "mtime": 1778556445.9556987,
+    "ast_hash": "7ecc2e34f9f5bac4fe4ee8a6ca1136c1",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\database-design\\database-selection.md": {
+    "mtime": 1778556445.9587145,
+    "ast_hash": "ed7294f1aaab6aad3943eaa1af43506b",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\database-design\\indexing.md": {
+    "mtime": 1778556445.959766,
+    "ast_hash": "cb067a0668e6bfd6977bbae58c275eec",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\database-design\\migrations.md": {
+    "mtime": 1778556445.9619524,
+    "ast_hash": "4d6e21cc0a5c5f6cb00aebd073824171",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\database-design\\optimization.md": {
+    "mtime": 1778556445.9630651,
+    "ast_hash": "c124bf77288084d45579c265fce34d6c",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\database-design\\orm-selection.md": {
+    "mtime": 1778556445.965094,
+    "ast_hash": "dee87596f93677bc0d8e86c4b943a83c",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\database-design\\schema-design.md": {
+    "mtime": 1778556445.9660928,
+    "ast_hash": "ffa4a6a26801fd198e83736aa18cf4fc",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\database-design\\SKILL.md": {
+    "mtime": 1778556445.957715,
+    "ast_hash": "82396966532ba83cefcafd1ba2af759b",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\deployment-procedures\\SKILL.md": {
+    "mtime": 1778556445.9700923,
+    "ast_hash": "49286b06281f52a4c0a1f3adc07160d7",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\documentation-templates\\SKILL.md": {
+    "mtime": 1778556445.9740934,
+    "ast_hash": "f84c496822a5ca34feecd18e8339c628",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\frontend-design\\animation-guide.md": {
+    "mtime": 1778556445.977566,
+    "ast_hash": "333f041776a3003fb92a26e0b28b37b2",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\frontend-design\\color-system.md": {
+    "mtime": 1778556445.9785855,
+    "ast_hash": "6820be3c160d200b12eef5e32a329492",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\frontend-design\\decision-trees.md": {
+    "mtime": 1778556445.979693,
+    "ast_hash": "1d0f47503402a58a9bc4eab3dbc6d950",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\frontend-design\\motion-graphics.md": {
+    "mtime": 1778556445.9806972,
+    "ast_hash": "7533edfd916481d219d46e80d05fee73",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\frontend-design\\SKILL.md": {
+    "mtime": 1778556445.9752991,
+    "ast_hash": "5dc74401e79d1031168721a7a16eedc0",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\frontend-design\\typography-system.md": {
+    "mtime": 1778556445.98673,
+    "ast_hash": "bc374daa92140c839f9add01b9f7d2b0",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\frontend-design\\ux-psychology.md": {
+    "mtime": 1778556445.9877908,
+    "ast_hash": "2b060e245f030b8caeec6620aba1a9d2",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\frontend-design\\visual-effects.md": {
+    "mtime": 1778556445.9887936,
+    "ast_hash": "47d8ca7dcdfab6d19a9306aa05684d00",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\game-development\\SKILL.md": {
+    "mtime": 1778556445.9948764,
+    "ast_hash": "479568e34378b84942aa235562ba2a36",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\game-development\\2d-games\\SKILL.md": {
+    "mtime": 1778556445.9918182,
+    "ast_hash": "79499a47072c20458b12b159d3df3849",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\game-development\\3d-games\\SKILL.md": {
+    "mtime": 1778556445.9938722,
+    "ast_hash": "4153081fe5edca63b8595d657386ad01",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\game-development\\game-art\\SKILL.md": {
+    "mtime": 1778556445.996917,
+    "ast_hash": "ecd673adccca2235be510a599078c450",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\game-development\\game-audio\\SKILL.md": {
+    "mtime": 1778556445.9989927,
+    "ast_hash": "93b8d2352cf6cf987a917cd3ac131b3c",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\game-development\\game-design\\SKILL.md": {
+    "mtime": 1778556446.0000405,
+    "ast_hash": "2d81c54d055b7064c027bf832f1711b4",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\game-development\\mobile-games\\SKILL.md": {
+    "mtime": 1778556446.0020947,
+    "ast_hash": "512390bddad6f8fa913a01f6771ba5b6",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\game-development\\multiplayer\\SKILL.md": {
+    "mtime": 1778556446.004114,
+    "ast_hash": "759f808bce7c2bfe53907c2d45f57368",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\game-development\\pc-games\\SKILL.md": {
+    "mtime": 1778556446.0064619,
+    "ast_hash": "011ea960aefc83e6c8b4ba1797f4f44d",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\game-development\\vr-ar\\SKILL.md": {
+    "mtime": 1778556446.007466,
+    "ast_hash": "9ac818a43e4b6d5563bd14ab8ccc0137",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\game-development\\web-games\\SKILL.md": {
+    "mtime": 1778556446.0100498,
+    "ast_hash": "3deb344f2212fab1d18f6e8a7a6583a2",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\geo-fundamentals\\SKILL.md": {
+    "mtime": 1778556446.0112047,
+    "ast_hash": "15bac4fcb8d1b9878cb4a033efc4bb24",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\i18n-localization\\SKILL.md": {
+    "mtime": 1778556446.0153024,
+    "ast_hash": "a328c681c5cd356537135e577af97c16",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\intelligent-routing\\SKILL.md": {
+    "mtime": 1778556446.0193028,
+    "ast_hash": "c1d81fb07c26cc26801c5a26c2d312a0",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\lint-and-validate\\SKILL.md": {
+    "mtime": 1778556446.0213034,
+    "ast_hash": "7c8ac65a9677e719f757c4f77f29d018",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mcp-builder\\SKILL.md": {
+    "mtime": 1778556446.0263016,
+    "ast_hash": "d69ff3b30a3e3cca5202e28b33a5359d",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mobile-design\\decision-trees.md": {
+    "mtime": 1778556446.0304856,
+    "ast_hash": "7e097ff2038fb7f318dc255ee63bb24d",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mobile-design\\mobile-backend.md": {
+    "mtime": 1778556446.0316155,
+    "ast_hash": "b2c3dd6905da453ecbe0cadf27002211",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mobile-design\\mobile-color-system.md": {
+    "mtime": 1778556446.032616,
+    "ast_hash": "15e7616d62f7b76f7e28131c6368b17a",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mobile-design\\mobile-debugging.md": {
+    "mtime": 1778556446.0336163,
+    "ast_hash": "acd38d5c634b5e8e906a42c3774cea58",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mobile-design\\mobile-design-thinking.md": {
+    "mtime": 1778556446.035615,
+    "ast_hash": "b9da917c0c9b83c2c231c114f89f4b28",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mobile-design\\mobile-navigation.md": {
+    "mtime": 1778556446.0366156,
+    "ast_hash": "933d0412e0935958ff7e1d5d671f66df",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mobile-design\\mobile-performance.md": {
+    "mtime": 1778556446.038616,
+    "ast_hash": "126336d8c6c8ad895b2fab165bc46e5f",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mobile-design\\mobile-testing.md": {
+    "mtime": 1778556446.0396166,
+    "ast_hash": "4d9b44654ec72d8e03966d4cdb08c55c",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mobile-design\\mobile-typography.md": {
+    "mtime": 1778556446.0406163,
+    "ast_hash": "494c8d6d0d0235ed30e193b332b66bf0",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mobile-design\\platform-android.md": {
+    "mtime": 1778556446.0426168,
+    "ast_hash": "2ded7fe3237efa51ca35df575a83337e",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mobile-design\\platform-ios.md": {
+    "mtime": 1778556446.043616,
+    "ast_hash": "bcf9b92fe9211fa30f404de331390125",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mobile-design\\SKILL.md": {
+    "mtime": 1778556446.028304,
+    "ast_hash": "6371dba7e691a41a19b42c0f977cf2b4",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\mobile-design\\touch-psychology.md": {
+    "mtime": 1778556446.0476155,
+    "ast_hash": "64044dabf271eb0d52335cc133a3fd85",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\nextjs-react-expert\\1-async-eliminating-waterfalls.md": {
+    "mtime": 1778556446.0496168,
+    "ast_hash": "40bd9247562c6486f4629addbb261c04",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\nextjs-react-expert\\2-bundle-bundle-size-optimization.md": {
+    "mtime": 1778556446.0506167,
+    "ast_hash": "955968c9e6aca35df2cbf7640529e871",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\nextjs-react-expert\\3-server-server-side-performance.md": {
+    "mtime": 1778556446.0516164,
+    "ast_hash": "a9a55a9f46aa119f674eb55aa5181754",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\nextjs-react-expert\\4-client-client-side-data-fetching.md": {
+    "mtime": 1778556446.0526166,
+    "ast_hash": "836f111475d0c51082baf26658d721b5",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\nextjs-react-expert\\5-rerender-re-render-optimization.md": {
+    "mtime": 1778556446.0546174,
+    "ast_hash": "1dbba72b8dc4d090b66b30a88a0395b9",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\nextjs-react-expert\\6-rendering-rendering-performance.md": {
+    "mtime": 1778556446.055618,
+    "ast_hash": "401435db42cfe2202e623623287137ee",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\nextjs-react-expert\\7-js-javascript-performance.md": {
+    "mtime": 1778556446.0566168,
+    "ast_hash": "5b4c76d57ac3d5cffce9bc680fde0aa0",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\nextjs-react-expert\\8-advanced-advanced-patterns.md": {
+    "mtime": 1778556446.0586188,
+    "ast_hash": "b06d3641f68ff43b1e436b5f43ec4e0a",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\nextjs-react-expert\\9-cache-components.md": {
+    "mtime": 1778556446.0596178,
+    "ast_hash": "c68caaba66f62273673ab46aa16c169f",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\nextjs-react-expert\\SKILL.md": {
+    "mtime": 1778556446.0606184,
+    "ast_hash": "5c484a74b6a2821a15a926c95a8c9e4a",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\nodejs-best-practices\\SKILL.md": {
+    "mtime": 1778556446.0656178,
+    "ast_hash": "f7ac5fd3bbeb79b53ed5f0cfee01a522",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\parallel-agents\\SKILL.md": {
+    "mtime": 1778556446.0676186,
+    "ast_hash": "c6608ef592c9dc20091ddf1017651338",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\performance-profiling\\SKILL.md": {
+    "mtime": 1778556446.0696175,
+    "ast_hash": "1baf338e79ec10e497c056a208bca729",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\plan-writing\\SKILL.md": {
+    "mtime": 1778556446.0736184,
+    "ast_hash": "f867a34a966cfd4dc66f862d974874fb",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\powershell-windows\\SKILL.md": {
+    "mtime": 1778556446.0756195,
+    "ast_hash": "454d0b4995b064c5582ab9e2a53f6d2c",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\python-patterns\\SKILL.md": {
+    "mtime": 1778556446.0776198,
+    "ast_hash": "ba90843f49cc611fa969ae9133c43fa6",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\red-team-tactics\\SKILL.md": {
+    "mtime": 1778556446.07962,
+    "ast_hash": "b6af18806581de30afd07e7d13b71a03",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\rust-pro\\SKILL.md": {
+    "mtime": 1778556446.081618,
+    "ast_hash": "5585abebc992886f44832f7efc2cdd58",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\seo-fundamentals\\SKILL.md": {
+    "mtime": 1778556446.0826185,
+    "ast_hash": "5a86b6632556e6491b7547a1c9ce8a89",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\server-management\\SKILL.md": {
+    "mtime": 1778556446.0866184,
+    "ast_hash": "46fc6e1b03c8362d6ba3cd7d706931b5",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\systematic-debugging\\SKILL.md": {
+    "mtime": 1778556446.088619,
+    "ast_hash": "42c1b67ca2235e81ae56bd4f93510d13",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\tailwind-patterns\\SKILL.md": {
+    "mtime": 1778556446.0906212,
+    "ast_hash": "db69539730c28d9c8be3e2b60dd76693",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\tdd-workflow\\SKILL.md": {
+    "mtime": 1778556446.0926194,
+    "ast_hash": "ec926241a9625b7cd1f3c1dbde932b8b",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\testing-patterns\\SKILL.md": {
+    "mtime": 1778556446.094828,
+    "ast_hash": "02a2c3a3a1f52fc7375f2ca67ba39855",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\vulnerability-scanner\\checklists.md": {
+    "mtime": 1778556446.1018298,
+    "ast_hash": "f67a2cb684124004aee8e07952d311f7",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\vulnerability-scanner\\SKILL.md": {
+    "mtime": 1778556446.0998304,
+    "ast_hash": "52de0ee323dde69b81d783b551bb5c4f",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\web-design-guidelines\\SKILL.md": {
+    "mtime": 1778556446.1068313,
+    "ast_hash": "b34682f931ba721e1b81b0560aee1999",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\skills\\webapp-testing\\SKILL.md": {
+    "mtime": 1778556446.1091359,
+    "ast_hash": "3b63c4227d96aa19f871c889f4f4ccd5",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\workflows\\brainstorm.md": {
+    "mtime": 1778556446.1126156,
+    "ast_hash": "906f1973f4ee1a27ff288aecb9b7d406",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\workflows\\create.md": {
+    "mtime": 1778556446.1136737,
+    "ast_hash": "eb68b41e2c59c6485da423c4affddfef",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\workflows\\debug.md": {
+    "mtime": 1778556446.115716,
+    "ast_hash": "cc585d89bceddc8d919dc300169c8a3c",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\workflows\\deploy.md": {
+    "mtime": 1778556446.1168494,
+    "ast_hash": "5a97cf6f01428b967b88563025ad926d",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\workflows\\enhance.md": {
+    "mtime": 1778556446.117916,
+    "ast_hash": "7fff6fd93d93afe6500abac3574be4c6",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\workflows\\orchestrate.md": {
+    "mtime": 1778556446.1190503,
+    "ast_hash": "daf6a768bebc9c7de434ecade376e148",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\workflows\\plan.md": {
+    "mtime": 1778556446.1204324,
+    "ast_hash": "6401e6d33cbe2868a453ce76ae66603f",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\workflows\\preview.md": {
+    "mtime": 1778556446.121592,
+    "ast_hash": "df196ce74d6fa58373eb66be154dabf0",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\workflows\\status.md": {
+    "mtime": 1778556446.1227055,
+    "ast_hash": "fed01bfa9384071ca74a7bc9d4771893",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\workflows\\test.md": {
+    "mtime": 1778556446.123837,
+    "ast_hash": "8c2b1ac0606f7bc017eea4600057f1c1",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\.agent\\workflows\\ui-ux-pro-max.md": {
+    "mtime": 1778556446.1262844,
+    "ast_hash": "71f7690f8551a285880cdad73be34239",
+    "semantic_hash": ""
+  },
+  "D:\\Development\\PixelTales(Image bug fixed)\\PixelTales\\Documentation\\collaboration_optimization_plan.md": {
+    "mtime": 1782910270.9061441,
+    "ast_hash": "6fd38b39ea6bec84b6d93365b3295d0b",
     "semantic_hash": ""
   }
 }

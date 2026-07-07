@@ -131,20 +131,33 @@ export class CollaborationService {
     // Get WebSocket URL from dynamic API config (Developer Mode support)
     const { apiConfigService } = await import('./apiConfig.service');
     const apiUrl = apiConfigService.getApiUrl();
-    const wsProtocol = apiUrl.startsWith('https') ? 'wss' : 'ws';
-    const wsHost = apiUrl.replace('http://', '').replace('https://', '').replace('/api', '');
+    let wsProtocol = apiUrl.startsWith('https') ? 'wss' : 'ws';
+    let wsHost = apiUrl.replace('http://', '').replace('https://', '').replace('/api', '');
+
+    // Support mobile browsers and tunnels (e.g. Pinggy, local IP access) by routing WS
+    // through the current browsing host if the configured API is pointing to localhost.
+    if (typeof window !== 'undefined' && !window.location.protocol.startsWith('capacitor')) {
+      const isLocalHost = wsHost.startsWith('localhost') || wsHost.startsWith('127.0.0.1');
+      if (isLocalHost && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        wsHost = window.location.host;
+        wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      }
+    }
+
     const wsUrl = `${wsProtocol}://${wsHost}/ws/collaborate/${sessionId}/?token=${token}`;
 
     console.log('Connecting to Collaboration WebSocket:', wsUrl.replace(token, '***TOKEN***'));
     console.log('API URL from config:', apiUrl);
 
     return new Promise((resolve, reject) => {
+      let isConnected = false;
 
       try {
         this.ws = new WebSocket(wsUrl);
 
         this.ws.onopen = () => {
           console.log('✅ WebSocket connected successfully');
+          isConnected = true;
           this.isConnecting = false;
           this.reconnectAttempts = 0;
           resolve();
@@ -162,7 +175,9 @@ export class CollaborationService {
         this.ws.onerror = (error) => {
           console.error('❌ WebSocket error:', error);
           this.isConnecting = false;
-          reject(error);
+          if (!isConnected) {
+            reject(new Error('WebSocket connection failed. Check console or server logs.'));
+          }
         };
 
         this.ws.onclose = (event) => {
@@ -175,6 +190,15 @@ export class CollaborationService {
           });
           this.isConnecting = false;
           this.ws = null;
+
+          if (!isConnected) {
+            let closeReason = 'Connection closed by server';
+            if (event.code === 4001) closeReason = 'Too many active sessions/connections for this user';
+            if (event.code === 4002) closeReason = 'Collaboration session is full';
+            if (event.code === 4003) closeReason = 'Unauthorized: You are not a participant of this session';
+            reject(new Error(`Failed to connect to collaboration server: ${closeReason} (Code: ${event.code})`));
+            return;
+          }
 
           // Attempt to reconnect if not a normal closure and not manually disconnected
           if (event.code !== 1000 && event.code !== 1001 && this.reconnectAttempts < this.maxReconnectAttempts) {
@@ -773,6 +797,7 @@ export class CollaborationService {
   }
 
   private syncToStore(message: any): void {
+    console.log('syncToStore ENTRY:', message.type, 'currentStoryId:', this.currentStoryId);
     if (!this.currentStoryId) return;
 
     switch (message.type) {
@@ -781,6 +806,7 @@ export class CollaborationService {
         break;
 
       case 'text_edit': {
+        console.log('text_edit received:', message);
         const store = useStoryStore.getState();
         let story = store.getStory(this.currentStoryId);
         if (!story) return;
@@ -792,6 +818,7 @@ export class CollaborationService {
           const pidStr = String(message.page_id);
           idx = story.pages.findIndex(p => String(p.id) === pidStr);
         }
+        console.log('resolved idx:', idx, 'story pages:', story.pages.map(p => p.id));
         if (idx < 0) return;
 
         while (story && story.pages.length <= idx) {
@@ -801,6 +828,7 @@ export class CollaborationService {
         if (!story || idx >= story.pages.length) return;
 
         const localPageId = story.pages[idx].id;
+        console.log('updatePage called:', this.currentStoryId, localPageId, message.text);
         store.updatePage(this.currentStoryId, localPageId, { text: message.text });
         break;
       }
@@ -808,6 +836,7 @@ export class CollaborationService {
   }
 
   private handleMessage(message: CollaborationMessage): void {
+    console.log('WS message received:', message.type, message);
     // Deep clone the message to avoid any reference issues
     const clonedMessage = JSON.parse(JSON.stringify(message));
 
@@ -984,8 +1013,11 @@ export class CollaborationService {
         return true;
       }
       
-      // Decode the payload (second part)
-      const payload = JSON.parse(atob(parts[1]));
+      // Decode the payload (second part) safely supporting base64url
+      const base64Url = parts[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
+      const payload = JSON.parse(atob(padded));
       
       // Check expiration time (exp is in seconds, Date.now() is in milliseconds)
       const now = Math.floor(Date.now() / 1000);
@@ -1022,7 +1054,7 @@ export class CollaborationService {
 
       const { apiConfigService } = await import('./apiConfig.service');
       const apiUrl = apiConfigService.getApiUrl();
-      const response = await fetch(`${apiUrl}/auth/token/refresh/`, {
+      const response = await fetch(`${apiUrl}/auth/refresh/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
