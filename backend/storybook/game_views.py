@@ -135,10 +135,10 @@ class StoryGameViewSet(viewsets.ReadOnlyModelViewSet):
         """
         game = self.get_object()
         
-        # Get questions without revealing answers
+        # Get questions including correct_answer for offline play caching
         questions = game.questions.filter(is_active=True).order_by('order').values(
             'id', 'question_type', 'question_text', 'options',
-            'order', 'hint', 'context', 'points'
+            'order', 'hint', 'context', 'points', 'correct_answer'
         )
         
         questions_data = list(questions)
@@ -526,19 +526,24 @@ def generate_games_for_story(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
+    regenerate = request.data.get('regenerate', False)
+    
     # Check if games already exist
     existing_games = StoryGame.objects.filter(story=story, is_active=True)
     if existing_games.exists():
-        return Response({
-            'message': 'Games already exist for this story',
-            'games': {
-                game.game_type: {
-                    'id': game.id,
-                    'questions_count': game.get_questions_count()
+        if regenerate:
+            existing_games.delete()
+        else:
+            return Response({
+                'message': 'Games already exist for this story',
+                'games': {
+                    game.game_type: {
+                        'id': game.id,
+                        'questions_count': game.get_questions_count()
+                    }
+                    for game in existing_games
                 }
-                for game in existing_games
-            }
-        }, status=status.HTTP_200_OK)
+            }, status=status.HTTP_200_OK)
     
     # Generate games
     result = GameGenerationService.generate_games_for_story(story)

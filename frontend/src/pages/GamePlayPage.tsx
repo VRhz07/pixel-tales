@@ -210,7 +210,7 @@ const GamePlayPage: React.FC = () => {
             id: q.id,
             question_text: q.question_text,
             options: q.options,
-            correct_answer: '',
+            correct_answer: q.correct_answer || '',
             context: q.context,
             hint: q.hint
           }))
@@ -250,7 +250,7 @@ const GamePlayPage: React.FC = () => {
           id: q.id,
           question_text: q.question_text,
           options: q.options,
-          correct_answer: '',
+          correct_answer: q.correct_answer || '',
           context: q.context,
           hint: q.hint
         }))
@@ -302,7 +302,7 @@ const GamePlayPage: React.FC = () => {
             id: q.id,
             question_text: q.question_text,
             options: q.options,
-            correct_answer: '',
+            correct_answer: q.correct_answer || '',
             context: q.context,
             hint: q.hint
           }))
@@ -337,12 +337,28 @@ const GamePlayPage: React.FC = () => {
           timestamp: Date.now()
         }]);
         
-        // Show generic feedback (can't validate offline)
-        // In offline mode, we allow progression without validation
-        setIsCorrect(true); // Set to true so user sees positive feedback
-        setCorrectAnswer(''); // Don't show correct answer in offline mode
+        // In offline mode, evaluate if we have the correct answer (from offline cache)
+        const hasCorrectAnswer = !!currentQuestion.correct_answer;
+        
+        if (hasCorrectAnswer) {
+          const isAnswerCorrect = userAnswer.trim().toLowerCase() === currentQuestion.correct_answer.toLowerCase();
+          setIsCorrect(isAnswerCorrect);
+          setCorrectAnswer(currentQuestion.correct_answer);
+          
+          if (isAnswerCorrect) {
+            setScore(prev => prev + 1);
+            playSuccess();
+          } else {
+            playError();
+          }
+        } else {
+          // Fallback if no correct answer is cached (e.g. game started online, then connection lost)
+          setIsCorrect(true);
+          setCorrectAnswer('');
+        }
+        
         setShowFeedback(true);
-        console.log('📴 Offline answer stored, showing feedback');
+        console.log('📴 Offline answer stored and evaluated locally');
       } else {
         const response = await api.post('/games/submit_answer/', {
           attempt_id: attemptId,
@@ -375,9 +391,19 @@ const GamePlayPage: React.FC = () => {
         timestamp: Date.now()
       }]);
       
-      // Show feedback to allow progression
-      setIsCorrect(true);
-      setCorrectAnswer('');
+      // Evaluate offline if possible
+      const hasCorrectAnswer = !!currentQuestion.correct_answer;
+      
+      if (hasCorrectAnswer) {
+        const isAnswerCorrect = userAnswer.trim().toLowerCase() === currentQuestion.correct_answer.toLowerCase();
+        setIsCorrect(isAnswerCorrect);
+        setCorrectAnswer(currentQuestion.correct_answer);
+        if (isAnswerCorrect) setScore(prev => prev + 1);
+      } else {
+        setIsCorrect(true);
+        setCorrectAnswer('');
+      }
+      
       setShowFeedback(true);
       setError('Answer saved offline - will sync when online');
     } finally {
@@ -598,6 +624,17 @@ const GamePlayPage: React.FC = () => {
           }, 2000);
         } catch (err) {
           console.error('Error submitting word search completion:', err);
+          
+          // Store offline pending progress for word search
+          if (attemptId) {
+            const currentQuestion = gameData!.questions[currentQuestionIndex];
+            gamesCacheService.storePendingProgress(gameData!.id, attemptId, [{
+              question_id: currentQuestion.id,
+              answer: newFoundWords.join(','),
+              timestamp: Date.now()
+            }]);
+          }
+          
           // Fallback to calculated time if API fails
           setTimeTaken(startTime ? Math.floor((Date.now() - startTime) / 1000) : 0);
           // Still show completion even if submission fails

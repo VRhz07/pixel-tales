@@ -820,13 +820,20 @@ class GameQuestion(models.Model):
         user_answer = str(user_answer).strip().lower()
         correct_answer = str(self.correct_answer).strip().lower()
         
-        # For spelling and fill-in-the-blank, allow for minor variations
-        if self.question_type in ['spelling', 'fill_blank']:
-            import re
-            user_answer = re.sub(r'[^\w\s]', '', user_answer)
-            correct_answer = re.sub(r'[^\w\s]', '', correct_answer)
-        
-        is_correct = user_answer == correct_answer
+        # For word search, answer is a comma-separated list of words
+        # Order doesn't matter, so we compare sets
+        if self.question_type == 'word_search':
+            user_words = set([w.strip() for w in user_answer.split(',') if w.strip()])
+            correct_words = set([w.strip() for w in correct_answer.split(',') if w.strip()])
+            is_correct = user_words == correct_words
+        else:
+            # For spelling and fill-in-the-blank, allow for minor variations
+            if self.question_type in ['spelling', 'fill_blank']:
+                import re
+                user_answer = re.sub(r'[^\w\s]', '', user_answer)
+                correct_answer = re.sub(r'[^\w\s]', '', correct_answer)
+            
+            is_correct = user_answer == correct_answer
         
         if is_correct:
             feedback = "Correct! " + (self.explanation or "Great job!")

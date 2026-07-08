@@ -133,6 +133,60 @@ class GameGenerationService:
         full_text = re.sub(r'\s+', ' ', full_text).strip()
         
         return full_text
+        
+    @classmethod
+    def _call_groq_api(cls, prompt, is_json=True):
+        """Helper to call Groq API for AI generation"""
+        import requests
+        import os
+        import json
+        
+        api_key = os.environ.get('VITE_GROQ_API_KEY') or os.environ.get('GROQ_API_KEY')
+        if not api_key:
+            return None
+            
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        payload = {
+            "model": "llama-3.3-70b-versatile",
+            "messages": [
+                {
+                    "role": "system", 
+                    "content": "You are an educational game designer for children. Always return valid JSON." if is_json else "You are an educational game designer for children."
+                },
+                {
+                    "role": "user", 
+                    "content": prompt
+                }
+            ]
+        }
+        
+        if is_json:
+            payload["response_format"] = {"type": "json_object"}
+            
+        try:
+            response = requests.post(
+                "https://api.groq.com/openai/v1/chat/completions", 
+                headers=headers, 
+                json=payload, 
+                timeout=15
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                if is_json and content:
+                    return json.loads(content)
+                return content
+            else:
+                print(f"Groq API error status {response.status_code}: {response.text}")
+        except Exception as e:
+            print(f"Groq API connection error: {e}")
+            
+        return None
     
     @classmethod
     def _generate_quiz_game(cls, story, story_text):
@@ -254,8 +308,39 @@ class GameGenerationService:
     def _generate_quiz_questions(cls, story, story_text):
         """
         Generate quiz questions from story content
-        This is a template-based approach. Can be enhanced with AI later.
+        Uses Groq AI first, with fallback to template-based approach.
         """
+        # 1. Try Groq AI
+        prompt = f"""
+        Read the following children's story and generate exactly 5 reading comprehension multiple-choice questions.
+        IMPORTANT: The questions, correct_answer, options, and explanations MUST be in the EXACT SAME LANGUAGE as the story (do not translate to English if the story is in another language).
+        
+        Story: {story_text}
+        
+        Return a JSON object with a single key "questions" containing an array of exactly 5 objects.
+        Each object must have exactly these keys:
+        - "question": The question text
+        - "correct_answer": The exact string of the correct answer
+        - "options": An array of exactly 4 strings (including the correct answer)
+        - "explanation": A short explanation of why the answer is correct
+        """
+        
+        ai_response = cls._call_groq_api(prompt, is_json=True)
+        if ai_response and "questions" in ai_response and isinstance(ai_response["questions"], list) and len(ai_response["questions"]) >= 3:
+            try:
+                questions = []
+                for q in ai_response["questions"]:
+                    questions.append({
+                        'question': q['question'],
+                        'correct_answer': q['correct_answer'],
+                        'options': q['options'],
+                        'explanation': q.get('explanation', '')
+                    })
+                return questions[:5]
+            except KeyError as e:
+                print(f"Groq output missing key: {e}")
+        
+        # 2. Fallback to templates if Groq fails
         questions = []
         
         # Extract key information from story
@@ -289,6 +374,39 @@ class GameGenerationService:
     @classmethod
     def _generate_fill_blank_questions(cls, story, story_text):
         """Generate fill-in-the-blank questions from story with multiple choice options"""
+        # 1. Try Groq AI
+        prompt = f"""
+        Read the following story and select 5 sentences. For each sentence, pick one important word to blank out (replace with "______").
+        IMPORTANT: All text and options MUST be in the EXACT SAME LANGUAGE as the story (do not translate to English). The words must be extracted verbatim from the text.
+        
+        Story: {story_text}
+        
+        Return a JSON object with a key "questions" containing an array of exactly 5 objects.
+        Each object must have these keys:
+        - "prompt": The sentence with the word replaced by "______"
+        - "answer": The correct word that was removed
+        - "options": An array of exactly 4 words (1 correct, 3 wrong but plausible words from the story in the SAME LANGUAGE)
+        - "full_sentence": The original unedited sentence
+        - "hint": A short hint (e.g., "The word has 5 letters" translated to the story's language)
+        """
+        
+        ai_response = cls._call_groq_api(prompt, is_json=True)
+        if ai_response and "questions" in ai_response and isinstance(ai_response["questions"], list) and len(ai_response["questions"]) >= 3:
+            try:
+                questions = []
+                for q in ai_response["questions"]:
+                    questions.append({
+                        'prompt': q['prompt'],
+                        'answer': q['answer'],
+                        'options': q['options'],
+                        'full_sentence': q['full_sentence'],
+                        'hint': q.get('hint', f"The word has {len(q['answer'])} letters")
+                    })
+                return questions[:5]
+            except KeyError as e:
+                print(f"Groq fill blanks output missing key: {e}")
+                
+        # 2. Fallback to templates if Groq fails
         questions = []
         
         # Split into sentences
@@ -355,13 +473,32 @@ class GameGenerationService:
         """Generate child-friendly word search grid with story words"""
         import random
         
-        # Extract interesting words from story (3-6 letters - shorter for children)
-        words = re.findall(r'\b[a-zA-Z]{3,6}\b', story_text)
-        unique_words = list(set([w.upper() for w in words]))
+        # 1. Try Groq AI to extract the most interesting thematic words
+        prompt = f"""
+        Extract the 5 most important and interesting thematic words from this story for a children's word search puzzle.
+        Rules:
+        - Words MUST be between 3 and 6 letters long.
+        - Words MUST only contain alphabet letters (no spaces or punctuation).
+        - IMPORTANT: The words MUST be extracted EXACTLY as they appear in the original text. DO NOT translate them to English. They must remain in the story's original language.
+        - Return ONLY the words, in uppercase.
         
-        # Filter out common words
-        common_words = {'THERE', 'THEIR', 'WHERE', 'WHICH', 'THESE', 'THOSE', 'WOULD', 'COULD', 'SHOULD', 'ABOUT', 'OTHER', 'WHAT', 'WHEN', 'WITH', 'HAVE', 'FROM', 'THEY', 'BEEN', 'WERE', 'THAT', 'THIS', 'WILL', 'JUST', 'LIKE', 'THEN', 'MORE', 'VERY', 'SAID', 'SOME'}
-        interesting_words = [w for w in unique_words if w not in common_words]
+        Story: {story_text}
+        
+        Return a JSON object with a single key "words" containing an array of exactly 5 string words.
+        """
+        
+        ai_response = cls._call_groq_api(prompt, is_json=True)
+        interesting_words = []
+        if ai_response and "words" in ai_response and isinstance(ai_response["words"], list):
+            interesting_words = [str(w).upper() for w in ai_response["words"] if isinstance(w, str) and 3 <= len(w) <= 6 and w.isalpha()]
+            
+        # 2. Fallback to regex extraction if Groq fails or returns too few words
+        if len(interesting_words) < 3:
+            import re
+            words = re.findall(r'\b[a-zA-Z]{3,6}\b', story_text)
+            unique_words = list(set([w.upper() for w in words]))
+            common_words = {'THERE', 'THEIR', 'WHERE', 'WHICH', 'THESE', 'THOSE', 'WOULD', 'COULD', 'SHOULD', 'ABOUT', 'OTHER', 'WHAT', 'WHEN', 'WITH', 'HAVE', 'FROM', 'THEY', 'BEEN', 'WERE', 'THAT', 'THIS', 'WILL', 'JUST', 'LIKE', 'THEN', 'MORE', 'VERY', 'SAID', 'SOME'}
+            interesting_words = [w for w in unique_words if w not in common_words]
         
         # Select 4-5 words for the puzzle (child-friendly amount)
         if len(interesting_words) < 4:
@@ -369,8 +506,8 @@ class GameGenerationService:
         
         selected_words = random.sample(interesting_words, min(5, len(interesting_words)))
         
-        # Create an 8x8 grid (child-friendly size, better for mobile)
-        grid_size = 8
+        # Create a 10x10 grid (standard size, better for diagonals)
+        grid_size = 10
         grid = [['_' for _ in range(grid_size)] for _ in range(grid_size)]
         
         placed_words = []
@@ -379,14 +516,13 @@ class GameGenerationService:
         for word in selected_words:
             placed = False
             attempts = 0
-            max_attempts = 50
+            max_attempts = 200
             
             while not placed and attempts < max_attempts:
                 attempts += 1
                 
-                # Random direction: 0=horizontal, 1=vertical (removed diagonal for children)
-                # Diagonals are harder for children to spot
-                direction = random.randint(0, 1)
+                # Random direction: 0=horizontal, 1=vertical, 2=diagonal down-right, 3=diagonal up-right
+                direction = random.randint(0, 3)
                 
                 if direction == 0:  # Horizontal
                     if len(word) <= grid_size:
@@ -417,7 +553,36 @@ class GameGenerationService:
                                 grid[row + i][col] = letter
                             placed = True
                             placed_words.append(word)
-                
+                            
+                elif direction == 2:  # Diagonal (top-left to bottom-right)
+                    if len(word) <= grid_size:
+                        row = random.randint(0, grid_size - len(word))
+                        col = random.randint(0, grid_size - len(word))
+                        
+                        # Check if space is available
+                        can_place = all(grid[row + i][col + i] == '_' or grid[row + i][col + i] == word[i] 
+                                      for i in range(len(word)))
+                        
+                        if can_place:
+                            for i, letter in enumerate(word):
+                                grid[row + i][col + i] = letter
+                            placed = True
+                            placed_words.append(word)
+                            
+                elif direction == 3:  # Diagonal (bottom-left to top-right)
+                    if len(word) <= grid_size:
+                        row = random.randint(len(word) - 1, grid_size - 1)
+                        col = random.randint(0, grid_size - len(word))
+                        
+                        # Check if space is available
+                        can_place = all(grid[row - i][col + i] == '_' or grid[row - i][col + i] == word[i] 
+                                      for i in range(len(word)))
+                        
+                        if can_place:
+                            for i, letter in enumerate(word):
+                                grid[row - i][col + i] = letter
+                            placed = True
+                            placed_words.append(word)
         
         # Fill empty spaces with random letters
         letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'

@@ -97,6 +97,25 @@ const StoryReaderPage: React.FC = () => {
       
       setIsLoading(true);
       
+      // Check offline storage first so we have it for fallbacks
+      let offlineDbStory: any = null;
+      try {
+        offlineDbStory = await offlineStorageService.getStory(storyId);
+      } catch (e) {
+        console.error('Failed to get story from offline storage', e);
+      }
+
+      // If we are offline and have an offline story, skip backend fetch
+      if (!navigator.onLine && offlineDbStory) {
+        console.log('📱 Device is offline, loading story from offline DB:', offlineDbStory.title);
+        setStory(offlineDbStory);
+        setStoryAuthor(offlineDbStory.author || user?.username || 'You');
+        setIsOwnStory(offlineDbStory.author === user?.username || (user?.id && offlineDbStory.authorId === user?.id?.toString()));
+        setIsSavedOffline(true);
+        setIsLoading(false);
+        return;
+      }
+
       // First, try to load from localStorage
       // This handles unpublished/draft stories that haven't been synced yet
       const localStory = getStory(storyId);
@@ -149,11 +168,19 @@ const StoryReaderPage: React.FC = () => {
           setIsLoading(false);
           return;
         } catch (error: any) {
-          console.error('? Failed to load story from backend:', error);
+          console.error('Failed to load story from backend:', error);
           
-          // If backend fails, try local store as final fallback
-          if (localStory) {
-            console.log('?? Fallback to local store after backend error:', localStory.title);
+          // If backend fails, try offline DB first, then local store as final fallback
+          if (offlineDbStory) {
+            console.log('📱 Fallback to offline DB after backend error:', offlineDbStory.title);
+            setStory(offlineDbStory);
+            setStoryAuthor(offlineDbStory.author || user?.username || 'You');
+            setIsOwnStory(offlineDbStory.author === user?.username || (user?.id && offlineDbStory.authorId === user?.id?.toString()));
+            setIsSavedOffline(true);
+            setIsLoading(false);
+            return;
+          } else if (localStory) {
+            console.log('📱 Fallback to local store after backend error:', localStory.title);
             setStory(localStory);
             setStoryAuthor(user?.username || 'You');
             setIsOwnStory(true);
@@ -223,7 +250,15 @@ const StoryReaderPage: React.FC = () => {
           fetchInteractionStats(storyIdToUse);
         }, 500);
       } catch (error) {
-        console.error('? Error loading story:', error);
+        console.error('Error loading story:', error);
+        if (offlineDbStory) {
+          console.log('📱 Fallback to offline DB after backend error (no user):', offlineDbStory.title);
+          setStory(offlineDbStory);
+          setStoryAuthor(offlineDbStory.author || 'Unknown Author');
+          setIsSavedOffline(true);
+          setIsLoading(false);
+          return;
+        }
         setStory(null);
       } finally {
         setIsLoading(false);
@@ -442,6 +477,36 @@ const StoryReaderPage: React.FC = () => {
       } else {
         alert(errorMessage || 'Failed to generate games');
       }
+    } finally {
+      setIsGeneratingGames(false);
+    }
+  };
+
+  const handleRegenerateGames = async () => {
+    if (!backendStoryId || isGeneratingGames) return;
+    
+    if (!window.confirm('Are you sure you want to regenerate games? This will permanently delete the existing games and any student scores/attempts associated with them.')) {
+      return;
+    }
+    
+    setIsGeneratingGames(true);
+    playButtonClick();
+    
+    try {
+      const response = await api.post('/games/generate/', {
+        story_id: backendStoryId,
+        regenerate: true
+      });
+      
+      setHasGames(true);
+      setGamesCount(Object.keys(response.games).length);
+      playSuccess();
+      alert(`🎉 Games regenerated successfully! ${Object.keys(response.games).length} new games created using AI.`);
+      setShowViewControls(false);
+    } catch (err: any) {
+      console.error('Error regenerating games:', err);
+      const errorMessage = err.response?.data?.error;
+      alert(errorMessage || 'Failed to regenerate games');
     } finally {
       setIsGeneratingGames(false);
     }
@@ -1699,28 +1764,57 @@ const StoryReaderPage: React.FC = () => {
           {(backendStoryId || hasGames) && (hasGames || canGenerateGames || isStoryAuthor) && (
             <div style={{ marginTop: '12px', width: '100%' }}>
               {hasGames ? (
-                <button
-                  onClick={handleViewGames}
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    backgroundColor: '#10b981',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '12px',
-                    fontSize: '16px',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
-                  }}
-                >
-                  <PuzzlePieceIcon style={{ width: '20px', height: '20px' }} />
-                  <span>Play Games ({gamesCount})</span>
-                </button>
+                <>
+                  <button
+                    onClick={handleViewGames}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      backgroundColor: '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '12px',
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
+                    }}
+                  >
+                    <PuzzlePieceIcon style={{ width: '20px', height: '20px' }} />
+                    <span>Play Games ({gamesCount})</span>
+                  </button>
+                  {isStoryAuthor && (
+                    <button
+                      onClick={handleRegenerateGames}
+                      disabled={isGeneratingGames}
+                      style={{
+                        width: '100%',
+                        padding: '12px 16px',
+                        backgroundColor: isGeneratingGames ? '#9ca3af' : '#f59e0b',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '12px',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        cursor: isGeneratingGames ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)',
+                        marginTop: '12px',
+                        opacity: isGeneratingGames ? 0.6 : 1
+                      }}
+                    >
+                      <SparklesIcon style={{ width: '20px', height: '20px' }} />
+                      <span>{isGeneratingGames ? 'Regenerating...' : 'Regenerate Games (AI)'}</span>
+                    </button>
+                  )}
+                </>
               ) : canGenerateGames ? (
                 <button
                   onClick={handleGenerateGames}
