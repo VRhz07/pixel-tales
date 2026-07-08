@@ -351,50 +351,50 @@ export const StoryModeSelectionModal: React.FC<StoryModeSelectionModalProps> = (
                   <Loader className={`w-8 h-8 animate-spin ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
                 </div>
               ) : friends.length === 0 ? (
-                <div className="text-center py-12">
-                  <Users className={`w-12 h-12 mx-auto mb-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
-                  <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>No friends yet</p>
-                  <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Add friends from the Social page first</p>
+                <div className="sms-empty-state">
+                  <Users className="sms-empty-icon" />
+                  <p className="sms-empty-title">No friends yet</p>
+                  <p className="sms-empty-sub">Add friends from the Social page first</p>
                 </div>
               ) : (
                 <>
-                  <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  <p className="sms-list-label">
                     Select friends to invite to collaborate on this story:
                   </p>
-                  <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+                  <div className="sms-friend-list">
                     {friends.map((friend) => (
-                      <div key={friend.id} className="friend-card-enhanced">
-                        <div className="friend-avatar-container">
-                          <AvatarWithBorder
-                            avatar={friend.avatar || friend.username?.charAt(0).toUpperCase() || 'U'}
-                            borderId={friend.selected_avatar_border || 'basic'}
-                            size={48}
-                          />
-                          <div className={`friend-online-indicator ${friend.isOnline ? 'online' : 'offline'}`}></div>
+                      <div key={friend.id} className="sms-friend-card">
+                        {/* Avatar — pure CSS, no AvatarWithBorder inline-style conflicts */}
+                        <div className="sms-avatar-wrap">
+                          <div className="sms-avatar">
+                            {friend.avatar || friend.username?.charAt(0)?.toUpperCase() || '?'}
+                          </div>
+                          <span className={`sms-dot ${friend.isOnline ? 'online' : 'offline'}`} />
                         </div>
-                        <div className="friend-info">
-                          <p className="friend-name">{friend.username}</p>
-                          <div className="friend-status">
-                            <div className={`friend-status-dot ${friend.isOnline ? 'online' : 'offline'}`}></div>
-                            <span className={`friend-status-text ${friend.isOnline ? 'online' : 'offline'}`}>
+
+                        <div className="sms-friend-info">
+                          <p className="sms-friend-name">{friend.username}</p>
+                          <div className="sms-status-row">
+                            <span className={`sms-status-pill ${friend.isOnline ? 'online' : 'offline'}`}>
                               {friend.isOnline ? 'Online' : 'Offline'}
                             </span>
                           </div>
                         </div>
+
                         <button
                           onClick={() => handleInviteFriend(friend.id)}
                           disabled={invitedFriends.has(friend.id)}
-                          className={`invite-button ${invitedFriends.has(friend.id) ? 'invited' : ''}`}
+                          className={`sms-invite-btn ${invitedFriends.has(friend.id) ? 'invited' : ''}`}
                         >
                           {invitedFriends.has(friend.id) ? (
                             <>
-                              <Check className="invite-button-icon" />
-                              <span className="invite-button-text">Invited</span>
+                              <Check className="sms-btn-icon" />
+                              <span>Invited</span>
                             </>
                           ) : (
                             <>
-                              <UserPlus className="invite-button-icon" />
-                              <span className="invite-button-text">Invite</span>
+                              <UserPlus className="sms-btn-icon" />
+                              <span>Invite</span>
                             </>
                           )}
                         </button>
@@ -405,6 +405,7 @@ export const StoryModeSelectionModal: React.FC<StoryModeSelectionModalProps> = (
               )}
             </div>
           )}
+
 
           {/* Waiting for Acceptance */}
           {mode === 'waiting' && (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { XMarkIcon, CheckIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, XCircleIcon } from '@heroicons/react/24/outline';
 
 interface VotingModalProps {
   isOpen: boolean;
@@ -30,302 +30,160 @@ export const VotingModal: React.FC<VotingModalProps> = ({
   initiatedBy,
   currentUserId
 }) => {
-  console.log('🗳️ VotingModal render:', { isOpen, votingData, participants, initiatedBy });
-  
-  // Timeout countdown state
   const [timeLeft, setTimeLeft] = React.useState(10);
   const timeoutRef = React.useRef<number | null>(null);
   const countdownRef = React.useRef<number | null>(null);
-  
+
   if (!isOpen) return null;
 
   const { voting_data = {}, total_participants, current_votes = 0, question } = votingData;
   const required_votes = total_participants;
   const pendingVotes = required_votes - current_votes;
-  
-  // Check if current user has voted and what they voted
+  const progressPct = Math.min((current_votes / required_votes) * 100, 100);
+
   const currentUserVote = currentUserId ? voting_data[currentUserId] : undefined;
   const hasCurrentUserVoted = currentUserVote !== undefined;
-  
-  console.log('🗳️ VotingModal computed values:', { 
-    voting_data, 
-    total_participants, 
-    current_votes, 
-    required_votes, 
-    pendingVotes,
-    participantsCount: participants.length 
-  });
 
-  // Timeout and auto-resolution logic
+  // Timer urgency level
+  const urgency = timeLeft <= 3 ? 'critical' : timeLeft <= 5 ? 'warning' : 'normal';
+
   React.useEffect(() => {
     if (!isOpen) {
-      // Reset timer when modal closes
       setTimeLeft(10);
       return;
     }
-    
-    console.log('🕐 VotingModal: Starting 10-second timeout');
-    setTimeLeft(10);
-    
-    // Start countdown
-    countdownRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          console.log('⏰ VotingModal: Countdown reached 0');
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    
-    // Auto-resolve after 10 seconds
-    timeoutRef.current = setTimeout(() => {
-      console.log('⏰ VotingModal: 10-second timeout reached, auto-resolving vote');
-      
-      // Get the latest voting data at timeout
-      const currentVotingData = votingData.voting_data || {};
-      const yesVotes = Object.values(currentVotingData).filter(vote => vote === true).length;
-      const noVotes = Object.values(currentVotingData).filter(vote => vote === false).length;
-      const totalVotes = yesVotes + noVotes;
-      
-      console.log('🗳️ Timeout auto-resolution:', {
-        yesVotes,
-        noVotes,
-        totalVotes,
-        totalParticipants: total_participants,
-        pendingVotes
-      });
-      
-      // Auto-resolve based on majority of responses received
-      if (totalVotes > 0) {
-        const autoVote = yesVotes > noVotes; // Majority wins
-        console.log(`⚖️ Auto-resolving vote: ${autoVote ? 'YES' : 'NO'} (${yesVotes} yes vs ${noVotes} no)`);
-        onVote(autoVote);
-      } else {
-        // If no votes at all, default to NO to be safe
-        console.log('🚫 No votes received, auto-resolving to NO');
-        onVote(false);
-      }
-    }, 10000);
-    
-    return () => {
-      console.log('🧹 VotingModal: Cleaning up timers');
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-        countdownRef.current = null;
-      }
-    };
-  }, [isOpen, votingData.vote_id]); // Only depend on isOpen and vote_id to prevent restarts
 
-  // Stop timeout if all participants have voted
+    setTimeLeft(10);
+
+    countdownRef.current = setInterval(() => {
+      setTimeLeft(prev => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
+
+    timeoutRef.current = setTimeout(() => {
+      const currentVotingData = votingData.voting_data || {};
+      const yesVotes = Object.values(currentVotingData).filter(v => v === true).length;
+      const noVotes = Object.values(currentVotingData).filter(v => v === false).length;
+      onVote(yesVotes + noVotes > 0 ? yesVotes > noVotes : false);
+    }, 10000);
+
+    return () => {
+      if (timeoutRef.current) { clearTimeout(timeoutRef.current); timeoutRef.current = null; }
+      if (countdownRef.current) { clearInterval(countdownRef.current); countdownRef.current = null; }
+    };
+  }, [isOpen, votingData.vote_id]);
+
   React.useEffect(() => {
     if (!isOpen || !votingData.voting_data) return;
-    
     const totalVoted = Object.keys(votingData.voting_data).length;
     if (totalVoted >= total_participants && timeoutRef.current) {
-      console.log('✅ All participants voted, clearing timeout');
       clearTimeout(timeoutRef.current);
-      clearInterval(countdownRef.current);
+      clearInterval(countdownRef.current!);
       timeoutRef.current = null;
       countdownRef.current = null;
-      setTimeLeft(0); // Set countdown to 0 to reflect that voting is complete
+      setTimeLeft(0);
     }
   }, [isOpen, votingData.voting_data, total_participants]);
 
-  console.log('🎨 About to return VotingModal JSX');
-  
   return (
-    <div 
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        zIndex: 999999,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}
-      onClick={(e) => {
-        // Prevent closing modal when clicking overlay
-        e.stopPropagation();
-      }}
-    >
-      <div 
-        onClick={(e) => {
-          // Stop propagation so clicking inside modal doesn't trigger overlay click
-          e.stopPropagation();
-        }}
-        style={{
-        backgroundColor: 'white',
-        borderRadius: '24px',
-        maxWidth: '500px',
-        width: '100%',
-        margin: '16px',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        overflow: 'hidden'
-      }}>
-        {/* Header */}
-        <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-6 text-white">
-          <div className="flex justify-between items-start mb-2">
-            <h2 className="text-2xl font-bold">💾 Save Story Vote</h2>
-            <div className="flex items-center gap-2">
-              <span className="text-sm opacity-75">⏱️ Time left:</span>
-              <span className={`text-lg font-mono font-bold px-2 py-1 rounded ${
-                timeLeft <= 3 
-                  ? 'bg-red-500 text-white' 
-                  : timeLeft <= 5 
-                    ? 'bg-yellow-500 text-black' 
-                    : 'bg-green-500 text-white'
-              }`}>
-                {timeLeft}s
-              </span>
+    <div className="vm-overlay" onClick={e => e.stopPropagation()}>
+      <div className="vm-card" onClick={e => e.stopPropagation()}>
+
+        {/* ── Header ── */}
+        <div className="vm-header">
+          <div className="vm-header-top">
+            <div className="vm-title-group">
+              <span className="vm-icon">💾</span>
+              <h2 className="vm-title">Save Story Vote</h2>
+            </div>
+            <div className={`vm-timer vm-timer--${urgency}`}>
+              <svg className="vm-timer-ring" viewBox="0 0 36 36">
+                <circle className="vm-timer-track" cx="18" cy="18" r="15.9" />
+                <circle
+                  className="vm-timer-fill"
+                  cx="18" cy="18" r="15.9"
+                  strokeDasharray={`${(timeLeft / 10) * 100} 100`}
+                />
+              </svg>
+              <span className="vm-timer-label">{timeLeft}s</span>
             </div>
           </div>
-          <p className="text-purple-100">
+          <p className="vm-subtitle">
             {question || `${initiatedBy} wants to save this collaborative story`}
           </p>
-          {timeLeft <= 5 && (
-            <p className="text-yellow-200 text-sm mt-2 animate-pulse">
-              ⚠️ Vote will auto-resolve in {timeLeft} seconds based on majority!
-            </p>
+          {urgency !== 'normal' && (
+            <div className="vm-urgency-banner">
+              ⚠️ Auto-resolving in {timeLeft}s based on majority
+            </div>
           )}
         </div>
 
-        {/* Content */}
-        <div className="p-6">
+        {/* ── Body ── */}
+        <div className="vm-body">
+
           {/* Progress */}
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gray-700">
-                Votes Collected
-              </span>
-              <span className="text-sm font-bold text-purple-600">
-                {current_votes} / {required_votes}
-              </span>
+          <div className="vm-progress-section">
+            <div className="vm-progress-labels">
+              <span className="vm-progress-text">Votes collected</span>
+              <span className="vm-progress-count">{current_votes} / {required_votes}</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-              <div
-                className="bg-gradient-to-r from-purple-500 to-pink-500 h-full transition-all duration-300 ease-out"
-                style={{ width: `${(current_votes / required_votes) * 100}%` }}
-              />
+            <div className="vm-progress-track">
+              <div className="vm-progress-fill" style={{ width: `${progressPct}%` }} />
             </div>
             {pendingVotes > 0 && (
-              <p className="text-xs text-gray-500 mt-2">
-                Waiting for {pendingVotes} more vote(s)...
-              </p>
+              <p className="vm-progress-hint">Waiting for {pendingVotes} more vote(s)…</p>
             )}
           </div>
 
-          {/* Participants List */}
-          <div className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">
-              Participants
-            </h3>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {participants && participants.length > 0 ? participants.map((participant, index) => {
-                const participantId = participant.user_id || participant.id;
-                console.log('🧑 Rendering participant:', participant);
-                const hasVoted = voting_data[participantId] !== undefined;
-                const vote = voting_data[participantId];
+          {/* Participants */}
+          <div className="vm-participants-section">
+            <h3 className="vm-section-label">Participants</h3>
+            <div className="vm-participants-list">
+              {participants && participants.length > 0
+                ? participants.map((p, i) => {
+                    const pid = p.user_id;
+                    const voted = voting_data[pid] !== undefined;
+                    const vote = voting_data[pid];
+                    const name = p.display_name || p.username || 'Unknown';
 
-                return (
-                  <div
-                    key={`${participantId}-${participant.username || index}`}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                        {(participant.display_name || participant.username || '?').charAt(0).toUpperCase()}
+                    return (
+                      <div key={`${pid}-${i}`} className="vm-participant">
+                        <div className="vm-avatar">{name.charAt(0).toUpperCase()}</div>
+                        <span className="vm-participant-name">{name}</span>
+                        {voted
+                          ? vote
+                            ? <span className="vm-badge vm-badge--yes"><CheckIcon className="vm-badge-icon" />Agreed</span>
+                            : <span className="vm-badge vm-badge--no"><XCircleIcon className="vm-badge-icon" />Declined</span>
+                          : <span className="vm-badge vm-badge--pending">Pending…</span>
+                        }
                       </div>
-                      <span className="text-sm font-medium text-gray-700">
-                        {participant.display_name || participant.username || 'Unknown'}
-                      </span>
-                    </div>
-
-                    {hasVoted ? (
-                      vote ? (
-                        <div className="flex items-center space-x-1 text-green-600">
-                          <CheckIcon className="w-5 h-5" />
-                          <span className="text-xs font-semibold">Agreed</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center space-x-1 text-red-600">
-                          <XCircleIcon className="w-5 h-5" />
-                          <span className="text-xs font-semibold">Disagreed</span>
-                        </div>
-                      )
-                    ) : (
-                      <span className="text-xs text-gray-400 font-medium">
-                        Pending...
-                      </span>
-                    )}
-                  </div>
-                );
-              }) : <div className="text-center text-gray-500">No participants</div>}
+                    );
+                  })
+                : <div className="vm-empty">No participants</div>
+              }
             </div>
           </div>
 
-          {/* Voting Buttons */}
-          <div className="flex gap-3">
+          {/* Buttons */}
+          <div className="vm-actions">
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('❌ Not Yet button clicked');
-                try {
-                  onVote(false);
-                } catch (error) {
-                  console.error('Error voting:', error);
-                }
-              }}
+              onClick={e => { e.preventDefault(); e.stopPropagation(); onVote(false); }}
               disabled={hasCurrentUserVoted}
-              className={`flex-1 py-3 px-4 font-semibold rounded-xl transition-colors duration-200 flex items-center justify-center space-x-2 ${
-                hasCurrentUserVoted && currentUserVote === false
-                  ? 'bg-red-500 text-white ring-2 ring-red-300' // User voted "Not Yet"
-                  : hasCurrentUserVoted
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed' // User voted "Agree" - disable this button
-                  : 'bg-gray-200 hover:bg-gray-300 text-gray-700' // User hasn't voted yet
-              }`}
+              className={`vm-btn vm-btn--no ${hasCurrentUserVoted && currentUserVote === false ? 'vm-btn--selected' : ''} ${hasCurrentUserVoted && currentUserVote !== false ? 'vm-btn--disabled' : ''}`}
             >
-              <XCircleIcon className="w-5 h-5" />
-              <span>{hasCurrentUserVoted && currentUserVote === false ? 'You Voted: Not Yet' : 'Not Yet'}</span>
+              <XCircleIcon className="vm-btn-icon" />
+              <span>{hasCurrentUserVoted && currentUserVote === false ? 'You: Not Yet' : 'Not Yet'}</span>
             </button>
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('✅ Agree button clicked');
-                try {
-                  onVote(true);
-                } catch (error) {
-                  console.error('Error voting:', error);
-                }
-              }}
+              onClick={e => { e.preventDefault(); e.stopPropagation(); onVote(true); }}
               disabled={hasCurrentUserVoted}
-              className={`flex-1 py-3 px-4 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl ${
-                hasCurrentUserVoted && currentUserVote === true
-                  ? 'bg-gradient-to-r from-green-500 to-green-600 text-white ring-2 ring-green-300' // User voted "Agree"
-                  : hasCurrentUserVoted
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed' // User voted "Not Yet" - disable this button
-                  : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white' // User hasn't voted yet
-              }`}
+              className={`vm-btn vm-btn--yes ${hasCurrentUserVoted && currentUserVote === true ? 'vm-btn--selected' : ''} ${hasCurrentUserVoted && currentUserVote !== true ? 'vm-btn--disabled' : ''}`}
             >
-              <CheckIcon className="w-5 h-5" />
-              <span>{hasCurrentUserVoted && currentUserVote === true ? 'You Voted: Agree' : 'Agree to Save'}</span>
+              <CheckIcon className="vm-btn-icon" />
+              <span>{hasCurrentUserVoted && currentUserVote === true ? 'You: Agreed' : 'Agree to Save'}</span>
             </button>
           </div>
 
-          {/* Info Text */}
-          <p className="text-xs text-center text-gray-500 mt-4">
-            All participants must agree to save the story
-          </p>
+          <p className="vm-footer-note">All participants must agree to save the story</p>
         </div>
       </div>
     </div>
