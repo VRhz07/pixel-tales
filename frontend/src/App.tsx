@@ -12,14 +12,14 @@ const EnhancedSocialPage = lazy(() => import('./components/pages/EnhancedSocialP
 const MessagingPage = lazy(() => import('./components/pages/MessagingPage'));
 const SettingsPage = lazy(() => import('./components/pages/SettingsPage'));
 const AuthPage = lazy(() => import('./components/auth/AuthPage'));
-const OfflineStoriesPage = lazy(() => import('./pages/OfflineStoriesPage'));
+import OfflineStoriesPage from './pages/OfflineStoriesPage';
 const OnlineStoriesPage = lazy(() => import('./pages/OnlineStoriesPage'));
 const CharactersLibraryPage = lazy(() => import('./pages/CharactersLibraryPage'));
 const YourWorksPage = lazy(() => import('./pages/YourWorksPage'));
 const ManualStoryCreationPage = lazy(() => import('./pages/ManualStoryCreationPage'));
 const CanvasDrawingPage = lazy(() => import('./pages/CanvasDrawingPage'));
 const CoverImageCanvasPage = lazy(() => import('./pages/CoverImageCanvasPage'));
-const StoryReaderPage = lazy(() => import('./pages/StoryReaderPage'));
+import StoryReaderPage from './pages/StoryReaderPage';
 const PublicLibraryPage = lazy(() => import('./pages/PublicLibraryPage'));
 const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage'));
 const CollaborationWaitingPage = lazy(() => import('./pages/CollaborationWaitingPage'));
@@ -29,9 +29,9 @@ const TeacherDashboardPage = lazy(() => import('./pages/TeacherDashboardPage'));
 const TeacherSettingsPage = lazy(() => import('./pages/TeacherSettingsPage'));
 const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
-const GamesPage = lazy(() => import('./pages/GamesPage'));
-const StoryGamesPage = lazy(() => import('./pages/StoryGamesPage'));
-const GamePlayPage = lazy(() => import('./pages/GamePlayPage'));
+import GamesPage from './pages/GamesPage';
+import StoryGamesPage from './pages/StoryGamesPage';
+import GamePlayPage from './pages/GamePlayPage';
 
 // Keep these as static imports (needed immediately)
 import ProtectedRoute from './components/auth/ProtectedRoute';

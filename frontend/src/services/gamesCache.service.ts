@@ -91,11 +91,15 @@ class GamesCacheService {
         if (cached) {
           const cacheData: CachedData<any[]> = JSON.parse(cached);
           
-          // Check if cache is expired
+          // Check if cache is expired, but keep it if we are offline
           if (Date.now() - cacheData.timestamp > CACHE_EXPIRY) {
-            console.log('⏰ Cache expired for story:', variant);
-            this.clearStoryGamesCache(storyId);
-            return null;
+            if (this.isOnline()) {
+              console.log('⏰ Cache expired for story:', variant);
+              this.clearStoryGamesCache(storyId);
+              return null;
+            } else {
+              console.log('⏰ Cache expired but device is offline, using anyway for story:', variant);
+            }
           }
 
           console.log('✅ Retrieved cached games for story:', variant);
@@ -162,11 +166,15 @@ class GamesCacheService {
       const cacheData: CachedData<any> = JSON.parse(cached);
       console.log('📦 Raw cached data:', cacheData);
       
-      // Check if cache is expired
+      // Check if cache is expired, but keep it if we are offline
       if (Date.now() - cacheData.timestamp > CACHE_EXPIRY) {
-        console.log('⏰ Game cache expired:', gameId);
-        this.clearGameDataCache(gameId);
-        return null;
+        if (this.isOnline()) {
+          console.log('⏰ Game cache expired:', gameId);
+          this.clearGameDataCache(gameId);
+          return null;
+        } else {
+          console.log('⏰ Game cache expired but device is offline, using anyway for game:', gameId);
+        }
       }
 
       console.log('✅ Retrieved cached game data for game:', gameId);

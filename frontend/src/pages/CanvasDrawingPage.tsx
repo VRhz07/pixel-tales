@@ -1225,9 +1225,14 @@ const CanvasDrawingPage: React.FC = () => {
     setPanOffset({ x: 0, y: 0 });
   };
 
-  const handleDone = () => {
-    // Save canvas data before leaving
-    if (drawingEngineRef.current && storyId) {
+  const performSave = async () => {
+    if (!drawingEngineRef.current || !storyId) return;
+    
+    try {
+      setShowSavingOverlay(true);
+      // Yield to allow UI to render the saving overlay
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const canvasData = drawingEngineRef.current.getCanvasData();
       const drawingState = drawingEngineRef.current.getDrawingState();
       
@@ -1277,7 +1282,23 @@ const CanvasDrawingPage: React.FC = () => {
       
       // Mark story as draft since canvas was modified
       markAsDraft(storyId);
+      
+      // Allow Zustand persistence to start
+      await new Promise(resolve => setTimeout(resolve, 300));
+    } catch (error) {
+      console.error('❌ Error during save:', error);
+      showInfoToast('Failed to save canvas properly. Some data might be lost.');
+    } finally {
+      setShowSavingOverlay(false);
     }
+  };
+
+  const handleDone = async () => {
+    await performSave();
+    
+    // Disconnect websocket gracefully
+    collaborationService.removeAllListeners();
+    // Intentionally NOT disconnecting here to preserve session for ManualStoryCreationPage
     
     // Navigate back to story creation with page index and collaboration info
     if (storyId) {
@@ -1296,59 +1317,13 @@ const CanvasDrawingPage: React.FC = () => {
     }
   };
 
-  const handleClose = () => {
-    // Save canvas data before leaving
-    if (drawingEngineRef.current && storyId) {
-      const canvasData = drawingEngineRef.current.getCanvasData();
-      const drawingState = drawingEngineRef.current.getDrawingState();
-      
-      if (isCoverImage) {
-        // Save as cover image
-        updateStory(storyId, { coverImage: canvasData });
-        
-        // Always save with full state for both collaboration and solo mode
-        const COVER_OPERATIONS_KEY = '__cover_operations__';
-        const existingData = getCanvasData(storyId, COVER_OPERATIONS_KEY);
-        let existingOperations = [];
-        
-        if (typeof existingData === 'object' && existingData !== null) {
-          existingOperations = existingData.operations || [];
-        }
-        
-        // Save with operations preserved and full drawing state
-        const updatedCanvasData = {
-          canvasDataUrl: canvasData, // Final snapshot
-          operations: existingOperations,
-          drawingState: drawingState, // Full Paper.js state for restoration
-          lastUpdate: Date.now()
-        };
-        
-        saveCanvasData(storyId, COVER_OPERATIONS_KEY, updatedCanvasData);
-        console.log('💾 Saved COVER IMAGE with', existingOperations.length, 'operations and full state');
-      } else if (pageId) {
-        // Always save with full state for both collaboration and solo mode
-        const existingData = getCanvasData(storyId, pageId);
-        let existingOperations = [];
-        
-        if (typeof existingData === 'object' && existingData !== null) {
-          existingOperations = existingData.operations || [];
-        }
-        
-        // Save with operations preserved and full drawing state
-        const updatedCanvasData = {
-          canvasDataUrl: canvasData, // Final snapshot
-          operations: existingOperations,
-          drawingState: drawingState, // Full Paper.js state for restoration
-          lastUpdate: Date.now()
-        };
-        
-        saveCanvasData(storyId, pageId, updatedCanvasData);
-        console.log('💾 Saved canvas with', existingOperations.length, 'operations and full state');
-      }
-      
-      // Mark story as draft since canvas was modified
-      markAsDraft(storyId);
-    }
+  const handleClose = async () => {
+    await performSave();
+    
+    // Disconnect websocket gracefully
+    collaborationService.removeAllListeners();
+    // Intentionally NOT disconnecting here to preserve session for ManualStoryCreationPage
+
     
     // Navigate back to story creation with page index and collaboration info
     if (storyId) {
@@ -1425,6 +1400,19 @@ const CanvasDrawingPage: React.FC = () => {
     { type: 'heart', label: 'Heart' },
     { type: 'arrow', label: 'Arrow' }
   ];
+
+  // Intercept Capacitor hardware back button
+  useEffect(() => {
+    const handleBackButton = (e: Event) => {
+      // Prevent default navigation
+      e.preventDefault();
+      // Handle cleanup, save, and custom navigation
+      handleClose();
+    };
+
+    window.addEventListener('capacitorBackButton', handleBackButton);
+    return () => window.removeEventListener('capacitorBackButton', handleBackButton);
+  }, [handleClose]);
 
   // Check if mobile
   useEffect(() => {
@@ -2061,9 +2049,7 @@ const CanvasDrawingPage: React.FC = () => {
 
     return () => {
       if (isCollaborating) {
-        collaborationService.off('vote_initiated', handleVoteInitiated);
-        collaborationService.off('vote_update', handleVoteUpdate);
-        collaborationService.off('vote_result', handleVoteResult);
+        collaborationService.removeAllListeners();
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

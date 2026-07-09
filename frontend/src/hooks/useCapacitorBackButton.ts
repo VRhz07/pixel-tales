@@ -22,6 +22,14 @@ export const useCapacitorBackButton = () => {
           canGoBack 
         });
 
+        // Check if there is a custom back handler
+        const event = new CustomEvent('capacitorBackButton', { cancelable: true });
+        window.dispatchEvent(event);
+        if (event.defaultPrevented) {
+          console.log('📱 Back button handled by component');
+          return;
+        }
+
         // Define main/home routes where we should show exit confirmation
         const mainRoutes = [
           '/',

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useSoundEffects } from '../hooks/useSoundEffects';
+import { offlineStorageService } from '../services/offlineStorageService';
 import './GamesPage.css';
 
 interface StoryWithGames {
@@ -19,6 +20,7 @@ const GamesPage: React.FC = () => {
   const [stories, setStories] = useState<StoryWithGames[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isOfflineMode, setIsOfflineMode] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
   // Pagination state
@@ -32,12 +34,72 @@ const GamesPage: React.FC = () => {
   const fetchStories = async () => {
     try {
       setLoading(true);
+      setIsOfflineMode(false);
       const response = await api.get('/games/available_stories/');
       setStories(response.stories || []);
       setError(null);
     } catch (err) {
       console.error('Error fetching stories:', err);
-      setError('Failed to load games');
+      
+      // Fallback to dynamically building offline games list
+      try {
+        console.log('Attempting to load offline games fallback...');
+        const offlineStoriesList = await offlineStorageService.getAllStories();
+        
+        const cachedStoryIds = new Set<string>();
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('games_cache_story_games_')) {
+            const variant = key.replace('games_cache_story_games_', '');
+            const match = variant.match(/\d+/);
+            if (match) {
+              cachedStoryIds.add(match[0]);
+            }
+          }
+        }
+        
+        const offlineGames = offlineStoriesList
+          .filter(story => cachedStoryIds.has(String(story.id)) || cachedStoryIds.has(String(story.backendId)))
+          .map(story => {
+            let gamesCount = 0;
+            const storyId = story.backendId || story.id;
+            try {
+              const cachedGamesRaw = localStorage.getItem(`games_cache_story_games_${storyId}`) || localStorage.getItem(`games_cache_story_games_story-${storyId}`);
+              if (cachedGamesRaw) {
+                const cachedData = JSON.parse(cachedGamesRaw);
+                if (cachedData && cachedData.data && Array.isArray(cachedData.data)) {
+                  gamesCount = cachedData.data.length;
+                }
+              }
+            } catch(e) {
+              console.error('Error reading cached games count', e);
+            }
+            
+            return {
+              id: storyId,
+              title: story.title || 'Unknown Title',
+              cover_image: story.coverImage || story.cover_image || null,
+              category: story.category || story.genre || 'Story',
+              author__username: (story.author && typeof story.author === 'string') 
+                                ? story.author 
+                                : (story.author_name || 'Unknown Author'),
+              games_count: gamesCount
+            };
+          });
+          
+        const playableOfflineGames = offlineGames.filter(g => g.games_count > 0);
+        
+        if (playableOfflineGames.length > 0) {
+          setStories(playableOfflineGames);
+          setIsOfflineMode(true);
+          setError(null); // Clear error since we successfully loaded offline fallback
+        } else {
+          setError('Failed to load games. No offline games available.');
+        }
+      } catch (offlineErr) {
+        console.error('Error loading offline fallback:', offlineErr);
+        setError('Failed to load games');
+      }
     } finally {
       setLoading(false);
     }
@@ -87,6 +149,26 @@ const GamesPage: React.FC = () => {
         <h1 className="games-page-title">Story Games</h1>
         <p className="games-page-subtitle">Play games based on your favorite stories</p>
       </div>
+
+      {/* Offline Mode Indicator */}
+      {isOfflineMode && (
+        <div className="games-offline-banner" style={{
+          backgroundColor: 'var(--ion-color-warning, #ffc409)',
+          color: 'var(--ion-color-warning-contrast, #000)',
+          padding: '0.5rem 1rem',
+          borderRadius: '8px',
+          margin: '0 1rem 1rem 1rem',
+          textAlign: 'center',
+          fontWeight: '500',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px'
+        }}>
+          <span style={{ fontSize: '1.2rem' }}>📶</span>
+          You are offline. Showing your downloaded games.
+        </div>
+      )}
 
       {/* Search */}
       <div className="games-search-container">

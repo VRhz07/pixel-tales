@@ -532,6 +532,13 @@ export class CollaborationService {
   }
 
   /**
+   * Remove all message handlers
+   */
+  removeAllListeners(): void {
+    this.messageHandlers.clear();
+  }
+
+  /**
    * Check if connected
    */
   isConnected(): boolean {

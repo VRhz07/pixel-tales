@@ -11,8 +11,8 @@ const IMAGE_STORE = 'story-images';
 interface ImageData {
   storyId: string;
   pageId: string;
-  imageType: 'page' | 'cover';
-  data: string; // base64 image data
+  imageType: 'page' | 'cover' | 'page_state' | 'page_operations' | 'cover_state' | 'cover_operations';
+  data: any; // base64 image data or JSON object
   savedAt: Date;
 }
 
@@ -62,7 +62,7 @@ class HybridStorageAdapter {
   /**
    * Save an image to IndexedDB
    */
-  async saveImage(storyId: string, pageId: string, imageType: 'page' | 'cover', data: string): Promise<void> {
+  async saveImage(storyId: string, pageId: string, imageType: 'page' | 'cover' | 'page_state' | 'page_operations' | 'cover_state' | 'cover_operations', data: any): Promise<void> {
     await this.initDB();
     if (!this.db) throw new Error('IndexedDB not initialized');
 
@@ -92,7 +92,7 @@ class HybridStorageAdapter {
   /**
    * Get an image from IndexedDB
    */
-  async getImage(storyId: string, pageId: string, imageType: 'page' | 'cover'): Promise<string | null> {
+  async getImage(storyId: string, pageId: string, imageType: 'page' | 'cover' | 'page_state' | 'page_operations' | 'cover_state' | 'cover_operations'): Promise<any | null> {
     await this.initDB();
     if (!this.db) return null;
 
@@ -172,15 +172,35 @@ class HybridStorageAdapter {
               newStory.coverImage = '__INDEXED_DB__'; // Placeholder
             }
 
+            // Extract cover image objects
+            if (story.coverImageDrawingState) {
+              await this.saveImage(story.id, 'cover', 'cover_state', story.coverImageDrawingState);
+              newStory.coverImageDrawingState = '__INDEXED_DB__';
+            }
+            if (story.coverImageOperations) {
+              await this.saveImage(story.id, 'cover', 'cover_operations', story.coverImageOperations);
+              newStory.coverImageOperations = '__INDEXED_DB__';
+            }
+
             // Extract page images
             if (story.pages && Array.isArray(story.pages)) {
               newStory.pages = await Promise.all(
                 story.pages.map(async (page: any) => {
                   const newPage = { ...page };
                   
-                  if (page.canvasData && page.canvasData.startsWith('data:')) {
+                  if (page.canvasData && typeof page.canvasData === 'string' && page.canvasData.startsWith('data:')) {
                     await this.saveImage(story.id, page.id, 'page', page.canvasData);
                     newPage.canvasData = '__INDEXED_DB__'; // Placeholder
+                  }
+                  
+                  if (page.canvasDrawingState) {
+                    await this.saveImage(story.id, page.id, 'page_state', page.canvasDrawingState);
+                    newPage.canvasDrawingState = '__INDEXED_DB__';
+                  }
+                  
+                  if (page.canvasOperations) {
+                    await this.saveImage(story.id, page.id, 'page_operations', page.canvasOperations);
+                    newPage.canvasOperations = '__INDEXED_DB__';
                   }
                   
                   return newPage;
@@ -205,15 +225,35 @@ class HybridStorageAdapter {
               newStory.coverImage = '__INDEXED_DB__';
             }
 
+            // Extract cover image objects
+            if (story.coverImageDrawingState) {
+              await this.saveImage(story.id, 'cover', 'cover_state', story.coverImageDrawingState);
+              newStory.coverImageDrawingState = '__INDEXED_DB__';
+            }
+            if (story.coverImageOperations) {
+              await this.saveImage(story.id, 'cover', 'cover_operations', story.coverImageOperations);
+              newStory.coverImageOperations = '__INDEXED_DB__';
+            }
+
             // Extract page images
             if (story.pages && Array.isArray(story.pages)) {
               newStory.pages = await Promise.all(
                 story.pages.map(async (page: any) => {
                   const newPage = { ...page };
                   
-                  if (page.canvasData && page.canvasData.startsWith('data:')) {
+                  if (page.canvasData && typeof page.canvasData === 'string' && page.canvasData.startsWith('data:')) {
                     await this.saveImage(story.id, page.id, 'page', page.canvasData);
                     newPage.canvasData = '__INDEXED_DB__';
+                  }
+
+                  if (page.canvasDrawingState) {
+                    await this.saveImage(story.id, page.id, 'page_state', page.canvasDrawingState);
+                    newPage.canvasDrawingState = '__INDEXED_DB__';
+                  }
+                  
+                  if (page.canvasOperations) {
+                    await this.saveImage(story.id, page.id, 'page_operations', page.canvasOperations);
+                    newPage.canvasOperations = '__INDEXED_DB__';
                   }
                   
                   return newPage;
@@ -260,6 +300,16 @@ class HybridStorageAdapter {
               newStory.coverImage = coverData || undefined;
             }
 
+            if (story.coverImageDrawingState === '__INDEXED_DB__') {
+              const coverState = await this.getImage(story.id, 'cover', 'cover_state');
+              newStory.coverImageDrawingState = coverState || undefined;
+            }
+            
+            if (story.coverImageOperations === '__INDEXED_DB__') {
+              const coverOps = await this.getImage(story.id, 'cover', 'cover_operations');
+              newStory.coverImageOperations = coverOps || undefined;
+            }
+
             // Restore page images
             if (story.pages && Array.isArray(story.pages)) {
               newStory.pages = await Promise.all(
@@ -269,6 +319,16 @@ class HybridStorageAdapter {
                   if (page.canvasData === '__INDEXED_DB__') {
                     const pageData = await this.getImage(story.id, page.id, 'page');
                     newPage.canvasData = pageData || undefined;
+                  }
+                  
+                  if (page.canvasDrawingState === '__INDEXED_DB__') {
+                    const pageState = await this.getImage(story.id, page.id, 'page_state');
+                    newPage.canvasDrawingState = pageState || undefined;
+                  }
+                  
+                  if (page.canvasOperations === '__INDEXED_DB__') {
+                    const pageOps = await this.getImage(story.id, page.id, 'page_operations');
+                    newPage.canvasOperations = pageOps || undefined;
                   }
                   
                   return newPage;
@@ -293,6 +353,16 @@ class HybridStorageAdapter {
               newStory.coverImage = coverData || undefined;
             }
 
+            if (story.coverImageDrawingState === '__INDEXED_DB__') {
+              const coverState = await this.getImage(story.id, 'cover', 'cover_state');
+              newStory.coverImageDrawingState = coverState || undefined;
+            }
+            
+            if (story.coverImageOperations === '__INDEXED_DB__') {
+              const coverOps = await this.getImage(story.id, 'cover', 'cover_operations');
+              newStory.coverImageOperations = coverOps || undefined;
+            }
+
             // Restore page images
             if (story.pages && Array.isArray(story.pages)) {
               newStory.pages = await Promise.all(
@@ -302,6 +372,16 @@ class HybridStorageAdapter {
                   if (page.canvasData === '__INDEXED_DB__') {
                     const pageData = await this.getImage(story.id, page.id, 'page');
                     newPage.canvasData = pageData || undefined;
+                  }
+                  
+                  if (page.canvasDrawingState === '__INDEXED_DB__') {
+                    const pageState = await this.getImage(story.id, page.id, 'page_state');
+                    newPage.canvasDrawingState = pageState || undefined;
+                  }
+                  
+                  if (page.canvasOperations === '__INDEXED_DB__') {
+                    const pageOps = await this.getImage(story.id, page.id, 'page_operations');
+                    newPage.canvasOperations = pageOps || undefined;
                   }
                   
                   return newPage;

@@ -1699,7 +1699,7 @@ export const useStoryStore = create<StoryState>()(
     }),
     {
       name: 'story-store',
-      storage: createJSONStorage(() => localStorage),
+      storage: createHybridStorage(),
       // Ensure proper hydration from localStorage
       onRehydrateStorage: () => {
         return (state, error) => {
