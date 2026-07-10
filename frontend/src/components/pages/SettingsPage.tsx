@@ -227,8 +227,8 @@ const SettingsPage = () => {
     <div className="min-h-screen settings-page">
       {/* Page Header */}
       <div className="settings-header px-6 py-4">
-        <h1 className="text-2xl font-bold text-gray-900">{t('settings.settings')}</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('settings.settings')}</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           {isAnonymous ? t('settings.managePreferences') : t('settings.manageAccountPreferences')}
         </p>
       </div>
@@ -243,11 +243,11 @@ const SettingsPage = () => {
 
       {/* Anonymous User Notice */}
       {isAnonymous && (
-        <div className="mx-6 mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-          <p className="text-sm text-purple-900 font-medium mb-2">
+        <div className="mx-6 mb-4 p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+          <p className="text-sm text-purple-900 dark:text-purple-100 font-medium mb-2">
             👋 {t('settings.browsingAsGuest')}
           </p>
-          <p className="text-xs text-purple-700 mb-3">
+          <p className="text-xs text-purple-700 dark:text-purple-300 mb-3">
             {t('settings.signUpPrompt')}
           </p>
           <button
@@ -627,11 +627,11 @@ const SettingsPage = () => {
 
       {/* Anonymous User Message */}
       {isAnonymous && (
-        <div className="mx-6 mb-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-          <p className="text-sm text-purple-900 font-medium mb-2">
+        <div className="mx-6 mb-6 p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+          <p className="text-sm text-purple-900 dark:text-purple-100 font-medium mb-2">
             📝 Sign up to save your settings
           </p>
-          <p className="text-xs text-purple-700">
+          <p className="text-xs text-purple-700 dark:text-purple-300">
             Create a free account to customize your experience and access all features.
           </p>
         </div>

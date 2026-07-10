@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useSoundEffects } from '../hooks/useSoundEffects';
 import { offlineStorageService } from '../services/offlineStorageService';
+import { StoryGenerationMiniGame } from '../components/creation/StoryGenerationMiniGame';
 import './GamesPage.css';
 
 interface StoryWithGames {
@@ -26,6 +27,8 @@ const GamesPage: React.FC = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+
+
 
   useEffect(() => {
     fetchStories();
@@ -321,6 +324,7 @@ const GamesPage: React.FC = () => {
           )}
         </>
       )}
+
     </div>
   );
 };

@@ -55,7 +55,7 @@ const SettingsTab = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Display Name</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Display Name</label>
             <input
               type="text"
               value={profile.name}
@@ -65,7 +65,7 @@ const SettingsTab = () => {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Avatar</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Avatar</label>
             <div className="avatar-selector">
               {['🎭', '🦄', '🐉', '🧚‍♀️', '🤖', '🎨'].map((emoji) => (
                 <button
@@ -82,7 +82,7 @@ const SettingsTab = () => {
           </div>
           
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bio</label>
             <textarea
               value={profile.bio}
               onChange={(e) => updateProfile({ bio: e.target.value })}
@@ -111,8 +111,8 @@ const SettingsTab = () => {
                 profile.accountType === accountType.type ? 'selected' : ''
               }`}
             >
-              <div className="font-medium text-gray-800">{accountType.label}</div>
-              <div className="text-sm text-gray-600 mt-1">{accountType.desc}</div>
+              <div className="font-medium text-gray-800 dark:text-gray-200">{accountType.label}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">{accountType.desc}</div>
             </button>
           ))}
         </div>
@@ -131,7 +131,7 @@ const SettingsTab = () => {
         
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Content Visibility</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content Visibility</label>
             <select
               value={privacySettings.contentVisibility}
               onChange={(e) => updatePrivacySettings({ contentVisibility: e.target.value as any })}
@@ -150,7 +150,7 @@ const SettingsTab = () => {
             { key: 'shareProgress', label: 'Share reading progress' }
           ].map((setting) => (
             <div key={setting.key} className="notification-item">
-              <span className="text-sm font-medium text-gray-700">{setting.label}</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{setting.label}</span>
               <button
                 onClick={() => updatePrivacySettings({ 
                   [setting.key]: !privacySettings[setting.key as keyof typeof privacySettings] 
@@ -182,7 +182,7 @@ const SettingsTab = () => {
         </h3>
         
         <div className="space-y-4">
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
             Enable advanced drawing tools that will appear in Story Creation and Character Creation modes.
           </p>
           
@@ -287,7 +287,7 @@ const SettingsTab = () => {
           <div className="pt-4 border-t border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Font Size</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Font Size</label>
                 <select
                   value={accessibilitySettings.fontSize}
                   onChange={(e) => updateAccessibilitySettings({ fontSize: e.target.value as any })}
@@ -301,7 +301,7 @@ const SettingsTab = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Reading Speed</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Reading Speed</label>
                 <select
                   value={accessibilitySettings.readingSpeed}
                   onChange={(e) => updateAccessibilitySettings({ readingSpeed: e.target.value as any })}
@@ -329,10 +329,10 @@ const SettingsTab = () => {
         <h3 className="settings-card-title">Safety & Controls</h3>
         
         <div className="space-y-6">
-          <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
             <div>
-              <div className="text-sm font-medium text-gray-700">Safe Mode</div>
-              <div className="text-xs text-gray-500 mt-1">Enhanced content filtering and monitoring</div>
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-200">Safe Mode</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Enhanced content filtering and monitoring</div>
             </div>
             <button
               onClick={() => updateParentalControls({ safeMode: !parentalControls.safeMode })}
@@ -343,7 +343,7 @@ const SettingsTab = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Content Filter Level</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content Filter Level</label>
             <div className="grid grid-cols-3 gap-2">
               {[
                 { value: 'strict', label: 'Strict', color: 'green' },
@@ -366,7 +366,7 @@ const SettingsTab = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Daily Time Limit: {parentalControls.timeLimit} minutes
             </label>
             <input
@@ -378,7 +378,7 @@ const SettingsTab = () => {
               onChange={(e) => updateParentalControls({ timeLimit: parseInt(e.target.value) })}
               className="range-slider"
             />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
               <span>15 min</span>
               <span>4 hours</span>
             </div>
@@ -399,7 +399,7 @@ const SettingsTab = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Language</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Language</label>
             <select
               value={appPreferences.language}
               onChange={(e) => updateAppPreferences({ language: e.target.value as any })}
@@ -413,7 +413,7 @@ const SettingsTab = () => {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Theme</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Theme</label>
             <select
               value={appPreferences.theme}
               onChange={(e) => updateAppPreferences({ theme: e.target.value as any })}
@@ -428,7 +428,7 @@ const SettingsTab = () => {
         </div>
 
         <div className="mt-6">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Notifications</h4>
+          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Notifications</h4>
           <div className="space-y-3">
             {[
               { key: 'newStories', label: 'New stories from followed creators' },
@@ -437,7 +437,7 @@ const SettingsTab = () => {
               { key: 'updates', label: 'App updates and news' }
             ].map((notification) => (
               <div key={notification.key} className="notification-item">
-                <span className="text-sm text-gray-700">{notification.label}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{notification.label}</span>
                 <button
                   onClick={() => updateAppPreferences({ 
                     notifications: {
@@ -457,7 +457,7 @@ const SettingsTab = () => {
         </div>
 
         <div className="mt-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Storage Limit: {appPreferences.storageLimit} MB
           </label>
           <input
@@ -469,7 +469,7 @@ const SettingsTab = () => {
             onChange={(e) => updateAppPreferences({ storageLimit: parseInt(e.target.value) })}
             className="range-slider"
           />
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
             <span>100 MB</span>
             <span>2 GB</span>
           </div>

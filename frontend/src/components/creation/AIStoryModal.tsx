@@ -21,7 +21,7 @@ import { VoiceFilteredTextarea } from '../common/VoiceFilteredTextarea';
 import { ImageGenerationWarningModal } from '../ui/ImageGenerationWarningModal';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
 import { convertImageToDataUrl } from '../../utils/imageCache';
-
+import { StoryGenerationMiniGame } from './StoryGenerationMiniGame';
 
 interface AIStoryModalProps {
   isOpen: boolean;
@@ -669,46 +669,8 @@ Make sure EVERY page's imagePrompt:
         onClick={(e) => e.stopPropagation()}
       >
         {isGenerating ? (
-          /* Beautiful Loading Animation */
-          <div style={{ padding: '40px', textAlign: 'center' }}>
-            {/* Animated Icon */}
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '80px',
-              height: '80px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              marginBottom: '24px',
-              animation: 'pulse 2s ease-in-out infinite'
-            }}>
-              <SparklesIcon style={{ 
-                height: '40px', 
-                width: '40px', 
-                color: 'white',
-                animation: 'spin 3s linear infinite'
-              }} />
-            </div>
-
-            {/* Progress Bar */}
-            <div style={{
-              width: '100%',
-              height: '8px',
-              backgroundColor: isDarkMode ? '#374151' : '#e5e7eb',
-              borderRadius: '999px',
-              overflow: 'hidden',
-              marginBottom: '16px'
-            }}>
-              <div style={{
-                width: `${generationProgress}%`,
-                height: '100%',
-                background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
-                borderRadius: '999px',
-                transition: 'width 0.5s ease-out'
-              }} />
-            </div>
-
+          /* Beautiful Loading Animation & Mini Game */
+          <div style={{ padding: '20px', textAlign: 'center' }}>
             {/* Stage Text */}
             <h3 style={{
               fontSize: '20px',
@@ -722,16 +684,48 @@ Make sure EVERY page's imagePrompt:
             {/* Progress Percentage */}
             <p style={{
               fontSize: '14px',
-              color: isDarkMode ? '#9ca3af' : '#6b7280'
+              color: isDarkMode ? '#9ca3af' : '#6b7280',
+              marginBottom: '16px'
             }}>
               {generationProgress}% complete
             </p>
+
+            {/* Progress Bar */}
+            <div style={{
+              width: '100%',
+              height: '8px',
+              backgroundColor: isDarkMode ? '#374151' : '#e5e7eb',
+              borderRadius: '999px',
+              overflow: 'hidden',
+              marginBottom: '24px'
+            }}>
+              <div style={{
+                width: `${generationProgress}%`,
+                height: '100%',
+                background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: '999px',
+                transition: 'width 0.5s ease-out'
+              }} />
+            </div>
+
+            {/* Fun Mini Game! */}
+            <div style={{ marginBottom: '16px' }}>
+              <p style={{ 
+                fontSize: '14px', 
+                fontWeight: 'bold', 
+                color: isDarkMode ? '#E5E7EB' : '#374151',
+                marginBottom: '8px' 
+              }}>
+                Play while you wait!
+              </p>
+              <StoryGenerationMiniGame storyIdea={formData.storyIdea} />
+            </div>
 
             {/* Fun Loading Messages */}
             <p style={{
               fontSize: '12px',
               color: isDarkMode ? '#6b7280' : '#9ca3af',
-              marginTop: '24px',
+              marginTop: '12px',
               fontStyle: 'italic'
             }}>
               {generationProgress < 40 && "Sprinkling magic dust..."}
@@ -740,17 +734,6 @@ Make sure EVERY page's imagePrompt:
               {generationProgress >= 75 && generationProgress < 100 && "Adding final touches..."}
               {generationProgress === 100 && "Almost there!"}
             </p>
-
-            <style>{`
-              @keyframes pulse {
-                0%, 100% { transform: scale(1); opacity: 1; }
-                50% { transform: scale(1.1); opacity: 0.8; }
-              }
-              @keyframes spin {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
-              }
-            `}</style>
           </div>
         ) : (
           <>
