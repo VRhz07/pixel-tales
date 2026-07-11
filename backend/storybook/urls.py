@@ -154,10 +154,12 @@ urlpatterns = [
     path('admin/dashboard/stats/', admin_views.admin_dashboard_stats, name='admin_dashboard_stats'),
     path('admin/users/', admin_views.admin_list_users, name='admin_list_users'),
     path('admin/users/archived/', admin_views.admin_list_archived_users, name='admin_list_archived_users'),
+    path('admin/stories/', admin_views.admin_list_stories, name='admin_list_stories'),
     path('admin/users/<int:user_id>/', admin_views.admin_get_user, name='admin_get_user'),
     path('admin/users/<int:user_id>/update/', admin_views.admin_update_user, name='admin_update_user'),
     path('admin/users/<int:user_id>/delete/', admin_views.admin_delete_user, name='admin_delete_user'),
     path('admin/users/<int:user_id>/restore/', admin_views.admin_restore_user, name='admin_restore_user'),
+    path('admin/users/<int:user_id>/hard_delete/', admin_views.admin_hard_delete_user, name='admin_hard_delete_user'),
     path('admin/relationships/add/', admin_views.admin_add_parent_child, name='admin_add_parent_child'),
     path('admin/relationships/<int:parent_id>/<int:child_id>/remove/', admin_views.admin_remove_parent_child, name='admin_remove_parent_child'),
     

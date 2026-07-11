@@ -109,8 +109,8 @@ const YourWorksPage: React.FC = () => {
   const [selectedGenre, setSelectedGenre] = useState('All Genres');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   
-  // Get real stories from store
-  const realStories = currentUserId ? (userLibraries[currentUserId]?.stories || []) : [];
+  // Get real stories from store, filtering out the original demo stories
+  const realStories = currentUserId ? (userLibraries[currentUserId]?.stories || []).filter((s: any) => !['story-1', 'story-2', 'story-3', 'story-4'].includes(s.id)) : [];
 
   // Show anonymous prompt if user is not authenticated
   if (isAnonymous) {

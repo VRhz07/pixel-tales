@@ -147,6 +147,22 @@ export interface UserDetail extends UserListItem {
   }>;
 }
 
+export interface StoryListItem {
+  id: number;
+  title: string;
+  author: string;
+  author_id: number | null;
+  is_published: boolean;
+  is_flagged: boolean;
+  date_created: string;
+  date_updated: string;
+  total_likes: number;
+  total_comments: number;
+  views: number;
+  creation_type: string;
+  cover_image: string | null;
+}
+
 export interface PaginationInfo {
   page: number;
   page_size: number;
@@ -251,6 +267,14 @@ class AdminService {
   }
 
   /**
+   * Permanently delete an archived user account
+   */
+  async hardDeleteUser(userId: number): Promise<{ success: boolean; message: string }> {
+    const response = await adminApi.delete(`/admin/users/${userId}/hard_delete/`);
+    return response.data;
+  }
+
+  /**
    * Add a parent-child relationship
    */
   async addParentChildRelationship(
@@ -272,6 +296,34 @@ class AdminService {
     childId: number
   ): Promise<{ success: boolean; message: string }> {
     const response = await adminApi.delete(`/admin/relationships/${parentId}/${childId}/remove/`);
+    return response.data;
+  }
+
+  /**
+   * List stories for moderation
+   */
+  async listStories(params?: {
+    status?: 'all' | 'published' | 'unpublished' | 'flagged';
+    search?: string;
+    page?: number;
+    page_size?: number;
+  }): Promise<{ success: boolean; stories: StoryListItem[]; pagination: PaginationInfo }> {
+    const response = await adminApi.get('/admin/stories/', { params });
+    return response.data;
+  }
+
+  /**
+   * Moderate a story (unpublish, delete, approve)
+   */
+  async moderateStory(
+    storyId: number,
+    action: 'unpublish' | 'delete' | 'approve',
+    reason?: string
+  ): Promise<{ success: boolean; message: string; error?: string }> {
+    const response = await adminApi.post(`/admin/moderation/story/${storyId}/`, {
+      action,
+      reason: reason || ''
+    });
     return response.data;
   }
   /**

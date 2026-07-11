@@ -15,6 +15,7 @@ import SystemHealthDashboard from '../components/admin/SystemHealthDashboard';
 import MobileAppSettings from '../components/admin/MobileAppSettings';
 import AIServicesConfig from '../components/admin/AIServicesConfig';
 import SecurityAuditLogs from '../components/admin/SecurityAuditLogs';
+import AdminStoryManagement from '../components/admin/AdminStoryManagement';
 import Logo from '../components/common/Logo';
 import '../styles/dashboard-common.css';
 import '../components/admin/ProfanityManagement.css';
@@ -23,7 +24,7 @@ import './AdminDashboardPage.css';
 export default function AdminDashboardPage() {
   const [adminUser, setAdminUser] = useState<any>(null);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'profanity' | 'system' | 'ai-services' | 'security'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'profanity' | 'system' | 'ai-services' | 'security' | 'stories'>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<UserListItem[]>([]);
@@ -282,6 +283,58 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleHardDeleteUser = async (userId: number, username: string) => {
+    if (!confirm(`PERMANENTLY delete user "${username}"? This action CANNOT be undone and will delete all their stories and data.`)) return;
+    
+    try {
+      await adminService.hardDeleteUser(userId);
+      alert(`User "${username}" permanently deleted`);
+      loadArchivedUsers();
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Failed to delete user permanently');
+    }
+  };
+
+  const handleBulkAction = async (action: 'archive' | 'restore' | 'hard_delete', userIds: number[]) => {
+    if (userIds.length === 0) return;
+
+    if (action === 'archive') {
+      const reason = prompt('Reason for archiving selected users:', 'Archived by admin bulk action');
+      if (reason === null) return;
+      
+      try {
+        await Promise.all(userIds.map(id => adminService.deleteUser(id, reason)));
+        alert(`Successfully archived ${userIds.length} users.`);
+        loadUsers();
+      } catch (err: any) {
+        alert(err.response?.data?.error || 'Failed to archive some users');
+        loadUsers();
+      }
+    } else if (action === 'restore') {
+      if (!confirm(`Restore ${userIds.length} selected users?`)) return;
+      
+      try {
+        await Promise.all(userIds.map(id => adminService.restoreUser(id)));
+        alert(`Successfully restored ${userIds.length} users.`);
+        loadArchivedUsers();
+      } catch (err: any) {
+        alert(err.response?.data?.error || 'Failed to restore some users');
+        loadArchivedUsers();
+      }
+    } else if (action === 'hard_delete') {
+      if (!confirm(`PERMANENTLY delete ${userIds.length} selected users? This action CANNOT be undone.`)) return;
+      
+      try {
+        await Promise.all(userIds.map(id => adminService.hardDeleteUser(id)));
+        alert(`Successfully permanently deleted ${userIds.length} users.`);
+        loadArchivedUsers();
+      } catch (err: any) {
+        alert(err.response?.data?.error || 'Failed to delete some users permanently');
+        loadArchivedUsers();
+      }
+    }
+  };
+
   const handleAddRelationship = async () => {
     try {
       await adminService.addParentChildRelationship(
@@ -449,6 +502,8 @@ export default function AdminDashboardPage() {
               onViewUser={handleViewUser}
               onDeleteUser={handleDeleteUser}
               onRestoreUser={handleRestoreUser}
+              onHardDeleteUser={handleHardDeleteUser}
+              onBulkAction={handleBulkAction}
               onAddRelationship={() => setShowAddRelationship(true)}
             />
             {!loading && statusFilter === 'active' && users.length === 0 && !error && (
@@ -459,6 +514,10 @@ export default function AdminDashboardPage() {
               />
             )}
           </>
+        )}
+
+        {activeTab === 'stories' && (
+          <AdminStoryManagement />
         )}
 
         {activeTab === 'profanity' && (
@@ -501,6 +560,13 @@ export default function AdminDashboardPage() {
           >
             <Users />
             <span>Users</span>
+          </button>
+          <button
+            className={`admin-nav-item ${activeTab === 'stories' ? 'active' : ''}`}
+            onClick={() => setActiveTab('stories')}
+          >
+            <BookOpen />
+            <span>Stories</span>
           </button>
           <button
             className={`admin-nav-item ${activeTab === 'profanity' ? 'active' : ''}`}

@@ -1,3 +1,4 @@
+import React from 'react';
 import { Search, Eye, Edit, Trash2, UserPlus, AlertTriangle, ChevronLeft, ChevronRight, RotateCcw, Archive, Users } from 'lucide-react';
 import { UserListItem, ArchivedUserListItem } from '../../services/admin.service';
 import './UserManagement.css';
@@ -17,6 +18,8 @@ interface UserManagementProps {
   onViewUser: (userId: number) => void;
   onDeleteUser: (userId: number, username: string) => void;
   onRestoreUser: (userId: number, username: string) => void;
+  onHardDeleteUser: (userId: number, username: string) => void;
+  onBulkAction: (action: 'archive' | 'restore' | 'hard_delete', userIds: number[]) => void;
   onAddRelationship: () => void;
 }
 
@@ -35,9 +38,15 @@ export default function UserManagement({
   onViewUser,
   onDeleteUser,
   onRestoreUser,
+  onHardDeleteUser,
+  onBulkAction,
   onAddRelationship,
 }: UserManagementProps) {
+  const [selectedUserIds, setSelectedUserIds] = React.useState<number[]>([]);
   
+  React.useEffect(() => {
+    setSelectedUserIds([]); // Clear selection when tab or page changes
+  }, [statusFilter, currentPage, searchQuery, userTypeFilter]);
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -53,6 +62,20 @@ export default function UserManagement({
   console.log('👤 UserManagement - archivedUsers:', archivedUsers.length);
   console.log('👤 UserManagement - displayUsers:', displayUsers.length);
   
+  const toggleSelection = (id: number) => {
+    setSelectedUserIds(prev => 
+      prev.includes(id) ? prev.filter(userId => userId !== id) : [...prev, id]
+    );
+  };
+
+  const toggleAll = () => {
+    if (selectedUserIds.length === displayUsers.length && displayUsers.length > 0) {
+      setSelectedUserIds([]);
+    } else {
+      setSelectedUserIds(displayUsers.map(u => u.id));
+    }
+  };
+
   return (
     <div className="user-management-container">
       {/* Tab Buttons */}
@@ -74,7 +97,7 @@ export default function UserManagement({
       </div>
 
       {/* Search and Filters */}
-      <div className="admin-section">
+      <div className="admin-section" style={{ position: 'relative' }}>
         <div className="admin-filters">
           <div className="admin-search-box">
             <Search className="admin-search-icon" />
@@ -82,14 +105,20 @@ export default function UserManagement({
               type="text"
               placeholder={statusFilter === 'active' ? "Search users..." : "Search archived users..."}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
               className="admin-search-input"
             />
           </div>
           {statusFilter === 'active' && (
             <select
               value={userTypeFilter}
-              onChange={(e) => setUserTypeFilter(e.target.value as any)}
+              onChange={(e) => {
+                setUserTypeFilter(e.target.value as any);
+                setCurrentPage(1);
+              }}
               className="admin-filter-select"
             >
               <option value="all">All Types</option>
@@ -99,6 +128,54 @@ export default function UserManagement({
             </select>
           )}
         </div>
+        
+        {/* Bulk Actions Bar */}
+        {selectedUserIds.length > 0 && (
+          <div className="bulk-actions-bar" style={{
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, 
+            background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(4px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '0 20px', borderRadius: '12px', zIndex: 10,
+            border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+          }}>
+            <span style={{ fontWeight: 600, color: '#374151' }}>{selectedUserIds.length} users selected</span>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button 
+                className="user-action-btn"
+                style={{ background: '#f3f4f6', padding: '6px 12px', width: 'auto', color: '#4b5563' }}
+                onClick={() => setSelectedUserIds([])}
+              >
+                Cancel
+              </button>
+              {statusFilter === 'active' ? (
+                <button 
+                  className="user-action-btn delete"
+                  style={{ background: '#fee2e2', padding: '6px 12px', width: 'auto' }}
+                  onClick={() => onBulkAction('archive', selectedUserIds)}
+                >
+                  <Archive size={16} style={{ marginRight: '6px' }} /> Archive Selected
+                </button>
+              ) : (
+                <>
+                  <button 
+                    className="user-action-btn restore"
+                    style={{ background: '#dcfce7', color: '#16a34a', padding: '6px 12px', width: 'auto' }}
+                    onClick={() => onBulkAction('restore', selectedUserIds)}
+                  >
+                    <RotateCcw size={16} style={{ marginRight: '6px' }} /> Restore Selected
+                  </button>
+                  <button 
+                    className="user-action-btn delete"
+                    style={{ background: '#fee2e2', padding: '6px 12px', width: 'auto' }}
+                    onClick={() => onBulkAction('hard_delete', selectedUserIds)}
+                  >
+                    <Trash2 size={16} style={{ marginRight: '6px' }} /> Delete Permanently
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Users Table */}
@@ -107,6 +184,14 @@ export default function UserManagement({
           <table className="user-table">
             <thead className="user-table-header">
               <tr>
+                <th style={{ width: '40px', paddingLeft: '20px' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={displayUsers.length > 0 && selectedUserIds.length === displayUsers.length}
+                    onChange={toggleAll}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </th>
                 <th>User</th>
                 <th>Type</th>
                 <th style={{ textAlign: 'right' }}>Actions</th>
@@ -114,7 +199,15 @@ export default function UserManagement({
             </thead>
             <tbody className="user-table-body">
               {users.map((user) => (
-                <tr key={user.id}>
+                <tr key={user.id} className={selectedUserIds.includes(user.id) ? 'selected-row' : ''}>
+                  <td style={{ width: '40px', paddingLeft: '20px' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={selectedUserIds.includes(user.id)}
+                      onChange={() => toggleSelection(user.id)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                  </td>
                   <td>
                     <div className="user-info-cell">
                       <div className="user-avatar">
@@ -157,6 +250,14 @@ export default function UserManagement({
           <table className="user-table">
             <thead className="user-table-header">
               <tr>
+                <th style={{ width: '40px', paddingLeft: '20px' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={displayUsers.length > 0 && selectedUserIds.length === displayUsers.length}
+                    onChange={toggleAll}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </th>
                 <th>User</th>
                 <th>Type</th>
                 <th>Archived Date</th>
@@ -167,7 +268,15 @@ export default function UserManagement({
             </thead>
             <tbody className="user-table-body">
               {archivedUsers.map((user) => (
-                <tr key={user.id} className="archived-user-row">
+                <tr key={user.id} className={`archived-user-row ${selectedUserIds.includes(user.id) ? 'selected-row' : ''}`}>
+                  <td style={{ width: '40px', paddingLeft: '20px' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={selectedUserIds.includes(user.id)}
+                      onChange={() => toggleSelection(user.id)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                  </td>
                   <td>
                     <div className="user-info-cell">
                       <div className="user-avatar archived">
@@ -207,6 +316,13 @@ export default function UserManagement({
                         title="Restore User"
                       >
                         <RotateCcw size={18} />
+                      </button>
+                      <button
+                        onClick={() => onHardDeleteUser(user.id, user.username)}
+                        className="user-action-btn delete"
+                        title="Permanently Delete"
+                      >
+                        <Trash2 size={18} />
                       </button>
                     </div>
                   </td>

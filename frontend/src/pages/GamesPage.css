@@ -121,15 +121,28 @@
 
 /* Stories Grid */
 .games-stories-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
+}
+
+.games-grid-item {
+  width: calc(33.333% - 14px);
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .games-grid-item {
+    width: calc(50% - 10px);
+  }
 }
 
 @media (max-width: 640px) {
   .games-stories-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
+  }
+  .games-grid-item {
+    width: calc(50% - 8px);
   }
 }
 

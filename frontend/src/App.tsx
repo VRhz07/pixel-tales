@@ -12,14 +12,14 @@ const EnhancedSocialPage = lazy(() => import('./components/pages/EnhancedSocialP
 const MessagingPage = lazy(() => import('./components/pages/MessagingPage'));
 const SettingsPage = lazy(() => import('./components/pages/SettingsPage'));
 const AuthPage = lazy(() => import('./components/auth/AuthPage'));
-import OfflineStoriesPage from './pages/OfflineStoriesPage';
+const OfflineStoriesPage = lazy(() => import('./pages/OfflineStoriesPage'));
 const OnlineStoriesPage = lazy(() => import('./pages/OnlineStoriesPage'));
 const CharactersLibraryPage = lazy(() => import('./pages/CharactersLibraryPage'));
 const YourWorksPage = lazy(() => import('./pages/YourWorksPage'));
 const ManualStoryCreationPage = lazy(() => import('./pages/ManualStoryCreationPage'));
 const CanvasDrawingPage = lazy(() => import('./pages/CanvasDrawingPage'));
 const CoverImageCanvasPage = lazy(() => import('./pages/CoverImageCanvasPage'));
-import StoryReaderPage from './pages/StoryReaderPage';
+const StoryReaderPage = lazy(() => import('./pages/StoryReaderPage'));
 const PublicLibraryPage = lazy(() => import('./pages/PublicLibraryPage'));
 const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage'));
 const CollaborationWaitingPage = lazy(() => import('./pages/CollaborationWaitingPage'));
@@ -29,9 +29,9 @@ const TeacherDashboardPage = lazy(() => import('./pages/TeacherDashboardPage'));
 const TeacherSettingsPage = lazy(() => import('./pages/TeacherSettingsPage'));
 const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
-import GamesPage from './pages/GamesPage';
-import StoryGamesPage from './pages/StoryGamesPage';
-import GamePlayPage from './pages/GamePlayPage';
+const GamesPage = lazy(() => import('./pages/GamesPage'));
+const StoryGamesPage = lazy(() => import('./pages/StoryGamesPage'));
+const GamePlayPage = lazy(() => import('./pages/GamePlayPage'));
 
 // Keep these as static imports (needed immediately)
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -60,13 +60,12 @@ function AppContent() {
   const { addCollaborationInviteToFriend } = useSocialStore();
   const { fetchNotificationCounts, incrementCollaborationInvites } = useNotificationStore();
   const [isInitializing, setIsInitializing] = useState(true);
-  const [collaborationInvites, setCollaborationInvites] = useState<CollaborationInvite[]>([]);
-  const [onlineUsers, setOnlineUsers] = useState<Set<number>>(new Set());
+  // Removed unused collaborationInvites and onlineUsers state that caused root re-renders
   const [currentInviteNotification, setCurrentInviteNotification] = useState<CollaborationInvite | null>(null);
   const [showWaitingScreen, setShowWaitingScreen] = useState(false);
   const [waitingScreenData, setWaitingScreenData] = useState<{sessionId: string, storyTitle: string, inviterName: string} | null>(null);
   const { toasts, removeToast, showOnlineToast, showOfflineToast, showInviteToast, showXPGain, showLevelUp } = useToastContext();
-  const [notificationReconnectAttempt, setNotificationReconnectAttempt] = useState(0);
+  // Removed unused notificationReconnectAttempt state
   
   // Handle Android back button in Capacitor
   useCapacitorBackButton();
@@ -246,7 +245,6 @@ function AppContent() {
     // Set up reconnection state handler for notification WebSocket
     notificationWebSocket.onReconnectStateChange = (reconnecting: boolean, attempt: number) => {
       // Reconnecting toast removed - no longer shown
-      setNotificationReconnectAttempt(attempt);
     };
 
     // Connect to WebSocket for real-time updates
@@ -358,7 +356,7 @@ function AppContent() {
       onFriendOnline: (userId, username) => {
         console.log('🔔 Friend came online:', username);
         console.log('🔔 Showing online toast for:', username);
-        setOnlineUsers(prev => new Set([...prev, userId]));
+        // Online users tracking removed from state to prevent root app re-renders
         // Update global status outside of setState
         setTimeout(() => updateOnlineStatus(userId, true), 0);
         
@@ -368,11 +366,7 @@ function AppContent() {
       },
       onFriendOffline: (userId, username) => {
         console.log('🔔 Friend went offline:', username);
-        setOnlineUsers(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(userId);
-          return newSet;
-        });
+        // Online users tracking removed from state to prevent root app re-renders
         // Update global status outside of setState
         setTimeout(() => updateOnlineStatus(userId, false), 0);
         
@@ -448,8 +442,7 @@ function AppContent() {
         // Close notification modal
         setCurrentInviteNotification(null);
         
-        // Remove from invitations
-        setCollaborationInvites(prev => prev.filter(inv => inv.id !== currentInviteNotification.id));
+        // Update handled globally
         
         // Show waiting screen instead of navigating immediately
         setWaitingScreenData({
@@ -486,8 +479,7 @@ function AppContent() {
       // Close notification modal
       setCurrentInviteNotification(null);
       
-      // Remove from invitations
-      setCollaborationInvites(prev => prev.filter(inv => inv.id !== currentInviteNotification.id));
+      // Update handled globally
     } catch (err) {
       console.error('Failed to decline invitation:', err);
       alert('Failed to decline invitation');
@@ -511,8 +503,7 @@ function AppContent() {
       );
 
       if (response.ok) {
-        // Remove from invitations
-        setCollaborationInvites(prev => prev.filter(inv => inv.id !== invitation.id));
+        // Update handled globally
         // Show waiting screen instead of navigating immediately
         setWaitingScreenData({
           sessionId: invitation.sessionId,
@@ -543,8 +534,7 @@ function AppContent() {
         }
       );
 
-      // Remove from invitations
-      setCollaborationInvites(prev => prev.filter(inv => inv.id !== invitationId));
+      // Update handled globally
     } catch (err) {
       console.error('Failed to decline invitation:', err);
     }

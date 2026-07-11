@@ -150,6 +150,7 @@ const getThemeForIdea = (idea: string): ThemeConfig => {
 
 export const StoryGenerationMiniGame: React.FC<StoryGenerationMiniGameProps> = ({ storyIdea }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const scoreRef = useRef<HTMLDivElement>(null);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
@@ -220,7 +221,10 @@ export const StoryGenerationMiniGame: React.FC<StoryGenerationMiniGameProps> = (
     imagesRef.current = newImagesRef;
   }, [storyIdea]);
 
-  const jump = () => {
+  const jump = useCallback((e?: React.PointerEvent | React.TouchEvent | React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     if (gameState.current.isGameOver) {
       gameState.current = {
         ...gameState.current,
@@ -233,6 +237,9 @@ export const StoryGenerationMiniGame: React.FC<StoryGenerationMiniGameProps> = (
       };
       setIsGameOver(false);
       setScore(0);
+      if (scoreRef.current) {
+        scoreRef.current.innerText = `Score: 0 | High: ${highScore}`;
+      }
       return;
     }
 
@@ -241,7 +248,7 @@ export const StoryGenerationMiniGame: React.FC<StoryGenerationMiniGameProps> = (
       gameState.current.isJumping = true;
       soundService.playSound('swipe');
     }
-  };
+  }, [highScore]);
 
   useEffect(() => {
     if (!imagesLoaded) return;
@@ -435,7 +442,10 @@ export const StoryGenerationMiniGame: React.FC<StoryGenerationMiniGameProps> = (
       }
 
       if (!state.isGameOver && state.score % 10 === 0) {
-        setScore(Math.floor(state.score / 10));
+        const newScore = Math.floor(state.score / 10);
+        if (scoreRef.current) {
+          scoreRef.current.innerText = `Score: ${newScore} | High: ${highScore}`;
+        }
       }
 
       state.frameCount++;
@@ -465,7 +475,7 @@ export const StoryGenerationMiniGame: React.FC<StoryGenerationMiniGameProps> = (
         WebkitTapHighlightColor: 'transparent',
         userSelect: 'none'
       }}
-      onClick={jump}
+      onPointerDown={jump}
     >
       <style>{`
         .minigame-force-white {
@@ -482,7 +492,7 @@ export const StoryGenerationMiniGame: React.FC<StoryGenerationMiniGameProps> = (
         </div>
       )}
 
-      <div className="minigame-force-white" style={{
+      <div ref={scoreRef} className="minigame-force-white" style={{
         position: 'absolute',
         top: '10px',
         left: '15px',

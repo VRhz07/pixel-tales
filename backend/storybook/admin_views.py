@@ -588,6 +588,35 @@ def admin_restore_user(request, user_id):
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+@admin_required
+def admin_hard_delete_user(request, user_id):
+    """Permanently delete an archived user account (admin only)"""
+    
+    # Prevent deleting own account
+    if request.admin_user.id == user_id:
+        return Response({'error': 'Cannot delete your own account'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user = User.objects.get(id=user_id)
+        username = user.username
+        
+        # Only allow hard deleting users who are already archived to prevent accidents
+        if hasattr(user, 'profile') and not user.profile.is_archived:
+            return Response({'error': 'Only archived users can be permanently deleted'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Delete the user (this cascades to profile, stories, etc. if set up that way)
+        user.delete()
+        
+        return Response({
+            'success': True,
+            'message': f'User {username} permanently deleted'
+        })
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 @admin_required
@@ -657,6 +686,77 @@ def admin_list_archived_users(request):
         }
     })
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+@admin_required
+def admin_list_stories(request):
+    """List all stories with filtering and pagination (admin only)"""
+    
+    # Get query parameters
+    search = request.GET.get('search', '')
+    status_filter = request.GET.get('status', 'all')  # 'all', 'published', 'unpublished', 'flagged'
+    page = int(request.GET.get('page', 1))
+    page_size = int(request.GET.get('page_size', 20))
+    
+    # Base query
+    stories = Story.objects.select_related('author').annotate(
+        total_likes=Count('likes', distinct=True),
+        total_comments=Count('comments', distinct=True)
+    )
+    
+    # Filter by status
+    if status_filter == 'published':
+        stories = stories.filter(is_published=True)
+    elif status_filter == 'unpublished':
+        stories = stories.filter(is_published=False)
+    elif status_filter == 'flagged':
+        stories = stories.filter(is_flagged=True)
+        
+    # Search by title or author username
+    if search:
+        stories = stories.filter(
+            Q(title__icontains=search) |
+            Q(author__username__icontains=search)
+        )
+        
+    # Order by date created (newest first)
+    stories = stories.order_by('-date_created')
+    
+    # Pagination
+    total_count = stories.count()
+    start = (page - 1) * page_size
+    end = start + page_size
+    stories_page = stories[start:end]
+    
+    # Serialize stories
+    stories_data = []
+    for story in stories_page:
+        stories_data.append({
+            'id': story.id,
+            'title': story.title,
+            'author': story.author.username if story.author else 'Unknown',
+            'author_id': story.author.id if story.author else None,
+            'is_published': story.is_published,
+            'is_flagged': getattr(story, 'is_flagged', False),
+            'date_created': story.date_created,
+            'date_updated': story.date_updated,
+            'total_likes': story.total_likes,
+            'total_comments': story.total_comments,
+            'views': story.views,
+            'creation_type': story.creation_type if hasattr(story, 'creation_type') else 'unknown',
+            'cover_image': story.cover_image,
+        })
+        
+    return Response({
+        'success': True,
+        'stories': stories_data,
+        'pagination': {
+            'page': page,
+            'page_size': page_size,
+            'total_count': total_count,
+            'total_pages': (total_count + page_size - 1) // page_size,
+        }
+    })
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

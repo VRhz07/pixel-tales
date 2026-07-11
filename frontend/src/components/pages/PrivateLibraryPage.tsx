@@ -55,12 +55,7 @@ const PrivateLibraryPage = () => {
         console.error('Failed to load offline stories:', error);
       }
       
-      try {
-        const preInstalled = await offlineFallbackService.getBundledStories();
-        setBundledStories(preInstalled);
-      } catch (error) {
-        console.error('Failed to load bundled stories:', error);
-      }
+      // Free included stories removed as requested
     };
     loadOfflineStories();
   }, []);
@@ -498,13 +493,7 @@ const PrivateLibraryPage = () => {
   const filteredYourWorks = filterStoriesBySearch(yourWorks);
   const filteredSaved = filterStoriesBySearch(savedStories);
   const filteredOffline = filterStoriesBySearch(offlineStories);
-  const filteredPreInstalled = filterStoriesBySearch(bundledStories.map(story => ({
-    ...story,
-    author: story.is_collaborative && story.authors_names && story.authors_names.length > 0 
-      ? story.authors_names.join(', ') 
-      : (story.author_name || story.author || t('library.unknownAuthor')),
-    isPreInstalled: true
-  })));
+  const filteredPreInstalled: any[] = [];
 
   // Determine which sections to show based on selected filter
   const shouldShowDrafts = selectedFilter === 'all' || selectedFilter === 'drafts';
@@ -575,8 +564,7 @@ const PrivateLibraryPage = () => {
                 { value: 'drafts', label: t('library.drafts') || 'Drafts' },
                 { value: 'works', label: t('library.savedWorks') || 'Saved Works' },
                 { value: 'saved', label: 'Saved Stories' },
-                { value: 'offline', label: t('library.offline') || 'Offline' },
-                { value: 'preinstalled', label: 'Free Included Stories' }
+                { value: 'offline', label: t('library.offline') || 'Offline' }
               ]}
             />
           </div>

@@ -60,229 +60,102 @@ export default function AdminLoginPage({ onLoginSuccess }: AdminLoginPageProps) 
   };
 
   return (
-    <div className="min-h-screen h-full flex items-center justify-center p-4 relative overflow-hidden" style={{ 
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0
-    }}>
-      {/* Animated Background Circles */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div 
-          className="absolute rounded-full opacity-20"
-          style={{
-            width: '500px',
-            height: '500px',
-            background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%)',
-            top: '-100px',
-            left: '-100px',
-            animation: 'float 20s ease-in-out infinite'
-          }}
-        />
-        <div 
-          className="absolute rounded-full opacity-20"
-          style={{
-            width: '400px',
-            height: '400px',
-            background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%)',
-            bottom: '-100px',
-            right: '-100px',
-            animation: 'float 25s ease-in-out infinite reverse'
-          }}
-        />
+    <div className="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden bg-slate-950 font-sans">
+      {/* Abstract Animated Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/10 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-500/10 blur-[120px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+        <div className="absolute top-[40%] left-[60%] w-[30%] h-[30%] rounded-full bg-cyan-500/10 blur-[100px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '4s' }} />
       </div>
 
-      <div className="max-w-md w-full relative z-10">
-        {/* Logo/Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center" style={{ marginBottom: '0' }}>
-            <Logo width="120px" height="120px" style={{ objectFit: 'contain' }} />
+      <div className="max-w-[420px] w-full relative z-10 flex flex-col">
+        {/* Header Section */}
+        <div className="text-center mb-8 transform transition-all duration-700 translate-y-0 opacity-100">
+          <div className="inline-flex items-center justify-center mb-2 drop-shadow-2xl">
+            <Logo width="100px" height="100px" style={{ objectFit: 'contain' }} />
           </div>
-          <h1 className="text-4xl font-bold mb-2" style={{ 
-            color: 'white',
-            textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-            marginTop: '-2.5rem'
-          }}>Admin Portal</h1>
-          <p className="text-lg" style={{ 
-            color: 'rgba(255, 255, 255, 0.8)',
-            textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
-          }}>PixelTale Administration</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
+            Admin Portal
+          </h1>
+          <p className="text-slate-400 font-medium tracking-wide text-sm uppercase">
+            PixelTale Administration
+          </p>
         </div>
 
         {/* Login Card */}
-        <div 
-          className="rounded-3xl p-8"
-          style={{
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.5)',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
-          }}
-        >
-          <h2 className="text-2xl font-bold mb-8 text-center" style={{ 
-            color: '#667eea'
-          }}>Welcome Back</h2>
+        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-700/50 rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4)] relative overflow-hidden group">
+          {/* Subtle Card Glow */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+          <h2 className="text-xl font-semibold mb-8 text-white flex items-center gap-2">
+            <Lock className="w-5 h-5 text-emerald-400" />
+            Secure Authentication
+          </h2>
 
           {error && (
-            <div 
-              className="mb-6 rounded-2xl p-4 flex items-start gap-3"
-              style={{
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                border: '1px solid rgba(239, 68, 68, 0.3)'
-              }}
-            >
-              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#ef4444' }} />
+            <div className="mb-6 rounded-xl p-4 flex items-start gap-3 bg-red-500/10 border border-red-500/20 backdrop-blur-sm animate-in fade-in slide-in-from-top-2">
+              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-400" />
               <div>
-                <p className="text-sm font-semibold" style={{ color: '#dc2626' }}>Authentication Failed</p>
-                <p className="text-sm mt-1" style={{ color: '#991b1b' }}>{error}</p>
+                <p className="text-sm font-semibold text-red-400">Authentication Failed</p>
+                <p className="text-sm mt-1 text-red-300/80">{error}</p>
               </div>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
             {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-semibold mb-2" style={{ color: '#374151' }}>
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-xs font-semibold text-slate-300 tracking-wider uppercase">
                 Email Address
               </label>
-              <div className="relative">
-                <div style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '16px',
-                  transform: 'translateY(-50%)',
-                  pointerEvents: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <User className="h-5 w-5" style={{ color: '#9ca3af' }} />
+              <div className="relative group/input">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within/input:text-emerald-400 transition-colors">
+                  <User className="h-5 w-5" />
                 </div>
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="admin-login-input"
-                  style={{
-                    width: '100%',
-                    paddingLeft: '48px',
-                    paddingRight: '16px',
-                    paddingTop: '14px',
-                    paddingBottom: '14px',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '12px',
-                    backgroundColor: '#f9fafb',
-                    color: '#1f2937',
-                    fontSize: '15px',
-                    lineHeight: '1.5',
-                    transition: 'all 0.2s ease',
-                    outline: 'none',
-                    display: 'block',
-                    boxSizing: 'border-box'
-                  }}
+                  className="w-full pl-11 pr-4 py-3.5 bg-slate-950/50 border border-slate-700 text-slate-200 rounded-xl text-sm transition-all duration-300 focus:bg-slate-900 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none placeholder-slate-600"
                   placeholder="admin@pixeltale.com"
                   required
                   autoComplete="email"
                   disabled={loading}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#667eea';
-                    e.target.style.backgroundColor = 'white';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#e5e7eb';
-                    e.target.style.backgroundColor = '#f9fafb';
-                    e.target.style.boxShadow = 'none';
-                  }}
                 />
               </div>
             </div>
 
             {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-semibold mb-2" style={{ color: '#374151' }}>
+            <div className="space-y-2">
+              <label htmlFor="password" className="block text-xs font-semibold text-slate-300 tracking-wider uppercase">
                 Password
               </label>
-              <div className="relative">
-                <div style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '16px',
-                  transform: 'translateY(-50%)',
-                  pointerEvents: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <Lock className="h-5 w-5" style={{ color: '#9ca3af' }} />
+              <div className="relative group/input">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within/input:text-emerald-400 transition-colors">
+                  <Lock className="h-5 w-5" />
                 </div>
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="admin-login-input"
-                  style={{
-                    width: '100%',
-                    paddingLeft: '48px',
-                    paddingRight: '56px',
-                    paddingTop: '14px',
-                    paddingBottom: '14px',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '12px',
-                    backgroundColor: '#f9fafb',
-                    color: '#1f2937',
-                    fontSize: '15px',
-                    lineHeight: '1.5',
-                    transition: 'all 0.2s ease',
-                    outline: 'none',
-                    display: 'block',
-                    boxSizing: 'border-box'
-                  }}
+                  className="w-full pl-11 pr-12 py-3.5 bg-slate-950/50 border border-slate-700 text-slate-200 rounded-xl text-sm transition-all duration-300 focus:bg-slate-900 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none placeholder-slate-600"
                   placeholder="••••••••"
                   required
                   autoComplete="current-password"
                   disabled={loading}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#667eea';
-                    e.target.style.backgroundColor = 'white';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#e5e7eb';
-                    e.target.style.backgroundColor = '#f9fafb';
-                    e.target.style.boxShadow = 'none';
-                  }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={loading}
-                  style={{ 
-                    position: 'absolute',
-                    top: '50%',
-                    right: '16px',
-                    transform: 'translateY(-50%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                    background: 'none',
-                    border: 'none',
-                    padding: 0,
-                    opacity: 1,
-                    transition: 'opacity 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-                  onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-slate-300 transition-colors focus:outline-none"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5" style={{ color: '#6b7280' }} />
+                    <EyeOff className="h-5 w-5" />
                   ) : (
-                    <Eye className="h-5 w-5" style={{ color: '#6b7280' }} />
+                    <Eye className="h-5 w-5" />
                   )}
                 </button>
               </div>
@@ -292,63 +165,34 @@ export default function AdminLoginPage({ onLoginSuccess }: AdminLoginPageProps) 
             <button
               type="submit"
               disabled={loading || !email || !password}
-              className="w-full text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg"
-              style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                fontSize: '17px',
-                paddingTop: '18px',
-                paddingBottom: '18px',
-                paddingLeft: '24px',
-                paddingRight: '24px',
-                boxShadow: '0 10px 25px rgba(102, 126, 234, 0.4)',
-                opacity: (loading || !email || !password) ? 0.6 : 1,
-                cursor: (loading || !email || !password) ? 'not-allowed' : 'pointer',
-                transform: 'translateY(0)',
-                transition: 'all 0.3s ease',
-                border: 'none',
-                width: '100%'
-              }}
-              onMouseEnter={(e) => {
-                if (!loading && email && password) {
-                  e.currentTarget.style.background = 'linear-gradient(135deg, #5a67d8 0%, #6b3fa0 100%)';
-                  e.currentTarget.style.boxShadow = '0 15px 35px rgba(102, 126, 234, 0.5)';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                e.currentTarget.style.boxShadow = '0 10px 25px rgba(102, 126, 234, 0.4)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
+              className="w-full mt-8 relative overflow-hidden rounded-xl font-bold text-sm tracking-wide text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group/btn shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:-translate-y-0.5 active:translate-y-0"
+              style={{ padding: '16px 24px' }}
             >
-              {loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  <span>Signing in...</span>
-                </>
-              ) : (
-                <>
-                  <Shield className="w-5 h-5" />
-                  <span>Sign In</span>
-                </>
-              )}
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-500 transition-transform duration-500 group-hover/btn:scale-[1.02]" />
+              <div className="relative flex items-center justify-center gap-2">
+                {loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Authenticating...</span>
+                  </>
+                ) : (
+                  <>
+                    <Shield className="w-5 h-5" />
+                    <span>Authorize Access</span>
+                  </>
+                )}
+              </div>
             </button>
           </form>
 
           {/* Info Box */}
-          <div 
-            className="mt-6 rounded-2xl p-4"
-            style={{
-              backgroundColor: 'rgba(102, 126, 234, 0.08)',
-              border: '1px solid rgba(102, 126, 234, 0.2)'
-            }}
-          >
-            <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#667eea' }} />
+          <div className="mt-8 pt-6 border-t border-slate-800/60 relative z-10">
+            <div className="flex items-start gap-3 text-slate-400">
+              <Shield className="w-5 h-5 flex-shrink-0 mt-0.5 text-slate-500" />
               <div>
-                <p className="text-sm font-semibold" style={{ color: '#374151' }}>Secure Admin Access</p>
-                <p className="text-xs mt-1" style={{ color: '#6b7280' }}>
-                  Only authorized administrators can access this portal. All login attempts are monitored.
+                <p className="text-xs font-medium text-slate-300 tracking-wide uppercase mb-1">Restricted Area</p>
+                <p className="text-xs leading-relaxed opacity-80">
+                  This system is strictly for authorized personnel only. All access attempts are recorded and monitored for security purposes.
                 </p>
               </div>
             </div>
@@ -357,11 +201,8 @@ export default function AdminLoginPage({ onLoginSuccess }: AdminLoginPageProps) 
 
         {/* Footer */}
         <div className="text-center mt-8">
-          <p className="text-sm font-medium" style={{ 
-            color: 'rgba(255, 255, 255, 0.9)',
-            textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
-          }}>
-            © 2025 PixelTale. All rights reserved.
+          <p className="text-xs font-medium text-slate-500 tracking-wide">
+            © {new Date().getFullYear()} PixelTale. All rights reserved.
           </p>
         </div>
       </div>

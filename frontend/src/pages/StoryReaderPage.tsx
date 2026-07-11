@@ -170,7 +170,16 @@ const StoryReaderPage: React.FC = () => {
         } catch (error: any) {
           console.error('Failed to load story from backend:', error);
           
-          // If backend fails, try offline DB first, then local store as final fallback
+          // If story was deleted on the server (404), remove it from local offline DB
+          if (error?.response?.status === 404 || error?.status === 404) {
+            console.warn(`Story ${storyId} not found on server. Force-syncing offline storage...`);
+            await offlineStorageService.removeStory(storyId);
+            setStory(null);
+            setIsLoading(false);
+            return;
+          }
+          
+          // If backend fails (but not 404), try offline DB first, then local store as final fallback
           if (offlineDbStory) {
             console.log('📱 Fallback to offline DB after backend error:', offlineDbStory.title);
             setStory(offlineDbStory);
@@ -249,8 +258,18 @@ const StoryReaderPage: React.FC = () => {
         setTimeout(() => {
           fetchInteractionStats(storyIdToUse);
         }, 500);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error loading story:', error);
+        
+        // If story was deleted on the server (404), remove it from local offline DB
+        if (error?.response?.status === 404 || error?.status === 404) {
+          console.warn(`Story ${storyId} not found on server. Force-syncing offline storage...`);
+          await offlineStorageService.removeStory(storyId);
+          setStory(null);
+          setIsLoading(false);
+          return;
+        }
+
         if (offlineDbStory) {
           console.log('📱 Fallback to offline DB after backend error (no user):', offlineDbStory.title);
           setStory(offlineDbStory);
@@ -1026,68 +1045,86 @@ const StoryReaderPage: React.FC = () => {
                     </button>
                   )}
                   
-                <img
-                    data-page-id={page.id}
-                  src={canvasData}
-                  alt={`Page ${index + 1} illustration`}
-                  className="story-reader-illustration"
-                  style={{ 
-                    opacity: loadingImages.has(page.id) ? 0.3 : 1,
-                    transition: 'opacity 0.3s ease-in-out'
-                  }}
-                  onLoadStart={() => {
-                    setLoadingImages(prev => new Set([...prev, page.id]));
-                  }}
-                  onError={(e) => {
-                    // Mark as failed to show retry button
-                    const newFailedPages = new Set(failedImages);
-                    newFailedPages.add(index.toString());
-                    setFailedImages(newFailedPages);
-                  }}
-                  onLoad={async (e) => {
-                    // Check if this is a real image or a placeholder
-                    const img = e.currentTarget as HTMLImageElement;
-                    
-                    // Only check for Pollinations URLs (backend proxy or direct)
-                    if (canvasData && (canvasData.includes('pollinations') || canvasData.includes('/fetch-image'))) {
-                      try {
-                        const response = await fetch(canvasData, { cache: 'no-cache' });
-                        const blob = await response.blob();
-                        const sizeKB = blob.size / 1024;
-                        
-                        console.log(`?? Page ${index + 1}: Image size: ${sizeKB.toFixed(1)}KB`);
-                        
-                        // Pollinations placeholders are LARGE (1-2MB), real images are smaller (50-100KB)
-                        if (sizeKB > 500) {
-                          console.log(`? Page ${index + 1}: Large placeholder detected (${sizeKB.toFixed(1)}KB), keeping loading state`);
-                          // Keep in loading state - image is still generating
-                          return;
+                {failedImages.has(index.toString()) ? (
+                  <div className="story-reader-illustration-placeholder" style={{
+                    width: '100%',
+                    aspectRatio: '1/1',
+                    backgroundColor: isDarkMode ? '#1f2937' : '#f3f4f6',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '16px',
+                    color: isDarkMode ? '#6b7280' : '#9ca3af',
+                    boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
+                  }}>
+                    <CloudArrowDownIcon style={{ width: '48px', height: '48px', marginBottom: '12px', opacity: 0.5 }} />
+                    <span style={{ fontSize: '14px', fontWeight: '500' }}>Image not available</span>
+                  </div>
+                ) : (
+                  <img
+                      data-page-id={page.id}
+                    src={canvasData}
+                    alt={`Page ${index + 1} illustration`}
+                    className="story-reader-illustration"
+                    style={{ 
+                      opacity: loadingImages.has(page.id) ? 0.3 : 1,
+                      transition: 'opacity 0.3s ease-in-out'
+                    }}
+                    onLoadStart={() => {
+                      setLoadingImages(prev => new Set([...prev, page.id]));
+                    }}
+                    onError={(e) => {
+                      // Mark as failed to show retry button
+                      const newFailedPages = new Set(failedImages);
+                      newFailedPages.add(index.toString());
+                      setFailedImages(newFailedPages);
+                    }}
+                    onLoad={async (e) => {
+                      // Check if this is a real image or a placeholder
+                      const img = e.currentTarget as HTMLImageElement;
+                      
+                      // Only check for Pollinations URLs (backend proxy or direct)
+                      if (canvasData && (canvasData.includes('pollinations') || canvasData.includes('/fetch-image'))) {
+                        try {
+                          const response = await fetch(canvasData, { cache: 'no-cache' });
+                          const blob = await response.blob();
+                          const sizeKB = blob.size / 1024;
+                          
+                          console.log(`?? Page ${index + 1}: Image size: ${sizeKB.toFixed(1)}KB`);
+                          
+                          // Pollinations placeholders are LARGE (1-2MB), real images are smaller (50-100KB)
+                          if (sizeKB > 500) {
+                            console.log(`? Page ${index + 1}: Large placeholder detected (${sizeKB.toFixed(1)}KB), keeping loading state`);
+                            // Keep in loading state - image is still generating
+                            return;
+                          }
+                          
+                          console.log(`? Page ${index + 1}: Real image loaded (${sizeKB.toFixed(1)}KB)`);
+                        } catch (err) {
+                          console.log(`?? Page ${index + 1}: Could not check image size, marking as loaded`);
                         }
-                        
-                        console.log(`? Page ${index + 1}: Real image loaded (${sizeKB.toFixed(1)}KB)`);
-                      } catch (err) {
-                        console.log(`?? Page ${index + 1}: Could not check image size, marking as loaded`);
                       }
-                    }
-                    
-                    // Real image loaded - remove from loading states
-                    setLoadingImages(prev => {
-                      const newSet = new Set(prev);
-                      newSet.delete(page.id);
-                      return newSet;
-                    });
-                    setFailedImages(prev => {
-                      const newSet = new Set(prev);
-                      newSet.delete(page.id);
-                      return newSet;
-                    });
-                    setRegeneratingImages(prev => {
-                      const newSet = new Set(prev);
-                      newSet.delete(page.id);
-                      return newSet;
-                    });
-                  }}
-                />
+                      
+                      // Real image loaded - remove from loading states
+                      setLoadingImages(prev => {
+                        const newSet = new Set(prev);
+                        newSet.delete(page.id);
+                        return newSet;
+                      });
+                      setFailedImages(prev => {
+                        const newSet = new Set(prev);
+                        newSet.delete(page.id);
+                        return newSet;
+                      });
+                      setRegeneratingImages(prev => {
+                        const newSet = new Set(prev);
+                        newSet.delete(page.id);
+                        return newSet;
+                      });
+                    }}
+                  />
+                )}
               </div>
             )}
             
@@ -1207,72 +1244,90 @@ const StoryReaderPage: React.FC = () => {
                       </button>
                     )}
                     
-                  <img
-                      data-page-id={page?.id}
-                    src={canvasData}
-                    alt={`Page ${currentPage + 1} illustration`}
-                    className="story-reader-horizontal-illustration"
-                    style={{ 
-                      opacity: page && loadingImages.has(page.id) ? 0.3 : 1,
-                      transition: 'opacity 0.3s ease-in-out'
-                    }}
-                    onLoadStart={() => {
-                      if (page) {
-                        setLoadingImages(prev => new Set([...prev, page.id]));
-                      }
-                    }}
-                    onError={(e) => {
-                      // Mark as failed to show retry button
-                      const newFailedPages = new Set(failedImages);
-                      newFailedPages.add(currentPage.toString());
-                      setFailedImages(newFailedPages);
-                    }}
-                    onLoad={async (e) => {
-                      if (!page) return;
-                      
-                      // Check if this is a real image or a placeholder
-                      const img = e.currentTarget as HTMLImageElement;
-                      
-                      // Only check for Pollinations URLs (backend proxy or direct)
-                      if (canvasData && (canvasData.includes('pollinations') || canvasData.includes('/fetch-image'))) {
-                        try {
-                          const response = await fetch(canvasData, { cache: 'no-cache' });
-                          const blob = await response.blob();
-                          const sizeKB = blob.size / 1024;
-                          
-                          console.log(`?? Page ${currentPage + 1}: Image size: ${sizeKB.toFixed(1)}KB`);
-                          
-                          // Pollinations placeholders are LARGE (1-2MB), real images are smaller (50-100KB)
-                          if (sizeKB > 500) {
-                            console.log(`? Page ${currentPage + 1}: Large placeholder detected (${sizeKB.toFixed(1)}KB), keeping loading state`);
-                            // Keep in loading state - image is still generating
-                            return;
-                          }
-                          
-                          console.log(`? Page ${currentPage + 1}: Real image loaded (${sizeKB.toFixed(1)}KB)`);
-                        } catch (err) {
-                          console.log(`?? Page ${currentPage + 1}: Could not check image size, marking as loaded`);
+                  {failedImages.has(currentPage.toString()) ? (
+                    <div className="story-reader-illustration-placeholder" style={{
+                      width: '100%',
+                      aspectRatio: '1/1',
+                      backgroundColor: isDarkMode ? '#1f2937' : '#f3f4f6',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '16px',
+                      color: isDarkMode ? '#6b7280' : '#9ca3af',
+                      boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
+                    }}>
+                      <CloudArrowDownIcon style={{ width: '48px', height: '48px', marginBottom: '12px', opacity: 0.5 }} />
+                      <span style={{ fontSize: '14px', fontWeight: '500' }}>Image not available</span>
+                    </div>
+                  ) : (
+                    <img
+                        data-page-id={page?.id}
+                      src={canvasData}
+                      alt={`Page ${currentPage + 1} illustration`}
+                      className="story-reader-horizontal-illustration"
+                      style={{ 
+                        opacity: page && loadingImages.has(page.id) ? 0.3 : 1,
+                        transition: 'opacity 0.3s ease-in-out'
+                      }}
+                      onLoadStart={() => {
+                        if (page) {
+                          setLoadingImages(prev => new Set([...prev, page.id]));
                         }
-                      }
-                      
-                      // Real image loaded - remove from loading states
-                      setLoadingImages(prev => {
-                        const newSet = new Set(prev);
-                        newSet.delete(page.id);
-                        return newSet;
-                      });
-                      setFailedImages(prev => {
-                        const newSet = new Set(prev);
-                        newSet.delete(page.id);
-                        return newSet;
-                      });
-                      setRegeneratingImages(prev => {
-                        const newSet = new Set(prev);
-                        newSet.delete(page.id);
-                        return newSet;
-                      });
-                    }}
-                  />
+                      }}
+                      onError={(e) => {
+                        // Mark as failed to show retry button
+                        const newFailedPages = new Set(failedImages);
+                        newFailedPages.add(currentPage.toString());
+                        setFailedImages(newFailedPages);
+                      }}
+                      onLoad={async (e) => {
+                        if (!page) return;
+                        
+                        // Check if this is a real image or a placeholder
+                        const img = e.currentTarget as HTMLImageElement;
+                        
+                        // Only check for Pollinations URLs (backend proxy or direct)
+                        if (canvasData && (canvasData.includes('pollinations') || canvasData.includes('/fetch-image'))) {
+                          try {
+                            const response = await fetch(canvasData, { cache: 'no-cache' });
+                            const blob = await response.blob();
+                            const sizeKB = blob.size / 1024;
+                            
+                            console.log(`?? Page ${currentPage + 1}: Image size: ${sizeKB.toFixed(1)}KB`);
+                            
+                            // Pollinations placeholders are LARGE (1-2MB), real images are smaller (50-100KB)
+                            if (sizeKB > 500) {
+                              console.log(`? Page ${currentPage + 1}: Large placeholder detected (${sizeKB.toFixed(1)}KB), keeping loading state`);
+                              // Keep in loading state - image is still generating
+                              return;
+                            }
+                            
+                            console.log(`? Page ${currentPage + 1}: Real image loaded (${sizeKB.toFixed(1)}KB)`);
+                          } catch (err) {
+                            console.log(`?? Page ${currentPage + 1}: Could not check image size, marking as loaded`);
+                          }
+                        }
+                        
+                        // Real image loaded - remove from loading states
+                        setLoadingImages(prev => {
+                          const newSet = new Set(prev);
+                          newSet.delete(page.id);
+                          return newSet;
+                        });
+                        setFailedImages(prev => {
+                          const newSet = new Set(prev);
+                          newSet.delete(page.id);
+                          return newSet;
+                        });
+                        setRegeneratingImages(prev => {
+                          const newSet = new Set(prev);
+                          newSet.delete(page.id);
+                          return newSet;
+                        });
+                      }}
+                    />
+                  )}
                 </div>
               )}
               {page?.text && (

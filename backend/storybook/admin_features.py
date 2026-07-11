@@ -100,7 +100,7 @@ def moderate_story(request, story_id):
         
         # Notify author
         Notification.objects.create(
-            user=story.author,
+            recipient=story.author,
             notification_type='moderation',
             title='Story Unpublished',
             message=f'Your story "{story.title}" has been unpublished by an administrator. Reason: {reason}',
@@ -119,7 +119,7 @@ def moderate_story(request, story_id):
         
         # Notify author
         Notification.objects.create(
-            user=author,
+            recipient=author,
             notification_type='moderation',
             title='Story Removed',
             message=f'Your story "{story_title}" has been removed by an administrator. Reason: {reason}'
@@ -158,7 +158,7 @@ def delete_comment(request, comment_id):
         
         # Notify user
         Notification.objects.create(
-            user=user,
+            recipient=user,
             notification_type='moderation',
             title='Comment Removed',
             message='One of your comments has been removed by an administrator for violating community guidelines.'
