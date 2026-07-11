@@ -72,7 +72,7 @@ def generate_story_with_gemini(request):
                 'contents': [{'parts': [{'text': prompt}]}],
                 'generationConfig': generation_config
             },
-            timeout=30
+            timeout=90
         )
         
         if response.status_code != 200:
@@ -129,7 +129,7 @@ def generate_character_with_gemini(request):
                     'maxOutputTokens': 1024,
                 }
             },
-            timeout=30
+            timeout=90
         )
         
         if response.status_code != 200:
@@ -190,7 +190,7 @@ def analyze_image_with_gemini(request):
                     ]
                 }]
             },
-            timeout=30
+            timeout=90
         )
         
         if response.status_code != 200:
@@ -245,7 +245,7 @@ def ocr_image(request):
                         'detectOrientation': True,
                         'scale': True,
                     },
-                    timeout=30
+                    timeout=90
                 )
                 
                 if response.status_code == 200:
@@ -307,7 +307,7 @@ def ocr_image(request):
                     ]
                 }]
             },
-            timeout=30
+            timeout=90
         )
         
         if response.status_code != 200:

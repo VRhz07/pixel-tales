@@ -19,6 +19,7 @@ import { generateStoryIllustrationsFromPrompts } from '../../services/imageGener
 import { VoiceFilteredTextarea } from '../common/VoiceFilteredTextarea';
 import { processImageWithOCR } from '../../services/ocrProxyService';
 import { convertImageToDataUrl } from '../../utils/imageCache';
+import { StoryGenerationMiniGame } from './StoryGenerationMiniGame';
 
 interface PhotoStoryModalProps {
   isOpen: boolean;
@@ -779,13 +780,15 @@ Make sure EVERY page's imagePrompt:
           {isGenerating || isExtractingText ? (
             /* Generation/OCR Progress */
             <div className="generation-progress">
-              <div className="progress-animation">
-                {isExtractingText ? (
+              {isExtractingText ? (
+                <div className="progress-animation">
                   <DocumentTextIcon className="w-16 h-16 text-blue-500 animate-pulse" />
-                ) : (
-                  <SparklesIcon className="w-16 h-16 text-purple-500 animate-pulse" />
-                )}
-              </div>
+                </div>
+              ) : (
+                <div style={{ width: '100%', marginBottom: '20px' }}>
+                  <StoryGenerationMiniGame storyIdea={formData.additionalContext || 'magic'} />
+                </div>
+              )}
               <h3 className="progress-title">
                 {isExtractingText 
                   ? (ocrStatus || 'Extracting text...')

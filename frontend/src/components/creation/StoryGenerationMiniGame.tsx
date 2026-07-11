@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useThemeStore } from '../../stores/themeStore';
 import soundService from '../../services/soundService';
 
