@@ -56,6 +56,16 @@ const PhotoStoryModal = ({ isOpen, onClose }: PhotoStoryModalProps) => {
   const [generationStage, setGenerationStage] = useState<string>('');
   const [generationProgress, setGenerationProgress] = useState(0);
   const [showCamera, setShowCamera] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => setIsReady(true), 50);
+      return () => clearTimeout(timer);
+    } else {
+      setIsReady(false);
+    }
+  }, [isOpen]);
   
   // OCR-specific state
   const [creationMode, setCreationMode] = useState<CreationMode>('photo');
@@ -776,7 +786,7 @@ Make sure EVERY page's imagePrompt:
         </div>
 
         {/* Content */}
-        <div className="modal-body">
+        <div className="modal-body" style={{ opacity: isReady ? 1 : 0, transition: 'opacity 0.2s ease-in' }}>
           {isGenerating || isExtractingText ? (
             /* Generation/OCR Progress */
             <div className="generation-progress">
@@ -1275,7 +1285,7 @@ Make sure EVERY page's imagePrompt:
 
         {/* Footer */}
         {!isGenerating && !isExtractingText && formData.capturedImage && creationMode === 'photo' && (
-          <div className="modal-footer">
+          <div className="modal-footer" style={{ opacity: isReady ? 1 : 0, transition: 'opacity 0.2s ease-in' }}>
             <button onClick={handleClose} className="modal-button-secondary">
               Cancel
             </button>

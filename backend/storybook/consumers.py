@@ -1790,17 +1790,29 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
         """Finalize and save the collaborative story"""
         from .models import Story
         from django.utils import timezone
+        import json
+        from django.core.cache import cache
         
         session = CollaborationSession.objects.get(session_id=self.session_id)
         
         # Get story draft data
         story_data = session.story_draft or {}
         
+        # Extract pages and convert to JSON string for the 'content' field
+        pages = story_data.get('pages', [])
+        content_json = json.dumps(pages)
+        
+        # Get canvas data from cache or session
+        cache_key = f'collab_canvas_data_{session.session_id}'
+        cached_data = cache.get(cache_key)
+        canvas_data_dict = cached_data if cached_data else (session.canvas_data or {})
+        canvas_data_json = json.dumps(canvas_data_dict)
+        
         # Create the main story record (without genres - ManyToManyField)
         story = Story.objects.create(
             title=story_data.get('title', 'Untitled Collaborative Story'),
-            content=story_data.get('content', ''),
-            canvas_data=story_data.get('canvas_data', '{}'),
+            content=content_json,
+            canvas_data=canvas_data_json,
             summary=story_data.get('summary', ''),
             category=story_data.get('category', 'other'),
             language=story_data.get('language', 'en'),
@@ -1821,8 +1833,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
         
         # Add all participants as co-authors
         participants = SessionParticipant.objects.filter(
-            session=session,
-            is_active=True
+            session=session
         ).select_related('user')
         
         for participant in participants:

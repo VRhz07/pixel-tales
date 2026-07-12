@@ -971,7 +971,10 @@ const StoryReaderPage: React.FC = () => {
     <div className="story-reader-vertical-container">
       {story.pages.map((page, index) => {
         // Try to get canvas data from store first (for local stories), then from page object (for API stories)
-        const canvasData = getCanvasData(story.id, page.id) || page.canvasData;
+        const rawCanvasData = getCanvasData(story.id, page.id) || page.canvasData;
+        const canvasData = typeof rawCanvasData === 'object' && rawCanvasData !== null 
+          ? (rawCanvasData as any).canvasDataUrl || (rawCanvasData as any).canvasData || (rawCanvasData as any).lastRemoteDrawing
+          : rawCanvasData;
         
         return (
           <div key={page.id} className={`story-reader-page-card ${isDarkMode ? 'dark' : 'light'}`}>
@@ -1016,7 +1019,7 @@ const StoryReaderPage: React.FC = () => {
                   </div>
                 )}
                   {/* Regenerate Image AI Button for Page */}
-                  {isOwnStory && !regeneratingImages.has(page.id) && (
+                  {isOwnStory && story.creationType !== 'manual' && !regeneratingImages.has(page.id) && (
                     <button
                       onClick={(e) => { e.stopPropagation(); handleAIGenerateImage(page.id, 'page'); }}
                       title="Regenerate this image using AI"
@@ -1163,7 +1166,10 @@ const StoryReaderPage: React.FC = () => {
     const isLastPage = currentPage >= story.pages.length;
     const page = !isLastPage ? story.pages[currentPage] : null;
     // Try to get canvas data from store first (for local stories), then from page object (for API stories)
-    const canvasData = page ? (getCanvasData(story.id, page.id) || page.canvasData) : null;
+    const rawCanvasData = page ? (getCanvasData(story.id, page.id) || page.canvasData) : null;
+    const canvasData = typeof rawCanvasData === 'object' && rawCanvasData !== null 
+      ? (rawCanvasData as any).canvasDataUrl || (rawCanvasData as any).canvasData || (rawCanvasData as any).lastRemoteDrawing
+      : rawCanvasData;
     
     return (
       <div className="story-reader-horizontal-container">
@@ -1215,7 +1221,7 @@ const StoryReaderPage: React.FC = () => {
                     </div>
                   )}
                     {/* Regenerate Image AI Button for Page */}
-                    {page && isOwnStory && !regeneratingImages.has(page.id) && (
+                    {page && isOwnStory && story.creationType !== 'manual' && !regeneratingImages.has(page.id) && (
                       <button
                         onClick={(e) => { e.stopPropagation(); handleAIGenerateImage(page.id, 'page'); }}
                         title="Regenerate this image using AI"
@@ -1574,7 +1580,7 @@ const StoryReaderPage: React.FC = () => {
             
             
               {/* Regenerate Image AI Button for Cover */}
-              {isOwnStory && !regeneratingImages.has('cover') && (
+              {isOwnStory && story.creationType !== 'manual' && !regeneratingImages.has('cover') && (
                 <button
                   onClick={(e) => { e.stopPropagation(); handleAIGenerateImage('cover', 'cover'); }}
                   title="Regenerate this image using AI"

@@ -41,7 +41,6 @@ import { useAuthStore } from './stores/authStore';
 import { useThemeStore } from './stores/themeStore';
 import { storage } from './utils/storage';
 import { CollaborationInvitationsContainer, CollaborationInvite } from './components/collaboration/CollaborationInvitation';
-import CollaborationInviteNotification from './components/collaboration/CollaborationInviteNotification';
 import CollaborationWaitingScreen from './components/collaboration/CollaborationWaitingScreen';
 import ToastNotification from './components/ui/ToastNotification';
 import { apiConfigService } from './services/apiConfig.service';
@@ -61,7 +60,6 @@ function AppContent() {
   const { fetchNotificationCounts, incrementCollaborationInvites } = useNotificationStore();
   const [isInitializing, setIsInitializing] = useState(true);
   // Removed unused collaborationInvites and onlineUsers state that caused root re-renders
-  const [currentInviteNotification, setCurrentInviteNotification] = useState<CollaborationInvite | null>(null);
   const [showWaitingScreen, setShowWaitingScreen] = useState(false);
   const [waitingScreenData, setWaitingScreenData] = useState<{sessionId: string, storyTitle: string, inviterName: string} | null>(null);
   const { toasts, removeToast, showOnlineToast, showOfflineToast, showInviteToast, showXPGain, showLevelUp } = useToastContext();
@@ -299,27 +297,6 @@ function AppContent() {
           });
         }
         
-        // Only show in-app notification modal if NOT on certain pages where it would be disruptive
-        // User can still see the invite in Social tab or via toast notification
-        const disruptivePages = ['/games', '/games/play/', '/story/', '/canvas-drawing', '/cover-canvas', '/create-story-manual'];
-        const isOnDisruptivePage = disruptivePages.some(path => location.pathname.startsWith(path));
-        
-        if (!isOnDisruptivePage) {
-          // Show beautiful in-app notification modal
-          setCurrentInviteNotification(invite);
-        } else {
-          console.log('🔔 Skipping modal on disruptive page:', location.pathname);
-          // Show toast notification instead when on disruptive pages
-          showInviteToast(
-            invite.inviter_name,
-            invite.story_title,
-            () => {
-              // Navigate to social page when user clicks on the toast
-              navigate('/social');
-            }
-          );
-        }
-        
         // Show toast notification
         showInviteToast(
           invite.inviter_name,
@@ -419,72 +396,6 @@ function AppContent() {
   }, [showWaitingScreen, waitingScreenData, navigate]);
 
   // XP system event listeners will be added in the future
-
-  // Handle accepting collaboration invitation from notification modal
-  const handleAcceptInviteFromNotification = async () => {
-    if (!currentInviteNotification) return;
-
-    try {
-      const token = localStorage.getItem('access_token');
-      const response = await fetch(
-        `${apiConfigService.getApiUrl()}/collaborate/invites/${currentInviteNotification.id}/respond/`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ action: 'accept' })
-        }
-      );
-
-      if (response.ok) {
-        // Close notification modal
-        setCurrentInviteNotification(null);
-        
-        // Update handled globally
-        
-        // Show waiting screen instead of navigating immediately
-        setWaitingScreenData({
-          sessionId: currentInviteNotification.sessionId,
-          storyTitle: currentInviteNotification.storyTitle,
-          inviterName: currentInviteNotification.inviter_name
-        });
-        setShowWaitingScreen(true);
-      }
-    } catch (err) {
-      console.error('Failed to accept invitation:', err);
-      alert('Failed to accept invitation');
-    }
-  };
-
-  // Handle declining collaboration invitation from notification modal
-  const handleDeclineInviteFromNotification = async () => {
-    if (!currentInviteNotification) return;
-
-    try {
-      const token = localStorage.getItem('access_token');
-      await fetch(
-        `${apiConfigService.getApiUrl()}/collaborate/invites/${currentInviteNotification.id}/respond/`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ action: 'decline' })
-        }
-      );
-
-      // Close notification modal
-      setCurrentInviteNotification(null);
-      
-      // Update handled globally
-    } catch (err) {
-      console.error('Failed to decline invitation:', err);
-      alert('Failed to decline invitation');
-    }
-  };
 
   // Handle accepting collaboration invitation (legacy - still used by other components)
   const handleAcceptInvite = async (invitation: CollaborationInvite) => {
@@ -738,18 +649,6 @@ function AppContent() {
         />
       )}
       
-      {/* Global Collaboration Invite Notification Modal */}
-      <AnimatePresence>
-        {currentInviteNotification && (
-          <CollaborationInviteNotification
-            inviterName={currentInviteNotification.inviter_name}
-            storyTitle={currentInviteNotification.story_title}
-            onAccept={handleAcceptInviteFromNotification}
-            onDecline={handleDeclineInviteFromNotification}
-            onClose={() => setCurrentInviteNotification(null)}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }

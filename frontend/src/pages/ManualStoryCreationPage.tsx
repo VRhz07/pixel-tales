@@ -14,7 +14,7 @@ import { CollaborationInviteModal } from '../components/collaboration/Collaborat
 import { ActiveSessionInviteModal } from '../components/collaboration/ActiveSessionInviteModal';
 import CollaborationLobby from '../components/collaboration/CollaborationLobby';
 import { VotingModal } from '../components/collaboration/VotingModal';
-import { ParticipantsPanel } from '../components/collaboration/ParticipantsPanel';
+
 import { RealtimePreviewCanvas, RealtimePreviewCanvasRef } from '../components/canvas/RealtimePreviewCanvas';
 import { RealtimeCanvasIndicator } from '../components/collaboration/RealtimeCanvasIndicator';
 import PageDeletionModal from '../components/collaboration/PageDeletionModal';
@@ -1125,6 +1125,12 @@ const ManualStoryCreationPage: React.FC = () => {
             showInfoToast('🎉 Story saved successfully!');
           } else {
             console.log('🚀 Vote initiator: Skipping story_finalized overlay (will show save modal)');
+            // CRITICAL: The websocket created the story with all authors. 
+            // We must update our local story to have this backendId so we UPDATE it instead of creating a new one.
+            if (message.story_id && currentStory) {
+              updateStory(currentStory.id, { backendId: message.story_id });
+              console.log(`✅ Set backendId to ${message.story_id} to avoid duplicates.`);
+            }
           }
         };
 
@@ -3355,20 +3361,6 @@ const ManualStoryCreationPage: React.FC = () => {
           </div>
         </div>,
         document.body
-      )}
-
-      {/* Participants Panel (Collaborative Mode) */}
-      {isCollaborating && participants.length > 0 && (
-        <div className="fixed right-4 top-20 z-40 w-80">
-          <ParticipantsPanel
-            participants={participants}
-            isHost={isHost}
-            onKick={handleKickUser}
-            currentUserId={currentUserId}
-            maxParticipants={5}
-            isCollaborationMode={isCollaborating}
-          />
-        </div>
       )}
 
       {/* Voting Modal - Rendered via Portal */}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   SparklesIcon, 
@@ -56,8 +56,17 @@ const AIStoryModal = ({ isOpen, onClose }: AIStoryModalProps) => {
   const [generationProgress, setGenerationProgress] = useState(0);
   const [imageGenerationWarnings, setImageGenerationWarnings] = useState<string[]>([]);
   const [showWarningModal, setShowWarningModal] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
-
+  useEffect(() => {
+    if (isOpen) {
+      // Defer rendering the heavy form content to prevent layout thrashing and lag during the opening animation
+      const timer = setTimeout(() => setIsReady(true), 50);
+      return () => clearTimeout(timer);
+    } else {
+      setIsReady(false);
+    }
+  }, [isOpen]);
   // Genre options from design profile with specific colors
   const genres = [
     { 
@@ -763,7 +772,9 @@ Make sure EVERY page's imagePrompt:
               padding: '10px 20px',
               background: isDarkMode ? '#1f2937' : '#f8fafc',
               borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
-              flexWrap: 'wrap'
+              flexWrap: 'wrap',
+              opacity: isReady ? 1 : 0,
+              transition: 'opacity 0.2s ease-in'
             }}>
               <span style={{ fontSize: '12px', fontWeight: '600', color: isDarkMode ? '#9ca3af' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Story Engine:
@@ -820,7 +831,9 @@ Make sure EVERY page's imagePrompt:
               padding: '10px 20px',
               background: isDarkMode ? '#111827' : '#f1f5f9',
               borderBottom: `1px solid ${isDarkMode ? '#374151' : '#e2e8f0'}`,
-              flexWrap: 'wrap'
+              flexWrap: 'wrap',
+              opacity: isReady ? 1 : 0,
+              transition: 'opacity 0.2s ease-in'
             }}>
               <span style={{ fontSize: '12px', fontWeight: '600', color: isDarkMode ? '#9ca3af' : '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Illustration Model:
@@ -853,7 +866,7 @@ Make sure EVERY page's imagePrompt:
             </div>
 
             {/* Body */}
-            <div className="modal-body">
+            <div className="modal-body" style={{ opacity: isReady ? 1 : 0, transition: 'opacity 0.2s ease-in' }}>
               {/* Story Idea Input */}
               <div className="form-section">
                 <label className="form-label">
@@ -960,7 +973,7 @@ Make sure EVERY page's imagePrompt:
             </div>
 
             {/* Footer */}
-            <div className="modal-footer">
+            <div className="modal-footer" style={{ opacity: isReady ? 1 : 0, transition: 'opacity 0.2s ease-in' }}>
               <button onClick={handleClose} className="modal-button-secondary">
                 Cancel
               </button>

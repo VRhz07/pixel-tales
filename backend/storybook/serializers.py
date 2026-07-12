@@ -96,9 +96,24 @@ class StorySerializer(serializers.ModelSerializer):
     
     def get_authors_names(self, obj):
         """Get all co-authors names for collaborative stories"""
-        if obj.is_collaborative and obj.authors.exists():
-            # Return list of all co-authors' display names
-            return [author.profile.display_name for author in obj.authors.all()]
+        if obj.is_collaborative:
+            authors = []
+            # Add host/main author first
+            if obj.author:
+                if hasattr(obj.author, 'profile') and obj.author.profile.display_name:
+                    authors.append(obj.author.profile.display_name)
+                else:
+                    authors.append(obj.author.username)
+            
+            # Add other participants
+            if obj.authors.exists():
+                for author in obj.authors.all():
+                    if author != obj.author:
+                        if hasattr(author, 'profile') and author.profile.display_name:
+                            authors.append(author.profile.display_name)
+                        else:
+                            authors.append(author.username)
+            return authors
         return []
 
 
@@ -300,6 +315,7 @@ class ParentChildRelationshipSerializer(serializers.ModelSerializer):
 class StoryListSerializer(serializers.ModelSerializer):
     """Simplified serializer for story lists"""
     author_name = serializers.CharField(source='author.profile.display_name', read_only=True)
+    authors_names = serializers.SerializerMethodField()  # Co-authors names for collaborative stories
     average_rating = serializers.SerializerMethodField()
     likes_count = serializers.SerializerMethodField()
     comments_count = serializers.SerializerMethodField()
@@ -308,11 +324,30 @@ class StoryListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Story
         fields = [
-            'id', 'title', 'author_name', 'summary', 'category', 'genres', 'language',
+            'id', 'title', 'author_name', 'authors_names', 'summary', 'category', 'genres', 'language',
             'cover_image', 'creation_type', 'is_published', 'date_created', 'date_updated', 'views',
             'average_rating', 'likes_count', 'comments_count', 'is_liked_by_user',
-            'content', 'canvas_data'
+            'content', 'canvas_data', 'is_collaborative'
         ]
+
+    def get_authors_names(self, obj):
+        """Get all co-authors names for collaborative stories"""
+        if obj.is_collaborative:
+            authors = []
+            if obj.author:
+                if hasattr(obj.author, 'profile') and obj.author.profile.display_name:
+                    authors.append(obj.author.profile.display_name)
+                else:
+                    authors.append(obj.author.username)
+            if obj.authors.exists():
+                for author in obj.authors.all():
+                    if author != obj.author:
+                        if hasattr(author, 'profile') and author.profile.display_name:
+                            authors.append(author.profile.display_name)
+                        else:
+                            authors.append(author.username)
+            return authors
+        return []
 
     def get_average_rating(self, obj):
         ratings = obj.ratings.all()

@@ -4245,7 +4245,7 @@ def get_user_sessions(request):
 @permission_classes([IsAuthenticated])
 def update_session_story_id(request, session_id):
     """Link a backend Story ID to a collaboration session"""
-    from .models import CollaborationSession
+    from .models import CollaborationSession, SessionParticipant, Story
     
     try:
         session = CollaborationSession.objects.get(session_id=session_id)
@@ -4263,6 +4263,21 @@ def update_session_story_id(request, session_id):
         
         session.story_id = story_id
         session.save(update_fields=['story_id'])
+        
+        # Add all session participants to the story's authors list
+        try:
+            story = Story.objects.get(id=story_id)
+            story.is_collaborative = True
+            story.collaboration_session = session
+            story.authors.add(session.host)
+            
+            participants = SessionParticipant.objects.filter(session=session)
+            for p in participants:
+                story.authors.add(p.user)
+                
+            story.save()
+        except Story.DoesNotExist:
+            pass
         
         return Response({
             'success': True,
