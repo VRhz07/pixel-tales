@@ -28,6 +28,9 @@ interface CacheState {
   // User stats cache
   userStats: CacheEntry<any> | null;
   
+  // Games list cache
+  gamesList: CacheEntry<any[]> | null;
+  
   // Activity feed cache
   activityFeed: CacheEntry<any[]> | null;
   
@@ -70,6 +73,7 @@ export const useCacheStore = create<CacheState>()(
       publishedStories: null,
       achievements: null,
       userStats: null,
+      gamesList: null,
       activityFeed: null,
       leaderboard: null,
       parentChildren: null,
@@ -134,6 +138,7 @@ export const useCacheStore = create<CacheState>()(
           publishedStories: null,
           achievements: null,
           userStats: null,
+          gamesList: null,
           activityFeed: null,
           leaderboard: null,
           parentChildren: null,

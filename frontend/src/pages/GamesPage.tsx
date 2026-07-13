@@ -5,6 +5,7 @@ import api from '../services/api';
 import { useSoundEffects } from '../hooks/useSoundEffects';
 import { offlineStorageService } from '../services/offlineStorageService';
 import { StoryGenerationMiniGame } from '../components/creation/StoryGenerationMiniGame';
+import { useCacheStore } from '../stores/cacheStore';
 import './GamesPage.css';
 
 interface StoryWithGames {
@@ -29,6 +30,7 @@ GridItem.displayName = 'GridItem';
 const GamesPage: React.FC = () => {
   const navigate = useNavigate();
   const { playButtonClick } = useSoundEffects();
+  const { getCache, setCache, isCacheValid } = useCacheStore();
   const [stories, setStories] = useState<StoryWithGames[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,10 +45,23 @@ const GamesPage: React.FC = () => {
 
   const fetchStories = async () => {
     try {
+      const cachedGames = getCache('gamesList') as StoryWithGames[] | null;
+      if (cachedGames && isCacheValid('gamesList')) {
+        setStories(cachedGames);
+        setLoading(false);
+        // Background fetch to keep data fresh
+        api.get('/games/available_stories/').then(response => {
+           setStories(response.stories || []);
+           setCache('gamesList', response.stories || []);
+        }).catch(err => console.error('Background fetch failed:', err));
+        return;
+      }
+      
       setLoading(true);
       setIsOfflineMode(false);
       const response = await api.get('/games/available_stories/');
       setStories(response.stories || []);
+      setCache('gamesList', response.stories || []);
       setError(null);
     } catch (err) {
       console.error('Error fetching stories:', err);
