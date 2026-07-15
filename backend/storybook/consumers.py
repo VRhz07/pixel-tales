@@ -584,6 +584,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
                 {
                     'type': 'session_ended',
                     'session_id': self.session_id,
+                    'story_id': story_data.get('story_id'),
                     'story_title': story_data['title'],
                     'ended_by': 'vote'
                 }
@@ -1153,6 +1154,7 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'type': 'session_ended',
             'session_id': event.get('session_id'),
+            'story_id': event.get('story_id'),
             'story_title': event.get('story_title'),
             'ended_by': event.get('ended_by')
         }))
@@ -1798,25 +1800,63 @@ class CollaborationConsumer(AsyncWebsocketConsumer):
         # Get story draft data
         story_data = session.story_draft or {}
         
-        # Extract pages and convert to JSON string for the 'content' field
+        # Extract pages and format them properly for 'content' field
+        # The frontend convertFromApiFormat expects pages to be joined by \n\n---PAGE BREAK---\n\n
         pages = story_data.get('pages', [])
-        content_json = json.dumps(pages)
+        content_texts = []
+        for p in pages:
+            if isinstance(p, dict):
+                content_texts.append(str(p.get('text', '')))
+            elif isinstance(p, str):
+                content_texts.append(p)
+                
+        content_string = '\n\n---PAGE BREAK---\n\n'.join(content_texts)
+        if not content_string.strip():
+            content_string = 'Untitled story content'
         
         # Get canvas data from cache or session
         cache_key = f'collab_canvas_data_{session.session_id}'
         cached_data = cache.get(cache_key)
         canvas_data_dict = cached_data if cached_data else (session.canvas_data or {})
-        canvas_data_json = json.dumps(canvas_data_dict)
+        
+        # Convert dictionary format to array format expected by frontend
+        canvas_array = []
+        
+        # 1. Add cover image if exists
+        cover_data = canvas_data_dict.get('cover_image')
+        if cover_data:
+            canvas_array.append({
+                'id': 'cover',
+                'order': -1,
+                'canvasData': cover_data
+            })
+            
+        # 2. Add pages
+        pages_dict = canvas_data_dict.get('pages', {})
+        for idx, (page_id, page_data) in enumerate(pages_dict.items()):
+            # Handle frontend page format vs backend page format
+            canvas_array.append({
+                'id': str(page_id),
+                'order': idx,
+                'canvasData': page_data
+            })
+            
+        canvas_data_json = json.dumps(canvas_array)
+        
+        # Extract cover image from canvas data array if not already set
+        cover_image_url = story_data.get('cover_image', '')
+        if not cover_image_url and cover_data:
+            cover_image_url = cover_data
         
         # Create the main story record (without genres - ManyToManyField)
         story = Story.objects.create(
             title=story_data.get('title', 'Untitled Collaborative Story'),
-            content=content_json,
+            content=content_string,
             canvas_data=canvas_data_json,
             summary=story_data.get('summary', ''),
             category=story_data.get('category', 'other'),
             language=story_data.get('language', 'en'),
-            cover_image=story_data.get('cover_image', ''),
+            cover_image=cover_image_url,
             creation_type='collaborative',
             is_collaborative=True,
             collaboration_session=session,

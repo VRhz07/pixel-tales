@@ -339,6 +339,12 @@ export class PaperDrawingEngine {
               type: 'draw_batch_end',
               strokeId: this.currentStrokeId
             });
+          } else if (this.currentTool !== 'text' && this.currentTool !== 'fill' && this.currentTool !== 'select') {
+             // Send final end signal for shape preview
+             this.onDrawingComplete({
+               type: 'shape_preview_end',
+               strokeId: 'shape_preview_' + this.scope.project.id
+             });
           }
           this.notifyDrawingComplete(pathForCollaboration, toolForCollaboration);
         }
@@ -576,8 +582,8 @@ export class PaperDrawingEngine {
     this.scope.project.activeLayer.addChild(this.currentPath);
   }
 
-  private performErase(eraserPath: paper.Path) {
-    const eraserWidth = this.currentSize * 2;
+  private performErase(eraserPath: paper.Path, customWidth?: number) {
+    const eraserWidth = customWidth || (this.currentSize * 2);
     
     // Get all items in the project
     const itemsToCheck = this.scope.project.activeLayer.children.slice();
@@ -1063,6 +1069,59 @@ export class PaperDrawingEngine {
       case 'arrow':
         this.updateArrow(startPoint, point);
         break;
+    }
+
+    // Send shape preview for real-time collaboration
+    if (this.currentPath && this.onDrawingComplete) {
+      const now = Date.now();
+      if (now - this.lastBatchTime > 50) {
+        this.lastBatchTime = now;
+        
+        try {
+          const pathData: any = {
+            type: 'shape_preview',
+            tool: this.currentTool,
+            strokeId: 'shape_preview_' + this.scope.project.id
+          };
+          
+          if (this.currentTool === 'heart' || this.currentTool === 'arrow') {
+            pathData.pathData = this.currentPath.exportJSON({ asString: false });
+          } else if (this.currentPath instanceof this.scope.Group) {
+            pathData.isGroup = true;
+            pathData.groupData = this.currentPath.exportJSON({ asString: false });
+          } else {
+            pathData.shapeData = {
+              bounds: {
+                x: this.currentPath.bounds.x,
+                y: this.currentPath.bounds.y,
+                width: this.currentPath.bounds.width,
+                height: this.currentPath.bounds.height
+              },
+              filled: this.shapeFilled
+            };
+            if (this.currentPath.segments && this.currentPath.segments.length > 0) {
+              pathData.points = this.currentPath.segments.map((seg: any) => ({
+                x: seg.point.x,
+                y: seg.point.y
+              }));
+            }
+          }
+          
+          if (this.currentPath.strokeColor) {
+            pathData.strokeColor = this.currentPath.strokeColor.toCSS(true);
+          }
+          if (this.currentPath.fillColor) {
+            pathData.fillColor = this.serializeColor(this.currentPath.fillColor);
+          }
+          pathData.strokeWidth = this.currentPath.strokeWidth || this.currentSize;
+          pathData.opacity = this.currentPath.opacity || 1;
+          pathData.filled = this.shapeFilled;
+
+          this.onDrawingComplete(pathData);
+        } catch (error) {
+          console.error('❌ Failed to serialize shape preview:', error);
+        }
+      }
     }
   }
 
@@ -1650,8 +1709,10 @@ export class PaperDrawingEngine {
     try {
       switch (data.type || data.tool) {
         case 'brush':
-        case 'eraser':
           this.applyRemoteBrushStroke(data);
+          break;
+        case 'eraser':
+          this.applyRemoteEraser(data);
           break;
         case 'rectangle':
           this.applyRemoteRectangle(data);
@@ -1691,6 +1752,12 @@ export class PaperDrawingEngine {
           break;
         case 'draw_batch_end':
           this.applyRemoteDrawBatchEnd(data);
+          break;
+        case 'shape_preview':
+          this.applyRemoteShapePreview(data);
+          break;
+        case 'shape_preview_end':
+          this.applyRemoteShapePreviewEnd(data);
           break;
         case 'transform':
           // Handle transform operations through the new collaboration enhancer
@@ -1737,6 +1804,18 @@ export class PaperDrawingEngine {
     this.scope.project.activeLayer.addChild(path);
   }
 
+  private applyRemoteEraser(data: any) {
+    if (!data.points || data.points.length === 0) return;
+
+    const eraserPath = new this.scope.Path({
+      segments: data.points.map((p: any) => new this.scope.Point(p.x, p.y)),
+      strokeWidth: data.strokeWidth || 10
+    });
+
+    this.performErase(eraserPath, data.strokeWidth || 10);
+    eraserPath.remove();
+  }
+
   private applyRemoteDrawBatchProgress(data: any) {
     if (!data.points || data.points.length === 0 || !data.strokeId) return;
     
@@ -1748,6 +1827,14 @@ export class PaperDrawingEngine {
         strokeCap: 'round',
         strokeJoin: 'round'
       });
+      
+      // Give eraser tracks a visible styling
+      if (data.tool === 'eraser') {
+        path.strokeColor = new this.scope.Color('#FFFFFF');
+        path.opacity = 0.5;
+        path.strokeWidth = (data.strokeWidth || 5) * 2;
+      }
+      
       this.scope.project.activeLayer.addChild(path);
       this.activeRemoteStrokes.set(data.strokeId, path);
     }
@@ -1770,6 +1857,65 @@ export class PaperDrawingEngine {
       // Alternatively, we can just leave it as is. But PixelTales' notifyDrawingComplete ALSO sends a full 'brush' event.
       // So let's remove the temporary batched path when the end arrives, because the full 'brush' payload will draw the final simplified path!
       path.remove();
+    }
+  }
+
+  private applyRemoteShapePreview(data: any) {
+    if (!data.strokeId) return;
+    
+    // Remove previous preview for this stroke if exists
+    const path = this.activeRemoteStrokes.get(data.strokeId);
+    if (path) {
+      path.remove();
+    }
+    
+    let newPath: any = null;
+    
+    try {
+      if (data.pathData || data.groupData) {
+        const jsonData = data.pathData || data.groupData;
+        newPath = this.scope.project.importJSON(jsonData);
+      } else if (data.tool === 'line') {
+         if (data.points && data.points.length >= 2) {
+            newPath = new this.scope.Path.Line({
+               from: new this.scope.Point(data.points[0].x, data.points[0].y),
+               to: new this.scope.Point(data.points[data.points.length - 1].x, data.points[data.points.length - 1].y)
+            });
+         }
+      } else if (data.shapeData?.bounds) {
+        const { x, y, width, height } = data.shapeData.bounds;
+        if (data.tool === 'rectangle') {
+          newPath = new this.scope.Path.Rectangle(new this.scope.Rectangle(x, y, width, height));
+        } else if (data.tool === 'circle') {
+          const center = new this.scope.Point(x + width / 2, y + height / 2);
+          newPath = new this.scope.Path.Ellipse({
+            center: center,
+            radius: new this.scope.Size(width / 2, height / 2)
+          });
+        } else if (data.points && data.points.length > 0) {
+           newPath = new this.scope.Path({
+              segments: data.points.map((p: any) => new this.scope.Point(p.x, p.y)),
+              closed: true
+           });
+        }
+      }
+      
+      if (newPath) {
+        this.applyRemoteShapeStyle(newPath, data);
+        this.scope.project.activeLayer.addChild(newPath);
+        this.activeRemoteStrokes.set(data.strokeId, newPath);
+      }
+    } catch (e) {
+      console.error('Failed to create remote shape preview:', e);
+    }
+  }
+
+  private applyRemoteShapePreviewEnd(data: any) {
+    if (!data.strokeId) return;
+    const path = this.activeRemoteStrokes.get(data.strokeId);
+    if (path) {
+      path.remove();
+      this.activeRemoteStrokes.delete(data.strokeId);
     }
   }
 

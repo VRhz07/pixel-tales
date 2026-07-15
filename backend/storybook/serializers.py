@@ -113,7 +113,8 @@ class StorySerializer(serializers.ModelSerializer):
                             authors.append(author.profile.display_name)
                         else:
                             authors.append(author.username)
-            return authors
+            # Remove duplicates and preserve order
+            return list(dict.fromkeys(authors))
         return []
 
 
@@ -346,7 +347,8 @@ class StoryListSerializer(serializers.ModelSerializer):
                             authors.append(author.profile.display_name)
                         else:
                             authors.append(author.username)
-            return authors
+            # Remove duplicates and preserve order
+            return list(dict.fromkeys(authors))
         return []
 
     def get_average_rating(self, obj):

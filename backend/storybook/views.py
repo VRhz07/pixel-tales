@@ -151,7 +151,7 @@ def story_list(request):
         print(f" Public library: {stories.count()} published stories from all users")
     elif request.user.is_authenticated:
         # Return user's own stories (including drafts)
-        stories = Story.objects.filter(author=request.user).order_by('-date_created')
+        stories = Story.objects.filter(Q(author=request.user) | Q(authors=request.user)).distinct().order_by('-date_created')
         print(f" User {request.user.id} has {stories.count()} total stories")
         print(f"   Published: {stories.filter(is_published=True).count()}")
         print(f"   Drafts: {stories.filter(is_published=False).count()}")
@@ -238,8 +238,15 @@ def story_detail(request, story_id):
     """Get story details"""
     story = get_object_or_404(Story, id=story_id)
     
-    # Check if story is published or user is the owner
-    if not story.is_published and story.author != request.user:
+    # Check if story is published or user is the owner or co-author
+    is_owner_or_coauthor = False
+    if request.user.is_authenticated:
+        if story.author == request.user:
+            is_owner_or_coauthor = True
+        elif story.authors.filter(id=request.user.id).exists():
+            is_owner_or_coauthor = True
+            
+    if not story.is_published and not is_owner_or_coauthor:
         return Response({
             'error': 'Story not found or not published'
         }, status=status.HTTP_404_NOT_FOUND)
@@ -268,8 +275,20 @@ def story_detail(request, story_id):
 @api_view(['PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def update_story(request, story_id):
-    """Update a story (only by owner)"""
-    story = get_object_or_404(Story, id=story_id, author=request.user)
+    """Update a story (only by owner or co-author)"""
+    story = get_object_or_404(Story, id=story_id)
+    
+    # Check if user is owner or co-author
+    is_owner_or_coauthor = False
+    if story.author == request.user:
+        is_owner_or_coauthor = True
+    elif story.authors.filter(id=request.user.id).exists():
+        is_owner_or_coauthor = True
+        
+    if not is_owner_or_coauthor:
+        return Response({
+            'error': 'Permission denied. Only authors can update this story.'
+        }, status=status.HTTP_403_FORBIDDEN)
     
     serializer = StorySerializer(story, data=request.data, partial=True, context={'request': request})
     

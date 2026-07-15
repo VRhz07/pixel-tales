@@ -1,0 +1,284 @@
+# 🎨 PixelTales Collaboration Sync — Bug Report & Fix Plan
+
+> **Status:** Documented, Not Yet Implemented  
+> **Date:** 2026-07-13  
+> **Analyzed by:** Antigravity (Frontend + Mobile Agent)
+
+---
+
+## 🐛 Reported Bugs
+
+### Bug 1 — Canvas Not Synced on Entry
+> *"When I go inside the canvas there is no drawing of the other user, but only see cursors and drawings when they stroke"*
+
+**What happens:**  
+User B enters the canvas mid-session. The canvas appears blank or shows only their own local data. The other person's existing drawings are invisible. Only new strokes drawn **after** B enters become visible.
+
+### Bug 2 — Clear Canvas Shows Ghost Data on Re-entry
+> *"I tried to clear the canvas both of us, and when I go in again I saw some drawings instead of a cleared canvas"*
+
+**What happens:**  
+Both users clear the canvas (collaboration `clear` event fires). The in-memory Paper.js canvas is cleared correctly. But when either user navigates away and comes back to the canvas, the **old drawings reappear** because they are still saved in local storage.
+
+### Bug 3 — Shapes / Eraser Not Visible Until Released
+> *"It's not consistent — you only see the drawing when they stroke"*
+
+**What happens:**  
+Brush strokes are sent in real-time batches (every 10 points or 50ms). However, shapes (rectangle, circle, line, triangle, etc.) and the eraser tool are only sent **once on mouse-up** — meaning the remote user sees nothing until the other person finishes the stroke.
+
+---
+
+## 🔍 Root Cause Analysis
+
+### Bug 1 Root Cause — No Initial State Request on Canvas Entry
+
+**File:** `frontend/src/pages/CanvasDrawingPage.tsx` (~line 783–910)
+
+When the canvas page mounts, it loads canvas data exclusively from **local `storyStore`** (IndexedDB/localStorage). It never requests the live, current canvas state from the other connected user via WebSocket.
+
+The full sync flow (`handle_request_sync` → `request_canvas_state` → `receive_canvas_state`) **exists in the backend** (`consumers.py` lines 842–935) but is **never triggered by the frontend on canvas entry during a live collaboration session**.
+
+```
+Current flow on canvas entry:
+  Mount → load from storyStore (local) → show stale or empty canvas ❌
+
+Required flow on canvas entry:
+  Mount + isCollaborating → request canvas state via WS → receive snapshot → render ✅
+```
+
+**Key backend handlers that already exist (unused):**
+- `handle_request_sync` (consumers.py:842) — accepts a `request_sync` message, fetches from DB or asks peers
+- `handle_canvas_state` (consumers.py:878) — receives a canvas snapshot, saves to DB
+- `receive_canvas_state` (consumers.py:924) — delivers snapshot to the requesting user
+
+---
+
+### Bug 2 Root Cause — Clear Event Doesn't Invalidate Local Cache
+
+**File:** `frontend/src/pages/CanvasDrawingPage.tsx` (~line 1750+)  
+**File:** `frontend/src/stores/storyStore.ts`
+
+The `canvas_cleared` WebSocket event handler calls `removeChildren()` on the active Paper.js layer — clearing the **in-memory** canvas. However, it does **not** call `saveCanvasData(storyId, pageId, null)` to wipe the locally persisted snapshot.
+
+When the user navigates away and re-enters the canvas, `CanvasDrawingPage` re-initializes and calls `getCanvasData(storyId, pageId)` from `storyStore` — which still returns the **old data** because it was never cleared.
+
+```
+Clear event handler (current):
+  canvas_cleared → paper.js removeChildren() ✅ | storyStore still has old data ❌
+
+Clear event handler (required):
+  canvas_cleared → paper.js removeChildren() ✅ + saveCanvasData(id, pageId, null) ✅
+```
+
+---
+
+### Bug 3 Root Cause — Shape/Eraser Tools Are Not Streamed
+
+**File:** `frontend/src/components/canvas/PaperDrawingEngine.ts`
+
+The brush tool uses `continueBrushStroke()` which calls `flushBatchedPoints()` — sending a `draw_batch_progress` message every 10 points or 50ms. This gives real-time feedback.
+
+All other tools send data **only in `handleMouseUp`** via `notifyDrawingComplete()`. The remote user sees nothing until the drawing is finished.
+
+| Tool | When data is sent | Remote experience |
+|---|---|---|
+| `brush` | Every 10 pts / 50ms | ✅ Real-time smooth |
+| `eraser` | On mouse-up only | ❌ Invisible during drag |
+| `rectangle` | On mouse-up only | ❌ Invisible during drag |
+| `circle` | On mouse-up only | ❌ Invisible during drag |
+| `line` | On mouse-up only | ❌ Invisible during drag |
+| `triangle/star/heart/arrow` | On mouse-up only | ❌ Invisible during drag |
+| `text` | On confirm | ✅ Acceptable |
+| `fill` | Immediately | ✅ Real-time |
+
+---
+
+## ✅ Proposed Solutions
+
+### Option A — Quick Fix (Recommended First Step, ~2-3 hours)
+
+Addresses Bugs 1 and 2. Requires changes to 2 files.
+
+#### Fix 1: Request canvas state on canvas entry
+
+**Where:** `CanvasDrawingPage.tsx` — in the collaboration `useEffect` (around line 1380-1490 where collaboration events are wired up)
+
+**What to add:**
+```typescript
+// When canvas page mounts and we're in a collab session, request the current state
+useEffect(() => {
+  if (!isCollaborating || !collaborationService.isConnected()) return;
+
+  const pageKey = isCoverImage ? 'cover_image' : (pageId || `page_${pageIndex}`);
+  
+  console.log('🔄 Requesting canvas state from collaborators on entry...');
+  collaborationService.sendMessage({
+    type: 'request_sync',
+    data: {
+      page_id: pageKey,
+      page_index: isCoverImage ? -1 : (pageIndex ?? 0),
+      is_cover_image: isCoverImage || false,
+    }
+  });
+}, [isCollaborating, pageId, isCoverImage]); // Re-run on page change
+```
+
+**Also add a handler for `canvas_state` response:**
+```typescript
+const handleCanvasStateReceived = (message: any) => {
+  if (!drawingEngineRef.current) return;
+  if (!message.canvas_data) return;
+
+  const { page_id, canvas_data } = message;
+  const currentPageKey = isCoverImage ? 'cover_image' : (pageId || `page_${pageIndex}`);
+  
+  // Only apply if it's for the current page
+  if (page_id !== currentPageKey) return;
+
+  console.log('📥 Received canvas state from collaborator, loading...');
+  drawingEngineRef.current.loadDrawingState(canvas_data);
+};
+
+collaborationService.on('canvas_state', handleCanvasStateReceived);
+```
+
+**Also make the host auto-send their state when requested:**
+```typescript
+const handleRequestCanvasState = (message: any) => {
+  if (!drawingEngineRef.current || !isCollaborating) return;
+
+  const currentPageKey = isCoverImage ? 'cover_image' : (pageId || `page_${pageIndex}`);
+  if (message.page_id !== currentPageKey) return;
+
+  // Export current canvas and send it
+  const canvasData = drawingEngineRef.current.getCanvasData(); // paper.js JSON export
+  collaborationService.sendMessage({
+    type: 'canvas_state',
+    data: {
+      target_user_id: message.requesting_user_id,
+      canvas_data: canvasData,
+      page_id: currentPageKey,
+      page_index: isCoverImage ? -1 : (pageIndex ?? 0),
+      is_cover_image: isCoverImage || false,
+    }
+  });
+};
+
+collaborationService.on('request_canvas_state', handleRequestCanvasState);
+```
+
+---
+
+#### Fix 2: Invalidate local cache on canvas clear
+
+**Where:** `CanvasDrawingPage.tsx` — in the `canvas_cleared` event handler
+
+**Find the existing handler and add the cache invalidation:**
+```typescript
+// In the handleClear / canvas_cleared event handler:
+const handleClear = (message: any) => {
+  const clearedPageId = message.page_id;
+  const currentPageKey = isCoverImage ? 'cover_image' : (pageId || `page_${pageIndex}`);
+  
+  if (clearedPageId !== currentPageKey) return;
+  
+  // Clear Paper.js canvas in memory
+  if (drawingEngineRef.current) {
+    drawingEngineRef.current.clearCanvas();
+  }
+
+  // ✅ NEW: Also clear local storyStore cache so re-entry shows blank canvas
+  if (storyId) {
+    saveCanvasData(storyId, pageId!, null); // wipe the page data
+    console.log('🗑️ Cleared local canvas cache for page:', pageId);
+  }
+};
+```
+
+---
+
+### Option B — Recommended Follow-up: Server-Authoritative Snapshot (1-2 days)
+
+This makes the collaboration system truly professional by making the **server** the single source of truth for canvas state.
+
+**Architecture:**
+
+```
+Host draws → every 5s → send canvas_state to server (Paper.js JSON export)
+Server stores it in canvas_state JSONField (already exists in CollaborationSession model)
+Any user enters canvas → server sends latest snapshot
+User applies snapshot → then receives/replays any deltas since snapshot
+```
+
+**Frontend changes needed:**
+1. Auto-save `paper.js exportJSON()` to server every 5 seconds in a `setInterval` during collaboration
+2. On canvas entry (`useEffect`), first request server snapshot, then wire up live drawing events
+
+**Backend changes needed:**
+1. `handle_canvas_state` (already exists) — stores JSON in `canvas_state` field ✅
+2. `handle_request_sync` (already exists) — reads from `canvas_state` and sends back ✅
+3. Nothing to add on the backend — it's already built!
+
+The backend plumbing is **100% done**. Only the frontend needs to be wired up.
+
+---
+
+### Option C — Shape Preview Streaming (Bug 3 fix, ~3 hours)
+
+Stream shape previews during drag by adding intermediate messages:
+
+**In `PaperDrawingEngine.ts` → `updateShape()` method:**
+```typescript
+private updateShape(point: paper.Point) {
+  // ... existing shape update logic ...
+  
+  // ✅ NEW: Send shape preview to collaborators during drag
+  if (this.onDrawingComplete && this.currentPath && this.shapeStartPoint) {
+    this.onDrawingComplete({
+      type: 'shape_preview',
+      tool: this.currentTool,
+      startPoint: { x: this.shapeStartPoint.x, y: this.shapeStartPoint.y },
+      endPoint: { x: point.x, y: point.y },
+      strokeColor: this.currentColor,
+      strokeWidth: this.currentSize,
+      filled: this.shapeFilled,
+      opacity: this.currentOpacity
+    });
+  }
+}
+```
+
+**Remote rendering:** Use a separate `previewLayer` in Paper.js that gets cleared on each `shape_preview` message and redrawn with the new shape. On `mouseup`, replace preview with the final committed shape.
+
+---
+
+## 📁 Key Files Reference
+
+| File | Role |
+|---|---|
+| `frontend/src/pages/CanvasDrawingPage.tsx` | Main canvas page — where Bugs 1 & 2 fixes go |
+| `frontend/src/components/canvas/PaperDrawingEngine.ts` | Drawing engine — where Bug 3 fix goes |
+| `frontend/src/components/canvas/CollaborationEnhancer.ts` | Advanced collab ops (text, layer, transform) |
+| `frontend/src/services/collaborationService.ts` | WebSocket service |
+| `backend/storybook/consumers.py` | WebSocket consumer — all server handlers |
+| `backend/storybook/models.py` (line 516) | `CollaborationSession.canvas_state` JSONField |
+
+---
+
+## 🚦 Priority Order for Implementation
+
+| Priority | Fix | Bug | Effort |
+|---|---|---|---|
+| 🔴 P0 | Request canvas state on entry | Bug 1 | ~1.5 hrs |
+| 🔴 P0 | Clear local cache on canvas_cleared | Bug 2 | ~30 min |
+| 🟡 P1 | Auto-save canvas state to server (Option B) | Bug 1 long-term | ~3 hrs |
+| 🟢 P2 | Shape preview streaming | Bug 3 | ~3 hrs |
+
+---
+
+## 💡 Notes
+
+- The backend WebSocket consumer already has **all the infrastructure needed** for Option A and B. No Django/Python work is required.
+- The `PaperDrawingEngine.getCanvasData()` method (line 2057) exports the full Paper.js project as JSON — this is what should be sent as the canvas snapshot.
+- The `loadDrawingState()` method can receive and restore a Paper.js JSON export — this is how the receiver applies it.
+- The `collaborationService` already has `sendMessage()` which can send arbitrary typed messages to the WebSocket.

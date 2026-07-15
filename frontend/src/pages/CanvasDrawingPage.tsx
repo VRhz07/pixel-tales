@@ -654,7 +654,7 @@ const CanvasDrawingPage: React.FC = () => {
                 'final page_index': enhancedData.page_index
               });
               
-              if (data.type === 'draw_batch_progress' || data.type === 'draw_batch_end') {
+              if (data.type === 'draw_batch_progress' || data.type === 'draw_batch_end' || data.type === 'shape_preview' || data.type === 'shape_preview_end') {
                 // Send transient updates using draw_batch
                 collaborationService.sendDrawingBatch([{
                   ...enhancedData,
@@ -1259,6 +1259,16 @@ const CanvasDrawingPage: React.FC = () => {
         
         saveCanvasData(storyId, COVER_OPERATIONS_KEY, updatedCanvasData);
         console.log('💾 Saved COVER IMAGE with', existingOperations.length, 'operations and full state');
+        
+        // Send snapshot to collaboration server
+        if (isCollaborating && collaborationService.isConnected()) {
+          collaborationService.sendCanvasSnapshot(
+            'cover_image',
+            true,
+            canvasData
+          );
+          console.log('📤 Sent cover image snapshot to collaboration server');
+        }
       } else if (pageId) {
         // Always save with full state for both collaboration and solo mode
         const existingData = getCanvasData(storyId, pageId);
@@ -1278,6 +1288,16 @@ const CanvasDrawingPage: React.FC = () => {
         
         saveCanvasData(storyId, pageId, updatedCanvasData);
         console.log('💾 Saved canvas with', existingOperations.length, 'operations and full state');
+        
+        // Send snapshot to collaboration server
+        if (isCollaborating && collaborationService.isConnected()) {
+          collaborationService.sendCanvasSnapshot(
+            pageId,
+            false,
+            canvasData
+          );
+          console.log('📤 Sent canvas snapshot to collaboration server');
+        }
       }
       
       // Mark story as draft since canvas was modified

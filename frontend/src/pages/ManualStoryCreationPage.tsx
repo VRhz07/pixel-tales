@@ -1134,9 +1134,31 @@ const ManualStoryCreationPage: React.FC = () => {
           }
         };
 
-        const handleSessionEnded = (message: any) => {
+        const handleSessionEnded = async (message: any) => {
       console.log('🎬 Session ended message received:', message);
           
+      if (message.story_id) {
+        if (currentStory) {
+          // This is a finalized session, update local story with backend ID
+          useStoryStore.getState().updateStory(currentStory.id, {
+            backendId: message.story_id,
+            isPublished: true,
+            isDraft: false,
+            creationType: 'collaborative'
+          });
+          console.log(`✅ Set local story to published with backendId ${message.story_id}`);
+        }
+        
+        // Wait for backend stories to sync so library is updated immediately
+        try {
+          console.log('📥 Fetching stories from backend to get collaborative story...');
+          await useStoryStore.getState().loadStoriesFromBackend();
+          console.log(`✅ Fetched updated collaborative story from backend!`);
+        } catch (err) {
+          console.warn('⚠️ Failed to fetch from backend on session end', err);
+        }
+      }
+
       // Clear all safety timeouts
           if ((window as any).sessionEndTimeoutId) {
             clearTimeout((window as any).sessionEndTimeoutId);
@@ -2267,7 +2289,8 @@ const ManualStoryCreationPage: React.FC = () => {
           ...currentDraft.story_draft,
           genres: genres, // Array of genre strings
           category: genres.length > 0 ? genres[0].toLowerCase().replace(/\s+/g, '_') : 'other',
-          summary: description || ''
+          summary: description || '',
+          language: language
         };
         await collaborationService.updateDraft(currentSessionId, updatedDraft);
         console.log('✅ Collaboration draft updated with genres:', genres);
@@ -2281,12 +2304,16 @@ const ManualStoryCreationPage: React.FC = () => {
     markAsSaved(currentStory.id);
     setHasUnsavedChanges(false);
     
-    // Immediately sync to backend to get backendId for publishing
-    try {
-      await syncStoryToBackend(currentStory.id);
-    } catch (error) {
-      console.error('Failed to sync story to backend:', error);
-      // Continue anyway - story is saved locally
+    // Immediately sync to backend to get backendId for publishing (skip if collaborating, as finalize will handle it)
+    if (!(isCollaborating && currentSessionId && wasVoteInitiator)) {
+      try {
+        await syncStoryToBackend(currentStory.id);
+      } catch (error) {
+        console.error('Failed to sync story to backend:', error);
+        // Continue anyway - story is saved locally
+      }
+    } else {
+      console.log('Skipping syncStoryToBackend because finalize_collaborative_story will handle creation');
     }
     
     // Award skill points for writing

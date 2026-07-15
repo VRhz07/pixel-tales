@@ -488,7 +488,8 @@ class StoryApiService {
         canvasPages = [];
       }
       
-      const contentPages = (apiStory.content || '').split('\n\n---PAGE BREAK---\n\n');
+      // Use regex split to robustly handle \r\n (Windows newlines) and extra spaces
+      const contentPages = (apiStory.content || '').split(/(?:\r?\n)*\s*---PAGE BREAK---\s*(?:\r?\n)*/);
       
       console.log('📄 Parsed canvas pages:', canvasPages.length);
       console.log('📄 Content pages:', contentPages.length);
@@ -498,7 +499,7 @@ class StoryApiService {
       
       pages = actualPages.map((canvasPage: any, index: number) => ({
         id: canvasPage.id || `page-${index}`,
-        text: contentPages[index] || '',
+        text: (contentPages[index] || '').trim(),
         canvasData: canvasPage.canvasData,
         characterIds: [],
         order: canvasPage.order || index,
