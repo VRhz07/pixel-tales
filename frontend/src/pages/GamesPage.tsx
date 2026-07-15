@@ -1,4 +1,5 @@
 import React, { useState, useEffect, forwardRef } from 'react';
+import { StoryGridSkeleton } from '../components/ui/StoryCardSkeleton';
 import { useNavigate } from 'react-router-dom';
 import { VirtuosoGrid } from 'react-virtuoso';
 import { WifiOff, Gamepad2 } from 'lucide-react';
@@ -138,8 +139,14 @@ const GamesPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="games-loading">
-        <p>Loading games...</p>
+      <div className="games-page" style={{ height: '100vh', overflowY: 'auto' }}>
+        <div className="games-page-header">
+          <h1 className="games-page-title">Story Games</h1>
+          <p className="games-page-subtitle">Play games based on your favorite stories</p>
+        </div>
+        <div className="p-4">
+          <StoryGridSkeleton count={8} />
+        </div>
       </div>
     );
   }

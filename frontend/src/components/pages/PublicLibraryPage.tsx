@@ -152,6 +152,8 @@ const mockPublicStories = {
   ]
 };
 
+import { StoryGridSkeleton } from '../ui/StoryCardSkeleton';
+
 const PublicLibraryPage = () => {
   const navigate = useNavigate();
   const { t } = useI18nStore();
@@ -416,11 +418,14 @@ const PublicLibraryPage = () => {
 
   if (isLoading) {
     return (
-      <div className="library-page-content">
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#9CA3AF' }}>
-          <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>📚</div>
-          <p>Loading published stories...</p>
+      <div className="library-page-content p-4">
+        <div className="library-header mb-6">
+          <div className="library-header-content">
+            <h1 className="library-title">Public Library</h1>
+            <p className="library-subtitle">Discover amazing stories from our community</p>
+          </div>
         </div>
+        <StoryGridSkeleton count={8} />
       </div>
     );
   }

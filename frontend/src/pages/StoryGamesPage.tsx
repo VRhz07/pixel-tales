@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Skeleton } from '../components/ui/Skeleton';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Pencil, PenLine, ALargeSmall, Gamepad2, WifiOff, CheckCircle2, Play, X, RefreshCw, Clock } from 'lucide-react';
 import api from '../services/api';
@@ -192,8 +193,22 @@ const StoryGamesPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="story-games-loading">
-        <p>Loading games...</p>
+      <div className="story-games-page">
+        <div className="story-games-header">
+          <button className="back-button" disabled>← Back to Games</button>
+          <Skeleton className="h-10 w-64 rounded-xl mx-auto mt-2" />
+          <p className="story-subtitle">Choose a game to play</p>
+        </div>
+        <div className="games-list mt-8">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="game-card h-64 flex flex-col items-center justify-center p-6 border-2 border-white/20 bg-white/40 dark:bg-slate-800/40 rounded-2xl">
+              <Skeleton className="h-16 w-16 rounded-2xl mb-4" />
+              <Skeleton className="h-6 w-32 rounded-lg mb-2" />
+              <Skeleton className="h-4 w-24 rounded-lg mb-6" />
+              <Skeleton className="h-12 w-full rounded-full" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Skeleton } from '../components/ui/Skeleton';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { App as CapacitorApp } from '@capacitor/app';
 import api from '../services/api';
@@ -717,8 +718,15 @@ const GamePlayPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="gameplay-loading">
-        <p>Loading game...</p>
+      <div className="gameplay-page" style={{ minHeight: '100vh', padding: '2rem 1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Skeleton className="h-6 w-32 rounded-full mb-8" />
+        <Skeleton className="h-10 w-3/4 max-w-md rounded-xl mb-12" />
+        <div className="w-full max-w-md flex flex-col gap-4">
+          <Skeleton className="h-16 w-full rounded-2xl" />
+          <Skeleton className="h-16 w-full rounded-2xl" />
+          <Skeleton className="h-16 w-full rounded-2xl" />
+          <Skeleton className="h-16 w-full rounded-2xl" />
+        </div>
       </div>
     );
   }

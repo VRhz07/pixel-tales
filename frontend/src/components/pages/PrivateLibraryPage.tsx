@@ -26,6 +26,8 @@ import {
 
 type FilterType = 'all' | 'drafts' | 'works' | 'saved' | 'offline' | 'preinstalled';
 
+import { StoryGridSkeleton } from '../ui/StoryCardSkeleton';
+
 const PrivateLibraryPage = () => {
   const navigate = useNavigate();
   const { t } = useI18nStore();
@@ -856,7 +858,7 @@ const PrivateLibraryPage = () => {
 
           {isLoadingSaved ? (
             <div className="library-empty-state">
-              <p>Loading saved stories...</p>
+              <StoryGridSkeleton count={4} />
             </div>
           ) : filteredSaved.length === 0 ? (
             <div className="library-empty-state">

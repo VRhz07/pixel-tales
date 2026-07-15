@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Skeleton } from '../ui/Skeleton';
 import '../../styles/enhanced-social.css';
 import { 
   UserPlusIcon, 
@@ -536,9 +537,32 @@ const EnhancedSocialPage = () => {
   if (isLoading) {
     return (
       <div className="social-page-container">
-        <div className="loading-container">
-          <div className="loading-spinner">⏳</div>
-          <p>Loading your friends...</p>
+        <div className="social-tabs-container mb-6">
+          <Skeleton className="h-12 w-32 rounded-full" />
+          <Skeleton className="h-12 w-32 rounded-full" />
+          <Skeleton className="h-12 w-32 rounded-full" />
+        </div>
+        <div className="social-tab-content">
+          <div className="social-section">
+            <div className="flex justify-between items-center mb-6">
+              <Skeleton className="h-8 w-48 rounded-md" />
+              <div className="flex gap-2">
+                <Skeleton className="h-10 w-32 rounded-full" />
+                <Skeleton className="h-10 w-32 rounded-full" />
+              </div>
+            </div>
+            <div className="friends-grid">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="friend-card h-24 p-4 flex items-center gap-4 border border-white/20 bg-white/40 dark:bg-slate-800/40 rounded-2xl">
+                  <Skeleton className="h-14 w-14 rounded-full" />
+                  <div className="flex flex-col gap-2">
+                    <Skeleton className="h-5 w-24 rounded-md" />
+                    <Skeleton className="h-4 w-32 rounded-md" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -1220,9 +1244,19 @@ const EnhancedSocialPage = () => {
 
             <div className="modal-results-large">
               {isLoadingUsers ? (
-                <div className="loading-state-large">
-                  <div className="loading-icon flex justify-center mb-2"><Hourglass size={48} className="text-gray-400 animate-pulse" /></div>
-                  <p>Finding friends...</p>
+                <div className="flex flex-col gap-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="user-search-result p-3 flex items-center justify-between border border-white/20 bg-white/40 dark:bg-slate-800/40 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-12 w-12 rounded-full" />
+                        <div className="flex flex-col gap-2">
+                          <Skeleton className="h-5 w-24 rounded-md" />
+                          <Skeleton className="h-4 w-16 rounded-md" />
+                        </div>
+                      </div>
+                      <Skeleton className="h-8 w-24 rounded-full" />
+                    </div>
+                  ))}
                 </div>
               ) : isSearching ? (
                 <div className="loading-state-large">

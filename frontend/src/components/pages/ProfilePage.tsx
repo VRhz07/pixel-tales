@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Skeleton } from '../ui/Skeleton';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../../stores/userStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -331,9 +332,39 @@ const ProfilePage = () => {
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '40px', color: '#9ca3af' }}>
-          {t('profile.loadingAchievements')}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', 
+          gap: '20px',
+          marginBottom: '32px'
+        }}>
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} style={{
+              background: isDarkMode ? '#2a2435' : '#ffffff',
+              borderRadius: '16px',
+              padding: '24px',
+              border: `3px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                <Skeleton className="h-16 w-16 rounded-xl" />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <Skeleton className="h-6 w-32 rounded-md" />
+                  <Skeleton className="h-4 w-24 rounded-md" />
+                </div>
+                <Skeleton className="h-10 w-16 rounded-xl" />
+              </div>
+              <Skeleton className="h-2 w-full rounded-full mb-4" />
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {[1, 2, 3, 4].map(j => (
+                  <Skeleton key={j} className="h-9 w-9 rounded-lg" />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
+
+
+
       ) : (
         <>
           {/* Category Cards Grid */}
