@@ -2,15 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import {
-  UserIcon,
-  QuestionMarkCircleIcon,
-  SpeakerWaveIcon,
-  ChevronRightIcon,
-  ArrowRightOnRectangleIcon,
-  TrashIcon,
-  SwatchIcon,
-  ArrowLeftIcon
-} from '@heroicons/react/24/outline';
+  Volume1,
+  Volume2,
+  Music,
+  Music2,
+  AlertTriangle,
+  HandMetal,
+  NotebookPen,
+  User,
+  Baby,
+  Lightbulb,
+  Sparkles,
+  CheckCircle,
+  Palette,
+  LogOut,
+  Trash2,
+  ArrowLeft
+} from 'lucide-react';
 import Logo from '../common/Logo';
 import { useAuthStore } from '../../stores/authStore';
 import { useThemeStore } from '../../stores/themeStore';
@@ -236,7 +244,7 @@ const SettingsPage = () => {
       {/* Success Message */}
       {successMessage && (
         <div className="mx-6 mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
-          <span className="text-green-600 text-xl">✓</span>
+          <CheckCircle size={20} className="text-green-600" />
           <p className="text-sm text-green-800 font-medium">{successMessage}</p>
         </div>
       )}
@@ -245,7 +253,7 @@ const SettingsPage = () => {
       {isAnonymous && (
         <div className="mx-6 mb-4 p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
           <p className="text-sm text-purple-900 dark:text-purple-100 font-medium mb-2">
-            👋 {t('settings.browsingAsGuest')}
+            <HandMetal size={18} className="inline-block mr-1" /> {t('settings.browsingAsGuest')}
           </p>
           <p className="text-xs text-purple-700 dark:text-purple-300 mb-3">
             {t('settings.signUpPrompt')}
@@ -265,7 +273,7 @@ const SettingsPage = () => {
         <>
           <div className="settings-section-header">
             <h2>
-              <UserIcon className="settings-section-icon" />
+              <User size={16} className="settings-section-icon" />
               Account
             </h2>
           </div>
@@ -327,7 +335,7 @@ const SettingsPage = () => {
       {/* Appearance Section */}
       <div className="settings-section-header">
         <h2>
-          <SwatchIcon className="settings-section-icon" />
+          <Palette size={16} className="settings-section-icon" />
           Appearance
         </h2>
       </div>
@@ -375,8 +383,8 @@ const SettingsPage = () => {
           </div>
           <CustomDropdown
             options={[
-              { value: 'en', label: '🇺🇸 English' },
-              { value: 'tl', label: '🇵🇭 Tagalog' }
+              { value: 'en', label: 'US English' },
+              { value: 'tl', label: 'PH Tagalog' }
             ]}
             value={language}
             onChange={(value) => {
@@ -421,7 +429,7 @@ const SettingsPage = () => {
               </div>
             </div>
             <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
-              <span style={{ fontSize: '1.25rem' }}>🔈</span>
+              <Volume1 size={20} className="text-gray-400" />
               <input
                 type="range"
                 min="0"
@@ -441,7 +449,7 @@ const SettingsPage = () => {
                   cursor: 'pointer',
                 }}
               />
-              <span style={{ fontSize: '1.25rem' }}>🔊</span>
+              <Volume2 size={20} className="text-gray-400" />
             </div>
           </div>
         )}
@@ -451,7 +459,7 @@ const SettingsPage = () => {
           <>
             <div className="settings-item">
               <div className="settings-item-content">
-                <div className="settings-item-title">🎵 Background Music</div>
+                <div className="settings-item-title"><Music size={16} className="inline-block mr-1" /> Background Music</div>
                 <div className="settings-item-subtitle">
                   {backgroundMusicEnabled ? t('settings.playfulMusic') : t('settings.musicDisabled')}
                 </div>
@@ -487,7 +495,7 @@ const SettingsPage = () => {
                     </div>
                   </div>
                   <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}>
-                    <span style={{ fontSize: '1.25rem' }}>🎵</span>
+                    <Music size={20} className="text-gray-400" />
                     <input
                       type="range"
                       min="0"
@@ -505,7 +513,7 @@ const SettingsPage = () => {
                         cursor: 'pointer',
                       }}
                     />
-                    <span style={{ fontSize: '1.25rem' }}>🎶</span>
+                    <Music2 size={20} className="text-gray-400" />
                   </div>
                 </div>
 
@@ -583,7 +591,7 @@ const SettingsPage = () => {
                     padding: '0 1rem',
                     textAlign: 'center',
                   }}>
-                    💡 {t('settings.randomTrackTip')}
+                    <Lightbulb size={14} className="inline-block mr-1 text-yellow-500" /> {t('settings.randomTrackTip')}
                   </p>
                 </div>
               </>
@@ -599,7 +607,7 @@ const SettingsPage = () => {
             onClick={handleSignOut}
             className="settings-sign-out-button"
           >
-            <ArrowRightOnRectangleIcon className="h-4 w-4" />
+            <LogOut size={16} className="h-4 w-4" />
             <span>{t('settings.signOut')}</span>
           </button>
 
@@ -607,7 +615,7 @@ const SettingsPage = () => {
             onClick={handleDeleteAccount}
             className="settings-button-destructive w-full px-6 py-3"
           >
-            <TrashIcon className="h-4 w-4" />
+            <Trash2 size={16} className="h-4 w-4" />
             <span>{t('settings.deleteAccount')}</span>
           </button>
         </div>
@@ -617,7 +625,7 @@ const SettingsPage = () => {
       {!isAnonymous && currentUser?.user_type === 'child' && (
         <div className="mx-6 mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
           <p className="text-sm text-blue-900 dark:text-blue-100 font-medium mb-1">
-            👶 Child Account
+            <Baby size={16} className="inline-block mr-1" /> Child Account
           </p>
           <p className="text-xs text-blue-700 dark:text-blue-300">
             Your account is managed by your parent or teacher. They can update your profile, change your password, and manage other account settings through their dashboard.
@@ -629,7 +637,7 @@ const SettingsPage = () => {
       {isAnonymous && (
         <div className="mx-6 mb-6 p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
           <p className="text-sm text-purple-900 dark:text-purple-100 font-medium mb-2">
-            📝 Sign up to save your settings
+            <NotebookPen size={16} className="inline-block mr-1" /> Sign up to save your settings
           </p>
           <p className="text-xs text-purple-700 dark:text-purple-300">
             Create a free account to customize your experience and access all features.
@@ -647,7 +655,7 @@ const SettingsPage = () => {
           }}
         >
           <p className="text-sm font-semibold mb-2" style={{ color: '#667eea' }}>
-            👨‍👩‍👧‍👦 Viewing as Child Account
+            <User size={14} className="inline-block mr-1" /> Viewing as Child Account
           </p>
           <p className="text-xs mb-3" style={{ color: '#764ba2', opacity: 0.9 }}>
             You are currently viewing the app from your child's perspective. Click below to return to your parent dashboard.
@@ -678,7 +686,7 @@ const SettingsPage = () => {
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
             }}
           >
-            <ArrowLeftIcon className="w-4 h-4" />
+            <ArrowLeft size={16} className="w-4 h-4" />
             Back to {parentName}
           </button>
         </div>
@@ -717,7 +725,7 @@ const SettingsPage = () => {
         <div className="settings-app-version">{t('settings.version')} 1.0.0</div>
         <div className="settings-app-tagline">
           <span>{t('settings.madeWith')}</span>
-          <span>✨</span>
+          <Sparkles size={16} className="inline-block" />
           <span>{t('settings.forYoungCreators')}</span>
         </div>
       </div>
@@ -782,7 +790,7 @@ const SettingsPage = () => {
           {/* Warning Icon */}
           <div className="delete-modal-icon">
             <div className="delete-modal-icon-circle">
-              <TrashIcon />
+              <Trash2 size={32} className="text-red-500" />
             </div>
           </div>
 
@@ -794,7 +802,7 @@ const SettingsPage = () => {
           {/* Warning Message */}
           <div className="delete-modal-warning">
             <p className="delete-modal-warning-title">
-              ⚠️ {t('deleteAccount.warning')}
+              <AlertTriangle size={16} className="inline-block mr-1 text-amber-600" /> {t('deleteAccount.warning')}
             </p>
             <p className="delete-modal-warning-text">
               {t('deleteAccount.permanentDelete')}

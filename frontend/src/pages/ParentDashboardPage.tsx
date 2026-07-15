@@ -17,6 +17,7 @@ import {
   BellIcon,
   BookmarkIcon
 } from '@heroicons/react/24/outline';
+import { TrendingUp, Target, LineChart, Trophy, PieChart, Volume2, Library, BookOpen, Sparkles, PenLine, Eye } from 'lucide-react';
 import Logo from '../components/common/Logo';
 import { useAuthStore } from '../stores/authStore';
 import { useThemeStore } from '../stores/themeStore';
@@ -569,7 +570,7 @@ const ParentDashboardPage: React.FC = () => {
             username: response.user.username,
             email: response.user.email,
             name: response.user.name,
-            avatar: response.user.avatar || '👤',
+            avatar: response.user.avatar || '',
             user_type: response.user.user_type,
             subscription_type: 'free' as const,
             is_verified: true,
@@ -868,7 +869,7 @@ const ParentDashboardPage: React.FC = () => {
                   {/* Engagement Insights */}
                   <section className="parent-section" style={{ marginTop: '24px' }}>
                     <div className="parent-section-header">
-                      <h2 className="parent-section-title">💡 Engagement Insights</h2>
+                      <h2 className="parent-section-title"><TrendingUp size={18} className="inline-block mr-1" /> Engagement Insights</h2>
                     </div>
                     <div className="engagement-insights-grid">
                       <div className="engagement-card engagement-card-teal">
@@ -903,7 +904,7 @@ const ParentDashboardPage: React.FC = () => {
                   {/* Learning Goals */}
                   <section className="parent-section" style={{ marginTop: '24px' }}>
                     <div className="parent-section-header">
-                      <h2 className="parent-section-title">🎯 Learning Goals</h2>
+                      <h2 className="parent-section-title"><Target size={18} className="inline-block mr-1" /> Learning Goals</h2>
                     </div>
                     <div className="parent-goals-list">
                       {learningGoals.length > 0 ? (
@@ -952,7 +953,7 @@ const ParentDashboardPage: React.FC = () => {
                   {/* Progress Timeline */}
                   <section className="parent-section" style={{ marginTop: '24px' }}>
                     <div className="parent-section-header">
-                      <h2 className="parent-section-title">📈 Progress Timeline</h2>
+                      <h2 className="parent-section-title"><LineChart size={18} className="inline-block mr-1" /> Progress Timeline</h2>
                       <select className="timeline-select">
                         <option>Last 7 Days</option>
                         <option>Last 30 Days</option>
@@ -1026,11 +1027,11 @@ const ParentDashboardPage: React.FC = () => {
                     {/* Milestones */}
                     <section className="parent-section">
                       <div className="parent-section-header">
-                        <h2 className="parent-section-title">🏆 Recent Milestones</h2>
+                        <h2 className="parent-section-title"><Trophy size={18} className="inline-block mr-1" /> Recent Milestones</h2>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {(analytics?.milestones && analytics.milestones.length > 0 ? analytics.milestones.slice(0, 4) : [
-                          { title: 'No milestones yet', date: null, icon: '🎯', color: '#9CA3AF', rarity: 'common' }
+                          { title: 'No milestones yet', date: null, icon: <Target size={16} />, color: '#9CA3AF', rarity: 'common' }
                         ]).map((milestone, index) => {
                           const formatDate = (dateStr: string | null) => {
                             if (!dateStr) return 'Keep going!';
@@ -1068,7 +1069,7 @@ const ParentDashboardPage: React.FC = () => {
                     {/* Category Breakdown with Pie Chart */}
                     <section className="parent-section">
                       <div className="parent-section-header">
-                        <h2 className="parent-section-title">📊 Category Distribution</h2>
+                        <h2 className="parent-section-title"><PieChart size={18} className="inline-block mr-1" /> Category Distribution</h2>
                       </div>
                       
                       {/* Pie Chart */}
@@ -1176,7 +1177,7 @@ const ParentDashboardPage: React.FC = () => {
                   {activitySubTab === 'notifications' && (
                     <section className="parent-section">
                       <div className="parent-section-header">
-                        <h2 className="parent-section-title">📢 Activity Notifications</h2>
+                        <h2 className="parent-section-title"><Volume2 size={18} className="inline-block mr-1" /> Activity Notifications</h2>
                       </div>
                       <div className="parent-activity-list">
                         {recentActivities.length > 0 ? (
@@ -1200,7 +1201,7 @@ const ParentDashboardPage: React.FC = () => {
                   {activitySubTab === 'library' && (
                     <section className="parent-section">
                       <div className="parent-section-header">
-                        <h2 className="parent-section-title">📚 Child's Library</h2>
+                        <h2 className="parent-section-title"><Library size={18} className="inline-block mr-1" /> Child's Library</h2>
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                           {statistics && (
                             <div style={{ display: 'flex', gap: '16px', fontSize: '14px', color: '#6B7280' }}>
@@ -1396,7 +1397,7 @@ const ParentDashboardPage: React.FC = () => {
                                   position: 'relative',
                                   flexShrink: 0
                                 }}>
-                                  {!story.cover_image && '📖'}
+                                  {!story.cover_image && <BookOpen size={40} style={{ color: 'rgba(255, 255, 255, 0.7)' }} />}
                                   {/* Status Badge */}
                                   <div style={{
                                     position: 'absolute',
@@ -1456,7 +1457,7 @@ const ParentDashboardPage: React.FC = () => {
                                         fontSize: '12px',
                                         fontWeight: '600'
                                       }}>
-                                        {story.creation_type === 'ai_assisted' ? '✨ AI' : '✏️ Manual'}
+                                        {story.creation_type === 'ai_assisted' ? <><Sparkles size={12} className="inline-block mr-1" /> AI</> : <><PenLine size={12} className="inline-block mr-1" /> Manual</>}
                                       </span>
                                     )}
                                   </div>
@@ -1501,7 +1502,7 @@ const ParentDashboardPage: React.FC = () => {
                                         {story.comments || 0}
                                       </span>
                                       <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                        👁️ {story.views || 0}
+                                        <Eye size={16} className="inline-block mr-1" /> {story.views || 0}
                                       </span>
                                     </div>
                                   )}

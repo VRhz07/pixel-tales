@@ -569,15 +569,7 @@ const PrivateLibraryPage = () => {
             />
           </div>
           
-          <div className="flex gap-2">
-            <button
-              className="library-create-story-button"
-              onClick={handleCreateNewStory}
-            >
-              <PencilIcon className="h-5 w-5" />
-              <span>{t('library.createNew')}</span>
-            </button>
-          </div>
+
         </div>
       </div>
 

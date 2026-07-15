@@ -30,7 +30,24 @@ import { useAuthStore } from '../../stores/authStore';
 import { useNotificationStore } from '../../stores/notificationStore';
 import AnonymousPrompt from '../ui/AnonymousPrompt';
 import { AvatarWithBorder } from '../common/AvatarWithBorder';
-
+import { 
+  BookOpen, 
+  MessageSquare, 
+  Save, 
+  Trophy, 
+  Users, 
+  Palette, 
+  Star, 
+  Award, 
+  PartyPopper, 
+  Eye, 
+  Book, 
+  Search,
+  Sparkles,
+  Heart,
+  Settings,
+  Hourglass
+} from 'lucide-react';
 const EnhancedSocialPage = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthStore();
@@ -413,15 +430,15 @@ const EnhancedSocialPage = () => {
 
   const getActivityIcon = (type: string) => {
     switch (type) {
-      case 'published': return '📚';
-      case 'liked': return '❤️';
-      case 'commented': return '💬';
-      case 'commented_on_your_story': return '💬';
-      case 'liked_your_story': return '❤️';
-      case 'saved_your_story': return '💾';
-      case 'achievement': return '🏆';
-      case 'followed': return '👥';
-      default: return '✨';
+      case 'published': return <BookOpen size={18} />;
+      case 'liked': return <Heart size={18} />;
+      case 'commented': return <MessageSquare size={18} />;
+      case 'commented_on_your_story': return <MessageSquare size={18} />;
+      case 'liked_your_story': return <Heart size={18} />;
+      case 'saved_your_story': return <Save size={18} />;
+      case 'achievement': return <Trophy size={18} />;
+      case 'followed': return <Users size={18} />;
+      default: return <Sparkles size={18} />;
     }
   };
 
@@ -598,11 +615,11 @@ const EnhancedSocialPage = () => {
                 </button>
               </div>
               <div className="friends-header-left">
-                <h2 className="social-section-title-large">
-                  👥 My Friends ({friends.length})
+                <h2 className="social-section-title-large flex items-center">
+                  <Users size={24} className="mr-2" /> My Friends ({friends.length})
                 </h2>
-                <span className="online-count">
-                  🟢 {friends.filter(f => f.is_online).length} online
+                <span className="online-count flex items-center">
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500 mr-1.5" /> {friends.filter(f => f.is_online).length} online
                 </span>
               </div>
             </div>
@@ -648,7 +665,7 @@ const EnhancedSocialPage = () => {
                                 animation: 'pulse 2s infinite',
                                 zIndex: 10
                               }}>
-                                🎨
+                                <Palette size={12} className="text-white" />
                               </div>
                             )}
                           </div>
@@ -659,12 +676,12 @@ const EnhancedSocialPage = () => {
                             {friend.name}
                           </div>
                           {collabInvite ? (
-                            <div className="text-purple-600 font-semibold text-xs sm:text-sm mt-1 truncate">
-                              📚 Collaboration: {collabInvite.story_title}
+                            <div className="text-purple-600 font-semibold text-xs sm:text-sm mt-1 truncate flex items-center">
+                              <BookOpen size={14} className="mr-1" /> Collaboration: {collabInvite.story_title}
                             </div>
                           ) : (
-                            <div className="friend-stats-small">
-                              📚 {friend.story_count} stories
+                            <div className="friend-stats-small flex items-center text-gray-500">
+                              <BookOpen size={14} className="mr-1" /> {friend.story_count} stories
                             </div>
                           )}
                         </div>
@@ -735,7 +752,7 @@ const EnhancedSocialPage = () => {
               </div>
             ) : (
               <div className="empty-state-large">
-                <div className="empty-state-icon">👥</div>
+                <div className="empty-state-icon"><Users size={48} className="text-gray-400" /></div>
                 <div className="empty-state-title">No friends yet!</div>
                 <div className="empty-state-text">Click "Add Friends" to find creators</div>
               </div>
@@ -748,8 +765,8 @@ const EnhancedSocialPage = () => {
       {activeTab === 'activity' && (
         <div className="social-tab-content">
           <div className="social-section">
-            <h2 className="social-section-title-large">
-              ✨ What's Happening
+            <h2 className="social-section-title-large flex items-center">
+              <Sparkles size={24} className="mr-2" /> What's Happening
             </h2>
             
             {activityFeed.length > 0 ? (
@@ -790,7 +807,7 @@ const EnhancedSocialPage = () => {
               </div>
             ) : (
               <div className="empty-state-large">
-                <div className="empty-state-icon">✨</div>
+                <div className="empty-state-icon"><Sparkles size={48} className="text-gray-400" /></div>
                 <div className="empty-state-title">No activity yet!</div>
                 <div className="empty-state-text">Your friends' activities will show here</div>
               </div>
@@ -803,8 +820,8 @@ const EnhancedSocialPage = () => {
       {activeTab === 'leaderboard' && (
         <div className="social-tab-content">
           <div className="social-section">
-            <h2 className="social-section-title-large">
-              🏆 Top Story Creators
+            <h2 className="social-section-title-large flex items-center">
+              <Trophy size={24} className="mr-2" /> Top Story Creators
             </h2>
             
             {/* Leaderboard Filter Buttons */}
@@ -813,28 +830,28 @@ const EnhancedSocialPage = () => {
                 className={`leaderboard-filter-btn ${leaderboardFilter === 'overall' ? 'filter-active' : ''}`}
                 onClick={() => setLeaderboardFilter('overall')}
               >
-                <span className="filter-icon">🌟</span>
+                <span className="filter-icon flex items-center justify-center mr-1"><Star size={16} /></span>
                 Overall
               </button>
               <button
                 className={`leaderboard-filter-btn ${leaderboardFilter === 'published' ? 'filter-active' : ''}`}
                 onClick={() => setLeaderboardFilter('published')}
               >
-                <span className="filter-icon">📚</span>
+                <span className="filter-icon flex items-center justify-center mr-1"><BookOpen size={16} /></span>
                 Published
               </button>
               <button
                 className={`leaderboard-filter-btn ${leaderboardFilter === 'likes' ? 'filter-active' : ''}`}
                 onClick={() => setLeaderboardFilter('likes')}
               >
-                <span className="filter-icon">❤️</span>
+                <span className="filter-icon flex items-center justify-center mr-1"><Heart size={16} /></span>
                 Likes
               </button>
               <button
                 className={`leaderboard-filter-btn ${leaderboardFilter === 'achievements' ? 'filter-active' : ''}`}
                 onClick={() => setLeaderboardFilter('achievements')}
               >
-                <span className="filter-icon">🏆</span>
+                <span className="filter-icon flex items-center justify-center mr-1"><Trophy size={16} /></span>
                 Achievements
               </button>
             </div>
@@ -844,9 +861,9 @@ const EnhancedSocialPage = () => {
                 {getFilteredLeaderboard().map((user, index) => (
                   <div key={user.id} className="leaderboard-card">
                     <div className="leaderboard-rank">
-                      {user.rank === 1 && <div className="rank-medal gold">🥇</div>}
-                      {user.rank === 2 && <div className="rank-medal silver">🥈</div>}
-                      {user.rank === 3 && <div className="rank-medal bronze">🥉</div>}
+                      {user.rank === 1 && <div className="rank-medal gold flex justify-center items-center"><Award size={20} className="text-yellow-500" /></div>}
+                      {user.rank === 2 && <div className="rank-medal silver flex justify-center items-center"><Award size={20} className="text-gray-400" /></div>}
+                      {user.rank === 3 && <div className="rank-medal bronze flex justify-center items-center"><Award size={20} className="text-amber-600" /></div>}
                       {user.rank > 3 && <div className="rank-number">#{user.rank}</div>}
                     </div>
                     <AvatarWithBorder 
@@ -866,34 +883,34 @@ const EnhancedSocialPage = () => {
                       {leaderboardFilter === 'overall' && (
                         <>
                           <div className="stat-item">
-                            <div className="stat-icon">📚</div>
+                            <div className="stat-icon flex justify-center items-center"><BookOpen size={16} /></div>
                             <div className="stat-value">{user.story_count}</div>
                           </div>
                           <div className="stat-item">
-                            <div className="stat-icon">❤️</div>
+                            <div className="stat-icon flex justify-center items-center"><Heart size={16} /></div>
                             <div className="stat-value">{user.total_likes}</div>
                           </div>
                           <div className="stat-item">
-                            <div className="stat-icon">🏆</div>
+                            <div className="stat-icon flex justify-center items-center"><Trophy size={16} /></div>
                             <div className="stat-value">{user.achievement_count || 0}</div>
                           </div>
                         </>
                       )}
                       {leaderboardFilter === 'published' && (
                         <div className="stat-item">
-                          <div className="stat-icon">📚</div>
+                          <div className="stat-icon flex justify-center items-center"><BookOpen size={16} /></div>
                           <div className="stat-value">{user.story_count}</div>
                         </div>
                       )}
                       {leaderboardFilter === 'likes' && (
                         <div className="stat-item">
-                          <div className="stat-icon">❤️</div>
+                          <div className="stat-icon flex justify-center items-center"><Heart size={16} /></div>
                           <div className="stat-value">{user.total_likes}</div>
                         </div>
                       )}
                       {leaderboardFilter === 'achievements' && (
                         <div className="stat-item">
-                          <div className="stat-icon">🏆</div>
+                          <div className="stat-icon flex justify-center items-center"><Trophy size={16} /></div>
                           <div className="stat-value">{user.achievement_count || 0}</div>
                         </div>
                       )}
@@ -903,7 +920,7 @@ const EnhancedSocialPage = () => {
               </div>
             ) : (
               <div className="empty-state-large">
-                <div className="empty-state-icon">🏆</div>
+                <div className="empty-state-icon"><Trophy size={48} className="text-gray-400" /></div>
                 <div className="empty-state-title">No leaderboard yet!</div>
               </div>
             )}
@@ -916,7 +933,7 @@ const EnhancedSocialPage = () => {
         <div className="modal-overlay" onClick={() => setIsManageFriendsModalOpen(false)}>
           <div className="add-friends-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header-large">
-              <h2 className="modal-title-large">⚙️ Manage Friends</h2>
+              <h2 className="modal-title-large flex items-center"><Settings size={24} className="mr-2" /> Manage Friends</h2>
               <button 
                 className="modal-close-btn-large"
                 onClick={() => setIsManageFriendsModalOpen(false)}
@@ -964,7 +981,7 @@ const EnhancedSocialPage = () => {
                 </div>
               ) : (
                 <div className="empty-state-large">
-                  <div className="empty-state-icon">👥</div>
+                  <div className="empty-state-icon"><Users size={48} className="text-gray-400" /></div>
                   <div className="empty-state-title">No friends yet</div>
                   <div className="empty-state-text">Add some friends to get started!</div>
                 </div>
@@ -979,7 +996,7 @@ const EnhancedSocialPage = () => {
         <div className="modal-overlay" onClick={() => setIsRequestsModalOpen(false)}>
           <div className="add-friends-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header-large">
-              <h2 className="modal-title-large">🎉 Friend Requests</h2>
+              <h2 className="modal-title-large flex items-center"><PartyPopper size={24} className="mr-2" /> Friend Requests</h2>
               <button 
                 className="modal-close-btn-large"
                 onClick={() => setIsRequestsModalOpen(false)}
@@ -1025,7 +1042,7 @@ const EnhancedSocialPage = () => {
                 </div>
               ) : (
                 <div className="empty-state-large">
-                  <div className="empty-state-icon">🎉</div>
+                  <div className="empty-state-icon"><PartyPopper size={48} className="text-gray-400" /></div>
                   <div className="empty-state-title">All caught up!</div>
                   <div className="empty-state-text">No pending requests or invitations</div>
                 </div>
@@ -1091,17 +1108,17 @@ const EnhancedSocialPage = () => {
             
             <div className="profile-stats-grid">
               <div className="profile-stat">
-                <div className="profile-stat-icon">📚</div>
+                <div className="profile-stat-icon flex items-center justify-center"><BookOpen size={24} /></div>
                 <div className="profile-stat-value">{selectedProfile.story_count}</div>
                 <div className="profile-stat-label">Stories</div>
               </div>
               <div className="profile-stat">
-                <div className="profile-stat-icon">👀</div>
+                <div className="profile-stat-icon flex items-center justify-center"><Eye size={24} /></div>
                 <div className="profile-stat-value">{selectedProfile.total_reads}</div>
                 <div className="profile-stat-label">Reads</div>
               </div>
               <div className="profile-stat">
-                <div className="profile-stat-icon">❤️</div>
+                <div className="profile-stat-icon flex items-center justify-center"><Heart size={24} /></div>
                 <div className="profile-stat-value">{selectedProfile.total_likes}</div>
                 <div className="profile-stat-label">Likes</div>
               </div>
@@ -1127,7 +1144,7 @@ const EnhancedSocialPage = () => {
             
             {selectedProfile.recent_stories.length > 0 && (
               <div className="profile-stories">
-                <h3 className="profile-stories-title">📚 Recent Stories</h3>
+                <h3 className="profile-stories-title flex items-center"><BookOpen size={20} className="mr-2" /> Recent Stories</h3>
                 <div className="profile-stories-grid">
                   {selectedProfile.recent_stories.map((story) => (
                     <div 
@@ -1143,7 +1160,7 @@ const EnhancedSocialPage = () => {
                       <div className="profile-story-cover">{story.cover}</div>
                       <div className="profile-story-title">{story.title}</div>
                       <div className="profile-story-stats">
-                        <span className="profile-story-likes">❤️ {story.likes}</span>
+                        <span className="profile-story-likes flex items-center gap-1"><Heart size={14} className="text-red-500" /> {story.likes}</span>
                       </div>
                     </div>
                   ))}
@@ -1153,7 +1170,7 @@ const EnhancedSocialPage = () => {
             
             {selectedProfile.recent_stories.length === 0 && (
               <div className="profile-empty-stories">
-                <div className="empty-stories-icon">📖</div>
+                <div className="empty-stories-icon flex justify-center"><Book size={48} className="text-gray-400" /></div>
                 <div className="empty-stories-text">No stories yet</div>
               </div>
             )}
@@ -1167,7 +1184,7 @@ const EnhancedSocialPage = () => {
         <div className="modal-overlay" onClick={() => setIsAddFriendsModalOpen(false)}>
           <div className="add-friends-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header-large">
-              <h2 className="modal-title-large">🔍 Find Friends</h2>
+              <h2 className="modal-title-large flex items-center"><Search size={24} className="mr-2" /> Find Friends</h2>
               <button 
                 className="modal-close-btn-large"
                 onClick={() => setIsAddFriendsModalOpen(false)}
@@ -1204,12 +1221,12 @@ const EnhancedSocialPage = () => {
             <div className="modal-results-large">
               {isLoadingUsers ? (
                 <div className="loading-state-large">
-                  <div className="loading-icon">⏳</div>
+                  <div className="loading-icon flex justify-center mb-2"><Hourglass size={48} className="text-gray-400 animate-pulse" /></div>
                   <p>Finding friends...</p>
                 </div>
               ) : isSearching ? (
                 <div className="loading-state-large">
-                  <div className="loading-icon">🔍</div>
+                  <div className="loading-icon flex justify-center mb-2"><Search size={48} className="text-gray-400 animate-pulse" /></div>
                   <p>Searching...</p>
                 </div>
               ) : searchResults.length > 0 ? (
@@ -1224,7 +1241,7 @@ const EnhancedSocialPage = () => {
                       <div className="search-result-info">
                         <div className="search-result-name">{user.name}</div>
                         <div className="search-result-stats">
-                          📚 {user.story_count} {user.story_count === 1 ? 'story' : 'stories'}
+                          <BookOpen size={14} className="inline-block mr-1 text-gray-500" /> {user.story_count} {user.story_count === 1 ? 'story' : 'stories'}
                         </div>
                       </div>
                       <div className="search-result-action">
@@ -1251,7 +1268,7 @@ const EnhancedSocialPage = () => {
                 </div>
               ) : (
                 <div className="empty-state-large">
-                  <div className="empty-state-icon">🔍</div>
+                  <div className="empty-state-icon flex justify-center"><Search size={48} className="text-gray-400" /></div>
                   <div className="empty-state-title">
                     {searchQuery ? `No users found` : 'No more users'}
                   </div>

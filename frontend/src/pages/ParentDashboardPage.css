@@ -4,7 +4,7 @@
 .parent-dashboard {
   min-height: 100dvh; /* Dynamic viewport height - updates with keyboard */
   background: #F9FAFB;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Nunito', sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
   transition: background-color 0.3s ease;
   /* Space for bottom nav + safe area for Android navigation */
   padding-bottom: calc(80px + env(safe-area-inset-bottom));

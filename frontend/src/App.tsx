@@ -3,6 +3,7 @@ import { useCapacitorBackButton } from './hooks/useCapacitorBackButton';
 import { useBackgroundMusic } from './hooks/useBackgroundMusic';
 import { useEffect, useState, lazy, Suspense } from 'react';
 import BottomNav from './components/navigation/BottomNav';
+import DesktopSidebar from './components/navigation/DesktopSidebar';
 
 // Lazy load route components for better performance
 const HomePage = lazy(() => import('./components/pages/HomePage'));
@@ -455,8 +456,18 @@ function AppContent() {
   // Don't show if user is null (not loaded yet) or on auth/canvas/admin/story-creation/parent/story-reader pages
   // Show bottom nav on pages that should have navigation
   // Special handling: Always show on /games and /games/story/* pages (games are accessible to all)
+  // Track window width — BottomNav is only for mobile (<1024px)
+  const [windowWidth, setWindowWidth] = useState(() => window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  const isDesktop = windowWidth >= 1024;
+
   const isGamesPage = location.pathname === '/games' || location.pathname.startsWith('/games/story/');
-  const showBottomNav = (isGamesPage || (user && (isAuthenticated || user.id === 'anonymous'))) && 
+  const showBottomNav = !isDesktop &&
+    (isGamesPage || (user && (isAuthenticated || user.id === 'anonymous'))) && 
     location.pathname !== '/auth' && 
     location.pathname !== '/canvas-drawing' &&
     location.pathname !== '/cover-canvas' &&
@@ -464,10 +475,10 @@ function AppContent() {
     location.pathname !== '/admin' &&
     location.pathname !== '/parent-dashboard' &&
     location.pathname !== '/parent-settings' &&
-    location.pathname !== '/teacher-dashboard' &&  // Hide bottom nav on teacher dashboard
-    location.pathname !== '/teacher-settings' &&   // Hide bottom nav on teacher settings
+    location.pathname !== '/teacher-dashboard' &&
+    location.pathname !== '/teacher-settings' &&
     !location.pathname.startsWith('/story/') &&
-    !location.pathname.startsWith('/games/play/') &&   // Hide on gameplay page (but keep on /games and /games/story/*)
+    !location.pathname.startsWith('/games/play/') &&
     location.pathname !== '/';
   
   // Check if current page is home page for wrapper class
@@ -486,7 +497,13 @@ function AppContent() {
   }
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${isHomePage ? 'home-page-wrapper' : ''}`}>
+    <div className="pt-app-layout">
+      {/* Desktop Sidebar — hidden on mobile/tablet, shown on lg+ */}
+      <DesktopSidebar />
+
+      {/* Main scrollable area */}
+      <div className="pt-app-main">
+
       {/* Notification Reconnecting Toast - Removed (was annoying) */}
       
       <Suspense fallback={
@@ -648,7 +665,8 @@ function AppContent() {
           inviterName={waitingScreenData.inviterName}
         />
       )}
-      
+
+      </div>
     </div>
   );
 }

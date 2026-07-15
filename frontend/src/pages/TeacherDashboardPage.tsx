@@ -9,6 +9,7 @@ import {
   ArrowRightIcon,
   ChartBarIcon
 } from '@heroicons/react/24/outline';
+import { Target, BookOpen, Users, CalendarDays, PenLine, Heart, Eye, Clock, User } from 'lucide-react';
 import Logo from '../components/common/Logo';
 import { useAuthStore } from '../stores/authStore';
 import { useThemeStore } from '../stores/themeStore';
@@ -398,7 +399,7 @@ const TeacherDashboardPage: React.FC = () => {
               <div className="teacher-welcome">
                 <div className="teacher-welcome-content">
                   <h1 className="teacher-welcome-title">
-                    Welcome back, {user?.name?.split(' ')[0] || 'Teacher'}! 👨‍🏫
+                    Welcome back, {user?.name?.split(' ')[0] || 'Teacher'}!
                   </h1>
                   <p className="teacher-welcome-subtitle">
                     Manage your classes and track your students' progress
@@ -434,7 +435,7 @@ const TeacherDashboardPage: React.FC = () => {
 
                 <div className="teacher-stat-card">
                   <div className="teacher-stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
-                    🎯
+                    <Target size={28} style={{ color: 'white' }} />
                   </div>
                   <div className="teacher-stat-label">Active Today</div>
                   <div className="teacher-stat-value">{stats?.active_students_today || 0}</div>
@@ -443,7 +444,7 @@ const TeacherDashboardPage: React.FC = () => {
 
               <section className="teacher-section" style={{ marginTop: '32px' }}>
               <div className="teacher-section-header">
-                <h2 className="teacher-section-title">📚 All Classes</h2>
+                <h2 className="teacher-section-title"><BookOpen size={18} className="inline-block mr-1" /> All Classes</h2>
                 <button
                   onClick={() => setActiveTab('classes')}
                   className="teacher-btn"
@@ -455,7 +456,7 @@ const TeacherDashboardPage: React.FC = () => {
 
               {classes.length === 0 ? (
                 <div className="teacher-empty-state">
-                  <div className="teacher-empty-icon">📚</div>
+                  <BookOpen size={40} className="teacher-empty-icon" style={{ margin: '0 auto' }} />
                   <h3 className="teacher-empty-title">No Classes Yet</h3>
                   <p className="teacher-empty-text">
                     Create your first class in the Manage tab
@@ -482,18 +483,18 @@ const TeacherDashboardPage: React.FC = () => {
                             </p>
                           )}
                           {cls.grade_level && (
-                            <p className="teacher-class-info">
-                              📖 Grade: {cls.grade_level}
+                              <p className="teacher-class-info">
+                              <BookOpen size={14} className="inline-block mr-1" /> Grade: {cls.grade_level}
                             </p>
                           )}
                           {cls.subject && (
-                            <p className="teacher-class-info">
-                              📚 Subject: {cls.subject}
+                              <p className="teacher-class-info">
+                              <BookOpenIcon style={{ width: '14px', height: '14px', display: 'inline-block', marginRight: '4px' }} /> Subject: {cls.subject}
                             </p>
                           )}
                           {cls.school_year && (
-                            <p className="teacher-class-info">
-                              📅 {cls.school_year}
+                              <p className="teacher-class-info">
+                              <CalendarDays size={14} className="inline-block mr-1" /> {cls.school_year}
                             </p>
                           )}
                           <div className="teacher-class-students">
@@ -571,7 +572,7 @@ const TeacherDashboardPage: React.FC = () => {
               {/* Classes Section */}
               <section className="teacher-section">
                 <div className="teacher-section-header">
-                  <h2 className="teacher-section-title">📚 My Classes</h2>
+                  <h2 className="teacher-section-title"><BookOpen size={18} className="inline-block mr-1" /> My Classes</h2>
                   <button
                     onClick={() => setShowAddClassModal(true)}
                     className="teacher-btn"
@@ -582,7 +583,7 @@ const TeacherDashboardPage: React.FC = () => {
                 </div>
                 {classes.length === 0 ? (
                   <div className="teacher-empty-state">
-                    <div className="teacher-empty-icon">📚</div>
+                      <BookOpen size={40} className="teacher-empty-icon" style={{ margin: '0 auto' }} />
                     <h3 className="teacher-empty-title">No Classes Yet</h3>
                     <p className="teacher-empty-text">
                       Create your first class to start managing students
@@ -612,18 +613,18 @@ const TeacherDashboardPage: React.FC = () => {
                         )}
                         {cls.grade_level && (
                           <p className="teacher-class-info">
-                            📖 Grade: {cls.grade_level}
-                          </p>
+                              <BookOpen size={14} className="inline-block mr-1" /> Grade: {cls.grade_level}
+                            </p>
                         )}
                         {cls.subject && (
                           <p className="teacher-class-info">
-                            📚 Subject: {cls.subject}
-                          </p>
+                              <BookOpenIcon style={{ width: '14px', height: '14px', display: 'inline-block', marginRight: '4px' }} /> Subject: {cls.subject}
+                            </p>
                         )}
                         {cls.school_year && (
                           <p className="teacher-class-info">
-                            📅 {cls.school_year}
-                          </p>
+                              <CalendarDays size={14} className="inline-block mr-1" /> {cls.school_year}
+                            </p>
                         )}
                         <div className="teacher-class-students">
                           <UserGroupIcon style={{ width: '16px', height: '16px' }} />
@@ -644,14 +645,14 @@ const TeacherDashboardPage: React.FC = () => {
           {activeTab === 'students' && (
             <section className="parent-section" style={{ marginTop: '24px' }}>
               <div className="parent-section-header">
-                <h2 className="parent-section-title">👥 All Students</h2>
+                <h2 className="parent-section-title"><Users size={18} className="inline-block mr-1" /> All Students</h2>
               </div>
               <div className="children-grid">
                 {allStudents.map((student) => (
                   <div key={student.id} className="child-card">
                     <div className="child-card-header">
                       <div className="child-avatar">
-                        <span className="text-4xl">{student.avatar_emoji || '👤'}</span>
+                        <span className="text-4xl">{student.avatar_emoji || <User size={36} />}</span>
                       </div>
                       <div className="child-info">
                         <h4 className="child-name">{student.display_name}</h4>
@@ -931,7 +932,7 @@ const TeacherDashboardPage: React.FC = () => {
                   justifyContent: 'center',
                   fontSize: '32px'
                 }}>
-                  {viewingStudent.avatar_emoji || '👤'}
+                  {viewingStudent.avatar_emoji || <User size={32} />}
                 </div>
                 <div>
                   <h2 style={{ 
@@ -988,7 +989,7 @@ const TeacherDashboardPage: React.FC = () => {
                   background: isDarkMode ? 'rgba(255,255,255,0.05)' : '#f9fafb',
                   borderRadius: '12px'
                 }}>
-                  <div style={{ fontSize: '48px', marginBottom: '12px' }}>📚</div>
+                  <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center' }}><BookOpen size={48} /></div>
                   <p style={{ 
                     fontSize: '16px', 
                     color: isDarkMode ? '#9ca3af' : '#6b7280'
@@ -1058,18 +1059,8 @@ const TeacherDashboardPage: React.FC = () => {
                           </div>
                         </div>
                       ) : (
-                        <div style={{
-                          width: '100%',
-                          height: '180px',
-                          background: isDarkMode 
-                            ? 'linear-gradient(135deg, #2d2b40 0%, #1a1830 100%)' 
-                            : 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '40px'
-                        }}>
-                          📖
+                        <div style={{ width: '100%', height: '180px', background: isDarkMode ? 'linear-gradient(135deg, #2d2b40 0%, #1a1830 100%)' : 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <BookOpen size={40} style={{ color: isDarkMode ? '#6b7280' : '#9ca3af' }} />
                         </div>
                       )}
                       
@@ -1100,19 +1091,19 @@ const TeacherDashboardPage: React.FC = () => {
                         }}>
                           {story.word_count > 0 && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                              <span>✍️</span>
+                              <PenLine size={12} />
                               <span>{story.word_count}</span>
                             </div>
                           )}
                           {story.likes_count > 0 && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                              <span>❤️</span>
+                              <Heart size={12} />
                               <span>{story.likes_count}</span>
                             </div>
                           )}
                           {story.views > 0 && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                              <span>👁️</span>
+                              <Eye size={12} />
                               <span>{story.views}</span>
                             </div>
                           )}
@@ -1129,7 +1120,7 @@ const TeacherDashboardPage: React.FC = () => {
                           alignItems: 'center',
                           gap: '4px'
                         }}>
-                          <span>🕐</span>
+                          <Clock size={14} className="inline-block mr-1" />
                           <span>{story.time_ago}</span>
                         </div>
                       </div>
@@ -1240,7 +1231,7 @@ const TeacherDashboardPage: React.FC = () => {
                     fontWeight: '600',
                     color: '#8b5cf6'
                   }}>
-                    📖 Grade: {viewingClass.grade_level}
+                    <BookOpen size={16} className="inline-block mr-1" /> Grade: {viewingClass.grade_level}
                   </div>
                 )}
                 {viewingClass.subject && (
@@ -1252,7 +1243,7 @@ const TeacherDashboardPage: React.FC = () => {
                     fontWeight: '600',
                     color: '#3b82f6'
                   }}>
-                    📚 Subject: {viewingClass.subject}
+                    <BookOpen size={16} className="inline-block mr-1" /> Subject: {viewingClass.subject}
                   </div>
                 )}
                 {viewingClass.school_year && (
@@ -1264,7 +1255,7 @@ const TeacherDashboardPage: React.FC = () => {
                     fontWeight: '600',
                     color: '#10b981'
                   }}>
-                    📅 {viewingClass.school_year}
+                    <CalendarDays size={16} className="inline-block mr-1" /> {viewingClass.school_year}
                   </div>
                 )}
               </div>
@@ -1304,7 +1295,7 @@ const TeacherDashboardPage: React.FC = () => {
                   background: isDarkMode ? 'rgba(255,255,255,0.05)' : '#f9fafb',
                   borderRadius: '12px'
                 }}>
-                  <div style={{ fontSize: '48px', marginBottom: '12px' }}>👥</div>
+                  <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center' }}><Users size={48} /></div>
                   <p style={{ 
                     fontSize: '16px', 
                     color: isDarkMode ? '#9ca3af' : '#6b7280'
@@ -1349,7 +1340,7 @@ const TeacherDashboardPage: React.FC = () => {
                         fontSize: '24px',
                         flexShrink: 0
                       }}>
-                        {student.avatar_emoji || '👤'}
+                        {student.avatar_emoji || <User size={24} />}
                       </div>
 
                       {/* Student Info */}

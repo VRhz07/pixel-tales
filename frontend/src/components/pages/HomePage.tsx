@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Sparkles, Pencil, Camera, Star, FileEdit, Library, Users } from 'lucide-react';
 import { useStoryStore } from '../../stores/storyStore';
 import { useI18nStore } from '../../stores/i18nStore';
 import { useAuthStore } from '../../stores/authStore';
@@ -122,7 +123,11 @@ const HomePage = () => {
         <p className="hero-subtitle" style={{ marginTop: '0rem' }}>
           {t('home.heroSubtitle')}
         </p>
-        <div className="magical-sparkles">✨ 🌟 ✨</div>
+        <div className="magical-sparkles flex justify-center items-center gap-1 text-amber-400 dark:text-yellow-400">
+          <Star size={18} className="sparkle-icon fill-amber-200 dark:fill-yellow-200" />
+          <Sparkles size={22} className="sparkle-icon-main fill-amber-200 dark:fill-yellow-200" />
+          <Star size={18} className="sparkle-icon fill-amber-200 dark:fill-yellow-200" />
+        </div>
       </div>
 
       {/* Creation Section */}
@@ -151,7 +156,7 @@ const HomePage = () => {
               className="feature-button ai-story"
             >
               <div className="feature-button-icon-wrapper">
-                <span className="feature-button-icon">🤖</span>
+                <Sparkles className="feature-button-icon" strokeWidth={1.5} />
               </div>
               <div className="feature-button-content">
                 <h3 className="feature-button-title">{t('home.aiStory')}</h3>
@@ -168,7 +173,7 @@ const HomePage = () => {
               className="feature-button draw-story"
             >
               <div className="feature-button-icon-wrapper">
-                <span className="feature-button-icon">✍️</span>
+                <Pencil className="feature-button-icon" strokeWidth={1.5} />
               </div>
               <div className="feature-button-content">
                 <h3 className="feature-button-title">{t('home.drawStory')}</h3>
@@ -186,7 +191,7 @@ const HomePage = () => {
               className="feature-button photo-ai"
             >
               <div className="feature-button-icon-wrapper">
-                <span className="feature-button-icon">📸</span>
+                <Camera className="feature-button-icon" strokeWidth={1.5} />
               </div>
               <div className="feature-button-content">
                 <h3 className="feature-button-title">{t('home.photoAI')}</h3>
@@ -242,7 +247,7 @@ const HomePage = () => {
             </div>
           ) : (
             <div>
-              <div className="status-icon">📝</div>
+              <div className="status-icon"><FileEdit size={28} strokeWidth={1.5} /></div>
               <p className="status-text">
                 {t('home.noDraftsMessage')}
               </p>
@@ -252,13 +257,13 @@ const HomePage = () => {
 
         {/* Quick Actions Section - Child-Friendly Colorful Design */}
         <div className="section-header" style={{marginTop: '3rem'}}>
-          <div className="section-icon">🌟</div>
+          <div className="section-icon"><Star size={20} strokeWidth={1.5} /></div>
           <h2 className="section-title">{t('home.quickActions')}</h2>
         </div>
 
         <div className="quick-actions-grid">
           <div className="quick-action-card quick-action-library">
-            <div className="quick-action-icon">📚</div>
+            <div className="quick-action-icon"><Library size={24} strokeWidth={1.5} /></div>
             <div className="quick-action-content">
               <h4 className="quick-action-title">{t('home.browseLibrary')}</h4>
               <p className="quick-action-description">{t('home.browseLibraryDesc')}</p>
@@ -272,7 +277,7 @@ const HomePage = () => {
           </div>
 
           <div className="quick-action-card quick-action-friends">
-            <div className="quick-action-icon">👥</div>
+            <div className="quick-action-icon"><Users size={24} strokeWidth={1.5} /></div>
             <div className="quick-action-content">
               <h4 className="quick-action-title">{t('home.findFriends')}</h4>
               <p className="quick-action-description">{t('home.findFriendsDesc')}</p>

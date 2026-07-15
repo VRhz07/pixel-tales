@@ -1,6 +1,7 @@
 import React, { useState, useEffect, forwardRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { VirtuosoGrid } from 'react-virtuoso';
+import { WifiOff, Gamepad2 } from 'lucide-react';
 import api from '../services/api';
 import { useSoundEffects } from '../hooks/useSoundEffects';
 import { offlineStorageService } from '../services/offlineStorageService';
@@ -170,7 +171,7 @@ const GamesPage: React.FC = () => {
           justifyContent: 'center',
           gap: '8px'
         }}>
-          <span style={{ fontSize: '1.2rem' }}>📶</span>
+          <WifiOff size={20} />
           You are offline. Showing your downloaded games.
         </div>
       )}
@@ -234,7 +235,7 @@ const GamesPage: React.FC = () => {
                     decoding="async"
                   />
                 ) : (
-                  <div className="games-story-icon">🎮</div>
+                  <div className="games-story-icon"><Gamepad2 size={40} strokeWidth={1.5} /></div>
                 )}
               </div>
               
@@ -246,9 +247,9 @@ const GamesPage: React.FC = () => {
                 <p className="games-story-author">
                   by {story.author__username}
                 </p>
-                <p className="games-story-count">
-                  🎮 {story.games_count} game{story.games_count !== 1 ? 's' : ''}
-                </p>
+                 <p className="games-story-count">
+                  <Gamepad2 size={14} className="inline-block mr-1" /> {story.games_count} game{story.games_count !== 1 ? 's' : ''}
+                 </p>
               </div>
             </div>
           )}

@@ -1,0 +1,388 @@
+{
+    "name": "pixel-tales-layout",
+    "description": "Layout-only design profile for the Pixel Tales UI. Describes the structural placement of regions, navigation, and controls across breakpoints. Excludes color, typography, and iconography choices.",
+    "breakpoints": {
+        "mobile": {
+            "min": 0,
+            "max": 767
+        },
+        "tablet": {
+            "min": 768,
+            "max": 1023
+        },
+        "desktop": {
+            "min": 1024,
+            "max": null
+        }
+    },
+    "appShell": {
+        "type": "responsive-shell",
+        "root": {
+            "display": "flex",
+            "direction": "row",
+            "minHeight": "100vh",
+            "width": "100%"
+        },
+        "regions": [
+            {
+                "id": "sidebar",
+                "visibleAt": [
+                    "desktop"
+                ]
+            },
+            {
+                "id": "main",
+                "visibleAt": [
+                    "mobile",
+                    "tablet",
+                    "desktop"
+                ]
+            },
+            {
+                "id": "bottomNav",
+                "visibleAt": [
+                    "mobile",
+                    "tablet"
+                ]
+            }
+        ]
+    },
+    "regions": {
+        "sidebar": {
+            "role": "primary-navigation",
+            "placement": "left",
+            "position": "sticky",
+            "top": 0,
+            "height": "100vh",
+            "width": "18rem",
+            "flex": "shrink-0",
+            "borderSide": "right",
+            "hiddenBelow": "desktop",
+            "sections": [
+                {
+                    "id": "brand",
+                    "order": 1,
+                    "layout": "row",
+                    "align": "center",
+                    "gap": "0.5rem",
+                    "padding": "1.5rem",
+                    "children": [
+                        {
+                            "id": "brandMark",
+                            "shape": "rounded-square",
+                            "size": "2.5rem"
+                        },
+                        {
+                            "id": "brandText",
+                            "layout": "column",
+                            "items": [
+                                "title",
+                                "tagline"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "navList",
+                    "order": 2,
+                    "flex": "1",
+                    "padding": "0 0.75rem",
+                    "layout": "column",
+                    "gap": "0.25rem",
+                    "itemLayout": {
+                        "shape": "row",
+                        "align": "center",
+                        "gap": "0.75rem",
+                        "padding": "0.75rem",
+                        "radius": "1rem",
+                        "iconPosition": "leading",
+                        "labelPosition": "trailing"
+                    }
+                },
+                {
+                    "id": "sidebarFooterCard",
+                    "order": 3,
+                    "placement": "bottom",
+                    "margin": "0 1rem 1.5rem",
+                    "padding": "1rem",
+                    "radius": "1.5rem"
+                }
+            ]
+        },
+        "main": {
+            "role": "content",
+            "flex": "1",
+            "minWidth": 0,
+            "paddingBottom": {
+                "mobile": "6rem",
+                "tablet": "6rem",
+                "desktop": "0"
+            },
+            "container": {
+                "maxWidth": "64rem",
+                "marginX": "auto",
+                "paddingX": {
+                    "mobile": "1rem",
+                    "tablet": "1.5rem",
+                    "desktop": "2.5rem"
+                },
+                "paddingY": {
+                    "mobile": "1.5rem",
+                    "desktop": "2.5rem"
+                }
+            },
+            "sections": [
+                {
+                    "id": "hero",
+                    "order": 1
+                },
+                {
+                    "id": "createYourStory",
+                    "order": 2,
+                    "marginTop": "2rem"
+                },
+                {
+                    "id": "continueWorking",
+                    "order": 3,
+                    "marginTop": "2rem"
+                }
+            ]
+        },
+        "bottomNav": {
+            "role": "primary-navigation",
+            "placement": "bottom",
+            "position": "fixed",
+            "inset": {
+                "left": 0,
+                "right": 0,
+                "bottom": 0
+            },
+            "zIndex": 40,
+            "borderSide": "top",
+            "hiddenAt": [
+                "desktop"
+            ],
+            "safeArea": "env(safe-area-inset-bottom)",
+            "container": {
+                "maxWidth": "42rem",
+                "marginX": "auto",
+                "paddingX": "0.5rem",
+                "paddingY": "0.5rem"
+            },
+            "itemLayout": {
+                "distribution": "space-between",
+                "flexEach": 1,
+                "shape": "column",
+                "align": "center",
+                "gap": "0.25rem",
+                "iconPosition": "top",
+                "labelPosition": "bottom",
+                "iconContainer": {
+                    "shape": "rounded-square",
+                    "size": "2.5rem"
+                }
+            }
+        }
+    },
+    "sections": {
+        "hero": {
+            "component": "HeroBanner",
+            "layout": "centered-stack",
+            "shape": "rounded-rect",
+            "radius": "1.5rem",
+            "padding": {
+                "mobile": "2.5rem 1.5rem",
+                "desktop": "3.5rem 2.5rem"
+            },
+            "overflow": "hidden",
+            "decorativeElements": [
+                {
+                    "id": "sun",
+                    "position": "top-left",
+                    "offset": "-1.5rem"
+                },
+                {
+                    "id": "cloud1",
+                    "position": "top-right"
+                },
+                {
+                    "id": "cloud2",
+                    "position": "top-right-inner"
+                },
+                {
+                    "id": "cloud3",
+                    "position": "bottom-center-left"
+                }
+            ],
+            "content": {
+                "align": "center",
+                "maxWidth": "42rem",
+                "order": [
+                    "badge",
+                    "title",
+                    "subtitle",
+                    "sparkleRow"
+                ]
+            }
+        },
+        "createYourStory": {
+            "layout": "section",
+            "header": {
+                "id": "sectionTitle",
+                "align": "start",
+                "marginBottom": "1rem"
+            },
+            "grid": {
+                "type": "css-grid",
+                "gap": "1rem",
+                "columns": {
+                    "mobile": 1,
+                    "tablet": 2,
+                    "desktop": 2,
+                    "xl": 3
+                }
+            },
+            "items": [
+                {
+                    "id": "aiStoryCard",
+                    "component": "StoryCard"
+                },
+                {
+                    "id": "drawStoryCard",
+                    "component": "StoryCard"
+                },
+                {
+                    "id": "photoAiCard",
+                    "component": "StoryCard"
+                }
+            ]
+        },
+        "continueWorking": {
+            "component": "ContinueCard",
+            "shape": "rounded-rect",
+            "radius": "1.5rem",
+            "padding": {
+                "mobile": "1.25rem",
+                "desktop": "1.5rem"
+            },
+            "children": [
+                {
+                    "id": "header",
+                    "layout": "row",
+                    "justify": "space-between",
+                    "align": "center"
+                },
+                {
+                    "id": "statsRow",
+                    "layout": "grid",
+                    "columns": {
+                        "mobile": "1fr auto",
+                        "desktop": "auto 1fr auto"
+                    },
+                    "gap": {
+                        "mobile": "1rem",
+                        "desktop": "1.5rem"
+                    },
+                    "align": "center",
+                    "padding": "1rem",
+                    "radius": "1rem",
+                    "items": [
+                        {
+                            "id": "pagesStat",
+                            "layout": "column"
+                        },
+                        {
+                            "id": "wordsStat",
+                            "layout": "column"
+                        },
+                        {
+                            "id": "lastEditedStat",
+                            "layout": "column",
+                            "visibleAt": [
+                                "desktop"
+                            ]
+                        },
+                        {
+                            "id": "continueButton",
+                            "shape": "rounded-rect",
+                            "placement": {
+                                "mobile": "full-width-below",
+                                "desktop": "inline-right"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "components": {
+        "StoryCard": {
+            "shape": "rounded-rect",
+            "radius": "1.5rem",
+            "layout": "row",
+            "align": "center",
+            "gap": "1rem",
+            "padding": {
+                "mobile": "1rem",
+                "desktop": "1.25rem"
+            },
+            "children": [
+                {
+                    "id": "iconBadge",
+                    "shape": "rounded-square",
+                    "size": "3.5rem",
+                    "placement": "leading",
+                    "flex": "shrink-0"
+                },
+                {
+                    "id": "textStack",
+                    "layout": "column",
+                    "flex": "1",
+                    "minWidth": 0,
+                    "items": [
+                        "title",
+                        "description"
+                    ]
+                }
+            ]
+        }
+    },
+    "navigation": {
+        "items": [
+            {
+                "id": "home",
+                "position": 1
+            },
+            {
+                "id": "games",
+                "position": 2
+            },
+            {
+                "id": "library",
+                "position": 3
+            },
+            {
+                "id": "social",
+                "position": 4
+            },
+            {
+                "id": "profile",
+                "position": 5
+            }
+        ],
+        "activeIndicator": {
+            "mobile": "filled-icon-badge",
+            "desktop": "filled-pill-row"
+        }
+    },
+    "layoutRules": [
+        "Sidebar replaces BottomNav at the desktop breakpoint; the two are mutually exclusive.",
+        "Main content reserves bottom padding equal to the BottomNav height on mobile/tablet to prevent overlap.",
+        "Main content has no bottom padding on desktop since navigation moves to the sidebar.",
+        "All flexible text containers use min-width: 0 to allow truncation next to fixed-size icon badges.",
+        "Fixed-size icons and badges use flex-shrink: 0.",
+        "Primary content is centered via a max-width container inside the main region.",
+        "Hero decorative elements are absolutely positioned within the hero and clipped by overflow-hidden.",
+        "Continue Working stats collapse from a 3-column row on desktop to a 2-column row on mobile, with the action button spanning full-width below on mobile."
+    ]
+}

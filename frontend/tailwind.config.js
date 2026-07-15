@@ -46,7 +46,8 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['system-ui', '-apple-system', 'sans-serif'],
+        sans: ['Nunito', 'sans-serif', 'system-ui', '-apple-system'],
+        heading: ['Fredoka', 'sans-serif'],
       },
     },
   },

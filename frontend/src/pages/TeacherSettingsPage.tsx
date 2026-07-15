@@ -27,6 +27,7 @@ import { apiConfigService } from '../services/apiConfig.service';
 import TeacherBottomNav from '../components/navigation/TeacherBottomNav';
 import parentDashboardService, { Child, ChildFormData } from '../services/parentDashboard.service';
 import './ParentSettingsPage.css';
+import { Lightbulb, Mail, User } from 'lucide-react';
 
 const TeacherSettingsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -654,7 +655,7 @@ const TeacherSettingsPage: React.FC = () => {
                       fontSize: '14px',
                       color: theme === 'dark' ? '#d1d5db' : '#6b7280'
                     }}>
-                      💡 <strong>Quick Tip:</strong> Go to your Teacher Dashboard to create classes, add students to classes, and view detailed analytics. This section shows all your students across all classes.
+                      <Lightbulb size={16} className="inline-block mr-1 text-yellow-500" /> <strong>Quick Tip:</strong> Go to your Teacher Dashboard to create classes, add students to classes, and view detailed analytics. This section shows all your students across all classes.
                     </p>
                   </div>
 
@@ -847,7 +848,7 @@ const TeacherSettingsPage: React.FC = () => {
                                               justifyContent: 'center',
                                               fontSize: '16px'
                                             }}>
-                                              {student.avatar_emoji || '👤'}
+                                              {student.avatar_emoji || <User size={20} />}
                                             </div>
                                             <div>
                                               <p style={{
@@ -1025,7 +1026,7 @@ const TeacherSettingsPage: React.FC = () => {
                           fontWeight: '500'
                         }}
                       >
-                        {sendingTestEmail ? '📧 Sending...' : '📧 Send Test Email'}
+                        {sendingTestEmail ? <><Mail size={16} className="inline-block mr-1" /> Sending...</> : <><Mail size={16} className="inline-block mr-1" /> Send Test Email</>}
                       </button>
                     </div>
                     <div className="parent-settings-card-body">
@@ -1462,7 +1463,7 @@ const TeacherSettingsPage: React.FC = () => {
                     availableStudents.map((student: any) => (
                       <div key={student.id} className="student-item">
                         <div className="student-info">
-                          <span className="text-2xl mr-3">{student.avatar_emoji || '👤'}</span>
+                          <span className="text-2xl mr-3 flex items-center justify-center">{student.avatar_emoji || <User size={24} />}</span>
                           <div>
                             <p className="font-medium">{student.display_name}</p>
                             <p className="text-sm text-gray-500">

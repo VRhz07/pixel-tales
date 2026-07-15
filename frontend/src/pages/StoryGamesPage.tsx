@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Pencil, PenLine, ALargeSmall, Gamepad2, WifiOff, CheckCircle2, Play, X, RefreshCw, Clock } from 'lucide-react';
 import api from '../services/api';
 import gamesCacheService from '../services/gamesCache.service';
 import { useSoundEffects } from '../hooks/useSoundEffects';
@@ -182,10 +183,10 @@ const StoryGamesPage: React.FC = () => {
 
   const getGameIcon = (gameType: string) => {
     switch (gameType) {
-      case 'quiz': return '📝';
-      case 'fill_blanks': return '✍️';
-      case 'spelling': return '🔤';
-      default: return '🎮';
+      case 'quiz': return <Pencil size={24} strokeWidth={1.5} />;
+      case 'fill_blanks': return <PenLine size={24} strokeWidth={1.5} />;
+      case 'spelling': return <ALargeSmall size={24} strokeWidth={1.5} />;
+      default: return <Gamepad2 size={24} strokeWidth={1.5} />;
     }
   };
 
@@ -234,14 +235,14 @@ const StoryGamesPage: React.FC = () => {
             justifyContent: 'center',
             gap: '8px'
           }}>
-            {!gamesCacheService.isOnline() ? (
+              {!gamesCacheService.isOnline() ? (
               <>
-                <span style={{ fontSize: '18px' }}>📴</span>
+                <WifiOff size={18} />
                 <span>Playing Offline - Progress will sync when online</span>
               </>
             ) : (
               <>
-                <span style={{ fontSize: '18px' }}>✅</span>
+                <CheckCircle2 size={18} />
                 <span>Games loaded from cache - Online mode active</span>
               </>
             )}
@@ -280,8 +281,8 @@ const StoryGamesPage: React.FC = () => {
               {/* Only show incomplete badge if user has actually answered at least one question */}
               {game.incomplete_attempt && game.incomplete_attempt.answered_count > 0 && (
                 <div className="incomplete-attempt-badge">
-                  <div className="badge-title">
-                    ⚠️ Incomplete Game
+                <div className="badge-title">
+                    <X size={14} className="inline-block mr-1" /> Incomplete Game
                   </div>
                   <div className="badge-info">
                     Progress: {game.incomplete_attempt.answered_count}/{game.incomplete_attempt.total_questions} questions
@@ -298,11 +299,11 @@ const StoryGamesPage: React.FC = () => {
                 <div className="last-attempt-badge">
                   <div className="badge-title">Last Score:</div>
                   <div className="badge-score-value">
-                    ✓ {game.last_attempt.score_percentage}% 
+                    <CheckCircle2 size={14} className="inline-block mr-1" /> {game.last_attempt.score_percentage}% 
                     ({game.last_attempt.correct_answers}/{game.last_attempt.total_questions} correct)
                   </div>
                   <div className="badge-time">
-                    ⏱️ Time: {Math.floor(game.last_attempt.time_taken_seconds / 60)}m {game.last_attempt.time_taken_seconds % 60}s
+                    <Clock size={13} className="inline-block mr-1" /> Time: {Math.floor(game.last_attempt.time_taken_seconds / 60)}m {game.last_attempt.time_taken_seconds % 60}s
                   </div>
                 </div>
               )}
@@ -323,7 +324,7 @@ const StoryGamesPage: React.FC = () => {
                       className="btn-resume"
                       title="Continue Game"
                     >
-                      ▶️ Resume
+                      <Play size={14} className="inline-block mr-1" /> Resume
                     </button>
                     <button
                       onClick={async () => {
@@ -349,7 +350,7 @@ const StoryGamesPage: React.FC = () => {
                       className="btn-clear"
                       title="Clear Incomplete Attempt"
                     >
-                      ❌
+                      <X size={14} />
                     </button>
                   </>
                 ) : (
@@ -362,7 +363,7 @@ const StoryGamesPage: React.FC = () => {
                     }}
                     className="btn-play"
                   >
-                    {game.last_attempt ? '🎮 Play Again' : '🎮 Start Game'}
+                    {game.last_attempt ? <><RefreshCw size={14} className="inline-block mr-1" /> Play Again</> : <><Play size={14} className="inline-block mr-1" /> Start Game</>}
                   </button>
                 )}
               </div>
