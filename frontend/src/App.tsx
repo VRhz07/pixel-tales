@@ -4,6 +4,8 @@ import { useBackgroundMusic } from './hooks/useBackgroundMusic';
 import { useEffect, useState, lazy, Suspense } from 'react';
 import BottomNav from './components/navigation/BottomNav';
 import DesktopSidebar from './components/navigation/DesktopSidebar';
+import ParentDesktopSidebar from './components/navigation/ParentDesktopSidebar';
+import TeacherDesktopSidebar from './components/navigation/TeacherDesktopSidebar';
 
 // Lazy load route components for better performance
 const HomePage = lazy(() => import('./components/pages/HomePage'));
@@ -480,6 +482,27 @@ function AppContent() {
     !location.pathname.startsWith('/story/') &&
     !location.pathname.startsWith('/games/play/') &&
     location.pathname !== '/';
+
+  const showDesktopSidebar = isDesktop &&
+    (isGamesPage || (user && (isAuthenticated || user.id === 'anonymous'))) && 
+    location.pathname !== '/auth' && 
+    location.pathname !== '/canvas-drawing' &&
+    location.pathname !== '/cover-canvas' &&
+    location.pathname !== '/create-story-manual' &&
+    location.pathname !== '/admin' &&
+    location.pathname !== '/parent-dashboard' &&
+    location.pathname !== '/parent-settings' &&
+    location.pathname !== '/teacher-dashboard' &&
+    location.pathname !== '/teacher-settings' &&
+    !location.pathname.startsWith('/story/') &&
+    !location.pathname.startsWith('/games/play/') &&
+    location.pathname !== '/';
+
+  const showParentDesktopSidebar = isDesktop &&
+    (location.pathname === '/parent-dashboard' || location.pathname === '/parent-settings');
+    
+  const showTeacherDesktopSidebar = isDesktop &&
+    (location.pathname === '/teacher-dashboard' || location.pathname === '/teacher-settings');
   
   // Check if current page is home page for wrapper class
   const isHomePage = location.pathname === '/home' || location.pathname === '/';
@@ -499,7 +522,9 @@ function AppContent() {
   return (
     <div className="pt-app-layout">
       {/* Desktop Sidebar — hidden on mobile/tablet, shown on lg+ */}
-      <DesktopSidebar />
+      {showDesktopSidebar && <DesktopSidebar />}
+      {showParentDesktopSidebar && <ParentDesktopSidebar />}
+      {showTeacherDesktopSidebar && <TeacherDesktopSidebar />}
 
       {/* Main scrollable area */}
       <div className="pt-app-main">
@@ -653,7 +678,6 @@ function AppContent() {
         </Routes>
       </Suspense>
       {showBottomNav && <BottomNav />}
-      
       {/* Toast Notifications */}
       <ToastNotification toasts={toasts} onClose={removeToast} />
       

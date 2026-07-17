@@ -135,3 +135,10 @@
     font-size: 11px;
   }
 }
+
+/* Desktop: hide bottom nav because we show the sidebar instead */
+@media (min-width: 1024px) {
+  .parent-bottom-nav {
+    display: none !important;
+  }
+}
