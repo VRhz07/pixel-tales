@@ -2699,17 +2699,20 @@ const CanvasDrawingPage: React.FC = () => {
                 <span className="studio-tool-label">Text</span>
               </button>
 
-              <div className="studio-sidebar-divider" />
-
-              {/* Layers - opens modal on tablet, focuses panel on widescreen */}
-              <button
-                className="canvas-studio-tool-btn studio-tool-btn"
-                onClick={() => (isTablet ? setShowLayersModal(true) : setActivePanel('layers'))}
-                aria-label="Layers"
-              >
-                <Square3Stack3DIcon className="studio-tool-icon" />
-                <span className="studio-tool-label">Layers</span>
-              </button>
+              {isTablet && (
+                <>
+                  <div className="studio-sidebar-divider" />
+                  {/* Layers - opens modal on tablet */}
+                  <button
+                    className="canvas-studio-tool-btn studio-tool-btn"
+                    onClick={() => setShowLayersModal(true)}
+                    aria-label="Layers"
+                  >
+                    <Square3Stack3DIcon className="studio-tool-icon" />
+                    <span className="studio-tool-label">Layers</span>
+                  </button>
+                </>
+              )}
             </aside>
           )}
 
@@ -2774,86 +2777,139 @@ const CanvasDrawingPage: React.FC = () => {
                     overflow: 'hidden'
                   }}
                 >
-                  {['brush', 'eraser', 'fill', 'text'].includes(activeTool) && (
-                    <div className="canvas-studio-mobile-sliders" style={{ border: '1px solid var(--studio-border)' }}>
-                      <div className="canvas-studio-sliders-header">
-                        <span className="canvas-studio-sliders-title">Tool Settings</span>
-                        <button
-                          className="canvas-studio-reset-btn"
-                          onClick={() => {
-                            setBrushSize(5);
-                            setBrushOpacity(1);
-                            if (drawingEngineRef.current) {
-                              drawingEngineRef.current.setSize(5);
-                              drawingEngineRef.current.setOpacity(1);
-                            }
-                          }}
-                          aria-label="Reset settings"
-                        >
-                          <ArrowPathIcon className="canvas-studio-reset-icon" />
-                        </button>
-                      </div>
+                  {['brush', 'eraser', 'fill', 'text'].includes(activeTool) && (() => {
+                    const dark = document.documentElement.classList.contains('dark');
+                    const panelBg = dark ? '#1e293b' : '#ffffff';
+                    const borderClr = dark ? '#334155' : '#e2e8f0';
+                    const labelColor = dark ? '#f8fafc' : '#334155';
+                    const titleColor = dark ? '#94a3b8' : '#64748b';
+                    const trackBg = dark ? '#475569' : '#cbd5e1';
+                    const thumbBg = dark ? '#1e293b' : '#ffffff';
+                    const resetBg = dark ? '#334155' : '#f1f5f9';
+                    const resetColor = dark ? '#94a3b8' : '#64748b';
+                    const accentColor = '#ff6b6b';
 
-                      <div className="canvas-studio-slider-container">
-                        <label className="canvas-studio-slider-label">
-                          <span>Size</span>
-                          <div className="canvas-studio-slider-preview">
-                            <div
-                              className="canvas-studio-brush-preview"
-                              style={{
-                                width: `${Math.min(brushSize, 30)}px`,
-                                height: `${Math.min(brushSize, 30)}px`,
-                                backgroundColor: selectedColor,
-                                opacity: brushOpacity
-                              }}
-                            />
-                            <span className="canvas-studio-slider-value">{brushSize}px</span>
+                    const TabletSliderRow = ({ label, value, min, max, onChange, suffix, previewDot }: {
+                      label: string; value: number; min: number; max: number;
+                      onChange: (v: number) => void; suffix: string; previewDot?: React.ReactNode;
+                    }) => (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.875rem', fontWeight: 500, color: labelColor }}>
+                          <span>{label}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            {previewDot}
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: accentColor }}>{value}{suffix}</span>
                           </div>
-                        </label>
+                        </div>
                         <input
                           type="range"
-                          min="1"
-                          max="50"
-                          value={brushSize}
-                          onChange={(e) => setBrushSize(Number(e.target.value))}
-                          className="canvas-studio-slider"
+                          min={min}
+                          max={max}
+                          value={value}
+                          onChange={(e) => onChange(Number(e.target.value))}
+                          style={{
+                            appearance: 'none' as const,
+                            WebkitAppearance: 'none' as const,
+                            width: '100%',
+                            height: 8,
+                            borderRadius: 9999,
+                            background: `linear-gradient(to right, ${accentColor} 0%, ${accentColor} ${((value - min) / (max - min)) * 100}%, ${trackBg} ${((value - min) / (max - min)) * 100}%, ${trackBg} 100%)`,
+                            outline: 'none',
+                            cursor: 'pointer',
+                            border: 'none',
+                          }}
                         />
+                        <style>{`
+                          input[type=range]::-webkit-slider-thumb {
+                            -webkit-appearance: none;
+                            appearance: none;
+                            width: 20px;
+                            height: 20px;
+                            margin-top: -6px;
+                            border-radius: 50%;
+                            background: ${thumbBg};
+                            border: 3px solid ${accentColor};
+                            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+                            cursor: pointer;
+                          }
+                          input[type=range]::-moz-range-thumb {
+                            width: 14px;
+                            height: 14px;
+                            border-radius: 50%;
+                            background: ${thumbBg};
+                            border: 3px solid ${accentColor};
+                            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+                            cursor: pointer;
+                          }
+                          input[type=range]::-moz-range-track {
+                            height: 8px;
+                            border-radius: 9999px;
+                            background: ${trackBg};
+                            border: none;
+                          }
+                        `}</style>
                       </div>
+                    );
 
-                      <div className="canvas-studio-slider-container">
-                        <label className="canvas-studio-slider-label">
-                          <span>Opacity</span>
-                          <span className="canvas-studio-slider-value">{Math.round(brushOpacity * 100)}%</span>
-                        </label>
-                        <input
-                          type="range"
-                          min="0"
-                          max="100"
-                          value={brushOpacity * 100}
-                          onChange={(e) => setBrushOpacity(Number(e.target.value) / 100)}
-                          className="canvas-studio-slider"
+                    return (
+                      <div style={{ background: panelBg, border: `1px solid ${borderClr}`, borderRadius: '1rem 1rem 0 0', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: titleColor }}>Tool Settings</span>
+                          <button
+                            onClick={() => {
+                              setBrushSize(5);
+                              setBrushOpacity(1);
+                              if (drawingEngineRef.current) {
+                                drawingEngineRef.current.setSize(5);
+                                drawingEngineRef.current.setOpacity(1);
+                              }
+                            }}
+                            aria-label="Reset settings"
+                            style={{ width: 32, height: 32, border: 'none', borderRadius: '50%', background: resetBg, color: resetColor, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          >
+                            <ArrowPathIcon style={{ width: 16, height: 16 }} />
+                          </button>
+                        </div>
+                        <TabletSliderRow
+                          label="Size" value={brushSize} min={1} max={50} suffix="px"
+                          onChange={(v) => setBrushSize(v)}
+                          previewDot={
+                            <div style={{ width: Math.min(brushSize, 30), height: Math.min(brushSize, 30), borderRadius: '50%', backgroundColor: selectedColor, opacity: brushOpacity, minWidth: 4, minHeight: 4 }} />
+                          }
+                        />
+                        <TabletSliderRow
+                          label="Opacity" value={Math.round(brushOpacity * 100)} min={0} max={100} suffix="%"
+                          onChange={(v) => setBrushOpacity(v / 100)}
                         />
                       </div>
-                    </div>
-                  )}
-                  {activeTool === 'shapes' && (
-                    <div className="canvas-studio-mobile-sliders" style={{ border: '1px solid var(--studio-border)' }}>
-                      <div className="canvas-studio-sliders-header">
-                        <span className="canvas-studio-sliders-title">Shape Settings</span>
+                    );
+                  })()}
+                  {activeTool === 'shapes' && (() => {
+                    const dark = document.documentElement.classList.contains('dark');
+                    const panelBg = dark ? '#1e293b' : '#ffffff';
+                    const borderClr = dark ? '#334155' : '#e2e8f0';
+                    const labelColor = dark ? '#f8fafc' : '#334155';
+                    const titleColor = dark ? '#94a3b8' : '#64748b';
+                    return (
+                      <div style={{ background: panelBg, border: `1px solid ${borderClr}`, borderRadius: '1rem 1rem 0 0', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: titleColor }}>Shape Settings</span>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.875rem', fontWeight: 500, color: labelColor }}>
+                            <span>Fill Mode</span>
+                            <button
+                              onClick={() => setShapeFilled(!shapeFilled)}
+                              className={`studio-mini-toggle ${shapeFilled ? 'studio-mini-toggle-active' : ''}`}
+                            >
+                              {shapeFilled ? 'Filled' : 'Hollow'}
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <div className="canvas-studio-slider-container">
-                        <label className="canvas-studio-slider-label">
-                          <span>Fill Mode</span>
-                          <button
-                            onClick={() => setShapeFilled(!shapeFilled)}
-                            className={`studio-mini-toggle ${shapeFilled ? 'studio-mini-toggle-active' : ''}`}
-                          >
-                            {shapeFilled ? 'Filled' : 'Hollow'}
-                          </button>
-                        </label>
-                      </div>
-                    </div>
-                  )}
+                    );
+                  })()}
+
                 </div>
               )}
 
@@ -2959,13 +3015,7 @@ const CanvasDrawingPage: React.FC = () => {
                   <div className="canvas-studio-color-circle-icon" />
                   Colors
                 </button>
-                <button
-                  className={`studio-panel-tab ${activePanel === 'settings' ? 'studio-panel-tab-active' : ''}`}
-                  onClick={() => setActivePanel('settings')}
-                >
-                  <Cog6ToothIcon className="studio-panel-tab-icon" />
-                  Settings
-                </button>
+
               </div>
 
               {/* Panel Content */}
@@ -3247,65 +3297,7 @@ const CanvasDrawingPage: React.FC = () => {
                   </>
                 )}
 
-                {activePanel === 'settings' && (
-                  <>
-                    {/* Shape Fill Toggle */}
-                    <div className="canvas-studio-color-section">
-                      <h3 className="canvas-studio-color-section-title">Shape Settings</h3>
-                      <div style={{ marginTop: '1rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                          <span className="studio-setting-label">Fill Mode</span>
-                          <button
-                            onClick={() => setShapeFilled(!shapeFilled)}
-                            className={`studio-mini-toggle ${shapeFilled ? 'studio-mini-toggle-active' : ''}`}
-                          >
-                            {shapeFilled ? 'Filled' : 'Hollow'}
-                          </button>
-                        </div>
-                        <p className="studio-setting-hint">
-                          {shapeFilled ? 'Shapes will be filled with color' : 'Shapes will be hollow with outline only'}
-                        </p>
-                      </div>
-                    </div>
 
-                    {/* Brush Settings */}
-                    <div className="canvas-studio-color-section">
-                      <h3 className="canvas-studio-color-section-title">Brush Settings</h3>
-
-                      {/* Brush Size */}
-                      <div style={{ marginTop: '1rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                          <span className="studio-setting-label">Size</span>
-                          <span className="studio-slider-value-label">{brushSize}px</span>
-                        </div>
-                        <input
-                          type="range"
-                          min="1"
-                          max="50"
-                          value={brushSize}
-                          onChange={(e) => setBrushSize(Number(e.target.value))}
-                          className="canvas-studio-slider"
-                        />
-                      </div>
-
-                      {/* Brush Opacity */}
-                      <div style={{ marginTop: '1rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                          <span className="studio-setting-label">Opacity</span>
-                          <span className="studio-slider-value-label">{Math.round(brushOpacity * 100)}%</span>
-                        </div>
-                        <input
-                          type="range"
-                          min="0"
-                          max="100"
-                          value={brushOpacity * 100}
-                          onChange={(e) => setBrushOpacity(Number(e.target.value) / 100)}
-                          className="canvas-studio-slider"
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
               </div>
             </aside>
           )}
@@ -3315,92 +3307,144 @@ const CanvasDrawingPage: React.FC = () => {
         {isMobile && (
           <>
             {/* Mobile Brush Settings - above dock when brush/eraser active */}
-            {(activeTool === 'brush' || activeTool === 'eraser') && (
-              <div className="canvas-studio-mobile-sliders">
-                <div className="canvas-studio-sliders-header">
-                  <span className="canvas-studio-sliders-title">Brush Settings</span>
-                  <button
-                    className="canvas-studio-reset-btn"
-                    onClick={() => {
-                      setBrushSize(5);
-                      setBrushOpacity(1);
-                      if (drawingEngineRef.current) {
-                        drawingEngineRef.current.setSize(5);
-                        drawingEngineRef.current.setOpacity(1);
-                      }
-                    }}
-                    aria-label="Reset settings"
-                  >
-                    <ArrowPathIcon className="canvas-studio-reset-icon" />
-                  </button>
-                </div>
+            {(activeTool === 'brush' || activeTool === 'eraser') && (() => {
+              const dark = document.documentElement.classList.contains('dark');
+              const panelBg = dark ? '#1e293b' : '#ffffff';
+              const borderColor = dark ? '#334155' : '#e2e8f0';
+              const labelColor = dark ? '#f8fafc' : '#334155';
+              const titleColor = dark ? '#94a3b8' : '#64748b';
+              const trackBg = dark ? '#475569' : '#cbd5e1';
+              const thumbBg = dark ? '#1e293b' : '#ffffff';
+              const resetBg = dark ? '#334155' : '#f1f5f9';
+              const resetColor = dark ? '#94a3b8' : '#64748b';
+              const accentColor = '#ff6b6b';
 
-                {/* Thickness Slider with Preview */}
-                <div className="canvas-studio-slider-container">
-                  <label className="canvas-studio-slider-label">
-                    <span>Size</span>
-                    <div className="canvas-studio-slider-preview">
-                      <div
-                        className="canvas-studio-brush-preview"
-                        style={{
-                          width: `${Math.min(brushSize, 30)}px`,
-                          height: `${Math.min(brushSize, 30)}px`,
-                          backgroundColor: selectedColor,
-                          opacity: brushOpacity
-                        }}
-                      />
-                      <span className="canvas-studio-slider-value">{brushSize}px</span>
+              const SliderRow = ({ label, value, min, max, onChange, suffix, previewDot }: {
+                label: string; value: number; min: number; max: number;
+                onChange: (v: number) => void; suffix: string; previewDot?: React.ReactNode;
+              }) => (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.875rem', fontWeight: 500, color: labelColor }}>
+                    <span>{label}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      {previewDot}
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: accentColor }}>{value}{suffix}</span>
                     </div>
-                  </label>
+                  </div>
                   <input
                     type="range"
-                    min="1"
-                    max="50"
-                    value={brushSize}
-                    onChange={(e) => setBrushSize(Number(e.target.value))}
-                    className="canvas-studio-slider"
+                    min={min}
+                    max={max}
+                    value={value}
+                    onChange={(e) => onChange(Number(e.target.value))}
+                    style={{
+                      appearance: 'none' as const,
+                      WebkitAppearance: 'none' as const,
+                      width: '100%',
+                      height: 8,
+                      borderRadius: 9999,
+                      background: `linear-gradient(to right, ${accentColor} 0%, ${accentColor} ${((value - min) / (max - min)) * 100}%, ${trackBg} ${((value - min) / (max - min)) * 100}%, ${trackBg} 100%)`,
+                      outline: 'none',
+                      cursor: 'pointer',
+                      border: 'none',
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.target as HTMLInputElement).style.setProperty('--thumb-shadow', `0 0 0 6px rgba(255,107,107,0.2)`);
+                    }}
                   />
+                  <style>{`
+                    input[type=range]::-webkit-slider-thumb {
+                      -webkit-appearance: none;
+                      appearance: none;
+                      width: 20px;
+                      height: 20px;
+                      margin-top: -6px;
+                      border-radius: 50%;
+                      background: ${thumbBg};
+                      border: 3px solid ${accentColor};
+                      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+                      cursor: pointer;
+                    }
+                    input[type=range]::-moz-range-thumb {
+                      width: 14px;
+                      height: 14px;
+                      border-radius: 50%;
+                      background: ${thumbBg};
+                      border: 3px solid ${accentColor};
+                      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+                      cursor: pointer;
+                    }
+                    input[type=range]::-moz-range-track {
+                      height: 8px;
+                      border-radius: 9999px;
+                      background: ${trackBg};
+                      border: none;
+                    }
+                  `}</style>
                 </div>
+              );
 
-                {/* Opacity Slider */}
-                <div className="canvas-studio-slider-container">
-                  <label className="canvas-studio-slider-label">
-                    <span>Opacity</span>
-                    <span className="canvas-studio-slider-value">{Math.round(brushOpacity * 100)}%</span>
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={brushOpacity * 100}
-                    onChange={(e) => setBrushOpacity(Number(e.target.value) / 100)}
-                    className="canvas-studio-slider"
+              return (
+                <div style={{ flexShrink: 0, background: panelBg, borderTop: `2px solid ${borderColor}`, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: titleColor }}>Brush Settings</span>
+                    <button
+                      onClick={() => {
+                        setBrushSize(5);
+                        setBrushOpacity(1);
+                        if (drawingEngineRef.current) {
+                          drawingEngineRef.current.setSize(5);
+                          drawingEngineRef.current.setOpacity(1);
+                        }
+                      }}
+                      aria-label="Reset settings"
+                      style={{ width: 32, height: 32, border: 'none', borderRadius: '50%', background: resetBg, color: resetColor, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <ArrowPathIcon style={{ width: 16, height: 16 }} />
+                    </button>
+                  </div>
+                  <SliderRow
+                    label="Size" value={brushSize} min={1} max={50} suffix="px"
+                    onChange={(v) => setBrushSize(v)}
+                    previewDot={
+                      <div style={{ width: Math.min(brushSize, 30), height: Math.min(brushSize, 30), borderRadius: '50%', backgroundColor: selectedColor, opacity: brushOpacity, minWidth: 4, minHeight: 4 }} />
+                    }
+                  />
+                  <SliderRow
+                    label="Opacity" value={Math.round(brushOpacity * 100)} min={0} max={100} suffix="%"
+                    onChange={(v) => setBrushOpacity(v / 100)}
                   />
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Mobile Shape Settings */}
-            {activeTool === 'shapes' && (
-              <div className="canvas-studio-mobile-sliders">
-                <div className="canvas-studio-sliders-header">
-                  <span className="canvas-studio-sliders-title">Shape Settings</span>
+            {activeTool === 'shapes' && (() => {
+              const dark = document.documentElement.classList.contains('dark');
+              const panelBg = dark ? '#1e293b' : '#ffffff';
+              const borderColor = dark ? '#334155' : '#e2e8f0';
+              const labelColor = dark ? '#f8fafc' : '#334155';
+              const titleColor = dark ? '#94a3b8' : '#64748b';
+              return (
+                <div style={{ flexShrink: 0, background: panelBg, borderTop: `2px solid ${borderColor}`, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: titleColor }}>Shape Settings</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.875rem', fontWeight: 500, color: labelColor }}>
+                      <span>Fill Mode</span>
+                      <button
+                        onClick={() => setShapeFilled(!shapeFilled)}
+                        className={`studio-mini-toggle ${shapeFilled ? 'studio-mini-toggle-active' : ''}`}
+                      >
+                        {shapeFilled ? 'Filled' : 'Hollow'}
+                      </button>
+                    </div>
+                  </div>
                 </div>
+              );
+            })()}
 
-                {/* Shape Fill Toggle */}
-                <div className="canvas-studio-slider-container">
-                  <label className="canvas-studio-slider-label">
-                    <span>Fill Mode</span>
-                    <button
-                      onClick={() => setShapeFilled(!shapeFilled)}
-                      className={`studio-mini-toggle ${shapeFilled ? 'studio-mini-toggle-active' : ''}`}
-                    >
-                      {shapeFilled ? 'Filled' : 'Hollow'}
-                    </button>
-                  </label>
-                </div>
-              </div>
-            )}
 
             {/* Bottom Dock */}
             <div className="canvas-studio-mobile-toolbar studio-bottom-dock">

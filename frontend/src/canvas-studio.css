@@ -20,12 +20,16 @@
   --studio-app-bg: #f1f5f9;
   --studio-canvas-backdrop: #e2e8f0;
   --studio-panel: #ffffff;
+  --studio-panel-translucent: rgba(255, 255, 255, 0.95);
   --studio-border: #e2e8f0;
   --studio-border-strong: #cbd5e1;
   --studio-text-primary: #334155;
   --studio-text-secondary: #64748b;
   --studio-text-muted: #94a3b8;
   --studio-text-placeholder: #cbd5e1;
+  --studio-surface-light: #f8fafc;
+  --studio-hover: #f1f5f9;
+  --studio-track: #cbd5e1;
 
   /* Semantic */
   --studio-danger: #f43f5e;
@@ -53,6 +57,36 @@
   --cs-hover: #f1f5f9;
   --cs-canvas-bg: #ffffff;
   --cs-canvas-border: #e2e8f0;
+}
+
+.dark {
+  /* Neutrals */
+  --studio-app-bg: #0f172a;
+  --studio-canvas-backdrop: #1e293b;
+  --studio-panel: #1e293b;
+  --studio-panel-translucent: rgba(30, 41, 59, 0.95);
+  --studio-border: #334155;
+  --studio-border-strong: #475569;
+  --studio-text-primary: #f8fafc;
+  --studio-text-secondary: #94a3b8;
+  --studio-text-muted: #64748b;
+  --studio-text-placeholder: #475569;
+  --studio-surface-light: #334155;
+  --studio-hover: #334155;
+  --studio-track: #475569;
+
+  /* Legacy --cs-* tokens */
+  --cs-bg-dark: #0f172a;
+  --cs-bg-darker: #1e293b;
+  --cs-surface: #1e293b;
+  --cs-surface-light: #334155;
+  --cs-text-primary: #f8fafc;
+  --cs-text-secondary: #94a3b8;
+  --cs-text-tertiary: #64748b;
+  --cs-border: #334155;
+  --cs-hover: #334155;
+  --cs-canvas-bg: #1e293b;
+  --cs-canvas-border: #334155;
 }
 
 /* ============================================
@@ -215,7 +249,7 @@ body.capacitor .canvas-studio {
 }
 
 .studio-zoom-btn:hover {
-  background: #ffffff;
+  background: var(--studio-panel);
   color: var(--studio-text-primary);
   box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
 }
@@ -231,7 +265,7 @@ body.capacitor .canvas-studio {
 
 .canvas-studio-zoom-input {
   width: 2.5rem;
-  background: #ffffff !important;
+  background: var(--studio-panel) !important;
   border: 1px solid var(--studio-border) !important;
   border-radius: 9999px;
   color: var(--studio-text-primary) !important;
@@ -489,7 +523,7 @@ body.capacitor .canvas-studio {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--studio-panel-translucent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--studio-border);
@@ -509,7 +543,7 @@ body.capacitor .canvas-studio {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--studio-panel-translucent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--studio-border);
@@ -591,7 +625,7 @@ body.capacitor .canvas-studio {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 2px solid #ffffff;
+  border: 2px solid var(--studio-panel);
   box-shadow: 0 0 0 2px var(--studio-border);
   cursor: pointer;
   flex-shrink: 0;
@@ -624,7 +658,7 @@ body.capacitor .canvas-studio {
   height: 40px;
   border-radius: 50%;
   border: 1px solid var(--studio-border);
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--studio-panel-translucent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: var(--studio-danger);
@@ -637,7 +671,7 @@ body.capacitor .canvas-studio {
 }
 
 .studio-clear-btn:hover {
-  background: #fff1f2;
+  background: rgba(244, 63, 94, 0.15);
   transform: translateY(-2px);
 }
 
@@ -831,7 +865,7 @@ body.capacitor .canvas-studio {
 /* Mini pill toggle buttons (Show/Hide, Filled/Hollow) */
 .studio-mini-toggle {
   padding: 0.375rem 0.75rem;
-  background: #ffffff;
+  background: var(--studio-panel);
   color: var(--studio-text-secondary);
   border: 2px solid var(--studio-border);
   border-radius: 9999px;
@@ -863,7 +897,7 @@ body.capacitor .canvas-studio {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 2px solid #ffffff;
+  border: 2px solid var(--studio-panel);
   box-shadow: 0 0 0 2px var(--studio-border);
   cursor: pointer;
   padding: 0;
@@ -882,16 +916,18 @@ body.capacitor .canvas-studio {
 }
 
 /* ============================================
-   SLIDERS — 8px pill track, coral accent
+   SLIDERS + MOBILE SETTINGS PANEL
+   (Completely rewritten for dark mode compatibility)
    ============================================ */
 
+/* ---- Slider base (light mode) ---- */
 .canvas-studio-slider {
   appearance: none;
   -webkit-appearance: none;
   width: 100%;
   height: 8px;
   border-radius: 9999px;
-  background: var(--studio-border);
+  background: #cbd5e1;
   outline: none;
   cursor: pointer;
 }
@@ -899,7 +935,7 @@ body.capacitor .canvas-studio {
 .canvas-studio-slider::-webkit-slider-runnable-track {
   height: 8px;
   border-radius: 9999px;
-  background: var(--studio-border);
+  background: #cbd5e1;
 }
 
 .canvas-studio-slider::-webkit-slider-thumb {
@@ -910,7 +946,7 @@ body.capacitor .canvas-studio {
   margin-top: -6px;
   border-radius: 50%;
   background: #ffffff;
-  border: 3px solid var(--studio-primary);
+  border: 3px solid #ff6b6b;
   box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
   cursor: pointer;
   transition: box-shadow 0.2s ease;
@@ -923,14 +959,14 @@ body.capacitor .canvas-studio {
 .canvas-studio-slider::-moz-range-track {
   height: 8px;
   border-radius: 9999px;
-  background: var(--studio-border);
+  background: #cbd5e1;
   border: none;
 }
 
 .canvas-studio-slider::-moz-range-progress {
   height: 8px;
   border-radius: 9999px;
-  background: var(--studio-primary);
+  background: #ff6b6b;
 }
 
 .canvas-studio-slider::-moz-range-thumb {
@@ -938,23 +974,50 @@ body.capacitor .canvas-studio {
   height: 14px;
   border-radius: 50%;
   background: #ffffff;
-  border: 3px solid var(--studio-primary);
+  border: 3px solid #ff6b6b;
   box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
   cursor: pointer;
 }
 
-/* ============================================
-   MOBILE SETTINGS PANEL (brush / shape)
-   ============================================ */
+/* ---- Slider dark mode — AFTER base rules so cascade takes priority ---- */
+.dark .canvas-studio-slider {
+  background: #64748b !important;
+}
 
+.dark .canvas-studio-slider::-webkit-slider-runnable-track {
+  background: #64748b !important;
+}
+
+.dark .canvas-studio-slider::-webkit-slider-thumb {
+  background: #1e293b !important;
+  border-color: #ff6b6b !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .canvas-studio-slider::-moz-range-track {
+  background: #64748b !important;
+}
+
+.dark .canvas-studio-slider::-moz-range-thumb {
+  background: #1e293b !important;
+  border-color: #ff6b6b !important;
+}
+
+/* ---- Mobile settings panel (light) ---- */
 .canvas-studio-mobile-sliders {
   flex-shrink: 0;
-  background: var(--studio-panel);
-  border-top: 2px solid var(--studio-border);
+  background: #ffffff;
+  border-top: 2px solid #e2e8f0;
   padding: 12px 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+/* ---- Mobile settings panel (dark) ---- */
+.dark .canvas-studio-mobile-sliders {
+  background: #1e293b !important;
+  border-top-color: #334155 !important;
 }
 
 .canvas-studio-sliders-header {
@@ -968,7 +1031,11 @@ body.capacitor .canvas-studio {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--studio-text-secondary);
+  color: #64748b;
+}
+
+.dark .canvas-studio-sliders-title {
+  color: #94a3b8 !important;
 }
 
 .canvas-studio-reset-btn {
@@ -976,8 +1043,8 @@ body.capacitor .canvas-studio {
   height: 32px;
   border: none;
   border-radius: 50%;
-  background: var(--studio-surface-light);
-  color: var(--studio-text-secondary);
+  background: #f1f5f9;
+  color: #64748b;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -985,9 +1052,19 @@ body.capacitor .canvas-studio {
   transition: all 0.2s ease;
 }
 
+.dark .canvas-studio-reset-btn {
+  background: #334155 !important;
+  color: #94a3b8 !important;
+}
+
 .canvas-studio-reset-btn:hover {
-  background: var(--studio-border);
-  color: var(--studio-primary);
+  background: #e2e8f0;
+  color: #ff6b6b;
+}
+
+.dark .canvas-studio-reset-btn:hover {
+  background: #475569 !important;
+  color: #ff6b6b !important;
 }
 
 .canvas-studio-reset-btn:active {
@@ -1011,7 +1088,11 @@ body.capacitor .canvas-studio {
   justify-content: space-between;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--studio-text-primary);
+  color: #334155;
+}
+
+.dark .canvas-studio-slider-label {
+  color: #f8fafc !important;
 }
 
 .canvas-studio-slider-preview {
@@ -1030,7 +1111,7 @@ body.capacitor .canvas-studio {
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: var(--studio-primary);
+  color: #ff6b6b;
 }
 
 /* ============================================
@@ -1179,7 +1260,7 @@ body.capacitor .studio-bottom-dock {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #f8fafc;
+  background: var(--studio-surface-light);
   border-radius: 1rem;
   padding: 8px;
   overflow-x: auto;
@@ -1253,7 +1334,7 @@ body.capacitor .studio-bottom-dock {
   align-items: flex-start;
   gap: 10px;
   padding: 10px;
-  background: #ffffff;
+  background: var(--studio-panel);
   border: 2px solid var(--studio-border);
   border-radius: 0.75rem;
   cursor: pointer;
@@ -1306,7 +1387,7 @@ body.capacitor .studio-bottom-dock {
   background:
     linear-gradient(45deg, var(--studio-border) 25%, transparent 25%, transparent 75%, var(--studio-border) 75%),
     linear-gradient(45deg, var(--studio-border) 25%, transparent 25%, transparent 75%, var(--studio-border) 75%);
-  background-color: #f8fafc;
+  background-color: var(--studio-surface-light);
   background-size: 12px 12px;
   background-position: 0 0, 6px 6px;
   opacity: 0.6;
@@ -1335,7 +1416,7 @@ body.capacitor .studio-bottom-dock {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--studio-text-primary);
-  background: #ffffff;
+  background: var(--studio-panel);
   border: 2px solid var(--studio-primary);
   border-radius: 0.5rem;
   padding: 2px 6px;
@@ -1372,7 +1453,7 @@ body.capacitor .studio-bottom-dock {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--studio-panel);
   border: 2px solid var(--studio-secondary);
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.2);
   cursor: pointer;
@@ -1382,7 +1463,7 @@ body.capacitor .studio-bottom-dock {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--studio-panel);
   border: 2px solid var(--studio-secondary);
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.2);
   cursor: pointer;
@@ -1425,7 +1506,7 @@ body.capacitor .studio-bottom-dock {
   top: 100%;
   right: 0;
   z-index: 40;
-  background: #ffffff;
+  background: var(--studio-panel);
   border: 1px solid var(--studio-border);
   border-radius: 0.75rem;
   box-shadow: var(--studio-shadow-floating-pill);
@@ -1581,7 +1662,7 @@ body.capacitor .studio-bottom-dock {
   align-items: center;
   gap: 8px;
   padding: 20px 28px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--studio-panel-translucent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 3px dashed var(--studio-danger);
@@ -1928,7 +2009,7 @@ body.capacitor .studio-bottom-dock {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--studio-panel);
   border: 3px solid var(--studio-primary);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   cursor: pointer;
@@ -1938,7 +2019,7 @@ body.capacitor .studio-bottom-dock {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--studio-panel);
   border: 3px solid var(--studio-primary);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   cursor: pointer;
@@ -1972,7 +2053,7 @@ body.capacitor .studio-bottom-dock {
   position: relative;
   z-index: 3;
   margin: 0 16px;
-  background: rgba(255, 255, 255, 0.97);
+  background: var(--studio-panel-translucent);
   border-radius: 1rem;
   padding: 12px;
   box-shadow: var(--studio-shadow-floating-pill);
@@ -2068,7 +2149,7 @@ body.capacitor .studio-bottom-dock {
 }
 
 .canvas-text-font-style.active {
-  background: #ffffff;
+  background: var(--studio-panel);
   color: var(--studio-text-primary);
   border-color: var(--studio-primary);
   box-shadow: var(--studio-shadow-tool-active);
