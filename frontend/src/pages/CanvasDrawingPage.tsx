@@ -46,7 +46,8 @@ import {
   DocumentDuplicateIcon,
   PencilIcon,
   ChevronUpIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  AdjustmentsHorizontalIcon
 } from '@heroicons/react/24/outline';
 
 type Tool = 'select' | 'brush' | 'eraser' | 'fill' | 'shapes' | 'text';
@@ -67,20 +68,20 @@ const CanvasDrawingPage: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingEngineRef = useRef<PaperDrawingEngine | null>(null);
   const collaborationEnhancerRef = useRef<CollaborationEnhancer | null>(null);
-  
+
   // Get story and page info from navigation state
-  const { 
-    storyId, 
-    pageId, 
-    pageIndex, 
+  const {
+    storyId,
+    pageId,
+    pageIndex,
     isCoverImage,
     sessionId: collabSessionId,
     isCollaborating: isCollabFromNav,
     isHost: isHostFromNav
-  } = (location.state as { 
-    storyId?: string; 
-    pageId?: string; 
-    pageIndex?: number; 
+  } = (location.state as {
+    storyId?: string;
+    pageId?: string;
+    pageIndex?: number;
     isCoverImage?: boolean;
     sessionId?: string;
     isCollaborating?: boolean;
@@ -95,6 +96,8 @@ const CanvasDrawingPage: React.FC = () => {
   const [submenuTool, setSubmenuTool] = useState<Tool | null>(null);
   const [submenuPosition, setSubmenuPosition] = useState({ top: 0, left: 0 });
   const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+  const [mobileVariantsOpen, setMobileVariantsOpen] = useState(true);
   const [showLayersModal, setShowLayersModal] = useState(false);
   const [activeBrush, setActiveBrush] = useState<BrushType>('round');
   const [activeShape, setActiveShape] = useState<ShapeType>('rectangle');
@@ -104,6 +107,7 @@ const CanvasDrawingPage: React.FC = () => {
   const [brushOpacity, setBrushOpacity] = useState(1);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showBrushSettingsPopover, setShowBrushSettingsPopover] = useState(false);
   const [showTextColorPicker, setShowTextColorPicker] = useState(false);
   const [textColor, setTextColor] = useState('#FFFFFF');
   const [showBrushPicker, setShowBrushPicker] = useState(false);
@@ -111,14 +115,14 @@ const CanvasDrawingPage: React.FC = () => {
   const [recentColors, setRecentColors] = useState<string[]>(['#8B5CF6', '#EF4444', '#10B981', '#F59E0B', '#8B5A2B']);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
-  
+
   // Collaboration states
   const [isCollaborating, setIsCollaborating] = useState(isCollabFromNav || false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(collabSessionId || null);
   const [isHost, setIsHost] = useState(isHostFromNav || false);
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [reconnectAttempt, setReconnectAttempt] = useState(0);
-  
+
   // Voting modal states
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [votingData, setVotingData] = useState<any>(null);
@@ -127,22 +131,22 @@ const CanvasDrawingPage: React.FC = () => {
   const [participants, setParticipants] = useState<any[]>([]);
   const voteInitiatorRef = useRef<number | null>(null);
   const [showSavingOverlay, setShowSavingOverlay] = useState(false);
-  
+
   // CRITICAL FIX: Set up reconnection handler with useRef to avoid stale closures
   const reconnectHandlerRef = useRef<((reconnecting: boolean, attempt: number) => void) | null>(null);
   const reconnectSuccessHandlerRef = useRef<(() => void) | null>(null);
-  
+
   // Create the handler function that uses the latest state
   reconnectHandlerRef.current = (reconnecting: boolean, attempt: number) => {
     console.log('🔄 Reconnection state changed:', { reconnecting, attempt });
     setIsReconnecting(reconnecting);
     setReconnectAttempt(attempt);
   };
-  
+
   // Create handler for successful reconnection
   reconnectSuccessHandlerRef.current = () => {
     console.log('✅ Reconnection successful, requesting canvas sync');
-    
+
     // Request canvas sync with current page info
     collaborationService.requestCanvasSync(
       pageId?.toString() || undefined,
@@ -150,10 +154,10 @@ const CanvasDrawingPage: React.FC = () => {
       isCoverImage
     );
   };
-  
+
   // Request canvas sync on initial load if in collaboration mode
   const hasRequestedInitialSync = useRef(false);
-  
+
   // Get current user ID
   useEffect(() => {
     let userStr = localStorage.getItem('user_data');
@@ -170,15 +174,15 @@ const CanvasDrawingPage: React.FC = () => {
       }
     }
   }, []);
-  
+
   // Handle status bar visibility and orientation changes
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
-    
+
     const handleOrientationChange = async () => {
       const isLandscape = window.matchMedia('(orientation: landscape)').matches;
       const isSmallHeight = window.innerHeight <= 600;
-      
+
       try {
         if (isLandscape && isSmallHeight) {
           // Hide status bar in landscape mode for immersive drawing
@@ -193,33 +197,33 @@ const CanvasDrawingPage: React.FC = () => {
         console.error('Failed to toggle status bar:', error);
       }
     };
-    
+
     // Initial check
     handleOrientationChange();
-    
+
     // Listen for orientation changes
     const mediaQuery = window.matchMedia('(orientation: landscape)');
     mediaQuery.addEventListener('change', handleOrientationChange);
-    
+
     // Also listen for resize events (more reliable on some devices)
     window.addEventListener('resize', handleOrientationChange);
-    
+
     return () => {
       mediaQuery.removeEventListener('change', handleOrientationChange);
       window.removeEventListener('resize', handleOrientationChange);
-      
+
       // Restore status bar when leaving canvas
       if (Capacitor.isNativePlatform()) {
         StatusBar.show().catch(console.error);
       }
     };
   }, []);
-  
+
   useEffect(() => {
     if (isCollaborating && collaborationService.isConnected() && drawingEngineRef.current && !hasRequestedInitialSync.current) {
       hasRequestedInitialSync.current = true;
       console.log('🔄 Initial load in collaboration mode - requesting canvas sync from backend');
-      
+
       // Request canvas sync with current page info
       collaborationService.requestCanvasSync(
         pageId?.toString() || undefined,
@@ -228,14 +232,14 @@ const CanvasDrawingPage: React.FC = () => {
       );
     }
   }, [isCollaborating, collaborationService.isConnected(), pageId, pageIndex, isCoverImage]);
-  
+
   // Auto-save canvas state to localStorage (solo mode) or backend (collaboration mode)
   useEffect(() => {
     if (!drawingEngineRef.current) return;
-    
+
     const autoSaveInterval = setInterval(() => {
       if (!drawingEngineRef.current || !storyId) return;
-      
+
       if (isCollaborating) {
         // Collaboration mode: save to backend via WebSocket
         if (collaborationService.isConnected()) {
@@ -255,11 +259,11 @@ const CanvasDrawingPage: React.FC = () => {
         // Solo mode: save to localStorage with full drawing state
         const canvasData = drawingEngineRef.current.getCanvasData();
         const drawingState = drawingEngineRef.current.getDrawingState();
-        
+
         if (isCoverImage) {
           // Save cover image snapshot
           updateStory(storyId, { coverImage: canvasData });
-          
+
           // Also save full state for restoration
           const COVER_OPERATIONS_KEY = '__cover_operations__';
           const canvasStateData = {
@@ -283,10 +287,10 @@ const CanvasDrawingPage: React.FC = () => {
         }
       }
     }, 5000); // Auto-save every 5 seconds for better persistence
-    
+
     return () => clearInterval(autoSaveInterval);
   }, [isCollaborating, pageId, pageIndex, isCoverImage, storyId]);
-  
+
   // Debug: Log collaboration state on mount
   useEffect(() => {
     console.log('🎨 CanvasDrawingPage mounted with collaboration state:', {
@@ -297,14 +301,14 @@ const CanvasDrawingPage: React.FC = () => {
       currentSessionId,
       wsConnected: collaborationService.isConnected()
     });
-    
+
     // Set up reconnection state handler on mount using ref
     console.log('🔧 Setting up reconnection state handler (always active)');
     collaborationService.onReconnectStateChange = (reconnecting: boolean, attempt: number) => {
       // Call through ref to avoid stale closure
       reconnectHandlerRef.current?.(reconnecting, attempt);
     };
-    
+
     // Set up reconnection success handler
     collaborationService.onReconnectSuccess = () => {
       // Call through ref to avoid stale closure
@@ -327,7 +331,7 @@ const CanvasDrawingPage: React.FC = () => {
   const cursorUpdateThrottle = useRef<number>(0);
   // Store user colors separately to persist across cursor updates
   const userColorsRef = useRef<Map<number, string>>(new Map());
-  
+
   // Advanced color management states
   const [showAdvancedColorPicker, setShowAdvancedColorPicker] = useState(false);
   const [showGradientEditor, setShowGradientEditor] = useState(false);
@@ -342,7 +346,7 @@ const CanvasDrawingPage: React.FC = () => {
     ]
   });
   const [layerBlendModes, setLayerBlendModes] = useState<Record<string, BlendMode>>({});
-  
+
   // Set initial zoom based on device type
   // Mobile phone (< 768px): 75% zoom
   // Tablet (768px - 1023px): 100% zoom
@@ -350,11 +354,11 @@ const CanvasDrawingPage: React.FC = () => {
   useEffect(() => {
     const width = window.innerWidth;
     let initialZoom = 1; // Default for desktop and tablet
-    
+
     if (width < 768) {
       initialZoom = 0.75; // Mobile phone only
     }
-    
+
     setZoomLevel(initialZoom);
     setPanOffset({ x: 0, y: 0 });
   }, []);
@@ -402,15 +406,15 @@ const CanvasDrawingPage: React.FC = () => {
         const windowHeight = window.innerHeight;
         const keyboardHeight = windowHeight - viewportHeight;
         setKeyboardHeight(keyboardHeight > 0 ? keyboardHeight : 0);
-        
+
         // For canvas page, adjust layout when keyboard is open
         const canvasStudio = document.querySelector('.canvas-studio') as HTMLElement;
         const mobileToolbar = document.querySelector('.canvas-studio-mobile-toolbar') as HTMLElement;
-        
+
         if (canvasStudio && keyboardHeight > 0) {
           // Keyboard is open - adjust canvas to fit above keyboard
           canvasStudio.style.height = `${viewportHeight}px`;
-          
+
           // Move toolbar above keyboard
           if (mobileToolbar) {
             mobileToolbar.style.bottom = `${keyboardHeight + 10}px`;
@@ -418,7 +422,7 @@ const CanvasDrawingPage: React.FC = () => {
         } else if (canvasStudio) {
           // Keyboard is closed - reset to normal
           canvasStudio.style.height = '100vh';
-          
+
           // Reset toolbar to normal position
           if (mobileToolbar) {
             mobileToolbar.style.bottom = '';
@@ -442,7 +446,7 @@ const CanvasDrawingPage: React.FC = () => {
       // Reset canvas and toolbar on cleanup
       const canvasStudio = document.querySelector('.canvas-studio') as HTMLElement;
       const mobileToolbar = document.querySelector('.canvas-studio-mobile-toolbar') as HTMLElement;
-      
+
       if (canvasStudio) {
         canvasStudio.style.height = '100vh';
       }
@@ -455,16 +459,16 @@ const CanvasDrawingPage: React.FC = () => {
   // Handle orientation and resize changes
   useEffect(() => {
     let resizeTimeout: number;
-    
+
     const handleResize = () => {
       // Clear previous timeout to debounce rapid resize events
       clearTimeout(resizeTimeout);
-      
+
       resizeTimeout = setTimeout(() => {
         const width = window.innerWidth;
         const height = window.innerHeight;
         setOrientation(width > height ? 'landscape' : 'portrait');
-        
+
         // Verify canvas size (will skip if already correct)
         if (drawingEngineRef.current) {
           requestAnimationFrame(() => {
@@ -540,26 +544,26 @@ const CanvasDrawingPage: React.FC = () => {
           drawingEngineRef.current.destroy();
           drawingEngineRef.current = null;
         }
-        
+
         // Initialize Paper.js drawing engine
         drawingEngineRef.current = new PaperDrawingEngine(canvas);
-        
+
         // Initialize collaboration enhancer
         collaborationEnhancerRef.current = new CollaborationEnhancer(pageId, pageIndex, isCoverImage);
         collaborationEnhancerRef.current.initialize(drawingEngineRef.current);
         collaborationEnhancerRef.current.setCollaborating(isCollaborating);
-        
+
         // Set up text input callback
         drawingEngineRef.current.setTextInputCallback((point) => {
           setTextPosition(point);
           setShowTextModal(true);
         });
-        
+
         // Set up layers changed callback
         drawingEngineRef.current.setLayersChangedCallback(() => {
           updateLayersList();
         });
-        
+
         // Set up drag callbacks for trash zone
         let wasOverTrash = false;
         drawingEngineRef.current.setDragCallbacks(
@@ -587,30 +591,30 @@ const CanvasDrawingPage: React.FC = () => {
             if (trashZoneRef.current && canvasRef.current) {
               const canvasRect = canvasRef.current.getBoundingClientRect();
               const trashRect = trashZoneRef.current.getBoundingClientRect();
-              
+
               // The point is in canvas pixel coordinates (0-500)
               // canvasRect gives us the actual screen position and size after CSS transforms
               // Calculate the ratio between canvas pixels and screen pixels
               const scaleX = canvasRect.width / canvasRef.current.width;
               const scaleY = canvasRect.height / canvasRef.current.height;
-              
+
               // Convert canvas coordinates to screen coordinates
               const screenX = canvasRect.left + (point.x * scaleX);
               const screenY = canvasRect.top + (point.y * scaleY);
-              
+
               // Check if point is within trash zone with some padding for easier targeting
               const padding = 30;
-              const isOver = screenX >= (trashRect.left - padding) && 
-                            screenX <= (trashRect.right + padding) &&
-                            screenY >= (trashRect.top - padding) && 
-                            screenY <= (trashRect.bottom + padding);
-              
+              const isOver = screenX >= (trashRect.left - padding) &&
+                screenX <= (trashRect.right + padding) &&
+                screenY >= (trashRect.top - padding) &&
+                screenY <= (trashRect.bottom + padding);
+
               wasOverTrash = isOver;
               setIsOverTrashZone(isOver);
             }
           }
         );
-        
+
         // Set up collaboration callbacks
         drawingEngineRef.current.setCollaborationCallbacks(
           // onDrawingComplete - send drawing to other users
@@ -622,18 +626,18 @@ const CanvasDrawingPage: React.FC = () => {
               wsReadyState: collaborationService.ws?.readyState,
               hasData: !!data
             });
-            
+
             // Check WebSocket state directly
             if (collaborationService.ws && collaborationService.ws.readyState === WebSocket.OPEN) {
               console.log('✅ WebSocket is OPEN, sending drawing to collaborators:', data);
-              
+
               // Validate page identification before sending
               if (!isCoverImage && !pageId) {
                 console.error('❌ Cannot send drawing: pageId is undefined for non-cover page');
                 console.error('Canvas state:', { pageId, pageIndex, isCoverImage, storyId });
                 return;
               }
-              
+
               // Enhance drawing data with page information for cross-page sync
               const enhancedData = {
                 ...data,
@@ -641,7 +645,7 @@ const CanvasDrawingPage: React.FC = () => {
                 page_index: isCoverImage ? -1 : (pageIndex !== undefined ? pageIndex : 0),
                 is_cover_image: isCoverImage || false
               };
-              
+
               console.log('🔍 Sending enhanced drawing data:', {
                 originalData: data,
                 enhancedData,
@@ -653,7 +657,7 @@ const CanvasDrawingPage: React.FC = () => {
                 'final page_id': enhancedData.page_id,
                 'final page_index': enhancedData.page_index
               });
-              
+
               if (data.type === 'draw_batch_progress' || data.type === 'draw_batch_end' || data.type === 'shape_preview' || data.type === 'shape_preview_end') {
                 // Send transient updates using draw_batch
                 collaborationService.sendDrawingBatch([{
@@ -668,7 +672,7 @@ const CanvasDrawingPage: React.FC = () => {
               console.warn('⚠️ WebSocket not OPEN. State:', {
                 exists: !!collaborationService.ws,
                 readyState: collaborationService.ws?.readyState,
-                readyStateName: collaborationService.ws?.readyState !== undefined 
+                readyStateName: collaborationService.ws?.readyState !== undefined
                   ? ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][collaborationService.ws.readyState]
                   : 'N/A'
               });
@@ -680,7 +684,7 @@ const CanvasDrawingPage: React.FC = () => {
             if (now - cursorUpdateThrottle.current > 50 && collaborationService.isConnected()) {
               cursorUpdateThrottle.current = now;
               collaborationService.sendCursorPosition(
-                x, 
+                x,
                 y,
                 isCoverImage ? 'cover_image' : (pageId || `page_${pageIndex}`),
                 isCoverImage ? -1 : (pageIndex !== undefined ? pageIndex : 0),
@@ -689,7 +693,7 @@ const CanvasDrawingPage: React.FC = () => {
             }
           }
         );
-        
+
         // Set up transform callbacks for real-time object transformation sync
         if ((drawingEngineRef.current as any).setTransformCallbacks) {
           (drawingEngineRef.current as any).setTransformCallbacks(
@@ -779,17 +783,17 @@ const CanvasDrawingPage: React.FC = () => {
             }
           );
         }
-        
+
         // Load existing canvas data if available
         if (storyId) {
           let existingData = null;
-          
+
           if (isCoverImage) {
             // Load cover image - check both regular cover image and operations
             const coverImageUrl = currentStory?.coverImage;
             const COVER_OPERATIONS_KEY = '__cover_operations__';
             const coverOperations = getCanvasData(storyId, COVER_OPERATIONS_KEY);
-            
+
             // If we have operations, use that structure; otherwise use just the URL
             if (coverOperations && typeof coverOperations === 'object' && coverOperations.operations) {
               existingData = coverOperations;
@@ -805,19 +809,19 @@ const CanvasDrawingPage: React.FC = () => {
             // Load page canvas data
             existingData = getCanvasData(storyId, pageId);
           }
-          
+
           if (existingData) {
             // Check if existingData contains drawingState (solo mode with full state)
             if (typeof existingData === 'object' && existingData.drawingState) {
               console.log('🎨 Loading canvas with full drawing state (solo mode)');
               console.log('   - Has drawing state:', !!existingData.drawingState);
               console.log('   - Canvas snapshot:', existingData.canvasDataUrl ? 'Yes' : 'No');
-              
+
               // Load the full Paper.js drawing state
               try {
                 drawingEngineRef.current.loadDrawingState(existingData.drawingState);
                 console.log('✅ Full drawing state loaded successfully');
-                
+
                 // Recalculate brush size after canvas data is loaded
                 if (drawingEngineRef.current) {
                   drawingEngineRef.current.setSize(brushSize);
@@ -839,7 +843,7 @@ const CanvasDrawingPage: React.FC = () => {
               console.log('🎨 Loading canvas with collaboration data');
               console.log('   - Canvas snapshot:', existingData.canvasDataUrl ? 'Yes' : 'No');
               console.log('   - Operations:', existingData.operations?.length || 0);
-              
+
               // Step 1: Load the base canvas snapshot FIRST if available
               if (existingData.canvasDataUrl) {
                 console.log('📸 Loading base canvas snapshot...');
@@ -848,11 +852,11 @@ const CanvasDrawingPage: React.FC = () => {
                     drawingEngineRef.current.setSize(brushSize);
                   }
                   console.log('✅ Base canvas snapshot loaded');
-                  
+
                   // Step 2: Then replay drawing operations on top of the snapshot
                   if (existingData.operations && existingData.operations.length > 0) {
                     console.log('🔄 Replaying', existingData.operations.length, 'drawing operations on top of snapshot...');
-                    
+
                     // Wait a bit for the snapshot to fully render
                     setTimeout(() => {
                       if (drawingEngineRef.current) {
@@ -877,7 +881,7 @@ const CanvasDrawingPage: React.FC = () => {
               } else {
                 // No snapshot, just replay operations
                 console.log('🔄 No snapshot found, replaying', existingData.operations.length, 'operations from scratch...');
-                
+
                 setTimeout(() => {
                   if (drawingEngineRef.current && existingData.operations) {
                     console.log('🎬 Starting operation replay...');
@@ -908,7 +912,7 @@ const CanvasDrawingPage: React.FC = () => {
             }
           }
         }
-        
+
         // Set initial tool properties
         if (activeTool !== 'text') {
           drawingEngineRef.current.setTool(activeTool as any);
@@ -917,13 +921,13 @@ const CanvasDrawingPage: React.FC = () => {
         drawingEngineRef.current.setBrushType(activeBrush);
         drawingEngineRef.current.setSize(brushSize);
         drawingEngineRef.current.setOpacity(brushOpacity);
-        
+
         // Set initial zoom and pan
         drawingEngineRef.current.setZoomAndPan(zoomLevel, panOffset);
-        
+
         // Load initial layers
         updateLayersList();
-        
+
         // Verify canvas size matches CSS (will skip if already 500x500)
         requestAnimationFrame(() => {
           if (drawingEngineRef.current) {
@@ -933,43 +937,43 @@ const CanvasDrawingPage: React.FC = () => {
       } catch (error) {
         console.error('Failed to initialize Paper.js drawing engine:', error);
       }
-      
+
       // Add zoom and pan event listeners
       const handleWheel = (e: WheelEvent) => {
         e.preventDefault();
         const delta = e.deltaY > 0 ? 0.9 : 1.1;
         setZoomLevel(prev => Math.min(Math.max(prev * delta, 0.1), 5));
       };
-      
+
       const handleTouchStart = (e: TouchEvent) => {
         setDebugInfo(`TouchStart: ${e.touches.length} fingers`);
-        
+
         // CRITICAL: Block drawing IMMEDIATELY when second finger touches
         if (e.touches.length >= 2) {
           setDebugInfo('Two fingers - Pan mode ON');
           // Block drawing BEFORE anything else
           setBlockDrawing(true);
-          
+
           // Two fingers - start pan/zoom mode
           e.preventDefault();
           e.stopPropagation();
           e.stopImmediatePropagation(); // CRITICAL: Stop drawing engine from receiving this event
-          
+
           const touch1 = e.touches[0];
           const touch2 = e.touches[1];
-          
+
           // Calculate initial pinch distance
           const distance = Math.sqrt(
-            Math.pow(touch2.clientX - touch1.clientX, 2) + 
+            Math.pow(touch2.clientX - touch1.clientX, 2) +
             Math.pow(touch2.clientY - touch1.clientY, 2)
           );
           lastPinchDistanceRef.current = distance;
-          
+
           // Calculate pinch center point
           const centerX = (touch1.clientX + touch2.clientX) / 2;
           const centerY = (touch1.clientY + touch2.clientY) / 2;
           lastPinchCenterRef.current = { x: centerX, y: centerY };
-          
+
           isPanningRef.current = true;
           setIsPanning(true); // For UI indicator;
         } else if (e.touches.length === 1 && isPanningRef.current) {
@@ -980,7 +984,7 @@ const CanvasDrawingPage: React.FC = () => {
         }
         // Single touch - let the drawing engine handle it
       };
-      
+
       const handleTouchMove = (e: TouchEvent) => {
         // Block any touch move if we're exiting pan mode
         if (isPanningRef.current && e.touches.length === 1) {
@@ -989,59 +993,59 @@ const CanvasDrawingPage: React.FC = () => {
           e.stopImmediatePropagation();
           return;
         }
-        
+
         if (e.touches.length === 2) {
           // Two fingers - handle pan and zoom
           e.preventDefault();
           e.stopPropagation();
           e.stopImmediatePropagation(); // CRITICAL: Stop drawing engine from receiving this event
-          
+
           const touch1 = e.touches[0];
           const touch2 = e.touches[1];
-          
+
           // Calculate current pinch distance
           const currentDistance = Math.sqrt(
-            Math.pow(touch2.clientX - touch1.clientX, 2) + 
+            Math.pow(touch2.clientX - touch1.clientX, 2) +
             Math.pow(touch2.clientY - touch1.clientY, 2)
           );
-          
+
           // Calculate current pinch center
           const currentCenterX = (touch1.clientX + touch2.clientX) / 2;
           const currentCenterY = (touch1.clientY + touch2.clientY) / 2;
-          
+
           // Only process if we have previous values
           if (lastPinchDistanceRef.current !== null) {
             // Calculate distance change for zoom
             const distanceChange = Math.abs(currentDistance - lastPinchDistanceRef.current);
-            
+
             // Calculate center movement for pan
             const deltaX = currentCenterX - lastPinchCenterRef.current.x;
             const deltaY = currentCenterY - lastPinchCenterRef.current.y;
             const panDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            
+
             // Determine if this is primarily a zoom or pan gesture
             // Make them mutually exclusive - zoom takes priority
             const isZoomGesture = distanceChange > 0.5; // Ultra sensitive for mobile
             const isPanGesture = !isZoomGesture && panDistance > 0.1; // Ultra sensitive for mobile
-            
+
             setDebugInfo(`Dist:${distanceChange.toFixed(1)} Pan:${panDistance.toFixed(1)} Z:${isZoomGesture} P:${isPanGesture}`);
-            
+
             if (isZoomGesture) {
               // Handle zoom with SMOOTH damping
               const rawScale = currentDistance / lastPinchDistanceRef.current;
-              
+
               // Apply damping for smooth zoom
               const dampingFactor = 0.6; // Higher = more responsive zoom
               const dampedScale = 1 + (rawScale - 1) * dampingFactor;
-              
+
               setDebugInfo(`ZOOM: ${dampedScale.toFixed(3)}x`);
-              
+
               // Use functional update to ensure we're using the latest zoom value
               setZoomLevel(prev => {
                 const calculatedZoom = Math.min(Math.max(prev * dampedScale, 0.1), 5);
                 return calculatedZoom;
               });
-              
+
               // Note: Removed zoom-toward-pinch-point to prevent canvas drift
               // Just zoom at center for stability
             } else if (isPanGesture) {
@@ -1054,25 +1058,25 @@ const CanvasDrawingPage: React.FC = () => {
               }));
             }
           }
-          
+
           // Update for next frame
           lastPinchDistanceRef.current = currentDistance;
           lastPinchCenterRef.current = { x: currentCenterX, y: currentCenterY };
         }
         // Single touch - let the drawing engine handle it
       };
-      
+
       const handleTouchEnd = (e: TouchEvent) => {
         // If we were in pan mode, prevent any touch events from reaching drawing engine
         if (isPanningRef.current) {
           e.preventDefault();
           e.stopPropagation();
           e.stopImmediatePropagation();
-          
+
           // Keep drawing blocked for longer to prevent accidental strokes
           setBlockDrawing(true);
           setTimeout(() => setBlockDrawing(false), 600); // Increased to 600ms
-          
+
           // Don't reset pan state immediately - wait for all fingers to lift
           if (e.touches.length === 0) {
             lastPinchDistanceRef.current = null;
@@ -1085,7 +1089,7 @@ const CanvasDrawingPage: React.FC = () => {
           setIsPanning(false);
         }
       };
-      
+
       // Mouse pan support - only for middle mouse button or Ctrl+click
       const handleMouseDown = (e: MouseEvent) => {
         if (e.button === 1 || (e.button === 0 && e.ctrlKey)) { // Middle mouse or Ctrl+click
@@ -1097,30 +1101,30 @@ const CanvasDrawingPage: React.FC = () => {
         }
         // Don't handle left mouse button without Ctrl - let drawing engine handle it
       };
-      
+
       const handleMouseMove = (e: MouseEvent) => {
         if (isPanningRef.current && (e.buttons === 4 || e.ctrlKey)) { // Middle mouse or Ctrl held
           e.preventDefault();
           e.stopPropagation();
           const deltaX = e.clientX - lastPanPointRef.current.x;
           const deltaY = e.clientY - lastPanPointRef.current.y;
-          
+
           setPanOffset(prev => ({
             x: prev.x + deltaX,
             y: prev.y + deltaY
           }));
-          
+
           lastPanPointRef.current = { x: e.clientX, y: e.clientY };
         }
       };
-      
+
       const handleMouseUp = (e: MouseEvent) => {
         if (e.button === 1 || !e.ctrlKey) { // Middle mouse released or Ctrl released
           isPanningRef.current = false;
           setIsPanning(false); // For UI indicator
         }
       };
-      
+
       // Add event listeners with capture phase to intercept before drawing engine
       canvas.addEventListener('wheel', handleWheel, { passive: false, capture: true });
       canvas.addEventListener('touchstart', handleTouchStart, { passive: false, capture: true });
@@ -1129,7 +1133,7 @@ const CanvasDrawingPage: React.FC = () => {
       canvas.addEventListener('mousedown', handleMouseDown, { capture: true });
       canvas.addEventListener('mousemove', handleMouseMove, { capture: true });
       canvas.addEventListener('mouseup', handleMouseUp, { capture: true });
-      
+
       return () => {
         canvas.removeEventListener('wheel', handleWheel, { capture: true } as any);
         canvas.removeEventListener('touchstart', handleTouchStart, { capture: true } as any);
@@ -1138,7 +1142,7 @@ const CanvasDrawingPage: React.FC = () => {
         canvas.removeEventListener('mousedown', handleMouseDown, { capture: true } as any);
         canvas.removeEventListener('mousemove', handleMouseMove, { capture: true } as any);
         canvas.removeEventListener('mouseup', handleMouseUp, { capture: true } as any);
-        
+
         // Cleanup Paper.js engine
         if (drawingEngineRef.current) {
           drawingEngineRef.current.destroy();
@@ -1167,7 +1171,7 @@ const CanvasDrawingPage: React.FC = () => {
   const handleUndo = () => {
     if (drawingEngineRef.current) {
       drawingEngineRef.current.undo();
-      
+
       // Broadcast undo to collaborators
       if (isCollaborating && collaborationService.isConnected()) {
         // Note: Undo/redo sync can be complex and may cause conflicts
@@ -1180,7 +1184,7 @@ const CanvasDrawingPage: React.FC = () => {
   const handleRedo = () => {
     if (drawingEngineRef.current) {
       drawingEngineRef.current.redo();
-      
+
       // Broadcast redo to collaborators
       if (isCollaborating && collaborationService.isConnected()) {
         console.log('🔄 Redo performed (not synced in collaboration mode)');
@@ -1191,7 +1195,7 @@ const CanvasDrawingPage: React.FC = () => {
   const handleClear = () => {
     if (drawingEngineRef.current) {
       drawingEngineRef.current.clearCanvas();
-      
+
       // Broadcast clear to collaborators with page information
       if (isCollaborating && collaborationService.isConnected()) {
         // Send enhanced clear data for cross-page sync
@@ -1204,51 +1208,51 @@ const CanvasDrawingPage: React.FC = () => {
       }
     }
   };
-  
+
   const handleZoomIn = () => {
     setZoomLevel(prev => Math.min(prev * 1.2, 5));
   };
-  
+
   const handleZoomOut = () => {
     setZoomLevel(prev => Math.max(prev * 0.8, 0.1));
   };
-  
+
   const handleResetZoom = () => {
     const width = window.innerWidth;
     let defaultZoom = 1; // Default for desktop and tablet
-    
+
     if (width < 768) {
       defaultZoom = 0.75; // Mobile phone only
     }
-    
+
     setZoomLevel(defaultZoom);
     setPanOffset({ x: 0, y: 0 });
   };
 
   const performSave = async () => {
     if (!drawingEngineRef.current || !storyId) return;
-    
+
     try {
       setShowSavingOverlay(true);
       // Yield to allow UI to render the saving overlay
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       const canvasData = drawingEngineRef.current.getCanvasData();
       const drawingState = drawingEngineRef.current.getDrawingState();
-      
+
       if (isCoverImage) {
         // Save as cover image
         updateStory(storyId, { coverImage: canvasData });
-        
+
         // Always save with full state for both collaboration and solo mode
         const COVER_OPERATIONS_KEY = '__cover_operations__';
         const existingData = getCanvasData(storyId, COVER_OPERATIONS_KEY);
         let existingOperations = [];
-        
+
         if (typeof existingData === 'object' && existingData !== null) {
           existingOperations = existingData.operations || [];
         }
-        
+
         // Save with operations preserved and full drawing state
         const updatedCanvasData = {
           canvasDataUrl: canvasData, // Final snapshot
@@ -1256,10 +1260,10 @@ const CanvasDrawingPage: React.FC = () => {
           drawingState: drawingState, // Full Paper.js state for restoration
           lastUpdate: Date.now()
         };
-        
+
         saveCanvasData(storyId, COVER_OPERATIONS_KEY, updatedCanvasData);
         console.log('💾 Saved COVER IMAGE with', existingOperations.length, 'operations and full state');
-        
+
         // Send snapshot to collaboration server
         if (isCollaborating && collaborationService.isConnected()) {
           collaborationService.sendCanvasSnapshot(
@@ -1273,11 +1277,11 @@ const CanvasDrawingPage: React.FC = () => {
         // Always save with full state for both collaboration and solo mode
         const existingData = getCanvasData(storyId, pageId);
         let existingOperations = [];
-        
+
         if (typeof existingData === 'object' && existingData !== null) {
           existingOperations = existingData.operations || [];
         }
-        
+
         // Save with operations preserved and full drawing state
         const updatedCanvasData = {
           canvasDataUrl: canvasData, // Final snapshot
@@ -1285,10 +1289,10 @@ const CanvasDrawingPage: React.FC = () => {
           drawingState: drawingState, // Full Paper.js state for restoration
           lastUpdate: Date.now()
         };
-        
+
         saveCanvasData(storyId, pageId, updatedCanvasData);
         console.log('💾 Saved canvas with', existingOperations.length, 'operations and full state');
-        
+
         // Send snapshot to collaboration server
         if (isCollaborating && collaborationService.isConnected()) {
           collaborationService.sendCanvasSnapshot(
@@ -1299,10 +1303,10 @@ const CanvasDrawingPage: React.FC = () => {
           console.log('📤 Sent canvas snapshot to collaboration server');
         }
       }
-      
+
       // Mark story as draft since canvas was modified
       markAsDraft(storyId);
-      
+
       // Allow Zustand persistence to start
       await new Promise(resolve => setTimeout(resolve, 300));
     } catch (error) {
@@ -1315,22 +1319,22 @@ const CanvasDrawingPage: React.FC = () => {
 
   const handleDone = async () => {
     await performSave();
-    
+
     // Disconnect websocket gracefully
     collaborationService.removeAllListeners();
     // Intentionally NOT disconnecting here to preserve session for ManualStoryCreationPage
-    
+
     // Navigate back to story creation with page index and collaboration info
     if (storyId) {
-      navigate('/create-story-manual', { 
-        state: { 
-          storyId, 
+      navigate('/create-story-manual', {
+        state: {
+          storyId,
           returnToPageIndex: pageIndex,
           // Pass back collaboration info
           sessionId: isCollaborating ? currentSessionId : undefined,
           isCollaborative: isCollaborating,
           isHost: isHost
-        } 
+        }
       });
     } else {
       navigate('/create-story-manual');
@@ -1339,23 +1343,23 @@ const CanvasDrawingPage: React.FC = () => {
 
   const handleClose = async () => {
     await performSave();
-    
+
     // Disconnect websocket gracefully
     collaborationService.removeAllListeners();
     // Intentionally NOT disconnecting here to preserve session for ManualStoryCreationPage
 
-    
+
     // Navigate back to story creation with page index and collaboration info
     if (storyId) {
-      navigate('/create-story-manual', { 
-        state: { 
-          storyId, 
+      navigate('/create-story-manual', {
+        state: {
+          storyId,
           returnToPageIndex: pageIndex,
           // Pass back collaboration info
           sessionId: isCollaborating ? currentSessionId : undefined,
           isCollaborative: isCollaborating,
           isHost: isHost
-        } 
+        }
       });
     } else {
       navigate('/create-story-manual');
@@ -1390,7 +1394,7 @@ const CanvasDrawingPage: React.FC = () => {
       setRecentColors(newRecentColors);
     }
     setShowColorPicker(false);
-    
+
     if (drawingEngineRef.current) {
       drawingEngineRef.current.setColor(color);
     }
@@ -1409,6 +1413,12 @@ const CanvasDrawingPage: React.FC = () => {
     '#84CC16', '#22C55E', '#10B981', '#14B8A6', '#06B6D4', '#0EA5E9',
     '#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#D946EF', '#EC4899',
     '#F43F5E', '#6B7280', '#9CA3AF', '#D1D5DB'
+  ];
+
+  // PixelTales design-profile palette (quick swatches for brush pill & mobile color row)
+  const studioPalette = [
+    '#111827', '#ff6b6b', '#ffa94d', '#ffe66d',
+    '#4ecdc4', '#60a5fa', '#a78bfa', '#f472b6'
   ];
 
   const shapeTypes: { type: ShapeType; label: string }[] = [
@@ -1437,7 +1447,9 @@ const CanvasDrawingPage: React.FC = () => {
   // Check if mobile
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width < 1024);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -1477,13 +1489,13 @@ const CanvasDrawingPage: React.FC = () => {
       console.log('✅ Canvas: WebSocket already connected to this session, reusing connection');
       return;
     }
-    
+
     // If connected to a different session, we need to reconnect
     if (collaborationService.isConnected() && collaborationService.sessionId !== currentSessionId) {
       console.log('⚠️ Connected to different session, disconnecting first');
       collaborationService.disconnect();
     }
-    
+
     // Sync session ID if service has one but we don't
     if (collaborationService.sessionId && !currentSessionId && collaborationService.isConnected()) {
       console.log('🔧 Syncing session ID from service');
@@ -1534,7 +1546,7 @@ const CanvasDrawingPage: React.FC = () => {
         messageKeys: Object.keys(message),
         dataKeys: message.data ? Object.keys(message.data) : 'no data'
       });
-      
+
       // Handle fill tool separately via CollaborationEnhancer
       if (message.data && message.data.tool === 'fill') {
         console.log('🎨 Detected fill tool message, routing to CollaborationEnhancer:', message.data);
@@ -1545,7 +1557,7 @@ const CanvasDrawingPage: React.FC = () => {
         }
         return;
       }
-      
+
       // Handle transform operations via CollaborationEnhancer
       if (message.data && message.data.type === 'transform') {
         console.log('🔄 Detected transform message, routing to CollaborationEnhancer:', message.data);
@@ -1556,15 +1568,15 @@ const CanvasDrawingPage: React.FC = () => {
         }
         return;
       }
-      
+
       if (!drawingEngineRef.current || !message.data) return;
-      
+
       // DRAWING ISOLATION: Only apply drawings from the exact same canvas
       const messageCoverImage = message.is_cover_image || message.page_id === 'cover_image';
       const currentCoverImage = isCoverImage || false;
-      
+
       let shouldApplyDrawing = false;
-      
+
       if (messageCoverImage && currentCoverImage) {
         // Both are cover image - apply drawing
         shouldApplyDrawing = true;
@@ -1586,7 +1598,7 @@ const CanvasDrawingPage: React.FC = () => {
         }
       }
       // If one is cover and one is page, shouldApplyDrawing stays false
-      
+
       console.log('🎨 Drawing operation filtering:', {
         messagePageId: message.page_id,
         messageCoverImage,
@@ -1594,7 +1606,7 @@ const CanvasDrawingPage: React.FC = () => {
         currentCoverImage,
         shouldApply: shouldApplyDrawing
       });
-      
+
       if (shouldApplyDrawing) {
         console.log('✅ Applying remote drawing from same canvas:', message.data);
         drawingEngineRef.current.applyRemoteDrawing(message.data);
@@ -1606,13 +1618,13 @@ const CanvasDrawingPage: React.FC = () => {
     // Handle batched drawing updates
     const handleRemoteDrawBatch = (message: any) => {
       if (!drawingEngineRef.current || !message.batch) return;
-      
+
       message.batch.forEach((item: any) => {
         // Reuse canvas matching logic
         const messageCoverImage = item.is_cover_image || item.page_id === 'cover_image';
         const currentCoverImage = isCoverImage || false;
         let shouldApplyDrawing = false;
-        
+
         if (messageCoverImage && currentCoverImage) {
           shouldApplyDrawing = true;
         } else if (!messageCoverImage && !currentCoverImage) {
@@ -1624,7 +1636,7 @@ const CanvasDrawingPage: React.FC = () => {
             shouldApplyDrawing = true;
           }
         }
-        
+
         if (shouldApplyDrawing && item.data) {
           drawingEngineRef.current.applyRemoteDrawing(item.data);
         }
@@ -1637,11 +1649,11 @@ const CanvasDrawingPage: React.FC = () => {
         // CURSOR ISOLATION: Only show cursors from the same canvas type
         const messageCoverImage = message.is_cover_image || message.page_id === 'cover_image';
         const currentCoverImage = isCoverImage || false;
-        
+
         // For page canvas: only show cursors from the exact same page
         // For cover canvas: only show cursors from cover canvas
         let shouldShowCursor = false;
-        
+
         if (messageCoverImage && currentCoverImage) {
           // Both are cover image - show cursor
           shouldShowCursor = true;
@@ -1661,7 +1673,7 @@ const CanvasDrawingPage: React.FC = () => {
           }
         }
         // If one is cover and one is page, shouldShowCursor stays false
-        
+
         console.log('🖱️ Cursor update filtering:', {
           messagePageId: message.page_id,
           messageCoverImage,
@@ -1669,16 +1681,16 @@ const CanvasDrawingPage: React.FC = () => {
           currentCoverImage,
           shouldShow: shouldShowCursor
         });
-        
+
         if (shouldShowCursor) {
           setRemoteCursors(prev => {
             const updated = new Map(prev);
             // Get color from: message > userColorsRef > existing map > default red
-            const userColor = message.cursor_color || 
-                            userColorsRef.current.get(message.user_id) || 
-                            prev.get(message.user_id)?.color || 
-                            '#FF0000';
-            
+            const userColor = message.cursor_color ||
+              userColorsRef.current.get(message.user_id) ||
+              prev.get(message.user_id)?.color ||
+              '#FF0000';
+
             updated.set(message.user_id, {
               user_id: message.user_id,
               username: message.username || 'Unknown',
@@ -1705,7 +1717,7 @@ const CanvasDrawingPage: React.FC = () => {
         // Store color in ref for persistence
         userColorsRef.current.set(message.user_id, message.cursor_color);
         console.log('🎨 Stored user color:', { user_id: message.user_id, color: message.cursor_color });
-        
+
         setRemoteCursors(prev => {
           const updated = new Map(prev);
           const existing = updated.get(message.user_id);
@@ -1718,7 +1730,7 @@ const CanvasDrawingPage: React.FC = () => {
           });
           return updated;
         });
-        
+
         // Note: Toast notifications are handled by ManualStoryCreationPage to avoid duplicates
       }
     };
@@ -1731,7 +1743,7 @@ const CanvasDrawingPage: React.FC = () => {
           updated.delete(message.user_id);
           return updated;
         });
-        
+
         // Note: Toast notifications are handled by ManualStoryCreationPage to avoid duplicates
       }
     };
@@ -1739,13 +1751,13 @@ const CanvasDrawingPage: React.FC = () => {
     // Handle canvas clear with page isolation
     const handleClear = (message: any) => {
       if (!drawingEngineRef.current) return;
-      
+
       // CLEAR ISOLATION: Only apply clears from the exact same canvas
       const messageCoverImage = message.is_cover_image || message.page_id === 'cover_image';
       const currentCoverImage = isCoverImage || false;
-      
+
       let shouldApplyClear = false;
-      
+
       if (messageCoverImage && currentCoverImage) {
         // Both are cover image - apply clear
         shouldApplyClear = true;
@@ -1765,7 +1777,7 @@ const CanvasDrawingPage: React.FC = () => {
         }
       }
       // If one is cover and one is page, shouldApplyClear stays false
-      
+
       console.log('🧽 Clear operation filtering:', {
         messagePageId: message.page_id,
         messageCoverImage,
@@ -1773,7 +1785,7 @@ const CanvasDrawingPage: React.FC = () => {
         currentCoverImage,
         shouldApply: shouldApplyClear
       });
-      
+
       if (shouldApplyClear) {
         console.log('✅ Applying remote clear from same canvas');
         drawingEngineRef.current.applyRemoteClear();
@@ -1812,7 +1824,7 @@ const CanvasDrawingPage: React.FC = () => {
     // Handle remote transform operations
     const handleTransform = (message: any) => {
       if (!drawingEngineRef.current || !message.data) return;
-      
+
       console.log('🎨 Canvas: Received remote transform:', message.data);
       drawingEngineRef.current.applyRemoteTransform(message.data);
     };
@@ -1820,7 +1832,7 @@ const CanvasDrawingPage: React.FC = () => {
     // Handle remote delete operations
     const handleDelete = (message: any) => {
       if (!drawingEngineRef.current || !message.data) return;
-      
+
       console.log('🎨 Canvas: Received remote delete:', message.data);
       // Delete operation could be implemented if needed
     };
@@ -1843,7 +1855,7 @@ const CanvasDrawingPage: React.FC = () => {
     collaborationService.on('title_edit', handleRemoteTitleEdit);
     collaborationService.on('page_added', handleRemotePageAdd);
     collaborationService.on('page_deleted', handleRemotePageDelete);
-    
+
     // Advanced collaboration handlers for text, layers, and transforms
     collaborationService.on('text_edit_advanced', (message: any) => {
       if (collaborationEnhancerRef.current && message.user_id !== getCurrentUserId()) {
@@ -1851,7 +1863,7 @@ const CanvasDrawingPage: React.FC = () => {
         collaborationEnhancerRef.current.applyRemoteTextEdit(message.data);
       }
     });
-    
+
     collaborationService.on('layer_operation', (message: any) => {
       if (collaborationEnhancerRef.current && message.user_id !== getCurrentUserId()) {
         console.log('📨 Received remote layer operation:', message);
@@ -1860,14 +1872,14 @@ const CanvasDrawingPage: React.FC = () => {
         setTimeout(() => updateLayersList(), 100);
       }
     });
-    
+
     collaborationService.on('transform_operation', (message: any) => {
       if (collaborationEnhancerRef.current && message.user_id !== getCurrentUserId()) {
         console.log('📥 Received remote transform:', message);
         collaborationEnhancerRef.current.applyRemoteTransform(message.data);
       }
     });
-    
+
     collaborationService.on('delete_item', (message: any) => {
       if (collaborationEnhancerRef.current && message.user_id !== getCurrentUserId()) {
         console.log('📥 Received remote delete:', message);
@@ -1879,18 +1891,18 @@ const CanvasDrawingPage: React.FC = () => {
     collaborationService.on('request_canvas_state', (message: any) => {
       console.log('📥 Received request for canvas state from user:', message.requesting_user_id);
       console.log('🔍 My DrawingEngine exists?', !!drawingEngineRef.current);
-      
+
       // Send our current canvas state to the requesting user
       if (!drawingEngineRef.current) {
         console.error('❌ Cannot send canvas state - DrawingEngine not available!');
         return;
       }
-      
+
       try {
         const canvasData = drawingEngineRef.current.getDrawingState();
         console.log('📤 Sending canvas state:', canvasData);
         console.log('📤 Canvas data has items?', canvasData && canvasData.projectData ? 'yes' : 'no');
-        
+
         collaborationService.sendCanvasState(
           canvasData,
           message.requesting_user_id,
@@ -1908,18 +1920,18 @@ const CanvasDrawingPage: React.FC = () => {
       console.log('📥 Received canvas state from user:', message.sender_user_id);
       console.log('📦 Canvas data received:', message.canvas_data);
       console.log('🔍 DrawingEngine exists?', !!drawingEngineRef.current);
-      
+
       // Apply the received canvas state
       if (!drawingEngineRef.current) {
         console.error('❌ DrawingEngine not available!');
         return;
       }
-      
+
       if (!message.canvas_data) {
         console.error('❌ No canvas data received!');
         return;
       }
-      
+
       console.log('🔄 Loading canvas state...');
       try {
         drawingEngineRef.current.loadDrawingState(message.canvas_data);
@@ -1932,7 +1944,7 @@ const CanvasDrawingPage: React.FC = () => {
     // Voting handlers
     const handleVoteInitiated = async (message: any) => {
       console.log('🗳️ Canvas: Vote initiated', message);
-      
+
       // Fetch fresh participant list before showing voting modal
       if (currentSessionId) {
         try {
@@ -1942,7 +1954,7 @@ const CanvasDrawingPage: React.FC = () => {
           console.error('Failed to fetch participants for voting:', error);
         }
       }
-      
+
       const voteData = {
         vote_id: message.vote_id,
         initiated_by: message.initiated_by,
@@ -1950,11 +1962,11 @@ const CanvasDrawingPage: React.FC = () => {
         total_participants: message.total_participants,
         question: message.question || 'Save and end the collaboration session?'
       };
-      
+
       setVotingData(voteData);
       voteInitiatorRef.current = message.initiated_by;
       setShowVotingModal(true);
-      
+
       // Auto-vote "agree" if this user initiated the vote
       if (message.initiated_by == currentUserId) {
         console.log('🚀 Canvas: Vote initiator auto-voting YES');
@@ -1966,11 +1978,11 @@ const CanvasDrawingPage: React.FC = () => {
 
     const handleVoteUpdate = (message: any) => {
       console.log('🗳️ Canvas: Vote update', message);
-      
+
       // Update the voting data with new votes
       setVotingData((prev: any) => {
         if (!prev || prev.vote_id !== message.vote_id) return prev;
-        
+
         return {
           ...prev,
           voting_data: message.voting_data || {},
@@ -1984,7 +1996,7 @@ const CanvasDrawingPage: React.FC = () => {
     const handleVoteResult = (message: any) => {
       const voteInitiatorId = voteInitiatorRef.current;
       const isCurrentUserInitiator = voteInitiatorId && voteInitiatorId == currentUserId;
-      
+
       console.log('🗳️ Canvas: Vote result received:', {
         approved: message.approved,
         voteInitiatorId,
@@ -1992,18 +2004,18 @@ const CanvasDrawingPage: React.FC = () => {
         isCurrentUserInitiator,
         initiatorName: votingData?.initiated_by_username
       });
-      
+
       setShowVotingModal(false);
-      
+
       if (message.approved) {
         if (isCurrentUserInitiator) {
           // Vote initiator: Save canvas and navigate back
           console.log('✅ Canvas: Vote initiator - saving canvas and navigating back');
           showInfoToast('Vote passed! Saving canvas...');
-          
+
           if (storyId && drawingEngineRef.current) {
             const canvasData = drawingEngineRef.current.getCanvasData();
-            
+
             if (isCoverImage) {
               updateStory(storyId, { coverImage: canvasData });
             } else if (pageId) {
@@ -2014,20 +2026,20 @@ const CanvasDrawingPage: React.FC = () => {
               };
               saveCanvasData(storyId, pageId, canvasStateData);
             }
-            
+
             markAsDraft(storyId);
           }
-          
+
           // Navigate back to story creation
           setTimeout(() => {
-            navigate('/create-story-manual', { 
-              state: { 
-                storyId, 
+            navigate('/create-story-manual', {
+              state: {
+                storyId,
                 returnToPageIndex: pageIndex,
                 sessionId: currentSessionId,
                 isCollaborative: true,
                 isHost: true
-              } 
+              }
             });
           }, 2000);
         } else {
@@ -2036,18 +2048,18 @@ const CanvasDrawingPage: React.FC = () => {
           console.log('⏳ Canvas: Other participant - showing saving overlay');
           showInfoToast(`Vote passed! ${initiatorName} is saving the canvas...`);
           setShowSavingOverlay(true);
-          
+
           // Wait for completion then navigate
           setTimeout(() => {
             setShowSavingOverlay(false);
-            navigate('/create-story-manual', { 
-              state: { 
-                storyId, 
+            navigate('/create-story-manual', {
+              state: {
+                storyId,
                 returnToPageIndex: pageIndex,
                 sessionId: currentSessionId,
                 isCollaborative: true,
                 isHost: false
-              } 
+              }
             });
           }, 3000);
         }
@@ -2055,7 +2067,7 @@ const CanvasDrawingPage: React.FC = () => {
         showInfoToast('Vote did not pass. Continuing with canvas editing...');
         setShowSavingOverlay(false);
       }
-      
+
       setVotingData(null);
       voteInitiatorRef.current = null;
     };
@@ -2121,7 +2133,7 @@ const CanvasDrawingPage: React.FC = () => {
     if (drawingEngineRef.current && textInput.trim()) {
       // Set the text color in the drawing engine
       drawingEngineRef.current.setColor(textColor);
-      
+
       // Add text to canvas (the drawing engine will handle collaboration internally)
       drawingEngineRef.current.addText({
         text: textInput,
@@ -2130,7 +2142,7 @@ const CanvasDrawingPage: React.FC = () => {
         fontWeight,
         textAlign
       }, textPosition || undefined);
-      
+
       // Reset and close
       setTextInput('');
       setShowTextModal(false);
@@ -2205,35 +2217,35 @@ const CanvasDrawingPage: React.FC = () => {
   const updateLayersList = () => {
     if (drawingEngineRef.current) {
       const layersList = drawingEngineRef.current.getLayers();
-      
+
       // Always update thumbnail cache with latest thumbnails
       layersList.forEach(layer => {
         if (layer.thumbnail) {
           thumbnailCacheRef.current.set(layer.id, layer.thumbnail);
         }
       });
-      
+
       setLayers(layersList);
-      
+
       const activeLayer = drawingEngineRef.current.getActiveLayer();
       setActiveLayerId(activeLayer?.id || null);
     }
   };
-  
+
   // Debounced opacity change for smooth slider
   const handleLayerOpacityChangeDebounced = (layerId: string, opacity: number) => {
     // Update UI immediately for smooth slider
-    setLayers(prevLayers => 
-      prevLayers.map(layer => 
+    setLayers(prevLayers =>
+      prevLayers.map(layer =>
         layer.id === layerId ? { ...layer, opacity } : layer
       )
     );
-    
+
     // Debounce the actual engine update
     if (opacityTimeoutRef.current) {
       clearTimeout(opacityTimeoutRef.current);
     }
-    
+
     opacityTimeoutRef.current = window.setTimeout(() => {
       if (drawingEngineRef.current) {
         drawingEngineRef.current.setLayerOpacity(layerId, opacity);
@@ -2350,31 +2362,31 @@ const CanvasDrawingPage: React.FC = () => {
       }
     }
   };
-  
+
   // Drag and drop handlers for mobile-friendly reordering
   const handleLayerDragStart = (e: React.DragEvent | React.TouchEvent, layerId: string) => {
     setDraggingLayerId(layerId);
-    
+
     // For touch events
     if ('touches' in e) {
       e.currentTarget.classList.add('dragging');
     }
   };
-  
+
   const handleLayerDragOver = (e: React.DragEvent, layerId: string) => {
     e.preventDefault();
     if (draggingLayerId && draggingLayerId !== layerId) {
       setDragOverLayerId(layerId);
     }
   };
-  
+
   const handleLayerDrop = (e: React.DragEvent, targetLayerId: string) => {
     e.preventDefault();
-    
+
     if (draggingLayerId && draggingLayerId !== targetLayerId && drawingEngineRef.current) {
       const dragIndex = layers.findIndex(l => l.id === draggingLayerId);
       const targetIndex = layers.findIndex(l => l.id === targetLayerId);
-      
+
       if (dragIndex !== -1 && targetIndex !== -1) {
         // Convert display index to Paper.js layer index (reversed)
         const paperTargetIndex = layers.length - targetIndex - 1;
@@ -2382,11 +2394,11 @@ const CanvasDrawingPage: React.FC = () => {
         updateLayersList();
       }
     }
-    
+
     setDraggingLayerId(null);
     setDragOverLayerId(null);
   };
-  
+
   const handleLayerDragEnd = () => {
     setDraggingLayerId(null);
     setDragOverLayerId(null);
@@ -2434,10 +2446,10 @@ const CanvasDrawingPage: React.FC = () => {
 
   const handleToolClick = (tool: Tool, event?: React.MouseEvent<HTMLButtonElement>) => {
     const toolsWithSubmenu: Tool[] = ['brush', 'shapes']; // Removed 'eraser' - no submenu needed
-    
+
     // Always set the tool as active
     setActiveTool(tool);
-    
+
     if (toolsWithSubmenu.includes(tool)) {
       // Toggle submenu if clicking the same tool
       if (showToolSubmenu && submenuTool === tool) {
@@ -2451,7 +2463,7 @@ const CanvasDrawingPage: React.FC = () => {
             left: buttonRect.right + 12 // 12px gap from button to prevent overlap
           });
         }
-        
+
         // Show submenu but also activate the tool
         setSubmenuTool(tool);
         setShowToolSubmenu(true);
@@ -2471,6 +2483,7 @@ const CanvasDrawingPage: React.FC = () => {
     }
   };
 
+
   return (
     <>
       {/* Reconnecting Modal */}
@@ -2489,18 +2502,18 @@ const CanvasDrawingPage: React.FC = () => {
         // Convert canvas coordinates to screen coordinates
         // Canvas coords are always 0-500, but screen size varies based on device/zoom
         if (!canvasRef.current) return null;
-        
+
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
-        
+
         // Calculate scale from canvas pixels (500x500) to screen pixels
         const scaleX = rect.width / canvas.width;   // canvas.width = 500
         const scaleY = rect.height / canvas.height; // canvas.height = 500
-        
+
         // Convert canvas coordinates to screen coordinates
         const screenX = rect.left + (cursor.x * scaleX);
         const screenY = rect.top + (cursor.y * scaleY);
-        
+
         // Helper function to determine if color is light or dark for text contrast
         const getContrastColor = (hexColor: string) => {
           // Remove # if present
@@ -2514,9 +2527,9 @@ const CanvasDrawingPage: React.FC = () => {
           // Return black for light colors, white for dark colors
           return luminance > 0.5 ? '#000000' : '#FFFFFF';
         };
-        
+
         const textColor = getContrastColor(cursor.color);
-        
+
         return (
           <div
             key={cursor.user_id}
@@ -2532,9 +2545,9 @@ const CanvasDrawingPage: React.FC = () => {
               className="w-4 h-4 rounded-full border-2 border-white shadow-lg"
               style={{ backgroundColor: cursor.color }}
             />
-            <div 
+            <div
               className="mt-1 px-2 py-1 text-xs rounded whitespace-nowrap shadow-lg"
-              style={{ 
+              style={{
                 backgroundColor: cursor.color,
                 color: textColor
               }}
@@ -2545,495 +2558,1185 @@ const CanvasDrawingPage: React.FC = () => {
         );
       })}
 
-      {/* Collaboration Status Indicator */}
-      <div className={`canvas-studio ${isMobile ? 'canvas-studio-mobile' : 'canvas-studio-desktop'}`}>
-      {/* Top Bar */}
-      <div className="canvas-studio-topbar">
-        <div className="canvas-studio-topbar-left">
-          <button 
-            className="canvas-studio-topbar-btn"
-            onClick={handleUndo}
-            aria-label="Undo"
-          >
-            <ArrowUturnLeftIcon className="canvas-studio-topbar-icon" />
-          </button>
-          <button 
-            className="canvas-studio-topbar-btn"
-            onClick={handleRedo}
-            aria-label="Redo"
-          >
-            <ArrowUturnRightIcon className="canvas-studio-topbar-icon" />
-          </button>
-        </div>
-        
-        <div className="canvas-studio-topbar-center">
-          <button 
-            className="canvas-studio-topbar-btn"
-            onClick={() => setZoomLevel(prev => Math.max(prev - 0.1, 0.1))}
-            aria-label="Zoom out"
-          >
-            <MinusIcon className="canvas-studio-topbar-icon" />
-          </button>
-          <button className="canvas-studio-topbar-btn" onClick={handleResetZoom} aria-label="Reset zoom">
-            <ArrowPathIcon className="canvas-studio-topbar-icon" />
-          </button>
-          <input
-            type="text"
-            className="canvas-studio-zoom-input"
-            value={Math.round(zoomLevel * 100)}
-            onChange={(e) => {
-              const value = parseInt(e.target.value);
-              if (!isNaN(value) && value > 0 && value <= 500) {
-                setZoomLevel(value / 100);
-              }
-            }}
-            onBlur={(e) => {
-              const value = parseInt(e.target.value);
-              if (isNaN(value) || value <= 0) {
-                setZoomLevel(1);
-              }
-            }}
-            aria-label="Zoom percentage"
-            style={{
-              backgroundColor: '#404650',
-              color: '#FFFFFF',
-              borderColor: '#404650'
-            }}
-          />
-          <span className="canvas-studio-zoom-percent">%</span>
-          <button 
-            className="canvas-studio-topbar-btn"
-            onClick={() => setZoomLevel(prev => Math.min(prev + 0.1, 5))}
-            aria-label="Zoom in"
-          >
-            <PlusIcon className="canvas-studio-topbar-icon" />
-          </button>
-        </div>
-        
-        <div className="canvas-studio-topbar-right">
-          {/* Collaboration button removed - now in ManualStoryCreationPage */}
-          <button className="canvas-studio-topbar-btn" onClick={handleDone} aria-label="Save">
-            <CheckIcon className="canvas-studio-topbar-icon" />
-          </button>
-        </div>
-      </div>
+      <div className={`canvas-studio ${isMobile ? 'canvas-studio-mobile' : 'canvas-studio-desktop'} ${isTablet ? 'canvas-studio-tablet' : ''}`}>
+        {/* ===== Header ===== */}
+        <header className="studio-header">
+          <div className="studio-header-left">
+            <div className="studio-logo">
+              <div className="studio-logo-mark">P</div>
+              <span className="studio-logo-title">PixelTales</span>
+            </div>
+          </div>
 
-      {/* Desktop: Three-column layout */}
-      {!isMobile && (
-        <>
-          {/* Left Toolbar */}
-          <div className="canvas-studio-left-toolbar">
-            {/* Select Tool */}
+          <div className="studio-header-center">
             <button
-              className={`canvas-studio-tool-btn ${activeTool === 'select' ? 'canvas-studio-tool-btn-active' : ''}`}
-              onClick={() => handleToolClick('select')}
-              aria-label="Select"
+              className="studio-icon-btn"
+              onClick={handleUndo}
+              aria-label="Undo"
             >
-              <CursorArrowRaysIcon className="canvas-studio-tool-icon" />
-              <span className="canvas-studio-tool-label">Select</span>
+              <ArrowUturnLeftIcon className="studio-icon" />
+            </button>
+            <button
+              className="studio-icon-btn"
+              onClick={handleRedo}
+              aria-label="Redo"
+            >
+              <ArrowUturnRightIcon className="studio-icon" />
             </button>
 
-            {/* Brush Tool - Dynamic Icon */}
-            <button
-              className={`canvas-studio-tool-btn ${activeTool === 'brush' ? 'canvas-studio-tool-btn-active' : ''}`}
-              onClick={(e) => handleToolClick('brush', e)}
-              aria-label="Brush"
-            >
-              {renderBrushIcon(activeBrush)}
-              <span className="canvas-studio-tool-label">Brush</span>
-              <div className="canvas-studio-tool-indicator" />
-            </button>
+            {!isMobile && (
+              <div className="studio-zoom-pill">
+                <button
+                  className="studio-zoom-btn"
+                  onClick={() => setZoomLevel(prev => Math.max(prev - 0.1, 0.1))}
+                  aria-label="Zoom out"
+                >
+                  <MinusIcon className="studio-zoom-icon" />
+                </button>
+                <input
+                  type="text"
+                  className="canvas-studio-zoom-input"
+                  value={Math.round(zoomLevel * 100)}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    if (!isNaN(value) && value > 0 && value <= 500) {
+                      setZoomLevel(value / 100);
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const value = parseInt(e.target.value);
+                    if (isNaN(value) || value <= 0) {
+                      setZoomLevel(1);
+                    }
+                  }}
+                  aria-label="Zoom percentage"
+                />
+                <span className="studio-zoom-percent">%</span>
+                <button className="studio-zoom-btn" onClick={handleResetZoom} aria-label="Reset zoom">
+                  <ArrowPathIcon className="studio-zoom-icon" />
+                </button>
+                <button
+                  className="studio-zoom-btn"
+                  onClick={() => setZoomLevel(prev => Math.min(prev + 0.1, 5))}
+                  aria-label="Zoom in"
+                >
+                  <PlusIcon className="studio-zoom-icon" />
+                </button>
+              </div>
+            )}
+          </div>
 
-            {/* Eraser Tool */}
-            <button
-              className={`canvas-studio-tool-btn ${activeTool === 'eraser' ? 'canvas-studio-tool-btn-active' : ''}`}
-              onClick={() => handleToolClick('eraser')}
-              aria-label="Eraser"
-            >
-              <div className="canvas-eraser-icon" />
-              <span className="canvas-studio-tool-label">Eraser</span>
-              <div className="canvas-studio-tool-indicator" />
-            </button>
-
-            {/* Fill Tool */}
-            <button
-              className={`canvas-studio-tool-btn ${activeTool === 'fill' ? 'canvas-studio-tool-btn-active' : ''}`}
-              onClick={() => handleToolClick('fill')}
-              aria-label="Fill"
-            >
-              <EyeDropperIcon className="canvas-studio-tool-icon" />
-              <span className="canvas-studio-tool-label">Fill</span>
-            </button>
-
-            {/* Shapes Tool - Dynamic Icon */}
-            <button
-              className={`canvas-studio-tool-btn ${activeTool === 'shapes' ? 'canvas-studio-tool-btn-active' : ''}`}
-              onClick={(e) => handleToolClick('shapes', e)}
-              aria-label="Shapes"
-            >
-              {renderShapeIcon(activeShape)}
-              <span className="canvas-studio-tool-label">Shapes</span>
-              <div className="canvas-studio-tool-indicator" />
-            </button>
-
-            {/* Text Tool */}
-            <button
-              className={`canvas-studio-tool-btn ${activeTool === 'text' ? 'canvas-studio-tool-btn-active' : ''}`}
-              onClick={() => handleToolClick('text')}
-              aria-label="Text"
-            >
-              <span className="canvas-studio-tool-icon-text">T</span>
-              <span className="canvas-studio-tool-label">Text</span>
-            </button>
-
-            {/* Divider */}
-            <div style={{ height: '1px', background: '#E5E7EB', margin: '8px 0' }} />
-
-            {/* Clear Canvas Button */}
-            <button
-              className="canvas-studio-tool-btn"
-              onClick={handleClearCanvas}
-              aria-label="Clear Canvas"
-              style={{ color: '#EF4444' }}
-            >
-              <TrashIcon className="canvas-studio-tool-icon" />
-              <span className="canvas-studio-tool-label">Clear</span>
+          <div className="studio-header-right">
+            <button className="studio-save-btn" onClick={handleDone} aria-label="Save">
+              <ArrowDownTrayIcon className="studio-save-icon" />
+              {!isMobile && <span>Save</span>}
             </button>
           </div>
-        </>
-      )}
+        </header>
 
-      {/* Tool Submenu - Works for both Desktop and Mobile */}
-      {showToolSubmenu && submenuTool && (
-        <>
-          {/* Backdrop for mobile */}
-          {isMobile && (
-            <div 
-              className="canvas-studio-submenu-backdrop"
-              onClick={() => setShowToolSubmenu(false)}
-            />
+        {/* ===== Main body ===== */}
+        <div className="studio-body">
+          {/* Left tool sidebar - tablet & widescreen */}
+          {!isMobile && (
+            <aside className="studio-sidebar">
+              {/* Select Tool */}
+              <button
+                className={`canvas-studio-tool-btn studio-tool-btn ${activeTool === 'select' ? 'studio-tool-btn-active' : ''}`}
+                onClick={() => handleToolClick('select')}
+                aria-label="Select"
+              >
+                <CursorArrowRaysIcon className="studio-tool-icon" />
+                <span className="studio-tool-label">Select</span>
+              </button>
+
+              {/* Brush Tool - Dynamic Icon */}
+              <button
+                className={`canvas-studio-tool-btn studio-tool-btn ${activeTool === 'brush' ? 'studio-tool-btn-active' : ''}`}
+                onClick={(e) => handleToolClick('brush', e)}
+                aria-label="Brush"
+              >
+                {renderBrushIcon(activeBrush, 'studio-tool-icon')}
+                <span className="studio-tool-label">Brush</span>
+              </button>
+
+              {/* Eraser Tool */}
+              <button
+                className={`canvas-studio-tool-btn studio-tool-btn ${activeTool === 'eraser' ? 'studio-tool-btn-active' : ''}`}
+                onClick={() => handleToolClick('eraser')}
+                aria-label="Eraser"
+              >
+                <div className="canvas-eraser-icon" />
+                <span className="studio-tool-label">Eraser</span>
+              </button>
+
+              {/* Fill Tool */}
+              <button
+                className={`canvas-studio-tool-btn studio-tool-btn ${activeTool === 'fill' ? 'studio-tool-btn-active' : ''}`}
+                onClick={() => handleToolClick('fill')}
+                aria-label="Fill"
+              >
+                <EyeDropperIcon className="studio-tool-icon" />
+                <span className="studio-tool-label">Fill</span>
+              </button>
+
+              {/* Shapes Tool - Dynamic Icon */}
+              <button
+                className={`canvas-studio-tool-btn studio-tool-btn ${activeTool === 'shapes' ? 'studio-tool-btn-active' : ''}`}
+                onClick={(e) => handleToolClick('shapes', e)}
+                aria-label="Shapes"
+              >
+                {renderShapeIcon(activeShape, 'studio-tool-icon')}
+                <span className="studio-tool-label">Shapes</span>
+              </button>
+
+              {/* Text Tool */}
+              <button
+                className={`canvas-studio-tool-btn studio-tool-btn ${activeTool === 'text' ? 'studio-tool-btn-active' : ''}`}
+                onClick={() => handleToolClick('text')}
+                aria-label="Text"
+              >
+                <span className="studio-tool-icon-text">T</span>
+                <span className="studio-tool-label">Text</span>
+              </button>
+
+              <div className="studio-sidebar-divider" />
+
+              {/* Layers - opens modal on tablet, focuses panel on widescreen */}
+              <button
+                className="canvas-studio-tool-btn studio-tool-btn"
+                onClick={() => (isTablet ? setShowLayersModal(true) : setActivePanel('layers'))}
+                aria-label="Layers"
+              >
+                <Square3Stack3DIcon className="studio-tool-icon" />
+                <span className="studio-tool-label">Layers</span>
+              </button>
+            </aside>
           )}
-          <div 
-            className={`canvas-studio-submenu ${isMobile ? 'canvas-studio-submenu-mobile' : ''}`}
-            style={!isMobile ? { top: `${submenuPosition.top}px`, left: `${submenuPosition.left}px` } : undefined}
-          >
-          {submenuTool === 'brush' && (
-            <>
-              {brushTypes.map(({ type, label }) => (
-                <button
-                  key={type}
-                  className={`canvas-studio-submenu-item ${activeBrush === type ? 'canvas-studio-submenu-item-active' : ''}`}
-                  onClick={() => {
-                    handleBrushSelect(type);
-                    setActiveTool('brush');
-                    setShowToolSubmenu(false);
+
+          {/* ===== Canvas area (single canvas, all breakpoints) ===== */}
+          <main className={`studio-canvas-area ${isMobile ? 'studio-canvas-area-mobile' : ''}`}>
+            <div className="studio-canvas-stage">
+              <div
+                className="canvas-studio-canvas-wrapper"
+                style={{
+                  transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomLevel})`,
+                  transformOrigin: 'center',
+                  touchAction: 'none',
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                  WebkitTouchCallout: 'none'
+                }}
+              >
+                {/* Candy decorations */}
+                <div className="studio-deco studio-deco-tl" />
+                <div className="studio-deco studio-deco-br" />
+                <canvas
+                  ref={canvasRef}
+                  className="canvas-studio-canvas"
+                  style={{
+                    touchAction: 'none',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    WebkitTouchCallout: 'none'
+                  }}
+                />
+              </div>
+
+              {/* Shape variants picker - floating top-left (tablet & widescreen) */}
+              {!isMobile && activeTool === 'shapes' && (
+                <div className="studio-shape-picker">
+                  {shapeTypes.map(({ type, label }) => (
+                    <button
+                      key={type}
+                      className={`studio-variant-btn ${activeShape === type ? 'studio-variant-btn-active' : ''}`}
+                      onClick={() => handleShapeSelect(type)}
+                      title={label}
+                      aria-label={label}
+                    >
+                      {renderShapeIcon(type, 'studio-variant-icon')}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Brush Settings Popover for Tablet/Widescreen */}
+              {!isMobile && showBrushSettingsPopover && ['brush', 'eraser', 'shapes', 'text', 'fill'].includes(activeTool) && (
+                <div 
+                  style={{
+                    position: 'absolute',
+                    bottom: '84px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 30,
+                    width: '320px',
+                    borderRadius: '1rem',
+                    boxShadow: 'var(--studio-shadow-floating-pill)',
+                    overflow: 'hidden'
                   }}
                 >
-                  {renderBrushIcon(type, 'canvas-studio-submenu-icon')}
-                  <span className="canvas-studio-submenu-label">{label}</span>
-                  {activeBrush === type && <CheckIcon className="canvas-studio-submenu-check" />}
-                </button>
-              ))}
-            </>
-          )}
-          {submenuTool === 'shapes' && (
-            <>
-              {shapeTypes.map(({ type, label }) => (
-                <button
-                  key={type}
-                  className={`canvas-studio-submenu-item ${activeShape === type ? 'canvas-studio-submenu-item-active' : ''}`}
-                  onClick={() => handleShapeSelect(type)}
-                >
-                  {renderShapeIcon(type, 'canvas-studio-submenu-icon')}
-                  <span className="canvas-studio-submenu-label">{label}</span>
-                  {activeShape === type && <CheckIcon className="canvas-studio-submenu-check" />}
-                </button>
-              ))}
-            </>
-          )}
-          </div>
-        </>
-      )}
+                  {['brush', 'eraser', 'fill', 'text'].includes(activeTool) && (
+                    <div className="canvas-studio-mobile-sliders" style={{ border: '1px solid var(--studio-border)' }}>
+                      <div className="canvas-studio-sliders-header">
+                        <span className="canvas-studio-sliders-title">Tool Settings</span>
+                        <button
+                          className="canvas-studio-reset-btn"
+                          onClick={() => {
+                            setBrushSize(5);
+                            setBrushOpacity(1);
+                            if (drawingEngineRef.current) {
+                              drawingEngineRef.current.setSize(5);
+                              drawingEngineRef.current.setOpacity(1);
+                            }
+                          }}
+                          aria-label="Reset settings"
+                        >
+                          <ArrowPathIcon className="canvas-studio-reset-icon" />
+                        </button>
+                      </div>
 
-      {/* Canvas Area */}
-      <div className={`canvas-studio-canvas-area ${isMobile ? 'canvas-studio-canvas-area-mobile' : ''} ${isMobile && (showBrushPicker || showColorPicker || showBrushMenu) ? 'has-settings' : ''}`}>
-        <div 
-          className="canvas-studio-canvas-wrapper"
-          style={{
-            transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomLevel})`,
-            transformOrigin: 'center',
-            touchAction: 'none',
-            userSelect: 'none',
-            WebkitUserSelect: 'none',
-            WebkitTouchCallout: 'none'
-          }}
-        >
-          <canvas
-            ref={canvasRef}
-            className="canvas-studio-canvas"
-            style={{
-              touchAction: 'none',
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
-              WebkitTouchCallout: 'none'
-            }}
-          />
-        </div>
-        
-        {/* Floating Trash Zone */}
-        {showTrashZone && (
-          <div 
-            ref={trashZoneRef}
-            className={`canvas-studio-trash-zone ${isOverTrashZone ? 'canvas-studio-trash-zone-active' : ''}`}
-          >
-            <TrashIcon className="canvas-studio-trash-zone-icon" />
-            <span className="canvas-studio-trash-zone-text">
-              {isOverTrashZone ? 'Release to Delete' : 'Drag Here to Delete'}
-            </span>
-          </div>
-        )}
-      </div>
+                      <div className="canvas-studio-slider-container">
+                        <label className="canvas-studio-slider-label">
+                          <span>Size</span>
+                          <div className="canvas-studio-slider-preview">
+                            <div
+                              className="canvas-studio-brush-preview"
+                              style={{
+                                width: `${Math.min(brushSize, 30)}px`,
+                                height: `${Math.min(brushSize, 30)}px`,
+                                backgroundColor: selectedColor,
+                                opacity: brushOpacity
+                              }}
+                            />
+                            <span className="canvas-studio-slider-value">{brushSize}px</span>
+                          </div>
+                        </label>
+                        <input
+                          type="range"
+                          min="1"
+                          max="50"
+                          value={brushSize}
+                          onChange={(e) => setBrushSize(Number(e.target.value))}
+                          className="canvas-studio-slider"
+                        />
+                      </div>
 
-      {/* Right Panel - Desktop Only */}
-      {!isMobile && (
-        <div className="canvas-studio-right-panel">
-          {/* Tab Bar */}
-          <div className="canvas-studio-panel-tabs">
-            <button
-              className={`canvas-studio-panel-tab ${activePanel === 'layers' ? 'canvas-studio-panel-tab-active' : ''}`}
-              onClick={() => setActivePanel('layers')}
-            >
-              <Square3Stack3DIcon className="canvas-studio-panel-tab-icon" />
-              Layers
-            </button>
-            <button
-              className={`canvas-studio-panel-tab ${activePanel === 'colors' ? 'canvas-studio-panel-tab-active' : ''}`}
-              onClick={() => setActivePanel('colors')}
-            >
-              <div className="canvas-studio-color-circle-icon" />
-              Colors
-            </button>
-            <button
-              className={`canvas-studio-panel-tab ${activePanel === 'settings' ? 'canvas-studio-panel-tab-active' : ''}`}
-              onClick={() => setActivePanel('settings')}
-            >
-              <Cog6ToothIcon className="canvas-studio-panel-tab-icon" />
-              Settings
-            </button>
-          </div>
+                      <div className="canvas-studio-slider-container">
+                        <label className="canvas-studio-slider-label">
+                          <span>Opacity</span>
+                          <span className="canvas-studio-slider-value">{Math.round(brushOpacity * 100)}%</span>
+                        </label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={brushOpacity * 100}
+                          onChange={(e) => setBrushOpacity(Number(e.target.value) / 100)}
+                          className="canvas-studio-slider"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {activeTool === 'shapes' && (
+                    <div className="canvas-studio-mobile-sliders" style={{ border: '1px solid var(--studio-border)' }}>
+                      <div className="canvas-studio-sliders-header">
+                        <span className="canvas-studio-sliders-title">Shape Settings</span>
+                      </div>
+                      <div className="canvas-studio-slider-container">
+                        <label className="canvas-studio-slider-label">
+                          <span>Fill Mode</span>
+                          <button
+                            onClick={() => setShapeFilled(!shapeFilled)}
+                            className={`studio-mini-toggle ${shapeFilled ? 'studio-mini-toggle-active' : ''}`}
+                          >
+                            {shapeFilled ? 'Filled' : 'Hollow'}
+                          </button>
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
-          {/* Panel Content */}
-          <div className="canvas-studio-panel-content">
-            {activePanel === 'layers' && (
-              <>
-                {/* Add Layer Button */}
-                <div style={{ padding: '0.5rem', borderBottom: '1px solid var(--cs-border)' }}>
+              {/* Brush pill - floating bottom-center (tablet & widescreen) */}
+              {!isMobile && ['brush', 'fill', 'shapes', 'text'].includes(activeTool) && (
+                <div className="studio-brush-pill">
+                  {/* Settings Toggle Button */}
                   <button
-                    onClick={handleAddLayer}
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      background: 'var(--cs-purple)',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '0.375rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.5rem',
-                      fontSize: '0.875rem',
-                      fontWeight: '500',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--cs-purple-dark)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'var(--cs-purple)'}
+                    className={`studio-variant-btn ${showBrushSettingsPopover ? 'studio-variant-btn-active' : ''}`}
+                    onClick={() => setShowBrushSettingsPopover(!showBrushSettingsPopover)}
+                    title="Settings"
+                    aria-label="Settings"
                   >
-                    <PlusIcon style={{ width: '1rem', height: '1rem' }} />
-                    Add Layer
+                    <AdjustmentsHorizontalIcon className="studio-variant-icon" />
+                  </button>
+                  <div className="studio-pill-divider" />
+                  
+                  {activeTool === 'brush' && (
+                    <>
+                      {brushTypes.map(({ type, label }) => (
+                        <button
+                          key={type}
+                          className={`studio-variant-btn ${activeBrush === type ? 'studio-variant-btn-active' : ''}`}
+                          onClick={() => handleBrushSelect(type)}
+                          title={label}
+                          aria-label={label}
+                        >
+                          {renderBrushIcon(type, 'studio-variant-icon')}
+                        </button>
+                      ))}
+                      <div className="studio-pill-divider" />
+                    </>
+                  )}
+                  {studioPalette.map((color) => (
+                    <button
+                      key={`pill-${color}`}
+                      className={`studio-swatch ${color === selectedColor && !gradientActive ? 'studio-swatch-active' : ''}`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => handleColorSelect(color)}
+                      aria-label={`Select color ${color}`}
+                    />
+                  ))}
+                  
+                  {/* Show more colors button for Tablet */}
+                  {isTablet && (
+                    <>
+                      <div className="studio-pill-divider" />
+                      <button
+                        className="canvas-studio-color-circle-icon"
+                        onClick={() => setShowColorPicker(true)}
+                        title="More Colors"
+                        aria-label="More Colors"
+                        style={{ width: '28px', height: '28px', border: 'none', cursor: 'pointer', padding: 0 }}
+                      />
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Clear button - floating top-right (tablet & widescreen) */}
+              {!isMobile && (
+                <button
+                  className="studio-clear-btn"
+                  onClick={handleClearCanvas}
+                  aria-label="Clear Canvas"
+                >
+                  <TrashIcon className="studio-clear-icon" />
+                </button>
+              )}
+            </div>
+
+            {/* Floating Trash Zone */}
+            {showTrashZone && (
+              <div
+                ref={trashZoneRef}
+                className={`canvas-studio-trash-zone ${isOverTrashZone ? 'canvas-studio-trash-zone-active' : ''}`}
+              >
+                <TrashIcon className="canvas-studio-trash-zone-icon" />
+                <span className="canvas-studio-trash-zone-text">
+                  {isOverTrashZone ? 'Release to Delete' : 'Drag Here to Delete'}
+                </span>
+              </div>
+            )}
+          </main>
+
+          {/* ===== Right panel - widescreen only ===== */}
+          {!isMobile && !isTablet && (
+            <aside className="studio-right-panel">
+              {/* Tab Bar */}
+              <div className="studio-panel-tabs">
+                <button
+                  className={`studio-panel-tab ${activePanel === 'layers' ? 'studio-panel-tab-active' : ''}`}
+                  onClick={() => setActivePanel('layers')}
+                >
+                  <Square3Stack3DIcon className="studio-panel-tab-icon" />
+                  Layers
+                  <span className="studio-panel-count">{layers.length}</span>
+                </button>
+                <button
+                  className={`studio-panel-tab ${activePanel === 'colors' ? 'studio-panel-tab-active' : ''}`}
+                  onClick={() => setActivePanel('colors')}
+                >
+                  <div className="canvas-studio-color-circle-icon" />
+                  Colors
+                </button>
+                <button
+                  className={`studio-panel-tab ${activePanel === 'settings' ? 'studio-panel-tab-active' : ''}`}
+                  onClick={() => setActivePanel('settings')}
+                >
+                  <Cog6ToothIcon className="studio-panel-tab-icon" />
+                  Settings
+                </button>
+              </div>
+
+              {/* Panel Content */}
+              <div className="studio-panel-content">
+                {activePanel === 'layers' && (
+                  <>
+                    {/* Add Layer Button */}
+                    <div className="studio-add-layer-wrap">
+                      <button
+                        onClick={handleAddLayer}
+                        className="studio-add-layer-btn"
+                      >
+                        <PlusIcon style={{ width: '1rem', height: '1rem' }} />
+                        Add Layer
+                      </button>
+                    </div>
+
+                    <div className="canvas-studio-layers-list">
+                      {layers && layers.length > 0 ? layers.map((layer, index) => {
+                        // Use cached thumbnail if available
+                        const thumbnail = thumbnailCacheRef.current.get(layer.id) || layer.thumbnail;
+                        if (layer.thumbnail && !thumbnailCacheRef.current.has(layer.id)) {
+                          thumbnailCacheRef.current.set(layer.id, layer.thumbnail);
+                        }
+
+                        return (
+                          <div
+                            key={layer.id}
+                            className={`canvas-studio-layer-item ${layer.id === activeLayerId ? 'canvas-studio-layer-item-active' : ''} ${layer.locked ? 'canvas-studio-layer-item-locked' : ''} ${draggingLayerId === layer.id ? 'canvas-studio-layer-item-dragging' : ''} ${dragOverLayerId === layer.id ? 'canvas-studio-layer-item-drag-over' : ''}`}
+                            onClick={() => !layer.locked && handleSelectLayer(layer.id)}
+                            draggable={!layer.isBackground && !layer.locked}
+                            onDragStart={(e) => handleLayerDragStart(e, layer.id)}
+                            onDragOver={(e) => handleLayerDragOver(e, layer.id)}
+                            onDrop={(e) => handleLayerDrop(e, layer.id)}
+                            onDragEnd={handleLayerDragEnd}
+                          >
+                            {/* Thumbnail */}
+                            <div className="canvas-studio-layer-thumbnail">
+                              {thumbnail ? (
+                                <img src={thumbnail} alt={layer.name} />
+                              ) : (
+                                <div className="canvas-studio-layer-thumbnail-empty" />
+                              )}
+                            </div>
+
+                            {/* Layer Info */}
+                            <div className="canvas-studio-layer-info">
+                              {editingLayerId === layer.id ? (
+                                <input
+                                  type="text"
+                                  value={editingLayerName}
+                                  onChange={(e) => setEditingLayerName(e.target.value)}
+                                  onBlur={handleFinishRenameLayer}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleFinishRenameLayer();
+                                    if (e.key === 'Escape') {
+                                      setEditingLayerId(null);
+                                      setEditingLayerName('');
+                                    }
+                                  }}
+                                  className="canvas-studio-layer-name-input"
+                                  autoFocus
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                              ) : (
+                                <span
+                                  className="canvas-studio-layer-name"
+                                  onDoubleClick={(e) => {
+                                    e.stopPropagation();
+                                    if (!layer.isBackground) {
+                                      handleStartRenameLayer(layer.id, layer.name);
+                                    }
+                                  }}
+                                >
+                                  {layer.name}
+                                </span>
+                              )}
+
+                              {/* Opacity Slider */}
+                              <div className="canvas-studio-layer-opacity" onClick={(e) => e.stopPropagation()}>
+                                <span className="canvas-studio-layer-opacity-label">{Math.round(layer.opacity * 100)}%</span>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="100"
+                                  value={layer.opacity * 100}
+                                  onChange={(e) => handleLayerOpacityChange(layer.id, parseInt(e.target.value) / 100)}
+                                  className="canvas-studio-layer-opacity-slider"
+                                />
+                              </div>
+
+                              {/* Layer Controls - Now inside layer-info, below opacity */}
+                              <div className="canvas-studio-layer-controls" onClick={(e) => e.stopPropagation()}>
+                                {/* Visibility Toggle */}
+                                <button
+                                  className="canvas-studio-layer-control-btn"
+                                  onClick={() => handleToggleLayerVisibility(layer.id)}
+                                  aria-label={layer.visible ? 'Hide layer' : 'Show layer'}
+                                >
+                                  {layer.visible ? (
+                                    <EyeIcon style={{ width: '1rem', height: '1rem' }} />
+                                  ) : (
+                                    <EyeSlashIcon style={{ width: '1rem', height: '1rem', opacity: 0.5 }} />
+                                  )}
+                                </button>
+
+                                {/* Lock Toggle */}
+                                <button
+                                  className="canvas-studio-layer-control-btn"
+                                  onClick={() => handleToggleLayerLock(layer.id)}
+                                  aria-label={layer.locked ? 'Unlock layer' : 'Lock layer'}
+                                >
+                                  {layer.locked ? (
+                                    <LockClosedIcon style={{ width: '1rem', height: '1rem' }} />
+                                  ) : (
+                                    <LockOpenIcon style={{ width: '1rem', height: '1rem', opacity: 0.5 }} />
+                                  )}
+                                </button>
+
+                                {/* More Options */}
+                                {!layer.isBackground && (
+                                  <div className="canvas-studio-layer-more">
+                                    <button
+                                      className="canvas-studio-layer-control-btn"
+                                      onClick={() => {
+                                        // Show context menu
+                                      }}
+                                      aria-label="More options"
+                                    >
+                                      ⋮
+                                    </button>
+
+                                    {/* Quick Actions */}
+                                    <div className="canvas-studio-layer-actions">
+                                      <button
+                                        onClick={() => handleDuplicateLayer(layer.id)}
+                                        title="Duplicate"
+                                      >
+                                        <DocumentDuplicateIcon style={{ width: '1rem', height: '1rem' }} />
+                                      </button>
+                                      <button
+                                        onClick={() => handleStartRenameLayer(layer.id, layer.name)}
+                                        title="Rename"
+                                      >
+                                        <PencilIcon style={{ width: '1rem', height: '1rem' }} />
+                                      </button>
+                                      {index < layers.length - 1 && (
+                                        <button
+                                          onClick={() => handleMergeLayerDown(layer.id)}
+                                          title="Merge Down"
+                                          style={{ fontSize: '0.75rem', fontWeight: '600' }}
+                                        >
+                                          Merge
+                                        </button>
+                                      )}
+                                      <button
+                                        onClick={() => handleDeleteLayer(layer.id)}
+                                        title="Delete"
+                                        style={{ color: '#f43f5e' }}
+                                      >
+                                        <TrashIcon style={{ width: '1rem', height: '1rem' }} />
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Drag Handle - More visible for mobile */}
+                                {!layer.isBackground && !layer.locked && (
+                                  <div className="canvas-studio-layer-drag-handle" title="Drag to reorder">
+                                    <div className="canvas-studio-layer-drag-dots">
+                                      <div></div>
+                                      <div></div>
+                                      <div></div>
+                                      <div></div>
+                                      <div></div>
+                                      <div></div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }) : (
+                        <div style={{ padding: '1rem', textAlign: 'center', color: '#94a3b8' }}>
+                          No layers available
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {activePanel === 'colors' && (
+                  <>
+                    {/* Advanced Color Picker */}
+                    <div className="canvas-studio-color-section">
+                      <h3 className="canvas-studio-color-section-title">Advanced Color Picker</h3>
+                      <AdvancedColorPicker
+                        color={selectedColor}
+                        onChange={(color, alpha) => {
+                          setSelectedColor(color);
+                          setGradientActive(false); // Disable gradient when selecting solid color
+                          if (alpha !== undefined) {
+                            setBrushOpacity(alpha);
+                          }
+                          if (drawingEngineRef.current) {
+                            drawingEngineRef.current.setColor(color);
+                            if (alpha !== undefined) {
+                              drawingEngineRef.current.setOpacity(alpha);
+                            }
+                          }
+                          // Add to recent colors
+                          if (!recentColors.includes(color)) {
+                            setRecentColors([color, ...recentColors.slice(0, 9)]);
+                          }
+                        }}
+                        showAlpha={true}
+                        showFormats={true}
+                        recentColors={recentColors}
+                        onAddToRecent={(color) => {
+                          if (!recentColors.includes(color)) {
+                            setRecentColors([color, ...recentColors.slice(0, 9)]);
+                          }
+                        }}
+                        showBrushSettings={!isMobile}
+                        brushSize={brushSize}
+                        onBrushSizeChange={setBrushSize}
+                      />
+                    </div>
+
+                    {/* Gradient Editor */}
+                    <div className="canvas-studio-color-section">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                        <h3 className="canvas-studio-color-section-title" style={{ marginBottom: 0 }}>Gradients</h3>
+                        <button
+                          onClick={() => setShowGradientEditor(!showGradientEditor)}
+                          className={`studio-mini-toggle ${showGradientEditor ? 'studio-mini-toggle-active' : ''}`}
+                        >
+                          {showGradientEditor ? 'Hide' : 'Show'}
+                        </button>
+                      </div>
+                      {showGradientEditor && (
+                        <GradientEditor
+                          gradient={currentGradient}
+                          onChange={setCurrentGradient}
+                          onApply={() => {
+                            // Apply gradient to drawing engine
+                            if (drawingEngineRef.current) {
+                              drawingEngineRef.current.setGradient(currentGradient);
+                              drawingEngineRef.current.setUseGradient(true);
+                              setGradientActive(true);
+                            }
+                            const gradientCSS = currentGradient.type === 'linear'
+                              ? `linear-gradient(${currentGradient.angle}deg, ${currentGradient.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
+                              : `radial-gradient(circle, ${currentGradient.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`;
+                            console.log('Gradient CSS:', gradientCSS);
+                            setShowGradientModal(true);
+                          }}
+                        />
+                      )}
+                    </div>
+
+                    {/* Quick Colors (Predefined) */}
+                    <div className="canvas-studio-color-section">
+                      <h3 className="canvas-studio-color-section-title">Quick Colors</h3>
+                      <div className="canvas-studio-colors-grid">
+                        {predefinedColors.map((color, index) => (
+                          <button
+                            key={`color-${index}`}
+                            className={`canvas-studio-color-swatch ${color === selectedColor ? 'canvas-studio-color-swatch-active' : ''
+                              }`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => handleColorSelect(color)}
+                            aria-label={`Select color ${color}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {activePanel === 'settings' && (
+                  <>
+                    {/* Shape Fill Toggle */}
+                    <div className="canvas-studio-color-section">
+                      <h3 className="canvas-studio-color-section-title">Shape Settings</h3>
+                      <div style={{ marginTop: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                          <span className="studio-setting-label">Fill Mode</span>
+                          <button
+                            onClick={() => setShapeFilled(!shapeFilled)}
+                            className={`studio-mini-toggle ${shapeFilled ? 'studio-mini-toggle-active' : ''}`}
+                          >
+                            {shapeFilled ? 'Filled' : 'Hollow'}
+                          </button>
+                        </div>
+                        <p className="studio-setting-hint">
+                          {shapeFilled ? 'Shapes will be filled with color' : 'Shapes will be hollow with outline only'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Brush Settings */}
+                    <div className="canvas-studio-color-section">
+                      <h3 className="canvas-studio-color-section-title">Brush Settings</h3>
+
+                      {/* Brush Size */}
+                      <div style={{ marginTop: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                          <span className="studio-setting-label">Size</span>
+                          <span className="studio-slider-value-label">{brushSize}px</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="1"
+                          max="50"
+                          value={brushSize}
+                          onChange={(e) => setBrushSize(Number(e.target.value))}
+                          className="canvas-studio-slider"
+                        />
+                      </div>
+
+                      {/* Brush Opacity */}
+                      <div style={{ marginTop: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                          <span className="studio-setting-label">Opacity</span>
+                          <span className="studio-slider-value-label">{Math.round(brushOpacity * 100)}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={brushOpacity * 100}
+                          onChange={(e) => setBrushOpacity(Number(e.target.value) / 100)}
+                          className="canvas-studio-slider"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </aside>
+          )}
+        </div>
+
+        {/* ===== Mobile bottom dock ===== */}
+        {isMobile && (
+          <>
+            {/* Mobile Brush Settings - above dock when brush/eraser active */}
+            {(activeTool === 'brush' || activeTool === 'eraser') && (
+              <div className="canvas-studio-mobile-sliders">
+                <div className="canvas-studio-sliders-header">
+                  <span className="canvas-studio-sliders-title">Brush Settings</span>
+                  <button
+                    className="canvas-studio-reset-btn"
+                    onClick={() => {
+                      setBrushSize(5);
+                      setBrushOpacity(1);
+                      if (drawingEngineRef.current) {
+                        drawingEngineRef.current.setSize(5);
+                        drawingEngineRef.current.setOpacity(1);
+                      }
+                    }}
+                    aria-label="Reset settings"
+                  >
+                    <ArrowPathIcon className="canvas-studio-reset-icon" />
                   </button>
                 </div>
-                
-                <div className="canvas-studio-layers-list">
-                {layers && layers.length > 0 ? layers.map((layer, index) => {
+
+                {/* Thickness Slider with Preview */}
+                <div className="canvas-studio-slider-container">
+                  <label className="canvas-studio-slider-label">
+                    <span>Size</span>
+                    <div className="canvas-studio-slider-preview">
+                      <div
+                        className="canvas-studio-brush-preview"
+                        style={{
+                          width: `${Math.min(brushSize, 30)}px`,
+                          height: `${Math.min(brushSize, 30)}px`,
+                          backgroundColor: selectedColor,
+                          opacity: brushOpacity
+                        }}
+                      />
+                      <span className="canvas-studio-slider-value">{brushSize}px</span>
+                    </div>
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="50"
+                    value={brushSize}
+                    onChange={(e) => setBrushSize(Number(e.target.value))}
+                    className="canvas-studio-slider"
+                  />
+                </div>
+
+                {/* Opacity Slider */}
+                <div className="canvas-studio-slider-container">
+                  <label className="canvas-studio-slider-label">
+                    <span>Opacity</span>
+                    <span className="canvas-studio-slider-value">{Math.round(brushOpacity * 100)}%</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={brushOpacity * 100}
+                    onChange={(e) => setBrushOpacity(Number(e.target.value) / 100)}
+                    className="canvas-studio-slider"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Shape Settings */}
+            {activeTool === 'shapes' && (
+              <div className="canvas-studio-mobile-sliders">
+                <div className="canvas-studio-sliders-header">
+                  <span className="canvas-studio-sliders-title">Shape Settings</span>
+                </div>
+
+                {/* Shape Fill Toggle */}
+                <div className="canvas-studio-slider-container">
+                  <label className="canvas-studio-slider-label">
+                    <span>Fill Mode</span>
+                    <button
+                      onClick={() => setShapeFilled(!shapeFilled)}
+                      className={`studio-mini-toggle ${shapeFilled ? 'studio-mini-toggle-active' : ''}`}
+                    >
+                      {shapeFilled ? 'Filled' : 'Hollow'}
+                    </button>
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/* Bottom Dock */}
+            <div className="canvas-studio-mobile-toolbar studio-bottom-dock">
+              {/* Variant strip - brush / shapes variants */}
+              {mobileVariantsOpen && activeTool === 'brush' && (
+                <div className="studio-variant-strip">
+                  {brushTypes.map(({ type, label }) => (
+                    <button
+                      key={type}
+                      className={`studio-strip-btn ${activeBrush === type ? 'studio-strip-btn-active' : ''}`}
+                      onClick={() => handleBrushSelect(type)}
+                      aria-label={label}
+                    >
+                      <span className="studio-strip-circle">{renderBrushIcon(type, 'studio-strip-icon')}</span>
+                      <span className="studio-strip-label">{label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {mobileVariantsOpen && activeTool === 'shapes' && (
+                <div className="studio-variant-strip">
+                  {shapeTypes.map(({ type, label }) => (
+                    <button
+                      key={type}
+                      className={`studio-strip-btn ${activeShape === type ? 'studio-strip-btn-active' : ''}`}
+                      onClick={() => handleShapeSelect(type)}
+                      aria-label={label}
+                    >
+                      <span className="studio-strip-circle">{renderShapeIcon(type, 'studio-strip-icon')}</span>
+                      <span className="studio-strip-label">{label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Color row */}
+              <div className="studio-color-row">
+                {studioPalette.map((color) => (
+                  <button
+                    key={`row-${color}`}
+                    className={`studio-swatch studio-swatch-mobile ${color === selectedColor && !gradientActive ? 'studio-swatch-active' : ''}`}
+                    style={{ backgroundColor: color }}
+                    onClick={() => handleColorSelect(color)}
+                    aria-label={`Select color ${color}`}
+                  />
+                ))}
+                <button
+                  className="studio-round-action"
+                  onClick={() => setMobileVariantsOpen(prev => !prev)}
+                  aria-label="Toggle tool variants"
+                >
+                  <Squares2X2Icon className="studio-round-action-icon" />
+                </button>
+                <button
+                  className="studio-round-action"
+                  onClick={() => setShowColorPicker(true)}
+                  aria-label="More colors"
+                >
+                  <div
+                    className="canvas-studio-color-indicator"
+                    style={{
+                      background: gradientActive && currentGradient
+                        ? currentGradient.type === 'linear'
+                          ? `linear-gradient(${currentGradient.angle}deg, ${currentGradient.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
+                          : `radial-gradient(circle, ${currentGradient.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
+                        : selectedColor
+                    }}
+                  />
+                </button>
+              </div>
+
+              {/* Primary tools */}
+              <div className="studio-primary-tools">
+                <button
+                  className={`studio-dock-tool ${activeTool === 'select' ? 'studio-dock-tool-active' : ''}`}
+                  onClick={() => handleToolClick('select')}
+                  aria-label="Select"
+                >
+                  <CursorArrowRaysIcon className="studio-dock-icon" />
+                </button>
+                <button
+                  className={`studio-dock-tool ${activeTool === 'brush' ? 'studio-dock-tool-active' : ''}`}
+                  onClick={() => handleToolClick('brush')}
+                  aria-label="Brush"
+                >
+                  {renderBrushIcon(activeBrush, 'studio-dock-icon')}
+                </button>
+                <button
+                  className={`studio-dock-tool ${activeTool === 'eraser' ? 'studio-dock-tool-active' : ''}`}
+                  onClick={() => handleToolClick('eraser')}
+                  aria-label="Eraser"
+                >
+                  <div className="canvas-eraser-icon" />
+                </button>
+                <button
+                  className={`studio-dock-tool ${activeTool === 'fill' ? 'studio-dock-tool-active' : ''}`}
+                  onClick={() => handleToolClick('fill')}
+                  aria-label="Fill"
+                >
+                  <EyeDropperIcon className="studio-dock-icon" />
+                </button>
+                <button
+                  className={`studio-dock-tool ${activeTool === 'shapes' ? 'studio-dock-tool-active' : ''}`}
+                  onClick={() => handleToolClick('shapes')}
+                  aria-label="Shapes"
+                >
+                  {renderShapeIcon(activeShape, 'studio-dock-icon')}
+                </button>
+                <button
+                  className={`studio-dock-tool ${activeTool === 'text' ? 'studio-dock-tool-active' : ''}`}
+                  onClick={() => handleToolClick('text')}
+                  aria-label="Text"
+                >
+                  <span className="studio-tool-icon-text">T</span>
+                </button>
+                <button
+                  className="studio-dock-tool"
+                  onClick={() => setShowLayersModal(true)}
+                  aria-label="Layers"
+                >
+                  <Square3Stack3DIcon className="studio-dock-icon" />
+                </button>
+                <button
+                  className="studio-dock-tool studio-dock-tool-danger"
+                  onClick={handleClearCanvas}
+                  aria-label="Clear Canvas"
+                >
+                  <TrashIcon className="studio-dock-icon" />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Layers Modal - mobile & tablet */}
+        {(isMobile || isTablet) && showLayersModal && (
+          <div className="canvas-studio-modal-overlay" onClick={() => setShowLayersModal(false)}>
+            <div className="canvas-studio-modal canvas-studio-layers-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="canvas-studio-modal-header">
+                <h3 className="canvas-studio-modal-title">Layers</h3>
+                <button
+                  className="canvas-studio-layer-add-btn"
+                  onClick={handleCreateLayer}
+                  aria-label="Add Layer"
+                >
+                  <PlusIcon style={{ width: '1.25rem', height: '1.25rem' }} />
+                </button>
+                <button onClick={() => setShowLayersModal(false)}>
+                  <XMarkIcon className="canvas-studio-modal-close-icon" />
+                </button>
+              </div>
+              <div className="canvas-studio-layers-list">
+                {layers.map((layer, index) => {
                   // Use cached thumbnail if available
                   const thumbnail = thumbnailCacheRef.current.get(layer.id) || layer.thumbnail;
                   if (layer.thumbnail && !thumbnailCacheRef.current.has(layer.id)) {
                     thumbnailCacheRef.current.set(layer.id, layer.thumbnail);
                   }
-                  
-                  return (
-                <div 
-                  key={layer.id}
-                  className={`canvas-studio-layer-item ${layer.id === activeLayerId ? 'canvas-studio-layer-item-active' : ''} ${layer.locked ? 'canvas-studio-layer-item-locked' : ''} ${draggingLayerId === layer.id ? 'canvas-studio-layer-item-dragging' : ''} ${dragOverLayerId === layer.id ? 'canvas-studio-layer-item-drag-over' : ''}`}
-                  onClick={() => !layer.locked && handleSelectLayer(layer.id)}
-                  draggable={!layer.isBackground && !layer.locked}
-                  onDragStart={(e) => handleLayerDragStart(e, layer.id)}
-                  onDragOver={(e) => handleLayerDragOver(e, layer.id)}
-                  onDrop={(e) => handleLayerDrop(e, layer.id)}
-                  onDragEnd={handleLayerDragEnd}
-                >
-                  {/* Thumbnail */}
-                  <div className="canvas-studio-layer-thumbnail">
-                    {thumbnail ? (
-                      <img src={thumbnail} alt={layer.name} />
-                    ) : (
-                      <div className="canvas-studio-layer-thumbnail-empty" />
-                    )}
-                  </div>
-                  
-                  {/* Layer Info */}
-                  <div className="canvas-studio-layer-info">
-                    {editingLayerId === layer.id ? (
-                      <input
-                        type="text"
-                        value={editingLayerName}
-                        onChange={(e) => setEditingLayerName(e.target.value)}
-                        onBlur={handleFinishRenameLayer}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleFinishRenameLayer();
-                          if (e.key === 'Escape') {
-                            setEditingLayerId(null);
-                            setEditingLayerName('');
-                          }
-                        }}
-                        className="canvas-studio-layer-name-input"
-                        autoFocus
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    ) : (
-                      <span 
-                        className="canvas-studio-layer-name"
-                        onDoubleClick={(e) => {
-                          e.stopPropagation();
-                          if (!layer.isBackground) {
-                            handleStartRenameLayer(layer.id, layer.name);
-                          }
-                        }}
-                      >
-                        {layer.name}
-                      </span>
-                    )}
-                    
-                    {/* Opacity Slider */}
-                    <div className="canvas-studio-layer-opacity" onClick={(e) => e.stopPropagation()}>
-                      <span className="canvas-studio-layer-opacity-label">{Math.round(layer.opacity * 100)}%</span>
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={layer.opacity * 100}
-                        onChange={(e) => handleLayerOpacityChange(layer.id, parseInt(e.target.value) / 100)}
-                        className="canvas-studio-layer-opacity-slider"
-                      />
-                    </div>
-                    
-                    {/* Layer Controls - Now inside layer-info, below opacity */}
-                    <div className="canvas-studio-layer-controls" onClick={(e) => e.stopPropagation()}>
-                    {/* Visibility Toggle */}
-                    <button
-                      className="canvas-studio-layer-control-btn"
-                      onClick={() => handleToggleLayerVisibility(layer.id)}
-                      aria-label={layer.visible ? 'Hide layer' : 'Show layer'}
-                    >
-                      {layer.visible ? (
-                        <EyeIcon style={{ width: '1rem', height: '1rem' }} />
-                      ) : (
-                        <EyeSlashIcon style={{ width: '1rem', height: '1rem', opacity: 0.5 }} />
-                      )}
-                    </button>
-                    
-                    {/* Lock Toggle */}
-                    <button
-                      className="canvas-studio-layer-control-btn"
-                      onClick={() => handleToggleLayerLock(layer.id)}
-                      aria-label={layer.locked ? 'Unlock layer' : 'Lock layer'}
-                    >
-                      {layer.locked ? (
-                        <LockClosedIcon style={{ width: '1rem', height: '1rem' }} />
-                      ) : (
-                        <LockOpenIcon style={{ width: '1rem', height: '1rem', opacity: 0.5 }} />
-                      )}
-                    </button>
-                    
-                    {/* More Options */}
-                    {!layer.isBackground && (
-                      <div className="canvas-studio-layer-more">
-                        <button
-                          className="canvas-studio-layer-control-btn"
-                          onClick={() => {
-                            // Show context menu
-                          }}
-                          aria-label="More options"
-                        >
-                          ⋮
-                        </button>
-                        
-                        {/* Quick Actions */}
-                        <div className="canvas-studio-layer-actions">
-                          <button
-                            onClick={() => handleDuplicateLayer(layer.id)}
-                            title="Duplicate"
-                          >
-                            <DocumentDuplicateIcon style={{ width: '1rem', height: '1rem' }} />
-                          </button>
-                          <button
-                            onClick={() => handleStartRenameLayer(layer.id, layer.name)}
-                            title="Rename"
-                          >
-                            <PencilIcon style={{ width: '1rem', height: '1rem' }} />
-                          </button>
-                          {index < layers.length - 1 && (
-                            <button
-                              onClick={() => handleMergeLayerDown(layer.id)}
-                              title="Merge Down"
-                              style={{ fontSize: '0.75rem', fontWeight: '600' }}
-                            >
-                              Merge
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleDeleteLayer(layer.id)}
-                            title="Delete"
-                            style={{ color: '#EF4444' }}
-                          >
-                            <TrashIcon style={{ width: '1rem', height: '1rem' }} />
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Drag Handle - More visible for mobile */}
-                    {!layer.isBackground && !layer.locked && (
-                      <div className="canvas-studio-layer-drag-handle" title="Drag to reorder">
-                        <div className="canvas-studio-layer-drag-dots">
-                          <div></div>
-                          <div></div>
-                          <div></div>
-                          <div></div>
-                          <div></div>
-                          <div></div>
-                        </div>
-                      </div>
-                    )}
-                    </div>
-                  </div>
-                </div>
-                );
-              }) : (
-                <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--cs-text-secondary)' }}>
-                  No layers available
-                </div>
-              )}
-              </div>
-              </>
-            )}
 
-            {activePanel === 'colors' && (
-              <>
+                  return (
+                    <div
+                      key={layer.id}
+                      className={`canvas-studio-layer-item ${layer.id === activeLayerId ? 'canvas-studio-layer-item-active' : ''} ${layer.locked ? 'canvas-studio-layer-item-locked' : ''} ${draggingLayerId === layer.id ? 'canvas-studio-layer-item-dragging' : ''} ${dragOverLayerId === layer.id ? 'canvas-studio-layer-item-drag-over' : ''}`}
+                      onClick={() => !layer.locked && handleSelectLayer(layer.id)}
+                      draggable={!layer.isBackground && !layer.locked}
+                      onDragStart={(e) => handleLayerDragStart(e, layer.id)}
+                      onDragOver={(e) => handleLayerDragOver(e, layer.id)}
+                      onDrop={(e) => handleLayerDrop(e, layer.id)}
+                      onDragEnd={handleLayerDragEnd}
+                    >
+                      {/* Thumbnail */}
+                      <div className="canvas-studio-layer-thumbnail">
+                        {thumbnail ? (
+                          <img src={thumbnail} alt={layer.name} />
+                        ) : (
+                          <div className="canvas-studio-layer-thumbnail-empty" />
+                        )}
+                      </div>
+
+                      {/* Layer Info */}
+                      <div className="canvas-studio-layer-info">
+                        {editingLayerId === layer.id ? (
+                          <input
+                            type="text"
+                            value={editingLayerName}
+                            onChange={(e) => setEditingLayerName(e.target.value)}
+                            onBlur={handleFinishRenameLayer}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleFinishRenameLayer();
+                              if (e.key === 'Escape') {
+                                setEditingLayerId(null);
+                                setEditingLayerName('');
+                              }
+                            }}
+                            className="canvas-studio-layer-name-input"
+                            autoFocus
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        ) : (
+                          <span
+                            className="canvas-studio-layer-name"
+                            onDoubleClick={(e) => {
+                              e.stopPropagation();
+                              if (!layer.isBackground) {
+                                handleStartRenameLayer(layer.id, layer.name);
+                              }
+                            }}
+                          >
+                            {layer.name}
+                          </span>
+                        )}
+
+                        {/* Opacity Slider */}
+                        <div className="canvas-studio-layer-opacity" onClick={(e) => e.stopPropagation()}>
+                          <span className="canvas-studio-layer-opacity-label">{Math.round(layer.opacity * 100)}%</span>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={layer.opacity * 100}
+                            onChange={(e) => handleLayerOpacityChange(layer.id, parseInt(e.target.value) / 100)}
+                            className="canvas-studio-layer-opacity-slider"
+                          />
+                        </div>
+
+                        {/* Layer Controls - Now inside layer-info, below opacity */}
+                        <div className="canvas-studio-layer-controls" onClick={(e) => e.stopPropagation()}>
+                          {/* Visibility Toggle */}
+                          <button
+                            className="canvas-studio-layer-control-btn"
+                            onClick={() => handleToggleLayerVisibility(layer.id)}
+                            aria-label={layer.visible ? 'Hide layer' : 'Show layer'}
+                          >
+                            {layer.visible ? (
+                              <EyeIcon style={{ width: '1rem', height: '1rem' }} />
+                            ) : (
+                              <EyeSlashIcon style={{ width: '1rem', height: '1rem', opacity: 0.5 }} />
+                            )}
+                          </button>
+
+                          {/* Lock Toggle */}
+                          <button
+                            className="canvas-studio-layer-control-btn"
+                            onClick={() => handleToggleLayerLock(layer.id)}
+                            aria-label={layer.locked ? 'Unlock layer' : 'Lock layer'}
+                          >
+                            {layer.locked ? (
+                              <LockClosedIcon style={{ width: '1rem', height: '1rem' }} />
+                            ) : (
+                              <LockOpenIcon style={{ width: '1rem', height: '1rem', opacity: 0.5 }} />
+                            )}
+                          </button>
+
+                          {/* More Options */}
+                          {!layer.isBackground && (
+                            <div className="canvas-studio-layer-more">
+                              <button
+                                className="canvas-studio-layer-control-btn"
+                                onClick={() => {
+                                  // Show context menu
+                                }}
+                                aria-label="More options"
+                              >
+                                ⋮
+                              </button>
+
+                              {/* Quick Actions */}
+                              <div className="canvas-studio-layer-actions">
+                                <button
+                                  onClick={() => handleDuplicateLayer(layer.id)}
+                                  title="Duplicate"
+                                >
+                                  <DocumentDuplicateIcon style={{ width: '1rem', height: '1rem' }} />
+                                </button>
+                                <button
+                                  onClick={() => handleStartRenameLayer(layer.id, layer.name)}
+                                  title="Rename"
+                                >
+                                  <PencilIcon style={{ width: '1rem', height: '1rem' }} />
+                                </button>
+                                {index < layers.length - 1 && (
+                                  <button
+                                    onClick={() => handleMergeLayerDown(layer.id)}
+                                    title="Merge Down"
+                                    style={{ fontSize: '0.75rem', fontWeight: '600' }}
+                                  >
+                                    Merge
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => handleDeleteLayer(layer.id)}
+                                  title="Delete"
+                                  style={{ color: '#f43f5e' }}
+                                >
+                                  <TrashIcon style={{ width: '1rem', height: '1rem' }} />
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Drag Handle - More visible for mobile */}
+                          {!layer.isBackground && !layer.locked && (
+                            <div className="canvas-studio-layer-drag-handle" title="Drag to reorder">
+                              <div className="canvas-studio-layer-drag-dots">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Mobile and Tablet Color Picker Modal */}
+        {(isMobile || isTablet) && showColorPicker && (
+          <div className="canvas-studio-modal-overlay" onClick={() => setShowColorPicker(false)}>
+            <div className="canvas-studio-modal canvas-studio-modal-large" onClick={(e) => e.stopPropagation()}>
+              <div className="canvas-studio-modal-header">
+                <h3 className="canvas-studio-modal-title">Colors</h3>
+                <button onClick={() => setShowColorPicker(false)}>
+                  <XMarkIcon className="canvas-studio-modal-close-icon" />
+                </button>
+              </div>
+              <div className="canvas-studio-modal-content">
                 {/* Advanced Color Picker */}
                 <div className="canvas-studio-color-section">
-                  <h3 className="canvas-studio-color-section-title">Advanced Color Picker</h3>
                   <AdvancedColorPicker
                     color={selectedColor}
                     onChange={(color, alpha) => {
@@ -3061,29 +3764,16 @@ const CanvasDrawingPage: React.FC = () => {
                         setRecentColors([color, ...recentColors.slice(0, 9)]);
                       }
                     }}
-                    showBrushSettings={!isMobile}
-                    brushSize={brushSize}
-                    onBrushSizeChange={setBrushSize}
                   />
                 </div>
 
                 {/* Gradient Editor */}
                 <div className="canvas-studio-color-section">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <h3 className="canvas-studio-color-section-title" style={{ marginBottom: 0 }}>Gradients</h3>
+                    <h4 className="canvas-studio-color-section-title" style={{ marginBottom: 0 }}>Gradients</h4>
                     <button
                       onClick={() => setShowGradientEditor(!showGradientEditor)}
-                      style={{
-                        padding: '0.375rem 0.75rem',
-                        background: showGradientEditor ? 'var(--cs-purple, #8B5CF6)' : 'var(--cs-bg-darker, #F3F4F6)',
-                        color: showGradientEditor ? 'white' : 'var(--cs-text-secondary, #6B7280)',
-                        border: 'none',
-                        borderRadius: '0.375rem',
-                        fontSize: '0.75rem',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                      }}
+                      className={`studio-mini-toggle ${showGradientEditor ? 'studio-mini-toggle-active' : ''}`}
                     >
                       {showGradientEditor ? 'Hide' : 'Show'}
                     </button>
@@ -3103,684 +3793,133 @@ const CanvasDrawingPage: React.FC = () => {
                           ? `linear-gradient(${currentGradient.angle}deg, ${currentGradient.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
                           : `radial-gradient(circle, ${currentGradient.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`;
                         console.log('Gradient CSS:', gradientCSS);
+                        setShowGradientEditor(false);
+                        setShowColorPicker(false);
                         setShowGradientModal(true);
                       }}
                     />
                   )}
                 </div>
 
-                {/* Quick Colors (Predefined) */}
+                {/* Quick Colors */}
                 <div className="canvas-studio-color-section">
-                  <h3 className="canvas-studio-color-section-title">Quick Colors</h3>
+                  <h4 className="canvas-studio-color-section-title">Quick Colors</h4>
                   <div className="canvas-studio-colors-grid">
                     {predefinedColors.map((color, index) => (
                       <button
                         key={`color-${index}`}
-                        className={`canvas-studio-color-swatch ${
-                          color === selectedColor ? 'canvas-studio-color-swatch-active' : ''
-                        }`}
+                        className={`canvas-studio-color-swatch ${color === selectedColor ? 'canvas-studio-color-swatch-active' : ''
+                          }`}
                         style={{ backgroundColor: color }}
-                        onClick={() => handleColorSelect(color)}
+                        onClick={() => {
+                          handleColorSelect(color);
+                        }}
                         aria-label={`Select color ${color}`}
                       />
                     ))}
                   </div>
                 </div>
-              </>
-            )}
 
-            {activePanel === 'settings' && (
-              <>
-                {/* Shape Fill Toggle */}
-                <div className="canvas-studio-color-section">
-                  <h3 className="canvas-studio-color-section-title">Shape Settings</h3>
-                  <div style={{ marginTop: '1rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                      <span style={{ fontSize: '0.875rem', fontWeight: '500', color: '#E5E7EB' }}>Fill Mode</span>
-                      <button
-                        onClick={() => setShapeFilled(!shapeFilled)}
-                        style={{
-                          padding: '0.375rem 0.75rem',
-                          background: shapeFilled ? 'var(--cs-purple, #8B5CF6)' : 'var(--cs-bg-darker, #F3F4F6)',
-                          color: shapeFilled ? 'white' : 'var(--cs-text-secondary, #6B7280)',
-                          border: 'none',
-                          borderRadius: '0.375rem',
-                          fontSize: '0.75rem',
-                          fontWeight: '600',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease'
-                        }}
-                      >
-                        {shapeFilled ? 'Filled' : 'Hollow'}
-                      </button>
-                    </div>
-                    <p style={{ 
-                      fontSize: '0.75rem', 
-                      color: '#9CA3AF', 
-                      margin: 0
-                    }}>
-                      {shapeFilled ? 'Shapes will be filled with color' : 'Shapes will be hollow with outline only'}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Brush Settings */}
-                <div className="canvas-studio-color-section">
-                  <h3 className="canvas-studio-color-section-title">Brush Settings</h3>
-                  
-                  {/* Brush Size */}
-                  <div style={{ marginTop: '1rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                      <span style={{ fontSize: '0.875rem', fontWeight: '500', color: '#E5E7EB' }}>Size</span>
-                      <span style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>{brushSize}px</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="1"
-                      max="50"
-                      value={brushSize}
-                      onChange={(e) => setBrushSize(Number(e.target.value))}
-                      className="canvas-studio-slider"
-                    />
-                  </div>
-
-                  {/* Brush Opacity */}
-                  <div style={{ marginTop: '1rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                      <span style={{ fontSize: '0.875rem', fontWeight: '500', color: '#E5E7EB' }}>Opacity</span>
-                      <span style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>{Math.round(brushOpacity * 100)}%</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={brushOpacity * 100}
-                      onChange={(e) => setBrushOpacity(Number(e.target.value) / 100)}
-                      className="canvas-studio-slider"
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Mobile Sliders - Above Toolbar in portrait, in right bar in landscape */}
-      {isMobile && (activeTool === 'brush' || activeTool === 'eraser') && (
-        <div className="canvas-studio-mobile-sliders">
-          <div className="canvas-studio-sliders-header">
-            <span className="canvas-studio-sliders-title">Brush Settings</span>
-            <button
-              className="canvas-studio-reset-btn"
-              onClick={() => {
-                setBrushSize(5);
-                setBrushOpacity(1);
-                if (drawingEngineRef.current) {
-                  drawingEngineRef.current.setSize(5);
-                  drawingEngineRef.current.setOpacity(1);
-                }
-              }}
-              aria-label="Reset settings"
-            >
-              <ArrowPathIcon className="canvas-studio-reset-icon" />
-            </button>
-          </div>
-
-          {/* Thickness Slider with Preview */}
-          <div className="canvas-studio-slider-container">
-            <label className="canvas-studio-slider-label">
-              <span>Size</span>
-              <div className="canvas-studio-slider-preview">
-                <div 
-                  className="canvas-studio-brush-preview"
-                  style={{ 
-                    width: `${Math.min(brushSize, 30)}px`,
-                    height: `${Math.min(brushSize, 30)}px`,
-                    backgroundColor: selectedColor,
-                    opacity: brushOpacity
-                  }}
-                />
-                <span className="canvas-studio-slider-value">{brushSize}px</span>
-              </div>
-            </label>
-            <input
-              type="range"
-              min="1"
-              max="50"
-              value={brushSize}
-              onChange={(e) => setBrushSize(Number(e.target.value))}
-              className="canvas-studio-slider"
-            />
-          </div>
-
-          {/* Opacity Slider */}
-          <div className="canvas-studio-slider-container">
-            <label className="canvas-studio-slider-label">
-              <span>Opacity</span>
-              <span className="canvas-studio-slider-value">{Math.round(brushOpacity * 100)}%</span>
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={brushOpacity * 100}
-              onChange={(e) => setBrushOpacity(Number(e.target.value) / 100)}
-              className="canvas-studio-slider"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Mobile Shape Settings */}
-      {isMobile && activeTool === 'shapes' && (
-        <div className="canvas-studio-mobile-sliders">
-          <div className="canvas-studio-sliders-header">
-            <span className="canvas-studio-sliders-title">Shape Settings</span>
-          </div>
-
-          {/* Shape Fill Toggle */}
-          <div className="canvas-studio-slider-container">
-            <label className="canvas-studio-slider-label">
-              <span>Fill Mode</span>
-              <button
-                onClick={() => setShapeFilled(!shapeFilled)}
-                style={{
-                  padding: '0.375rem 0.75rem',
-                  background: shapeFilled ? 'var(--cs-purple, #8B5CF6)' : 'var(--cs-bg-darker, #F3F4F6)',
-                  color: shapeFilled ? 'white' : 'var(--cs-text-secondary, #6B7280)',
-                  border: 'none',
-                  borderRadius: '0.375rem',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                {shapeFilled ? 'Filled' : 'Hollow'}
-              </button>
-            </label>
-          </div>
-        </div>
-      )}
-
-      {/* Mobile Bottom Toolbar in portrait, right vertical bar in landscape */}
-      {isMobile && (
-        <div className="canvas-studio-mobile-toolbar">
-          <button
-            className={`canvas-studio-mobile-tool ${activeTool === 'select' ? 'canvas-studio-mobile-tool-active' : ''}`}
-            onClick={() => handleToolClick('select')}
-          >
-            <CursorArrowRaysIcon className="canvas-studio-mobile-tool-icon" />
-          </button>
-          <button
-            className={`canvas-studio-mobile-tool ${activeTool === 'brush' ? 'canvas-studio-mobile-tool-active' : ''}`}
-            onClick={() => handleToolClick('brush')}
-          >
-            {renderBrushIcon(activeBrush, 'canvas-studio-mobile-tool-icon')}
-          </button>
-          <button
-            className={`canvas-studio-mobile-tool ${activeTool === 'eraser' ? 'canvas-studio-mobile-tool-active' : ''}`}
-            onClick={() => handleToolClick('eraser')}
-          >
-            <div className="canvas-eraser-icon" />
-          </button>
-          <button
-            className={`canvas-studio-mobile-tool ${activeTool === 'fill' ? 'canvas-studio-mobile-tool-active' : ''}`}
-            onClick={() => handleToolClick('fill')}
-          >
-            <EyeDropperIcon className="canvas-studio-mobile-tool-icon" />
-          </button>
-          <button
-            className={`canvas-studio-mobile-tool ${activeTool === 'shapes' ? 'canvas-studio-mobile-tool-active' : ''}`}
-            onClick={() => handleToolClick('shapes')}
-          >
-            {renderShapeIcon(activeShape, 'canvas-studio-mobile-tool-icon')}
-          </button>
-          <button
-            className={`canvas-studio-mobile-tool ${activeTool === 'text' ? 'canvas-studio-mobile-tool-active' : ''}`}
-            onClick={() => handleToolClick('text')}
-          >
-            <span className="canvas-studio-tool-icon-text">T</span>
-          </button>
-          <button
-            className="canvas-studio-mobile-tool"
-            onClick={() => setShowLayersModal(true)}
-          >
-            <Square3Stack3DIcon className="canvas-studio-mobile-tool-icon" />
-          </button>
-          <button
-            className="canvas-studio-mobile-tool"
-            onClick={() => setShowColorPicker(true)}
-          >
-            <div 
-              className="canvas-studio-color-indicator"
-              style={{ 
-                background: gradientActive && currentGradient
-                  ? currentGradient.type === 'linear'
-                    ? `linear-gradient(${currentGradient.angle}deg, ${currentGradient.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
-                    : `radial-gradient(circle, ${currentGradient.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
-                  : selectedColor
-              }}
-            />
-          </button>
-          <button
-            className="canvas-studio-mobile-tool"
-            onClick={handleClearCanvas}
-            aria-label="Clear Canvas"
-            style={{ color: '#EF4444' }}
-          >
-            <TrashIcon className="canvas-studio-mobile-tool-icon" />
-          </button>
-        </div>
-      )}
-
-      {/* Mobile Layers Modal */}
-      {isMobile && showLayersModal && (
-        <div className="canvas-studio-modal-overlay" onClick={() => setShowLayersModal(false)}>
-          <div className="canvas-studio-modal canvas-studio-layers-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="canvas-studio-modal-header">
-              <h3 className="canvas-studio-modal-title">Layers</h3>
-              <button 
-                className="canvas-studio-layer-add-btn"
-                onClick={handleCreateLayer}
-                aria-label="Add Layer"
-              >
-                <PlusIcon style={{ width: '1.25rem', height: '1.25rem' }} />
-              </button>
-              <button onClick={() => setShowLayersModal(false)}>
-                <XMarkIcon className="canvas-studio-modal-close-icon" />
-              </button>
-            </div>
-            <div className="canvas-studio-layers-list">
-              {layers.map((layer, index) => {
-                // Use cached thumbnail if available
-                const thumbnail = thumbnailCacheRef.current.get(layer.id) || layer.thumbnail;
-                if (layer.thumbnail && !thumbnailCacheRef.current.has(layer.id)) {
-                  thumbnailCacheRef.current.set(layer.id, layer.thumbnail);
-                }
-                
-                return (
-                <div 
-                  key={layer.id}
-                  className={`canvas-studio-layer-item ${layer.id === activeLayerId ? 'canvas-studio-layer-item-active' : ''} ${layer.locked ? 'canvas-studio-layer-item-locked' : ''} ${draggingLayerId === layer.id ? 'canvas-studio-layer-item-dragging' : ''} ${dragOverLayerId === layer.id ? 'canvas-studio-layer-item-drag-over' : ''}`}
-                  onClick={() => !layer.locked && handleSelectLayer(layer.id)}
-                  draggable={!layer.isBackground && !layer.locked}
-                  onDragStart={(e) => handleLayerDragStart(e, layer.id)}
-                  onDragOver={(e) => handleLayerDragOver(e, layer.id)}
-                  onDrop={(e) => handleLayerDrop(e, layer.id)}
-                  onDragEnd={handleLayerDragEnd}
-                >
-                  {/* Thumbnail */}
-                  <div className="canvas-studio-layer-thumbnail">
-                    {thumbnail ? (
-                      <img src={thumbnail} alt={layer.name} />
-                    ) : (
-                      <div className="canvas-studio-layer-thumbnail-empty" />
-                    )}
-                  </div>
-                  
-                  {/* Layer Info */}
-                  <div className="canvas-studio-layer-info">
-                    {editingLayerId === layer.id ? (
-                      <input
-                        type="text"
-                        value={editingLayerName}
-                        onChange={(e) => setEditingLayerName(e.target.value)}
-                        onBlur={handleFinishRenameLayer}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleFinishRenameLayer();
-                          if (e.key === 'Escape') {
-                            setEditingLayerId(null);
-                            setEditingLayerName('');
-                          }
-                        }}
-                        className="canvas-studio-layer-name-input"
-                        autoFocus
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    ) : (
-                      <span 
-                        className="canvas-studio-layer-name"
-                        onDoubleClick={(e) => {
-                          e.stopPropagation();
-                          if (!layer.isBackground) {
-                            handleStartRenameLayer(layer.id, layer.name);
-                          }
-                        }}
-                      >
-                        {layer.name}
-                      </span>
-                    )}
-                    
-                    {/* Opacity Slider */}
-                    <div className="canvas-studio-layer-opacity" onClick={(e) => e.stopPropagation()}>
-                      <span className="canvas-studio-layer-opacity-label">{Math.round(layer.opacity * 100)}%</span>
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={layer.opacity * 100}
-                        onChange={(e) => handleLayerOpacityChange(layer.id, parseInt(e.target.value) / 100)}
-                        className="canvas-studio-layer-opacity-slider"
-                      />
-                    </div>
-                    
-                    {/* Layer Controls - Now inside layer-info, below opacity */}
-                    <div className="canvas-studio-layer-controls" onClick={(e) => e.stopPropagation()}>
-                    {/* Visibility Toggle */}
-                    <button
-                      className="canvas-studio-layer-control-btn"
-                      onClick={() => handleToggleLayerVisibility(layer.id)}
-                      aria-label={layer.visible ? 'Hide layer' : 'Show layer'}
-                    >
-                      {layer.visible ? (
-                        <EyeIcon style={{ width: '1rem', height: '1rem' }} />
-                      ) : (
-                        <EyeSlashIcon style={{ width: '1rem', height: '1rem', opacity: 0.5 }} />
-                      )}
-                    </button>
-                    
-                    {/* Lock Toggle */}
-                    <button
-                      className="canvas-studio-layer-control-btn"
-                      onClick={() => handleToggleLayerLock(layer.id)}
-                      aria-label={layer.locked ? 'Unlock layer' : 'Lock layer'}
-                    >
-                      {layer.locked ? (
-                        <LockClosedIcon style={{ width: '1rem', height: '1rem' }} />
-                      ) : (
-                        <LockOpenIcon style={{ width: '1rem', height: '1rem', opacity: 0.5 }} />
-                      )}
-                    </button>
-                    
-                    {/* More Options */}
-                    {!layer.isBackground && (
-                      <div className="canvas-studio-layer-more">
-                        <button
-                          className="canvas-studio-layer-control-btn"
-                          onClick={() => {
-                            // Show context menu
-                          }}
-                          aria-label="More options"
-                        >
-                          ⋮
-                        </button>
-                        
-                        {/* Quick Actions */}
-                        <div className="canvas-studio-layer-actions">
-                          <button
-                            onClick={() => handleDuplicateLayer(layer.id)}
-                            title="Duplicate"
-                          >
-                            <DocumentDuplicateIcon style={{ width: '1rem', height: '1rem' }} />
-                          </button>
-                          <button
-                            onClick={() => handleStartRenameLayer(layer.id, layer.name)}
-                            title="Rename"
-                          >
-                            <PencilIcon style={{ width: '1rem', height: '1rem' }} />
-                          </button>
-                          {index < layers.length - 1 && (
-                            <button
-                              onClick={() => handleMergeLayerDown(layer.id)}
-                              title="Merge Down"
-                              style={{ fontSize: '0.75rem', fontWeight: '600' }}
-                            >
-                              Merge
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleDeleteLayer(layer.id)}
-                            title="Delete"
-                            style={{ color: '#EF4444' }}
-                          >
-                            <TrashIcon style={{ width: '1rem', height: '1rem' }} />
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Drag Handle - More visible for mobile */}
-                    {!layer.isBackground && !layer.locked && (
-                      <div className="canvas-studio-layer-drag-handle" title="Drag to reorder">
-                        <div className="canvas-studio-layer-drag-dots">
-                          <div></div>
-                          <div></div>
-                          <div></div>
-                          <div></div>
-                          <div></div>
-                          <div></div>
-                        </div>
-                      </div>
-                    )}
-                    </div>
-                  </div>
-                </div>
-              );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Mobile Color Picker Modal */}
-      {isMobile && showColorPicker && (
-        <div className="canvas-studio-modal-overlay" onClick={() => setShowColorPicker(false)}>
-          <div className="canvas-studio-modal canvas-studio-modal-large" onClick={(e) => e.stopPropagation()}>
-            <div className="canvas-studio-modal-header">
-              <h3 className="canvas-studio-modal-title">Colors</h3>
-              <button onClick={() => setShowColorPicker(false)}>
-                <XMarkIcon className="canvas-studio-modal-close-icon" />
-              </button>
-            </div>
-            <div className="canvas-studio-modal-content">
-              {/* Advanced Color Picker */}
-              <div className="canvas-studio-color-section">
-                <AdvancedColorPicker
-                  color={selectedColor}
-                  onChange={(color, alpha) => {
-                    setSelectedColor(color);
-                    setGradientActive(false); // Disable gradient when selecting solid color
-                    if (alpha !== undefined) {
-                      setBrushOpacity(alpha);
-                    }
-                    if (drawingEngineRef.current) {
-                      drawingEngineRef.current.setColor(color);
-                      if (alpha !== undefined) {
-                        drawingEngineRef.current.setOpacity(alpha);
-                      }
-                    }
-                    // Add to recent colors
-                    if (!recentColors.includes(color)) {
-                      setRecentColors([color, ...recentColors.slice(0, 9)]);
-                    }
-                  }}
-                  showAlpha={true}
-                  showFormats={true}
-                  recentColors={recentColors}
-                  onAddToRecent={(color) => {
-                    if (!recentColors.includes(color)) {
-                      setRecentColors([color, ...recentColors.slice(0, 9)]);
-                    }
-                  }}
-                />
-              </div>
-
-              {/* Gradient Editor */}
-              <div className="canvas-studio-color-section">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <h4 className="canvas-studio-color-section-title" style={{ marginBottom: 0 }}>Gradients</h4>
+                {/* Close Button */}
+                <div style={{ padding: '1rem 0' }}>
                   <button
-                    onClick={() => setShowGradientEditor(!showGradientEditor)}
-                    style={{
-                      padding: '0.375rem 0.75rem',
-                      background: showGradientEditor ? 'var(--cs-purple, #8B5CF6)' : 'var(--cs-bg-darker, #F3F4F6)',
-                      color: showGradientEditor ? 'white' : 'var(--cs-text-secondary, #6B7280)',
-                      border: 'none',
-                      borderRadius: '0.375rem',
-                      fontSize: '0.75rem',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
-                    }}
+                    onClick={() => setShowColorPicker(false)}
+                    className="studio-modal-done-btn"
                   >
-                    {showGradientEditor ? 'Hide' : 'Show'}
+                    Done
                   </button>
                 </div>
-                {showGradientEditor && (
-                  <GradientEditor
-                    gradient={currentGradient}
-                    onChange={setCurrentGradient}
-                    onApply={() => {
-                      // Apply gradient to drawing engine
-                      if (drawingEngineRef.current) {
-                        drawingEngineRef.current.setGradient(currentGradient);
-                        drawingEngineRef.current.setUseGradient(true);
-                        setGradientActive(true);
-                      }
-                      const gradientCSS = currentGradient.type === 'linear'
-                        ? `linear-gradient(${currentGradient.angle}deg, ${currentGradient.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
-                        : `radial-gradient(circle, ${currentGradient.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`;
-                      console.log('Gradient CSS:', gradientCSS);
-                      setShowGradientEditor(false);
-                      setShowColorPicker(false);
-                      setShowGradientModal(true);
-                    }}
-                  />
-                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Text Input Overlay - Instagram Stories Style */}
+        {showTextModal && (
+          <div className="canvas-text-overlay">
+            {/* Dimmed background */}
+            <div className="canvas-text-dim" onClick={handleCancelText} />
+
+            {/* Top Toolbar */}
+            <div className="canvas-text-top-toolbar">
+              {/* Color Picker Button */}
+              <button
+                className="canvas-text-toolbar-btn"
+                onClick={() => setShowTextColorPicker(!showTextColorPicker)}
+                title="Text Color"
+              >
+                <div className="canvas-text-color-circle" style={{ backgroundColor: textColor }} />
+              </button>
+
+              {/* Alignment Buttons */}
+              <button
+                onClick={() => setTextAlign('left')}
+                className={`canvas-text-toolbar-btn ${textAlign === 'left' ? 'active' : ''}`}
+                title="Align Left"
+              >
+                ☰
+              </button>
+              <button
+                onClick={() => setTextAlign('center')}
+                className={`canvas-text-toolbar-btn ${textAlign === 'center' ? 'active' : ''}`}
+                title="Align Center"
+              >
+                ≡
+              </button>
+              <button
+                onClick={() => setTextAlign('right')}
+                className={`canvas-text-toolbar-btn ${textAlign === 'right' ? 'active' : ''}`}
+                title="Align Right"
+              >
+                ☰
+              </button>
+
+              {/* Font Size Slider */}
+              <div className="canvas-text-size-slider-wrapper">
+                <input
+                  type="range"
+                  min="16"
+                  max="80"
+                  value={fontSize}
+                  onChange={(e) => setFontSize(parseInt(e.target.value))}
+                  className="canvas-text-size-slider"
+                  title={`Font Size: ${fontSize}px`}
+                />
               </div>
 
-              {/* Quick Colors */}
-              <div className="canvas-studio-color-section">
-                <h4 className="canvas-studio-color-section-title">Quick Colors</h4>
-                <div className="canvas-studio-colors-grid">
-                  {predefinedColors.map((color, index) => (
-                    <button
-                      key={`color-${index}`}
-                      className={`canvas-studio-color-swatch ${
-                        color === selectedColor ? 'canvas-studio-color-swatch-active' : ''
-                      }`}
-                      style={{ backgroundColor: color }}
-                      onClick={() => {
-                        handleColorSelect(color);
-                      }}
-                      aria-label={`Select color ${color}`}
-                    />
-                  ))}
+              {/* Done Button */}
+              <button
+                className="canvas-text-done-btn"
+                onClick={handleAddText}
+                disabled={!textInput.trim()}
+              >
+                Done
+              </button>
+            </div>
+
+            {/* Color Picker Popup */}
+            {showTextColorPicker && (
+              <div className="canvas-text-color-picker">
+                <div className="canvas-text-color-grid">
+                  {['#FFFFFF', '#000000', '#EF4444', '#F97316', '#F59E0B', '#EAB308',
+                    '#84CC16', '#22C55E', '#10B981', '#14B8A6', '#06B6D4', '#0EA5E9',
+                    '#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#D946EF', '#EC4899'].map((color) => (
+                      <button
+                        key={color}
+                        className={`canvas-text-color-option ${textColor === color ? 'active' : ''}`}
+                        style={{ backgroundColor: color }}
+                        onClick={() => {
+                          setTextColor(color);
+                          setShowTextColorPicker(false);
+                        }}
+                      />
+                    ))}
                 </div>
               </div>
+            )}
 
-              {/* Close Button */}
-              <div style={{ padding: '1rem 0' }}>
-                <button
-                  onClick={() => setShowColorPicker(false)}
-                  style={{
-                    width: '100%',
-                    padding: '0.875rem',
-                    background: 'var(--cs-purple, #8B5CF6)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '0.5rem',
-                    fontSize: '0.875rem',
-                    fontWeight: '600',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Done
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Text Input Overlay - Instagram Stories Style */}
-      {showTextModal && (
-        <div className="canvas-text-overlay">
-          {/* Dimmed background */}
-          <div className="canvas-text-dim" onClick={handleCancelText} />
-          
-          {/* Top Toolbar */}
-          <div className="canvas-text-top-toolbar">
-            {/* Color Picker Button */}
-            <button 
-              className="canvas-text-toolbar-btn"
-              onClick={() => setShowTextColorPicker(!showTextColorPicker)}
-              title="Text Color"
-            >
-              <div className="canvas-text-color-circle" style={{ backgroundColor: textColor }} />
-            </button>
-
-            {/* Alignment Buttons */}
-            <button
-              onClick={() => setTextAlign('left')}
-              className={`canvas-text-toolbar-btn ${textAlign === 'left' ? 'active' : ''}`}
-              title="Align Left"
-            >
-              ☰
-            </button>
-            <button
-              onClick={() => setTextAlign('center')}
-              className={`canvas-text-toolbar-btn ${textAlign === 'center' ? 'active' : ''}`}
-              title="Align Center"
-            >
-              ≡
-            </button>
-            <button
-              onClick={() => setTextAlign('right')}
-              className={`canvas-text-toolbar-btn ${textAlign === 'right' ? 'active' : ''}`}
-              title="Align Right"
-            >
-              ☰
-            </button>
-
-            {/* Font Size Slider */}
-            <div className="canvas-text-size-slider-wrapper">
-              <input
-                type="range"
-                min="16"
-                max="80"
-                value={fontSize}
-                onChange={(e) => setFontSize(parseInt(e.target.value))}
-                className="canvas-text-size-slider"
-                title={`Font Size: ${fontSize}px`}
-              />
-            </div>
-
-            {/* Done Button */}
-            <button
-              className="canvas-text-done-btn"
-              onClick={handleAddText}
-              disabled={!textInput.trim()}
-            >
-              Done
-            </button>
-          </div>
-
-          {/* Color Picker Popup */}
-          {showTextColorPicker && (
-            <div className="canvas-text-color-picker">
-              <div className="canvas-text-color-grid">
-                {['#FFFFFF', '#000000', '#EF4444', '#F97316', '#F59E0B', '#EAB308',
-                  '#84CC16', '#22C55E', '#10B981', '#14B8A6', '#06B6D4', '#0EA5E9',
-                  '#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#D946EF', '#EC4899'].map((color) => (
-                  <button
-                    key={color}
-                    className={`canvas-text-color-option ${textColor === color ? 'active' : ''}`}
-                    style={{ backgroundColor: color }}
-                    onClick={() => {
-                      setTextColor(color);
-                      setShowTextColorPicker(false);
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Dynamic style override */}
-          <style>{`
+            {/* Dynamic style override */}
+            <style>{`
             .canvas-text-input-field-active {
               font-family: ${fontFamily} !important;
               font-size: ${fontSize}px !important;
@@ -3791,176 +3930,176 @@ const CanvasDrawingPage: React.FC = () => {
             }
           `}</style>
 
-          {/* Text input positioned on canvas */}
-          <div className="canvas-text-on-canvas">
-            <textarea
-              value={textInput}
-              onChange={(e) => setTextInput(e.target.value)}
-              placeholder="Tap to type"
-              className="canvas-text-input-field canvas-text-input-field-active"
-              autoFocus
-            />
-          </div>
+            {/* Text input positioned on canvas */}
+            <div className="canvas-text-on-canvas">
+              <textarea
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+                placeholder="Tap to type"
+                className="canvas-text-input-field canvas-text-input-field-active"
+                autoFocus
+              />
+            </div>
 
-          {/* Font Style Buttons - Float above keyboard */}
-          <div 
-            className="canvas-text-font-styles"
-            style={{
-              // DISABLED: Manual keyboard positioning not needed with resize: none
-              // bottom: keyboardHeight > 0 ? `${keyboardHeight + 20}px` : undefined
-            }}
-          >
-            {/* Classic - Clean and readable */}
-            <button
-              onClick={() => {
-                setFontFamily('Arial');
-                setFontWeight('normal');
-                setFontStyle('normal');
+            {/* Font Style Buttons - Float above keyboard */}
+            <div
+              className="canvas-text-font-styles"
+              style={{
+                // DISABLED: Manual keyboard positioning not needed with resize: none
+                // bottom: keyboardHeight > 0 ? `${keyboardHeight + 20}px` : undefined
               }}
-              className={`canvas-text-font-style ${fontFamily === 'Arial' ? 'active' : ''}`}
-              style={{ fontFamily: 'Arial', fontWeight: 'normal' }}
             >
-              Aa
-            </button>
-            {/* Bold - Strong impact */}
-            <button
-              onClick={() => {
-                setFontFamily('Impact');
-                setFontWeight('normal');
-                setFontStyle('normal');
-              }}
-              className={`canvas-text-font-style ${fontFamily === 'Impact' ? 'active' : ''}`}
-              style={{ fontFamily: 'Impact', fontWeight: 'normal' }}
-            >
-              Aa
-            </button>
-            {/* Handwritten - Fun and playful */}
-            <button
-              onClick={() => {
-                setFontFamily('Comic Sans MS');
-                setFontWeight('bold');
-                setFontStyle('normal');
-              }}
-              className={`canvas-text-font-style ${fontFamily === 'Comic Sans MS' ? 'active' : ''}`}
-              style={{ fontFamily: 'Comic Sans MS', fontWeight: 'bold' }}
-            >
-              Aa
-            </button>
-            {/* Elegant - Sophisticated serif */}
-            <button
-              onClick={() => {
-                setFontFamily('Georgia');
-                setFontWeight('normal');
-                setFontStyle('italic');
-              }}
-              className={`canvas-text-font-style ${fontFamily === 'Georgia' ? 'active' : ''}`}
-              style={{ fontFamily: 'Georgia', fontStyle: 'italic' }}
-            >
-              Aa
-            </button>
-            {/* Typewriter - Vintage feel */}
-            <button
-              onClick={() => {
-                setFontFamily('Courier New');
-                setFontWeight('bold');
-                setFontStyle('normal');
-              }}
-              className={`canvas-text-font-style ${fontFamily === 'Courier New' ? 'active' : ''}`}
-              style={{ fontFamily: 'Courier New', fontWeight: 'bold' }}
-            >
-              Aa
-            </button>
-            {/* Brush - Artistic and expressive */}
-            <button
-              onClick={() => {
-                setFontFamily('Brush Script MT');
-                setFontWeight('normal');
-                setFontStyle('italic');
-              }}
-              className={`canvas-text-font-style ${fontFamily === 'Brush Script MT' ? 'active' : ''}`}
-              style={{ fontFamily: 'Brush Script MT, cursive', fontStyle: 'italic' }}
-            >
-              Aa
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Clear Canvas Confirmation Modal */}
-      {showClearConfirmModal && (
-        <div className="canvas-studio-modal-backdrop" onClick={handleCancelClear}>
-          <div className="canvas-studio-modal canvas-studio-modal-small" onClick={(e) => e.stopPropagation()}>
-            <div className="canvas-studio-modal-header">
-              <h3 className="canvas-studio-modal-title">Clear Canvas?</h3>
-              <button 
-                className="canvas-studio-modal-close"
-                onClick={handleCancelClear}
-                aria-label="Close"
+              {/* Classic - Clean and readable */}
+              <button
+                onClick={() => {
+                  setFontFamily('Arial');
+                  setFontWeight('normal');
+                  setFontStyle('normal');
+                }}
+                className={`canvas-text-font-style ${fontFamily === 'Arial' ? 'active' : ''}`}
+                style={{ fontFamily: 'Arial', fontWeight: 'normal' }}
               >
-                <XMarkIcon className="canvas-studio-modal-close-icon" />
+                Aa
+              </button>
+              {/* Bold - Strong impact */}
+              <button
+                onClick={() => {
+                  setFontFamily('Impact');
+                  setFontWeight('normal');
+                  setFontStyle('normal');
+                }}
+                className={`canvas-text-font-style ${fontFamily === 'Impact' ? 'active' : ''}`}
+                style={{ fontFamily: 'Impact', fontWeight: 'normal' }}
+              >
+                Aa
+              </button>
+              {/* Handwritten - Fun and playful */}
+              <button
+                onClick={() => {
+                  setFontFamily('Comic Sans MS');
+                  setFontWeight('bold');
+                  setFontStyle('normal');
+                }}
+                className={`canvas-text-font-style ${fontFamily === 'Comic Sans MS' ? 'active' : ''}`}
+                style={{ fontFamily: 'Comic Sans MS', fontWeight: 'bold' }}
+              >
+                Aa
+              </button>
+              {/* Elegant - Sophisticated serif */}
+              <button
+                onClick={() => {
+                  setFontFamily('Georgia');
+                  setFontWeight('normal');
+                  setFontStyle('italic');
+                }}
+                className={`canvas-text-font-style ${fontFamily === 'Georgia' ? 'active' : ''}`}
+                style={{ fontFamily: 'Georgia', fontStyle: 'italic' }}
+              >
+                Aa
+              </button>
+              {/* Typewriter - Vintage feel */}
+              <button
+                onClick={() => {
+                  setFontFamily('Courier New');
+                  setFontWeight('bold');
+                  setFontStyle('normal');
+                }}
+                className={`canvas-text-font-style ${fontFamily === 'Courier New' ? 'active' : ''}`}
+                style={{ fontFamily: 'Courier New', fontWeight: 'bold' }}
+              >
+                Aa
+              </button>
+              {/* Brush - Artistic and expressive */}
+              <button
+                onClick={() => {
+                  setFontFamily('Brush Script MT');
+                  setFontWeight('normal');
+                  setFontStyle('italic');
+                }}
+                className={`canvas-text-font-style ${fontFamily === 'Brush Script MT' ? 'active' : ''}`}
+                style={{ fontFamily: 'Brush Script MT, cursive', fontStyle: 'italic' }}
+              >
+                Aa
               </button>
             </div>
-            <div className="canvas-studio-modal-content">
-              <p style={{ marginBottom: '1.5rem', color: '#6B7280' }}>
-                This will permanently delete all your drawings on this canvas. This action cannot be undone.
-              </p>
-              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+          </div>
+        )}
+
+        {/* Clear Canvas Confirmation Modal */}
+        {showClearConfirmModal && (
+          <div className="canvas-studio-modal-backdrop" onClick={handleCancelClear}>
+            <div className="canvas-studio-modal canvas-studio-modal-small" onClick={(e) => e.stopPropagation()}>
+              <div className="canvas-studio-modal-header">
+                <h3 className="canvas-studio-modal-title">Clear Canvas?</h3>
                 <button
-                  className="canvas-studio-btn-secondary"
+                  className="canvas-studio-modal-close"
                   onClick={handleCancelClear}
+                  aria-label="Close"
                 >
-                  Cancel
+                  <XMarkIcon className="canvas-studio-modal-close-icon" />
                 </button>
-                <button
-                  className="canvas-studio-btn-danger"
-                  onClick={handleConfirmClear}
-                >
-                  Clear Canvas
-                </button>
+              </div>
+              <div className="canvas-studio-modal-content">
+                <p style={{ marginBottom: '1.5rem', color: '#64748b' }}>
+                  This will permanently delete all your drawings on this canvas. This action cannot be undone.
+                </p>
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                  <button
+                    className="canvas-studio-btn-secondary"
+                    onClick={handleCancelClear}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="canvas-studio-btn-danger"
+                    onClick={handleConfirmClear}
+                  >
+                    Clear Canvas
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Gradient Applied Modal */}
-      <GradientAppliedModal
-        isOpen={showGradientModal}
-        onClose={() => setShowGradientModal(false)}
-        gradientPreview={
-          currentGradient.type === 'linear'
-            ? `linear-gradient(${currentGradient.angle}deg, ${currentGradient.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
-            : `radial-gradient(circle, ${currentGradient.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
-        }
-      />
+        {/* Gradient Applied Modal */}
+        <GradientAppliedModal
+          isOpen={showGradientModal}
+          onClose={() => setShowGradientModal(false)}
+          gradientPreview={
+            currentGradient.type === 'linear'
+              ? `linear-gradient(${currentGradient.angle}deg, ${currentGradient.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
+              : `radial-gradient(circle, ${currentGradient.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`
+          }
+        />
 
-      {/* Voting Modal */}
-      {showVotingModal && votingData && ReactDOM.createPortal(
-        <VotingModal
-          isOpen={showVotingModal}
-          onVote={handleVote}
-          votingData={votingData}
-          participants={participants}
-          initiatedBy={votingData.initiated_by_username}
-          currentUserId={currentUserId}
-        />,
-        document.body
-      )}
+        {/* Voting Modal */}
+        {showVotingModal && votingData && ReactDOM.createPortal(
+          <VotingModal
+            isOpen={showVotingModal}
+            onVote={handleVote}
+            votingData={votingData}
+            participants={participants}
+            initiatedBy={votingData.initiated_by_username}
+            currentUserId={currentUserId}
+          />,
+          document.body
+        )}
 
-      {/* Saving Overlay */}
-      {showSavingOverlay && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          style={{ zIndex: 999998 }}
-        >
-          <div className="bg-white rounded-lg p-6 max-w-md mx-4 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <h3 className="text-lg font-semibold mb-2">Saving Canvas...</h3>
-            <p className="text-gray-600">Please wait while the canvas is being saved.</p>
+        {/* Saving Overlay */}
+        {showSavingOverlay && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            style={{ zIndex: 999998 }}
+          >
+            <div className="bg-white rounded-lg p-6 max-w-md mx-4 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+              <h3 className="text-lg font-semibold mb-2">Saving Canvas...</h3>
+              <p className="text-gray-600">Please wait while the canvas is being saved.</p>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
     </>
   );
 };

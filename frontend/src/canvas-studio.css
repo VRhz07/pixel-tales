@@ -1,37 +1,75 @@
 /* ============================================
-   CANVAS STUDIO - PROFESSIONAL DRAWING APP
-   Design System Implementation
+   PixelTales — Playful Candy Studio
+   Drawing canvas page styles (design profile v1.0.0)
    ============================================ */
 
-/* Color Palette from Design Profile */
 :root {
-  --cs-bg-dark: #2C3137;
-  --cs-bg-darker: #1F2329;
-  --cs-surface: #343A40;
-  --cs-surface-light: #404650;
-  --cs-text-primary: #FFFFFF;
-  --cs-text-secondary: #B8BCC2;
-  --cs-text-tertiary: #8B9197;
-  --cs-purple: #8B5CF6;
-  --cs-purple-dark: #7C3AED;
-  --cs-purple-light: #A78BFA;
-  --cs-border: #404650;
-  --cs-hover: #404650;
-  --cs-canvas-bg: #FFFFFF;
-  --cs-canvas-border: #E5E7EB;
+  /* Brand */
+  --studio-primary: #ff6b6b;
+  /* candy coral — active tool, CTAs, focus */
+  --studio-primary-dark: #f04e4e;
+  --studio-secondary: #4ecdc4;
+  /* mint — save, active layer accents */
+  --studio-accent: #ffe66d;
+  /* butter yellow — highlights */
+  --studio-purple: #a78bfa;
+  --studio-sky: #7dd3fc;
+
+  /* Neutrals */
+  --studio-canvas-surface: #ffffff;
+  --studio-app-bg: #f1f5f9;
+  --studio-canvas-backdrop: #e2e8f0;
+  --studio-panel: #ffffff;
+  --studio-border: #e2e8f0;
+  --studio-border-strong: #cbd5e1;
+  --studio-text-primary: #334155;
+  --studio-text-secondary: #64748b;
+  --studio-text-muted: #94a3b8;
+  --studio-text-placeholder: #cbd5e1;
+
+  /* Semantic */
+  --studio-danger: #f43f5e;
+  --studio-success: #4ecdc4;
+
+  /* Shadows */
+  --studio-shadow-toy: 4px 4px 0 rgba(0, 0, 0, 0.10);
+  --studio-shadow-tool-active: 0 10px 20px -8px rgba(255, 107, 107, 0.35);
+  --studio-shadow-floating-pill: 0 20px 40px -12px rgba(15, 23, 42, 0.25);
+  --studio-shadow-card: 0 20px 40px -20px rgba(15, 23, 42, 0.35);
+
+  /* Legacy --cs-* tokens remapped to the light candy theme
+     (kept for child components: AdvancedColorPicker, GradientEditor, etc.) */
+  --cs-bg-dark: #f1f5f9;
+  --cs-bg-darker: #ffffff;
+  --cs-surface: #ffffff;
+  --cs-surface-light: #f1f5f9;
+  --cs-text-primary: #334155;
+  --cs-text-secondary: #64748b;
+  --cs-text-tertiary: #94a3b8;
+  --cs-purple: #ff6b6b;
+  --cs-purple-dark: #f04e4e;
+  --cs-purple-light: #ffa3a3;
+  --cs-border: #e2e8f0;
+  --cs-hover: #f1f5f9;
+  --cs-canvas-bg: #ffffff;
+  --cs-canvas-border: #e2e8f0;
 }
 
 /* ============================================
-   MAIN LAYOUT - THREE COLUMN GRID
+   ROOT
    ============================================ */
 
 .canvas-studio {
   width: 100vw;
-  height: 100vh; /* Fixed viewport - canvas needs stable height */
-  background: var(--cs-bg-dark);
+  height: 100vh;
+  /* Fixed viewport - canvas needs stable height */
+  background: var(--studio-app-bg);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  font-family: 'Fredoka', ui-sans-serif, system-ui, sans-serif;
+  color: var(--studio-text-primary);
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Capacitor safe area for canvas studio */
@@ -40,379 +78,348 @@ body.capacitor .canvas-studio {
   height: calc(100vh - env(safe-area-inset-bottom));
 }
 
-.canvas-studio-desktop {
-  display: grid;
-  grid-template-columns: 60px 1fr 280px; /* Increased right panel from 200px to 280px */
-  grid-template-rows: auto 1fr;
+.canvas-studio button {
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Force canvas to 500px in desktop layout */
-.canvas-studio-desktop .canvas-studio-canvas {
-  width: 500px !important;
-  height: 500px !important;
-}
-
-.canvas-studio-mobile {
-  display: flex;
-  flex-direction: column;
+.canvas-studio button:focus-visible,
+.canvas-studio input:focus-visible {
+  outline: 2px solid var(--studio-primary);
+  outline-offset: 2px;
 }
 
 /* ============================================
-   TOP BAR
+   HEADER (64px)
    ============================================ */
 
-.canvas-studio-topbar {
-  grid-column: 1 / -1;
-  background: var(--cs-bg-darker);
-  border-bottom: 1px solid var(--cs-border);
-  padding: 0.4rem 0.5rem;
+.studio-header {
+  height: 64px;
+  flex-shrink: 0;
+  background: var(--studio-panel);
+  border-bottom: 4px solid var(--studio-border);
+  padding: 0 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.3rem;
+  gap: 8px;
   z-index: 100;
-  overflow-x: hidden;
   max-width: 100vw;
+  overflow: hidden;
 }
 
-/* Capacitor safe area for topbar */
-body.capacitor .canvas-studio-topbar {
-  padding-top: 0.4rem;
+.canvas-studio-mobile .studio-header {
+  padding: 0 12px;
 }
 
-.canvas-studio-topbar-left,
-.canvas-studio-topbar-center,
-.canvas-studio-topbar-right {
+.studio-header-left,
+.studio-header-center,
+.studio-header-right {
   display: flex;
   align-items: center;
-  gap: 0.2rem;
-  flex-shrink: 1;
+  gap: 8px;
   min-width: 0;
 }
 
-.canvas-studio-title {
-  color: var(--cs-text-primary);
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0;
+/* Logo */
+.studio-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.canvas-studio-topbar-btn {
-  background: transparent;
-  color: var(--cs-text-secondary);
-  border: none;
-  border-radius: 0.375rem;
-  padding: 0.2rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.studio-logo-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--studio-primary);
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
+  transform: rotate(3deg);
+  box-shadow: var(--studio-shadow-toy);
+  user-select: none;
+}
+
+.studio-logo-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--studio-text-primary);
+  white-space: nowrap;
+}
+
+/* Title hidden on mobile per design profile */
+.canvas-studio-mobile .studio-logo-title {
+  display: none;
+}
+
+/* 40px circular icon actions */
+.studio-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: var(--studio-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
   flex-shrink: 0;
-  min-width: 1.5rem;
-  min-height: 1.5rem;
 }
 
-.canvas-studio-topbar-btn:hover {
-  background: var(--cs-hover);
-  color: var(--cs-text-primary);
+.studio-icon-btn:hover {
+  background: var(--studio-hover);
+  color: var(--studio-text-primary);
 }
 
-.canvas-studio-topbar-icon {
-  width: 0.9rem;
-  height: 0.9rem;
+.studio-icon-btn:active {
+  transform: scale(0.95);
 }
 
-.canvas-studio-zoom-display {
-  color: var(--cs-text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
+.studio-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Zoom pill */
+.studio-zoom-pill {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--studio-surface-light);
+  border: 1px solid var(--studio-border);
+  border-radius: 9999px;
+  padding: 4px 8px;
+  margin-left: 8px;
+}
+
+.studio-zoom-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: var(--studio-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.studio-zoom-btn:hover {
+  background: #ffffff;
+  color: var(--studio-text-primary);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+.studio-zoom-btn:active {
+  transform: scale(0.95);
+}
+
+.studio-zoom-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .canvas-studio-zoom-input {
   width: 2.5rem;
-  background: var(--cs-surface-light) !important;
-  border: 1px solid var(--cs-border) !important;
-  border-radius: 0.375rem;
-  color: var(--cs-text-primary) !important;
-  font-size: 0.625rem;
-  font-weight: 500;
+  background: #ffffff !important;
+  border: 1px solid var(--studio-border) !important;
+  border-radius: 9999px;
+  color: var(--studio-text-primary) !important;
+  font-family: 'Fredoka', ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-align: center;
-  padding: 0.125rem;
+  padding: 0.25rem 0.125rem;
   outline: none;
   transition: all 0.2s ease;
 }
 
 .canvas-studio-zoom-input:focus {
-  border-color: var(--cs-purple) !important;
-  background: var(--cs-bg-darker) !important;
-  color: var(--cs-text-primary) !important;
+  border-color: var(--studio-primary) !important;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
 }
 
-/* Support for light mode */
-@media (prefers-color-scheme: light) {
-  .canvas-studio-zoom-input {
-    background: #f3f4f6 !important;
-    color: #1f2937 !important;
-    border-color: #d1d5db !important;
-  }
-  
-  .canvas-studio-zoom-input:focus {
-    background: #e5e7eb !important;
-    color: #1f2937 !important;
-    border-color: var(--cs-purple) !important;
-  }
-}
-
-.canvas-studio-zoom-percent {
-  color: var(--cs-text-secondary);
+.studio-zoom-percent {
+  color: var(--studio-text-secondary);
   font-size: 0.75rem;
-  font-weight: 500;
-  margin-left: 0.15rem;
+  font-weight: 700;
+  margin: 0 2px 0 1px;
+}
+
+/* Save button — mint pill */
+.studio-save-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--studio-secondary);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  padding: 8px 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 14px -6px rgba(78, 205, 196, 0.55);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.studio-save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px -6px rgba(78, 205, 196, 0.6);
+}
+
+.studio-save-btn:active {
+  transform: scale(0.95);
+}
+
+.canvas-studio-mobile .studio-save-btn {
+  padding: 8px 12px;
+}
+
+.studio-save-icon {
+  width: 20px;
+  height: 20px;
 }
 
 /* ============================================
-   LEFT TOOLBAR - 60px WIDTH
+   BODY LAYOUT
    ============================================ */
 
-.canvas-studio-left-toolbar {
-  background: var(--cs-bg-darker);
-  border-right: 1px solid var(--cs-border);
-  padding: 1rem 0;
+.studio-body {
+  flex: 1;
+  min-height: 0;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  overflow-y: auto;
+  flex-direction: row;
+  overflow: hidden;
 }
 
-.canvas-studio-tool-btn {
-  background: transparent;
-  color: var(--cs-text-secondary);
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  margin: 0 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+/* ============================================
+   LEFT TOOL SIDEBAR (tablet & widescreen, 96px)
+   ============================================ */
+
+.studio-sidebar {
+  width: 96px;
+  flex-shrink: 0;
+  background: var(--studio-panel);
+  border-right: 4px solid var(--studio-border);
+  padding: 24px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
+  gap: 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-.canvas-studio-tool-btn:hover {
-  background: var(--cs-hover);
+.studio-sidebar-divider {
+  width: 48px;
+  height: 2px;
+  background: var(--studio-border);
+  border-radius: 9999px;
+  flex-shrink: 0;
 }
 
-.canvas-studio-tool-btn-active {
-  background: var(--cs-purple) !important;
-  color: var(--cs-text-primary) !important;
+/* 64px tool buttons — icon over label */
+.studio-tool-btn {
+  width: 64px;
+  height: 64px;
+  border: none;
+  border-radius: 1rem;
+  background: var(--studio-surface-light);
+  color: var(--studio-text-secondary);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  position: relative;
 }
 
-.canvas-studio-tool-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+.studio-tool-btn:hover {
+  transform: translateY(-2px);
+  background: var(--studio-border);
 }
 
-/* Eraser icon for desktop left toolbar */
-.canvas-studio-tool-btn .canvas-eraser-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+.studio-tool-btn:active {
+  transform: scale(0.95);
 }
 
-.canvas-studio-tool-btn .canvas-eraser-icon::before {
-  width: 1rem;
-  height: 0.75rem;
+.studio-tool-btn-active,
+.studio-tool-btn-active:hover {
+  background: var(--studio-primary);
+  color: #ffffff;
+  box-shadow: var(--studio-shadow-tool-active);
 }
 
-.canvas-studio-tool-btn .canvas-eraser-icon::after {
-  width: 0.6rem;
+.studio-tool-icon {
+  width: 24px;
+  height: 24px;
 }
 
-/* Square icon for desktop left toolbar */
-.canvas-studio-tool-btn .canvas-square-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.canvas-studio-tool-icon-text {
-  font-size: 1.25rem;
+.studio-tool-icon-text {
+  font-size: 1.375rem;
   font-weight: 700;
   line-height: 1;
 }
 
-.canvas-studio-tool-label {
+.studio-tool-label {
   font-size: 0.625rem;
-  color: var(--cs-text-tertiary);
-  margin-top: 0.25rem;
-  font-weight: 500;
-  text-align: center;
-  line-height: 1.2;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  margin-top: 2px;
 }
 
-.canvas-studio-tool-indicator {
-  position: absolute;
-  bottom: 0.25rem;
-  right: 0.25rem;
-  width: 4px;
-  height: 4px;
-  background: var(--cs-purple);
-  border-radius: 50%;
-  opacity: 0.7;
+.studio-tool-btn-active .studio-tool-label {
+  color: #ffffff;
 }
 
 /* ============================================
-   TOOL SUBMENU
+   CANVAS AREA — dot grid backdrop + candy card
    ============================================ */
 
-.canvas-studio-submenu {
-  position: fixed;
-  /* Position is set dynamically via inline styles based on clicked button */
-  background: var(--cs-surface);
-  border: 1px solid var(--cs-border);
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-  padding: 0.5rem;
-  min-width: 12rem;
-  z-index: 1000;
-  transform: none;
-  animation: slideIn 0.2s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Mobile Submenu */
-.canvas-studio-submenu-mobile {
-  position: fixed;
-  left: 50%;
-  bottom: 80px;
-  top: auto;
-  transform: translateX(-50%);
-  animation: slideUp 0.2s ease-out;
-  max-width: 90vw;
-  z-index: 1001;
-}
-
-.canvas-studio-submenu-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  animation: fadeIn 0.2s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
-
-.canvas-studio-submenu-item {
-  background: transparent;
-  color: var(--cs-text-secondary);
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  width: 100%;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  text-align: left;
-}
-
-.canvas-studio-submenu-item:hover {
-  background: var(--cs-hover);
-}
-
-.canvas-studio-submenu-item-active {
-  background: var(--cs-hover) !important;
-  color: var(--cs-text-primary) !important;
-}
-
-.canvas-studio-submenu-icon {
-  width: 1rem;
-  height: 1rem;
-  color: var(--cs-text-secondary);
-}
-
-.canvas-studio-submenu-label {
-  font-size: 0.875rem;
-  font-weight: 500;
+.studio-canvas-area {
   flex: 1;
-}
-
-.canvas-studio-submenu-check {
-  width: 1rem;
-  height: 1rem;
-  color: var(--cs-purple);
-  margin-left: auto;
-}
-
-/* ============================================
-   CANVAS AREA - CENTER
-   ============================================ */
-
-.canvas-studio-canvas-area {
-  background: var(--cs-bg-dark);
-  padding: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
   position: relative;
-}
-
-.canvas-studio-canvas-area-mobile {
-  position: fixed;
-  top: 48px; /* Below top bar */
-  bottom: 140px; /* Above brush settings panel + toolbar - increased for better clearance */
-  left: 0;
-  right: 0;
+  background: var(--studio-canvas-backdrop);
+  background-image: radial-gradient(rgba(148, 163, 184, 0.35) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+  padding: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
   overflow: hidden;
-  transition: bottom 0.3s ease;
 }
 
-/* Capacitor safe area for mobile canvas */
-body.capacitor .canvas-studio-canvas-area-mobile {
-  top: calc(48px + env(safe-area-inset-top));
-  bottom: calc(140px + env(safe-area-inset-bottom));
+.studio-canvas-area-mobile {
+  padding: 12px;
 }
 
-/* Expand space when additional settings are visible */
-.canvas-studio-canvas-area-mobile.has-settings {
-  bottom: 200px; /* Above all settings + toolbar - increased for better clearance */
+.studio-canvas-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
 }
 
 .canvas-studio-canvas-wrapper {
@@ -421,490 +428,556 @@ body.capacitor .canvas-studio-canvas-area-mobile {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .canvas-studio-canvas {
-  background: var(--cs-canvas-bg);
-  border-radius: 0;
-  box-shadow: none;
+  background: var(--studio-canvas-surface);
   width: 500px;
   height: 500px;
   aspect-ratio: 1 / 1;
+  border-radius: 1.75rem;
+  box-shadow: var(--studio-shadow-card);
+  outline: 1px solid var(--studio-border);
+  position: relative;
+  z-index: 2;
+}
+
+/* Force canvas to 500px in desktop layout (engine coordinate space) */
+.canvas-studio-desktop .canvas-studio-canvas {
+  width: 500px !important;
+  height: 500px !important;
+}
+
+/* Blurred candy decorations */
+.studio-deco {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.studio-deco-tl {
+  width: 160px;
+  height: 160px;
+  background: var(--studio-accent);
+  opacity: 0.4;
+  top: calc(50% - 290px);
+  left: calc(50% - 290px);
+}
+
+.studio-deco-br {
+  width: 180px;
+  height: 180px;
+  background: var(--studio-secondary);
+  opacity: 0.3;
+  bottom: calc(50% - 300px);
+  right: calc(50% - 300px);
 }
 
 /* ============================================
-   RIGHT PANEL - 280px WIDTH (Wider for layer controls)
+   FLOATING CANVAS OVERLAYS
    ============================================ */
 
-.canvas-studio-right-panel {
-  background: var(--cs-bg-darker);
-  border-left: 1px solid var(--cs-border);
-  width: 280px; /* Increased from 200px to fit layer controls */
-  overflow-y: auto;
+/* Shape variants picker — top-left card */
+.studio-shape-picker {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 30;
   display: flex;
   flex-direction: column;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--studio-border);
+  border-radius: 1rem;
+  padding: 8px;
+  box-shadow: var(--studio-shadow-floating-pill);
+  animation: studioPop 0.18s ease-out;
 }
 
-/* Panel Tabs */
-.canvas-studio-panel-tabs {
-  background: var(--cs-bg-darker);
-  border-bottom: 1px solid var(--cs-border);
-  padding: 0.5rem 0.5rem;
+/* Brush pill — bottom-center floating */
+.studio-brush-pill {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--studio-border);
+  border-radius: 9999px;
+  padding: 12px 20px;
+  box-shadow: var(--studio-shadow-floating-pill);
+  max-width: calc(100% - 32px);
+  overflow-x: auto;
+  animation: studioPop 0.18s ease-out;
 }
 
-.canvas-studio-panel-tab {
-  background: transparent;
-  color: var(--cs-text-secondary);
+@keyframes studioPop {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.studio-brush-pill::-webkit-scrollbar {
+  display: none;
+}
+
+.studio-brush-pill {
+  scrollbar-width: none;
+}
+
+.studio-pill-divider {
+  width: 2px;
+  height: 24px;
+  background: var(--studio-border);
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+/* 40px variant buttons */
+.studio-variant-btn {
+  width: 40px;
+  height: 40px;
   border: none;
-  border-bottom: 2px solid transparent;
-  padding-bottom: 0.75rem;
+  border-radius: 0.75rem;
+  background: var(--studio-surface-light);
+  color: var(--studio-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.studio-variant-btn:hover {
+  transform: translateY(-2px);
+  background: var(--studio-border);
+}
+
+.studio-variant-btn:active {
+  transform: scale(0.95);
+}
+
+.studio-variant-btn-active,
+.studio-variant-btn-active:hover {
+  background: var(--studio-primary);
+  color: #ffffff;
+  box-shadow: var(--studio-shadow-tool-active);
+}
+
+.studio-variant-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Color swatches */
+.studio-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px var(--studio-border);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.studio-swatch:hover {
+  transform: scale(1.1);
+}
+
+.studio-swatch-active,
+.studio-swatch-active:hover {
+  box-shadow: 0 0 0 2px var(--studio-primary);
+  transform: scale(1.1);
+}
+
+.studio-swatch-mobile {
+  width: 32px;
+  height: 32px;
+}
+
+/* Clear button — top-right circular, rose */
+.studio-clear-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 30;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--studio-border);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--studio-danger);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 16px -8px rgba(15, 23, 42, 0.25);
+  transition: all 0.2s ease;
+}
+
+.studio-clear-btn:hover {
+  background: #fff1f2;
+  transform: translateY(-2px);
+}
+
+.studio-clear-btn:active {
+  transform: scale(0.95);
+}
+
+.studio-clear-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* ============================================
+   RIGHT PANEL (widescreen, 288px)
+   ============================================ */
+
+.studio-right-panel {
+  width: 288px;
+  flex-shrink: 0;
+  background: var(--studio-panel);
+  border-left: 4px solid var(--studio-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Tabs */
+.studio-panel-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px;
+  border-bottom: 2px solid var(--studio-border);
+  flex-shrink: 0;
+}
+
+.studio-panel-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--studio-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 8px 4px;
+  border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  display: flex;
+}
+
+.studio-panel-tab:hover {
+  background: var(--studio-hover);
+  color: var(--studio-text-primary);
+}
+
+.studio-panel-tab-active,
+.studio-panel-tab-active:hover {
+  background: var(--studio-primary);
+  color: #ffffff;
+  box-shadow: var(--studio-shadow-tool-active);
+}
+
+.studio-panel-tab-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.studio-panel-count {
+  min-width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.12);
+  color: inherit;
+  font-size: 0.625rem;
+  font-weight: 700;
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
+  justify-content: center;
+  padding: 0 6px;
 }
 
-.canvas-studio-panel-tab:hover {
-  color: var(--cs-text-primary);
-}
-
-.canvas-studio-panel-tab-active {
-  color: var(--cs-text-primary) !important;
-  border-bottom-color: var(--cs-purple) !important;
-  font-weight: 600;
-}
-
-.canvas-studio-panel-tab-icon {
-  width: 1rem;
-  height: 1rem;
+.studio-panel-tab:not(.studio-panel-tab-active) .studio-panel-count {
+  background: var(--studio-border);
+  color: var(--studio-text-secondary);
 }
 
 .canvas-studio-color-circle-icon {
-  width: 1rem;
-  height: 1rem;
-  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 50%, #7c3aed 100%);
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+  background: conic-gradient(#ff6b6b, #ffa94d, #ffe66d, #4ecdc4, #60a5fa, #a78bfa, #f472b6, #ff6b6b);
+  box-shadow: inset 0 0 0 2px #ffffff;
+  flex-shrink: 0;
 }
 
-/* Panel Content */
-.canvas-studio-panel-content {
-  padding: 0.5rem;
+/* Panel content */
+.studio-panel-content {
   flex: 1;
   overflow-y: auto;
-  overflow-x: hidden;
-  max-height: calc(100vh - 120px);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* Custom Scrollbar for Panel Content */
-.canvas-studio-panel-content::-webkit-scrollbar {
+.studio-panel-content::-webkit-scrollbar {
   width: 8px;
 }
 
-.canvas-studio-panel-content::-webkit-scrollbar-track {
-  background: var(--cs-bg-darker);
+.studio-panel-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.studio-panel-content::-webkit-scrollbar-thumb {
+  background: var(--studio-border-strong);
   border-radius: 4px;
 }
 
-.canvas-studio-panel-content::-webkit-scrollbar-thumb {
-  background: var(--cs-border);
-  border-radius: 4px;
-  transition: background 0.2s ease;
+/* Add layer — dashed full-width button */
+.studio-add-layer-wrap {
+  padding-bottom: 4px;
 }
 
-.canvas-studio-panel-content::-webkit-scrollbar-thumb:hover {
-  background: var(--cs-purple);
+.studio-add-layer-btn {
+  width: 100%;
+  padding: 0.625rem;
+  background: transparent;
+  color: var(--studio-text-secondary);
+  border: 2px dashed var(--studio-border-strong);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
-/* Settings Group */
-.canvas-studio-setting-group {
-  margin-bottom: 1.5rem;
+.studio-add-layer-btn:hover {
+  border-color: var(--studio-secondary);
+  color: var(--studio-secondary);
+  background: rgba(78, 205, 196, 0.05);
 }
 
-.canvas-studio-setting-label {
-  color: var(--cs-text-secondary);
+.studio-add-layer-btn:active {
+  transform: scale(0.97);
+}
+
+/* Sections inside panel */
+.canvas-studio-color-section {
+  background: var(--studio-surface-light);
+  border-radius: 1rem;
+  padding: 16px;
+}
+
+.canvas-studio-color-section-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--studio-text-secondary);
+}
+
+.studio-setting-label {
   font-size: 0.875rem;
   font-weight: 500;
-  display: block;
-  margin-bottom: 0.75rem;
+  color: var(--studio-text-primary);
 }
 
-.canvas-studio-slider {
-  width: 100%;
-  height: 0.5rem;
-  background: var(--cs-border);
+.studio-setting-hint {
+  font-size: 0.75rem;
+  color: var(--studio-text-muted);
+  margin: 0;
+}
+
+.studio-slider-value-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--studio-primary);
+}
+
+/* Mini pill toggle buttons (Show/Hide, Filled/Hollow) */
+.studio-mini-toggle {
+  padding: 0.375rem 0.75rem;
+  background: #ffffff;
+  color: var(--studio-text-secondary);
+  border: 2px solid var(--studio-border);
   border-radius: 9999px;
-  outline: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.studio-mini-toggle:hover {
+  border-color: var(--studio-border-strong);
+}
+
+.studio-mini-toggle-active,
+.studio-mini-toggle-active:hover {
+  background: var(--studio-primary);
+  border-color: var(--studio-primary);
+  color: #ffffff;
+}
+
+/* Quick colors grid */
+.canvas-studio-colors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(28px, 1fr));
+  gap: 8px;
+}
+
+.canvas-studio-color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px var(--studio-border);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
+  justify-self: center;
+}
+
+.canvas-studio-color-swatch:hover {
+  transform: scale(1.1);
+}
+
+.canvas-studio-color-swatch-active,
+.canvas-studio-color-swatch-active:hover {
+  box-shadow: 0 0 0 2px var(--studio-primary);
+  transform: scale(1.1);
+}
+
+/* ============================================
+   SLIDERS — 8px pill track, coral accent
+   ============================================ */
+
+.canvas-studio-slider {
   appearance: none;
   -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--studio-border);
+  outline: none;
+  cursor: pointer;
+}
+
+.canvas-studio-slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--studio-border);
 }
 
 .canvas-studio-slider::-webkit-slider-thumb {
   appearance: none;
   -webkit-appearance: none;
-  width: 1rem;
-  height: 1rem;
-  background: var(--cs-text-primary);
-  border: 2px solid var(--cs-purple);
+  width: 20px;
+  height: 20px;
+  margin-top: -6px;
   border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid var(--studio-primary);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.2s ease;
+}
+
+.canvas-studio-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 6px rgba(255, 107, 107, 0.2);
+}
+
+.canvas-studio-slider::-moz-range-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--studio-border);
+  border: none;
+}
+
+.canvas-studio-slider::-moz-range-progress {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--studio-primary);
 }
 
 .canvas-studio-slider::-moz-range-thumb {
-  width: 1rem;
-  height: 1rem;
-  background: var(--cs-text-primary);
-  border: 2px solid var(--cs-purple);
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid var(--studio-primary);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.canvas-studio-setting-value {
-  color: var(--cs-text-primary);
-  font-size: 0.875rem;
-  font-weight: 600;
-  margin-top: 0.5rem;
-  text-align: right;
-}
-
-/* Layers List */
-.canvas-studio-layers-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.canvas-studio-layer-item {
-  background: var(--cs-surface);
-  border: 1px solid var(--cs-border);
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.canvas-studio-layer-item:hover {
-  background: var(--cs-hover);
-}
-
-.canvas-studio-layer-item-active {
-  border-color: var(--cs-purple);
-  background: var(--cs-hover);
-}
-
-.canvas-studio-layer-thumbnail {
-  width: 2.5rem;
-  height: 2.5rem;
-  background: var(--cs-canvas-bg);
-  border: 1px solid var(--cs-border);
-  border-radius: 0.25rem;
-}
-
-.canvas-studio-layer-name {
-  color: var(--cs-text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  flex: 1;
-}
-
-/* Color Section */
-.canvas-studio-color-section {
-  margin-bottom: 1.5rem;
-}
-
-.canvas-studio-color-section-title {
-  color: var(--cs-text-secondary);
-  font-size: 0.625rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.75rem;
-}
-
-/* Color Picker */
-.canvas-studio-color-picker-container {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  background: var(--cs-surface);
-  border-radius: 0.5rem;
-}
-
-.canvas-studio-color-picker {
-  width: 48px;
-  height: 48px;
-  border: none;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  background: none;
-}
-
-.canvas-studio-color-picker::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
-
-.canvas-studio-color-picker::-webkit-color-swatch {
-  border: 2px solid var(--cs-border);
-  border-radius: 0.375rem;
-}
-
-.canvas-studio-color-preview {
-  width: 32px;
-  height: 32px;
-  border-radius: 0.375rem;
-  border: 2px solid var(--cs-border);
-}
-
-.canvas-studio-color-hex {
-  color: var(--cs-text-secondary);
-  font-size: 0.75rem;
-  font-family: monospace;
-  font-weight: 500;
-}
-
-/* Recent Colors Row */
-.canvas-studio-colors-row {
-  display: flex;
-  gap: 0.375rem;
-  flex-wrap: wrap;
-}
-
-.canvas-studio-colors-row .canvas-studio-color-swatch {
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-}
-
-/* Colors Grid */
-.canvas-studio-colors-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.375rem;
-}
-
-.canvas-studio-color-swatch {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border: 2px solid transparent;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.canvas-studio-color-swatch:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.canvas-studio-color-swatch-active {
-  border-color: var(--cs-text-primary) !important;
-  box-shadow: 0 0 0 2px var(--cs-purple);
 }
 
 /* ============================================
-   MOBILE BOTTOM TOOLBAR
-   ============================================ */
-
-.canvas-studio-mobile-toolbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--cs-bg-darker);
-  border-top: 1px solid var(--cs-border);
-  padding: 0.4rem 0.4rem; /* Further reduced padding */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem; /* Smaller gap to fit all in one row */
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 100;
-  max-width: 100vw; /* Ensure it doesn't exceed viewport */
-  overflow-x: auto; /* Allow horizontal scroll if needed */
-  overflow-y: hidden;
-  flex-wrap: nowrap; /* Force single row */
-}
-
-/* Capacitor safe area for mobile toolbar */
-body.capacitor .canvas-studio-mobile-toolbar {
-  padding-bottom: calc(0.4rem + env(safe-area-inset-bottom));
-}
-
-.canvas-studio-mobile-tool {
-  background: var(--cs-surface);
-  color: var(--cs-text-secondary);
-  border: none;
-  border-radius: 50%;
-  width: 2.4rem; /* Further reduced for single row fit */
-  height: 2.4rem;
-  min-width: 2.4rem; /* Ensure minimum size */
-  min-height: 2.4rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0; /* Prevent buttons from shrinking */
-}
-
-.canvas-studio-mobile-tool:hover {
-  background: var(--cs-hover);
-}
-
-.canvas-studio-mobile-tool-active {
-  background: var(--cs-purple) !important;
-  color: var(--cs-text-primary) !important;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.5);
-}
-
-.canvas-studio-mobile-tool-icon {
-  width: 1.2rem; /* Further reduced for smaller buttons */
-  height: 1.2rem;
-  flex-shrink: 0;
-}
-
-.canvas-studio-color-indicator {
-  width: 1.2rem; /* Further reduced to match icon size */
-  height: 1.2rem;
-  border-radius: 50%;
-  border: 2px solid var(--cs-text-primary);
-  flex-shrink: 0;
-}
-
-/* Eraser Icon - Custom SVG-like shape */
-.canvas-eraser-icon {
-  width: 1.2rem;
-  height: 1.2rem;
-  position: relative;
-  flex-shrink: 0;
-}
-
-.canvas-eraser-icon::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(-45deg);
-  width: 0.9rem;
-  height: 0.65rem;
-  background: linear-gradient(to bottom, 
-    currentColor 0%, 
-    currentColor 60%, 
-    rgba(139, 92, 246, 0.3) 60%, 
-    rgba(139, 92, 246, 0.3) 100%
-  );
-  border: 1.5px solid currentColor;
-  border-radius: 1px 1px 2px 2px;
-}
-
-.canvas-eraser-icon::after {
-  content: '';
-  position: absolute;
-  bottom: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0.5rem;
-  height: 2px;
-  background: currentColor;
-  opacity: 0.4;
-  border-radius: 1px;
-}
-
-/* Eraser icon in active state */
-.canvas-studio-mobile-tool-active .canvas-eraser-icon::before,
-.canvas-studio-tool-btn-active .canvas-eraser-icon::before {
-  background: linear-gradient(to bottom, 
-    currentColor 0%, 
-    currentColor 60%, 
-    rgba(255, 255, 255, 0.3) 60%, 
-    rgba(255, 255, 255, 0.3) 100%
-  );
-}
-
-/* Square/Rectangle Icon for shapes tool */
-.canvas-square-icon {
-  width: 1.2rem;
-  height: 1.2rem;
-  border: 2px solid currentColor;
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
-/* Hide scrollbar on toolbar but keep functionality */
-.canvas-studio-mobile-toolbar::-webkit-scrollbar {
-  height: 2px;
-}
-
-.canvas-studio-mobile-toolbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.canvas-studio-mobile-toolbar::-webkit-scrollbar-thumb {
-  background: var(--cs-border);
-  border-radius: 1px;
-}
-
-/* ============================================
-   MOBILE SLIDERS (Above Toolbar)
+   MOBILE SETTINGS PANEL (brush / shape)
    ============================================ */
 
 .canvas-studio-mobile-sliders {
-  position: fixed;
-  bottom: 60px; /* Adjusted for smaller toolbar height */
-  left: 0;
-  right: 0;
-  background: var(--cs-bg-main);
-  border-top: 1px solid var(--cs-border);
-  padding: 0.5rem 0.75rem; /* Reduced horizontal padding for better fit */
+  flex-shrink: 0;
+  background: var(--studio-panel);
+  border-top: 2px solid var(--studio-border);
+  padding: 12px 16px;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  z-index: 90;
-  max-width: 100vw; /* Ensure it doesn't exceed viewport */
-  overflow-x: hidden;
-  overflow-y: auto;
-  max-height: 40vh; /* Limit height to prevent cutoff */
-}
-
-/* Capacitor safe area for mobile sliders */
-body.capacitor .canvas-studio-mobile-sliders {
-  bottom: calc(60px + env(safe-area-inset-bottom));
+  gap: 10px;
 }
 
 .canvas-studio-sliders-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  flex-shrink: 0; /* Prevent header from shrinking */
-  padding-bottom: 0.25rem; /* Reduced from 0.5rem */
+  justify-content: space-between;
 }
 
 .canvas-studio-sliders-title {
-  color: var(--cs-text-secondary);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  color: var(--studio-text-secondary);
 }
 
 .canvas-studio-reset-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 0.375rem;
-  padding: 0.375rem;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: var(--studio-surface-light);
+  color: var(--studio-text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -913,8 +986,8 @@ body.capacitor .canvas-studio-mobile-sliders {
 }
 
 .canvas-studio-reset-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: var(--cs-purple);
+  background: var(--studio-border);
+  color: var(--studio-primary);
 }
 
 .canvas-studio-reset-btn:active {
@@ -922,1663 +995,481 @@ body.capacitor .canvas-studio-mobile-sliders {
 }
 
 .canvas-studio-reset-icon {
-  width: 1rem;
-  height: 1rem;
-  color: var(--cs-text-primary);
+  width: 16px;
+  height: 16px;
 }
 
 .canvas-studio-slider-container {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem; /* Reduced from 0.5rem for more compact layout */
+  gap: 6px;
 }
 
 .canvas-studio-slider-label {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  color: var(--cs-text-secondary);
+  justify-content: space-between;
   font-size: 0.875rem;
   font-weight: 500;
-  width: 100%;
-}
-
-.canvas-studio-slider-label > span:first-child {
-  flex-shrink: 0;
-}
-
-.canvas-studio-slider-value {
-  color: var(--cs-text-primary);
-  font-weight: 600;
-  white-space: nowrap;
+  color: var(--studio-text-primary);
 }
 
 .canvas-studio-slider-preview {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
+  gap: 8px;
 }
 
 .canvas-studio-brush-preview {
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+  min-width: 4px;
+  min-height: 4px;
 }
 
-.canvas-studio-slider {
-  width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.1);
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-  cursor: pointer;
-}
-
-.canvas-studio-slider::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.canvas-studio-slider::-moz-range-track {
-  width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.canvas-studio-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--cs-purple);
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.5);
-  transition: all 0.2s ease;
-  margin-top: -7px; /* Center the thumb: (20px - 6px) / 2 */
-}
-
-.canvas-studio-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.7);
-}
-
-.canvas-studio-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--cs-purple);
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.5);
-  transition: all 0.2s ease;
-}
-
-.canvas-studio-slider::-moz-range-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.7);
-}
-
-/* ============================================
-   MOBILE MODAL
-   ============================================ */
-
-.canvas-studio-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  z-index: 200;
-}
-
-.canvas-studio-modal {
-  background: var(--cs-bg-darker);
-  border-radius: 1rem 1rem 0 0;
-  width: 100%;
-  max-height: 80vh;
-  overflow-y: auto;
-  padding: 1.5rem;
-}
-
-.canvas-studio-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.canvas-studio-modal-title {
-  color: var(--cs-text-primary);
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-.canvas-studio-modal-close-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--cs-text-secondary);
-  cursor: pointer;
-}
-
-.canvas-studio-modal-large {
-  max-height: 90vh;
-}
-
-.canvas-studio-modal-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* Color Picker Sections */
-.canvas-studio-color-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.canvas-studio-color-section-title {
-  color: var(--cs-text-secondary);
-  font-size: 0.875rem;
-  font-weight: 600;
+.canvas-studio-slider-value {
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 0;
+  color: var(--studio-primary);
 }
 
-.canvas-studio-color-picker-container {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
+/* ============================================
+   MOBILE BOTTOM DOCK
+   ============================================ */
 
-.canvas-studio-color-wheel {
-  width: 120px;
-  height: 120px;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  background: none;
-}
-
-.canvas-studio-color-wheel::-webkit-color-swatch-wrapper {
-  padding: 0;
-  border-radius: 50%;
-}
-
-.canvas-studio-color-wheel::-webkit-color-swatch {
-  border: 3px solid var(--cs-border);
-  border-radius: 50%;
-}
-
-.canvas-studio-color-preview {
+.studio-bottom-dock {
+  flex-shrink: 0;
+  background: var(--studio-panel);
+  border-top: 4px solid var(--studio-border);
+  padding: 12px 12px 16px;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
+  gap: 12px;
 }
 
-.canvas-studio-color-preview-swatch {
-  width: 60px;
-  height: 60px;
-  border-radius: 0.5rem;
-  border: 2px solid var(--cs-border);
+body.capacitor .studio-bottom-dock {
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
 }
 
-.canvas-studio-color-hex {
-  color: var(--cs-text-primary);
-  font-size: 0.875rem;
-  font-weight: 600;
-  font-family: monospace;
-}
-
-/* Compact Color Picker for Mobile */
-.canvas-studio-color-section-compact {
-  margin-bottom: 1rem;
-}
-
-.canvas-studio-color-picker-row {
+/* Variant strip — horizontal scroll of 48px circular buttons */
+.studio-variant-strip {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: var(--cs-surface);
-  border-radius: 0.5rem;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 2px 2px 6px;
+  scrollbar-width: none;
 }
 
-.canvas-studio-color-wheel-compact {
-  width: 48px;
-  height: 48px;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  background: none;
-  flex-shrink: 0;
-}
-
-.canvas-studio-color-wheel-compact::-webkit-color-swatch-wrapper {
-  padding: 0;
-  border-radius: 50%;
-}
-
-.canvas-studio-color-wheel-compact::-webkit-color-swatch {
-  border: 2px solid var(--cs-border);
-  border-radius: 50%;
-}
-
-.canvas-studio-color-hex-compact {
-  color: var(--cs-text-primary);
-  font-size: 0.875rem;
-  font-weight: 600;
-  font-family: monospace;
-  flex: 1;
-}
-
-.canvas-studio-color-apply-btn-compact {
-  background: var(--cs-purple);
-  color: var(--cs-text-primary);
-  border: none;
-  border-radius: 0.375rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.canvas-studio-color-apply-btn-compact:hover {
-  background: var(--cs-purple-hover);
-  transform: scale(1.05);
-}
-
-.canvas-studio-color-apply-btn {
-  background: var(--cs-purple);
-  color: var(--cs-text-primary);
-  border: none;
-  border-radius: 0.375rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 0.5rem;
-}
-
-.canvas-studio-color-apply-btn:hover {
-  background: var(--cs-purple-dark);
-  transform: translateY(-1px);
-}
-
-.canvas-studio-colors-row {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.canvas-studio-colors-row .canvas-studio-color-swatch {
-  width: 48px;
-  height: 48px;
-  flex-shrink: 0;
-}
-
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
-
-/* Tablet Portrait & Mobile - Use mobile layout */
-@media (max-width: 1024px) and (orientation: portrait) {
-  .canvas-studio-desktop {
-    display: none;
-  }
-
-  .canvas-studio-mobile {
-    display: flex;
-  }
-  
-  /* Add padding to show canvas rounded corners */
-  .canvas-studio-canvas-wrapper {
-    padding: 1rem;
-  }
-  
-  /* Ensure canvas stays square in portrait mode */
-  .canvas-studio-canvas {
-    /* Fixed size for consistency across orientations */
-    width: 500px !important;
-    height: 500px !important;
-    aspect-ratio: 1 / 1 !important;
-  }
-
-  /* Mobile toolbar with 2 rows for portrait */
-  .canvas-studio-mobile-toolbar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--cs-bg-darker);
-    border-top: 1px solid var(--cs-border);
-    padding: 0.5rem 0.4rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
-    z-index: 100;
-    max-width: 100vw;
-    overflow-x: hidden;
-    flex-wrap: wrap;
-    row-gap: 0.4rem;
-  }
-
-  /* Capacitor safe area for mobile toolbar */
-  body.capacitor .canvas-studio-mobile-toolbar {
-    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
-  }
-
-  /* Larger buttons for portrait mode */
-  .canvas-studio-mobile-tool {
-    width: 2.8rem;
-    height: 2.8rem;
-    min-width: 2.8rem;
-    min-height: 2.8rem;
-  }
-
-  .canvas-studio-mobile-tool-icon {
-    width: 1.4rem;
-    height: 1.4rem;
-  }
-
-  .canvas-studio-color-indicator {
-    width: 1.4rem;
-    height: 1.4rem;
-  }
-
-  /* Canvas area adjustment for 2-row toolbar */
-  .canvas-studio-canvas-area-mobile {
-    bottom: 220px;
-  }
-
-  body.capacitor .canvas-studio-canvas-area-mobile {
-    bottom: calc(220px + env(safe-area-inset-bottom));
-  }
-
-  .canvas-studio-canvas-area-mobile.has-settings {
-    bottom: 280px;
-  }
-
-  /* Move brush settings higher in portrait mode */
-  .canvas-studio-mobile-sliders {
-    bottom: 160px;
-  }
-
-  body.capacitor .canvas-studio-mobile-sliders {
-    bottom: calc(160px + env(safe-area-inset-bottom));
-  }
-}
-
-/* Phone Landscape - Use mobile landscape layout */
-@media (max-width: 1024px) and (orientation: landscape) and (max-height: 600px) {
-  .canvas-studio-desktop {
-    display: none;
-  }
-
-  .canvas-studio-mobile {
-    display: flex;
-  }
-  
-  /* Add padding to show canvas rounded corners */
-  .canvas-studio-canvas-wrapper {
-    padding: 1rem;
-  }
-}
-
-/* Tablet Landscape - Use desktop layout (only if height > 600px) */
-@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) and (min-height: 601px) {
-  .canvas-studio-desktop {
-    display: grid !important;
-  }
-  
-  .canvas-studio-mobile {
-    display: none !important;
-  }
-  
-  .canvas-studio-left-toolbar {
-    display: flex !important;
-  }
-  
-  .canvas-studio-canvas-area {
-    display: flex !important;
-  }
-  
-  /* Same fixed size as portrait for consistency */
-  .canvas-studio-canvas {
-    width: 500px !important;
-    height: 500px !important;
-    aspect-ratio: 1 / 1 !important;
-  }
-}
-
-/* Scaling for tablets and larger phones in portrait */
-@media (min-width: 600px) and (max-width: 1024px) and (orientation: portrait) {
-  .canvas-studio-topbar {
-    padding: 0.6rem 0.8rem;
-    gap: 0.5rem;
-  }
-
-  .canvas-studio-topbar-btn {
-    padding: 0.35rem;
-    min-width: 2.2rem;
-    min-height: 2.2rem;
-  }
-
-  .canvas-studio-topbar-icon {
-    width: 1.2rem;
-    height: 1.2rem;
-  }
-
-  .canvas-studio-zoom-input {
-    width: 3rem;
-    font-size: 0.75rem;
-    padding: 0.2rem 0.4rem;
-  }
-
-  .canvas-studio-zoom-percent {
-    font-size: 0.85rem;
-  }
-
-  .canvas-studio-mobile-tool {
-    width: 3.2rem;
-    height: 3.2rem;
-    min-width: 3.2rem;
-    min-height: 3.2rem;
-  }
-
-  .canvas-studio-mobile-tool-icon {
-    width: 1.6rem;
-    height: 1.6rem;
-  }
-
-  /* Tablet portrait: brush settings panel optimized for visibility and access */
-  .canvas-studio-mobile-sliders {
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 520px;
-    bottom: 70px;
-    padding: 1rem 1.5rem;
-    gap: 1rem;
-    background: var(--cs-bg-main);
-    border: 1px solid var(--cs-border);
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    margin-bottom: 0.75rem;
-    z-index: 91;
-    display: flex;
-    flex-direction: column;
-    max-height: auto;
-    overflow-y: auto;
-  }
-
-  body.capacitor .canvas-studio-mobile-sliders {
-    bottom: calc(70px + env(safe-area-inset-bottom));
-    margin-bottom: 0.75rem;
-  }
-
-  .canvas-studio-slider-container {
-    gap: 0.6rem;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .canvas-studio-slider-label {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--cs-text-primary);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    gap: 0.8rem;
-  }
-
-  .canvas-studio-slider-value {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--cs-purple);
-    min-width: 70px;
-    text-align: right;
-    flex-shrink: 0;
-  }
-
-  .canvas-studio-sliders-title {
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--cs-text-primary);
-  }
-
-  .canvas-studio-reset-btn {
-    padding: 0.5rem 0.75rem;
-    width: 100%;
-    font-size: 0.8rem;
-    font-weight: 600;
-    border-radius: 0.375rem;
-  }
-
-  .canvas-studio-reset-icon {
-    width: 1.2rem;
-    height: 1.2rem;
-  }
-
-  /* Make sliders full width and larger on tablet */
-  .canvas-studio-slider {
-    width: 100%;
-    height: 8px;
-  }
-}
-
-/* This rule is for tablets and small screens, but won't override portrait mode */
-@media (max-width: 768px) and (orientation: landscape) {
-  .canvas-studio-topbar {
-    padding: 0.4rem 0.4rem; /* Further reduced for small screens */
-    gap: 0.35rem; /* Tighter gap for small screens */
-  }
-  
-  .canvas-studio-topbar-btn {
-    padding: 0.3rem; /* Even smaller padding on small screens */
-  }
-  
-  .canvas-studio-title {
-    font-size: 0.875rem;
-  }
-  
-  .canvas-studio-topbar-icon {
-    width: 1rem;
-    height: 1rem;
-  }
-  
-  .canvas-studio-canvas-area {
-    padding: 1rem;
-  }
-  
-  .canvas-studio-mobile-toolbar {
-    padding: 0.3rem 0.3rem; /* Even more reduced for very small screens */
-    gap: 0.3rem; /* Tighter gap for smaller screens */
-  }
-  
-  .canvas-studio-mobile-tool {
-    width: 2.2rem; /* Smaller on very small screens */
-    height: 2.2rem;
-    min-width: 2.2rem;
-    min-height: 2.2rem;
-  }
-  
-  .canvas-studio-mobile-tool-icon {
-    width: 1.1rem; /* Smaller icon for small screens */
-    height: 1.1rem;
-  }
-  
-  .canvas-studio-color-indicator {
-    width: 1.1rem;
-    height: 1.1rem;
-  }
-  
-  .canvas-eraser-icon {
-    width: 1.1rem;
-    height: 1.1rem;
-  }
-  
-  .canvas-eraser-icon::before {
-    width: 0.8rem;
-    height: 0.55rem;
-  }
-  
-  .canvas-eraser-icon::after {
-    width: 0.45rem;
-  }
-  
-  .canvas-square-icon {
-    width: 1.1rem;
-    height: 1.1rem;
-  }
-  
-  .canvas-studio-mobile-sliders {
-    bottom: 55px; /* Adjusted for smaller toolbar on small screens */
-    padding: 0.4rem 0.5rem;
-    max-height: 35vh; /* More conservative height */
-  }
-  
-  body.capacitor .canvas-studio-mobile-sliders {
-    bottom: calc(55px + env(safe-area-inset-bottom));
-  }
-}
-
-/* ============================================
-   LANDSCAPE MODE (Mobile) - Rearrange Layout
-   ============================================ */
-
-@media (max-width: 1024px) and (orientation: landscape) and (max-height: 600px) {
-  /* Override body padding in landscape for canvas page */
-  body.capacitor {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-  
-  /* Override root padding in landscape for canvas page */
-  .capacitor #root {
-    padding-top: 0 !important;
-  }
-  
-  /* Change to horizontal layout: left bar | canvas | right bar */
-  .canvas-studio-mobile {
-    display: grid;
-    grid-template-columns: 48px 1fr 140px; /* Updated to 140px for 2-column toolbar */
-    grid-template-rows: 1fr;
-    height: 100vh; /* Fixed viewport - canvas needs stable height */
-    overflow: hidden; /* Prevent scrolling */
-  }
-  
-  /* Capacitor safe area for landscape mode - account for notch/camera */
-  body.capacitor .canvas-studio-mobile {
-    height: 100vh; /* Fixed viewport - canvas needs stable height */
-    margin-top: 0;
-    /* Add safe areas on left and right for notches/cameras */
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-    /* Adjust grid to account for padding */
-    grid-template-columns: calc(48px) 1fr calc(140px); /* Updated to 140px */
-  }
-  
-  /* Override the default canvas-studio padding in landscape */
-  body.capacitor .canvas-studio {
-    padding-top: 0;
-    padding-bottom: 0;
-    overflow: hidden; /* Prevent scrolling */
-  }
-
-  /* Top bar becomes left vertical bar */
-  .canvas-studio-topbar {
-    grid-column: 1;
-    grid-row: 1;
-    flex-direction: column;
-    width: 48px;
-    height: 100%;
-    padding: 0.5rem 0;
-    border-right: 1px solid var(--cs-border);
-    border-bottom: none;
-  }
-  
-  /* Remove extra padding in landscape for Capacitor */
-  body.capacitor .canvas-studio-topbar {
-    padding-top: 0.5rem;
-  }
-
-  .canvas-studio-topbar-left,
-  .canvas-studio-topbar-center,
-  .canvas-studio-topbar-right {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .canvas-studio-topbar-center {
-    flex: 1;
-    justify-content: center;
-  }
-
-  .canvas-studio-topbar-btn {
-    width: 2rem;
-    height: 2rem;
-  }
-
-  .canvas-studio-topbar-icon {
-    width: 1rem;
-    height: 1rem;
-  }
-
-  .canvas-studio-zoom-input {
-    width: 2.5rem;
-    font-size: 0.625rem;
-    padding: 0.125rem;
-    background: var(--cs-surface-light) !important;
-    color: var(--cs-text-primary) !important;
-    border-color: var(--cs-border) !important;
-  }
-
-  .canvas-studio-zoom-input:focus {
-    background: var(--cs-bg-darker) !important;
-    color: var(--cs-text-primary) !important;
-    border-color: var(--cs-purple) !important;
-  }
-
-  .canvas-studio-zoom-percent {
-    font-size: 0.625rem;
-  }
-
-  /* Canvas in middle */
-  .canvas-studio-canvas-area {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  /* Override mobile canvas positioning in landscape */
-  .canvas-studio-canvas-area-mobile {
-    position: static;
-    top: auto;
-    bottom: auto;
-    left: auto;
-    right: auto;
-    grid-column: 2;
-    grid-row: 1;
-    width: 100%;
-    height: 100%;
-    padding: 1rem;
-  }
-  
-  /* Override Capacitor safe area for canvas in landscape */
-  body.capacitor .canvas-studio-canvas-area-mobile {
-    position: static;
-    top: auto;
-    bottom: auto;
-  }
-
-  /* Bottom toolbar becomes right vertical bar with 2-row layout */
-  .canvas-studio-mobile-toolbar {
-    grid-column: 3;
-    grid-row: 1;
-    position: static;
-    flex-direction: row;
-    width: 140px; /* Wide enough for 2 columns of 2.8rem buttons */
-    height: 100%;
-    padding: 0.4rem 0.3rem;
-    border-left: 1px solid var(--cs-border);
-    border-top: none;
-    bottom: auto;
-    left: auto;
-    right: auto;
-    overflow-y: auto;
-    overflow-x: hidden;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    justify-content: center;
-  }
-  
-  /* Override Capacitor safe area for toolbar in landscape */
-  body.capacitor .canvas-studio-mobile-toolbar {
-    padding-bottom: 0.4rem;
-  }
-
-  .canvas-studio-mobile-tool {
-    width: 3.2rem; /* Even larger buttons for landscape */
-    height: 3.2rem;
-    min-width: 3.2rem;
-    min-height: 3.2rem;
-  }
-
-  .canvas-studio-mobile-tool-icon {
-    width: 1.6rem; /* Even larger icons for landscape */
-    height: 1.6rem;
-  }
-  
-  .canvas-eraser-icon {
-    width: 1.2rem;
-    height: 1.2rem;
-  }
-  
-  .canvas-eraser-icon::before {
-    width: 0.9rem;
-    height: 0.65rem;
-  }
-  
-  .canvas-eraser-icon::after {
-    width: 0.5rem;
-  }
-  
-  .canvas-square-icon {
-    width: 1.2rem;
-    height: 1.2rem;
-  }
-  
-  .canvas-studio-color-indicator {
-    width: 1.2rem;
-    height: 1.2rem;
-  }
-
-  /* Sliders positioned to the right side (vertical/standing orientation) */
-  .canvas-studio-mobile-sliders {
-    position: fixed;
-    right: 155px; /* 140px toolbar + 15px gap for better spacing */
-    top: 0;
-    bottom: 0;
-    transform: none;
-    left: auto;
-    width: 130px;
-    height: 100vh;
-    max-height: none;
-    background: var(--cs-bg-main);
-    border: 1px solid var(--cs-border);
-    border-radius: 0.5rem;
-    padding: 1.2rem 0.8rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    overflow-y: auto;
-    z-index: 91;
-  }
-
-  /* Account for safe-area on devices with notches/camera cutouts when using Capacitor */
-  body.capacitor .canvas-studio-mobile-sliders {
-    top: env(safe-area-inset-top);
-    bottom: env(safe-area-inset-bottom);
-    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  }
-
-  /* Use dynamic viewport units where supported to avoid URL bar shrink issues */
-  @supports (height: 100dvh) {
-    .canvas-studio-mobile-sliders {
-      height: 100dvh;
-    }
-    body.capacitor .canvas-studio-mobile-sliders {
-      height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    }
-  }
-
-  /* Position brush selection menu on the right in landscape */
-  .canvas-studio-submenu-mobile {
-    left: auto;
-    right: 8px;
-    transform: none;
-    bottom: auto;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateY(-50%) translateX(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(-50%) translateX(0);
-    }
-  }
-
-  .canvas-studio-submenu-mobile {
-    animation: slideInRight 0.2s ease-out;
-  }
-
-  .canvas-studio-sliders-header {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .canvas-studio-sliders-title {
-    font-size: 0.7rem;
-    writing-mode: horizontal-tb;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 700;
-  }
-
-  .canvas-studio-reset-btn {
-    padding: 0.5rem;
-    width: 100%;
-    font-size: 0.75rem;
-  }
-
-  .canvas-studio-reset-icon {
-    width: 1.1rem;
-    height: 1.1rem;
-  }
-
-  .canvas-studio-slider-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .canvas-studio-slider-label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--cs-text-secondary);
-    text-align: center;
-    width: 100%;
-  }
-
-  .canvas-studio-slider-preview {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .canvas-studio-brush-preview {
-    /* Size is set inline via style attribute, just ensure it displays */
-    max-width: 40px !important;
-    max-height: 40px !important;
-    min-width: 4px !important;
-    min-height: 4px !important;
-    flex-shrink: 0;
-  }
-
-  .canvas-studio-slider-value {
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-
-  .canvas-studio-slider {
-    width: 100%;
-  }
-
-
-  .canvas-studio-submenu-backdrop {
-    z-index: 1000;
-  }
-
-  /* Modal positioning in landscape - next to right toolbar */
-  .canvas-studio-modal-overlay {
-    align-items: center !important;
-    justify-content: flex-end !important;
-    padding-right: 88px; /* 80px toolbar + 8px gap */
-  }
-
-  .canvas-studio-modal {
-    width: auto;
-    max-width: 400px;
-    min-width: 320px;
-    max-height: 90vh;
-    border-radius: 1rem;
-    margin: 0;
-    animation: fadeIn 0.2s ease-out !important; /* Use fade instead of slide */
-    transform: none !important; /* Remove any transform */
-  }
-
-  .canvas-studio-modal-large {
-    max-width: 450px;
-  }
-
-  /* Fix canvas size in landscape */
-  .canvas-studio-canvas-area {
-    width: 100%;
-    height: 100%;
-    padding: 1rem;
-  }
-
-  .canvas-studio-canvas-wrapper {
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    max-height: 100%;
-  }
-
-  .canvas-studio-canvas {
-    /* Same fixed size for consistency across orientations */
-    width: 500px;
-    height: 500px;
-    aspect-ratio: 1 / 1; /* Keep square aspect ratio */
-  }
-}
-
-/* ============================================
-   MODAL VARIANTS & BUTTONS
-   ============================================ */
-
-.canvas-studio-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-}
-
-.canvas-studio-modal-small {
-  max-width: 400px;
-  width: 100%;
-  border-radius: 1rem;
-}
-
-.canvas-studio-modal-medium {
-  max-width: 500px;
-  width: 100%;
-  border-radius: 1rem;
-}
-
-.canvas-studio-modal-close {
-  background: none;
-  border: none;
-  padding: 0.25rem;
-  cursor: pointer;
-  color: var(--cs-text-secondary);
-  transition: color 0.2s;
-}
-
-.canvas-studio-modal-close:hover {
-  color: var(--cs-text-primary);
-}
-
-.canvas-studio-btn-secondary {
-  padding: 0.625rem 1.25rem;
-  background: var(--cs-surface);
-  color: var(--cs-text-primary);
-  border: 1px solid var(--cs-border);
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.canvas-studio-btn-secondary:hover {
-  background: var(--cs-hover);
-  border-color: var(--cs-text-tertiary);
-}
-
-.canvas-studio-btn-danger {
-  padding: 0.625rem 1.25rem;
-  background: #EF4444;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.canvas-studio-btn-danger:hover {
-  background: #DC2626;
-}
-
-.canvas-studio-btn-danger:active {
-  transform: scale(0.98);
-}
-
-.canvas-studio-btn-primary {
-  padding: 0.625rem 1.25rem;
-  background: var(--cs-purple);
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.canvas-studio-btn-primary:hover {
-  background: var(--cs-purple-dark);
-}
-
-.canvas-studio-btn-primary:active {
-  transform: scale(0.98);
-}
-
-/* ============================================
-   TRASH ZONE
-   ============================================ */
-
-.canvas-studio-trash-zone {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 50px;
-  height: 50px;
-  padding: 0;
-  background: rgba(107, 114, 128, 0.2);
-  border: 2px dashed #9CA3AF;
-  border-radius: 50%;
-  z-index: 100;
-  transition: all 0.2s ease;
-  pointer-events: all;
-}
-
-/* Mobile: Position trash zone higher and make it larger */
-@media (max-width: 768px) {
-  .canvas-studio-trash-zone {
-    bottom: 120px; /* Move up to be more visible */
-    width: 60px;
-    height: 60px;
-  }
-}
-
-.canvas-studio-trash-zone-active {
-  background: rgba(239, 68, 68, 0.9);
-  border-color: #EF4444;
-  border-style: solid;
-  transform: translateX(-50%) scale(1.15);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-}
-
-.canvas-studio-trash-zone-icon {
-  width: 1.75rem;
-  height: 1.75rem;
-  color: #6B7280;
-  transition: color 0.2s;
-}
-
-/* Mobile: Larger icon */
-@media (max-width: 768px) {
-  .canvas-studio-trash-zone-icon {
-    width: 2rem;
-    height: 2rem;
-  }
-}
-
-.canvas-studio-trash-zone-active .canvas-studio-trash-zone-icon {
-  color: white;
-}
-
-.canvas-studio-trash-zone-text {
+.studio-variant-strip::-webkit-scrollbar {
   display: none;
 }
 
-/* ============================================
-   PROFESSIONAL LAYER SYSTEM
-   ============================================ */
-
-/* Layer Modal */
-.canvas-studio-layers-modal {
-  max-width: 450px;
-  max-height: 80vh;
+.studio-strip-btn {
   display: flex;
   flex-direction: column;
-}
-
-.canvas-studio-layers-modal .canvas-studio-modal-header {
-  display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--cs-border);
+  gap: 4px;
+  border: none;
+  background: transparent;
+  color: var(--studio-text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
 }
 
-.canvas-studio-layer-add-btn {
-  background: var(--cs-purple);
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.5rem;
-  cursor: pointer;
+/* 48px circular touch target */
+.studio-strip-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--studio-surface-light);
+  color: var(--studio-text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  margin-left: auto;
-  margin-right: 0.5rem;
 }
 
-.canvas-studio-layer-add-btn:hover {
-  background: var(--cs-purple-dark);
-  transform: scale(1.05);
+.studio-strip-icon {
+  width: 20px;
+  height: 20px;
 }
 
-.canvas-studio-layer-add-btn:active {
+.studio-strip-btn:hover .studio-strip-circle {
+  transform: translateY(-2px);
+  background: var(--studio-border);
+}
+
+.studio-strip-btn:active .studio-strip-circle {
   transform: scale(0.95);
 }
 
-/* Layers List */
-.canvas-studio-layers-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.studio-strip-btn-active .studio-strip-circle,
+.studio-strip-btn-active:hover .studio-strip-circle {
+  background: var(--studio-primary);
+  color: #ffffff;
+  box-shadow: var(--studio-shadow-tool-active);
 }
 
-/* Layer Item */
-.canvas-studio-layer-item {
-  background: var(--cs-surface);
-  border: 2px solid transparent;
-  border-radius: 0.75rem;
-  padding: 0.75rem;
+.studio-strip-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--studio-text-muted);
+}
+
+.studio-strip-btn-active .studio-strip-label {
+  color: var(--studio-primary);
+}
+
+/* Color row */
+.studio-color-row {
   display: flex;
-  align-items: flex-start; /* Changed from center to flex-start */
-  gap: 0.75rem;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 2px;
+  scrollbar-width: none;
+}
+
+.studio-color-row::-webkit-scrollbar {
+  display: none;
+}
+
+/* Round action buttons (variants toggle / custom color) */
+.studio-round-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--studio-border);
+  background: var(--studio-surface-light);
+  color: var(--studio-text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.canvas-studio-layer-item:hover {
-  background: var(--cs-surface-light);
-  border-color: var(--cs-border);
-}
-
-.canvas-studio-layer-item-active {
-  background: var(--cs-surface-light);
-  border-color: var(--cs-purple);
-  box-shadow: 0 0 0 1px var(--cs-purple);
-}
-
-.canvas-studio-layer-item-locked {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.canvas-studio-layer-item-locked:hover {
-  background: var(--cs-surface);
-  border-color: transparent;
-}
-
-/* Layer Thumbnail */
-.canvas-studio-layer-thumbnail {
-  width: 60px;
-  height: 60px;
-  min-width: 60px;
-  background: white;
-  border: 1px solid var(--cs-border);
-  border-radius: 0.5rem;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
+  flex-shrink: 0;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.studio-round-action:hover {
+  background: var(--studio-border);
+}
+
+.studio-round-action:active {
+  transform: scale(0.95);
+}
+
+.studio-round-action-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.canvas-studio-color-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.7);
+}
+
+/* Primary tools container */
+.studio-primary-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  border-radius: 1rem;
+  padding: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.studio-primary-tools::-webkit-scrollbar {
+  display: none;
+}
+
+/* 48px dock tool buttons */
+.studio-dock-tool {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 0.75rem;
+  background: var(--studio-surface-light);
+  color: var(--studio-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.studio-dock-tool:hover {
+  transform: translateY(-2px);
+  background: var(--studio-border);
+}
+
+.studio-dock-tool:active {
+  transform: scale(0.95);
+}
+
+.studio-dock-tool-active,
+.studio-dock-tool-active:hover {
+  background: var(--studio-primary);
+  color: #ffffff;
+  box-shadow: var(--studio-shadow-tool-active);
+}
+
+.studio-dock-tool-danger {
+  color: var(--studio-danger);
+}
+
+.studio-dock-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.studio-dock-tool .studio-tool-icon-text {
+  font-size: 1.25rem;
+}
+
+/* ============================================
+   LAYERS LIST (right panel & modal)
+   ============================================ */
+
+.canvas-studio-layers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.canvas-studio-layer-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  background: #ffffff;
+  border: 2px solid var(--studio-border);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.canvas-studio-layer-item:hover {
+  border-color: var(--studio-border-strong);
+  transform: translateY(-1px);
+}
+
+.canvas-studio-layer-item-active,
+.canvas-studio-layer-item-active:hover {
+  border-color: var(--studio-secondary);
+  background: rgba(78, 205, 196, 0.05);
+}
+
+.canvas-studio-layer-item-locked {
+  opacity: 0.6;
+}
+
+.canvas-studio-layer-item-dragging {
+  opacity: 0.4;
+}
+
+.canvas-studio-layer-item-drag-over {
+  border-color: var(--studio-primary);
+  border-style: dashed;
+}
+
+.canvas-studio-layer-thumbnail {
+  width: 44px;
+  height: 44px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: var(--studio-surface-light);
+  border: 1px solid var(--studio-border);
+  flex-shrink: 0;
 }
 
 .canvas-studio-layer-thumbnail img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .canvas-studio-layer-thumbnail-empty {
   width: 100%;
   height: 100%;
-  background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%),
-              linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%);
-  background-size: 10px 10px;
-  background-position: 0 0, 5px 5px;
+  background:
+    linear-gradient(45deg, var(--studio-border) 25%, transparent 25%, transparent 75%, var(--studio-border) 75%),
+    linear-gradient(45deg, var(--studio-border) 25%, transparent 25%, transparent 75%, var(--studio-border) 75%);
+  background-color: #f8fafc;
+  background-size: 12px 12px;
+  background-position: 0 0, 6px 6px;
+  opacity: 0.6;
 }
 
-/* Layer Info */
 .canvas-studio-layer-info {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  min-width: 0;
-  width: 100%; /* Ensure it takes full available width */
+  gap: 6px;
 }
 
 .canvas-studio-layer-name {
-  color: var(--cs-text-primary);
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--studio-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .canvas-studio-layer-name-input {
-  background: var(--cs-bg-darker);
-  color: var(--cs-text-primary);
-  border: 1px solid var(--cs-purple);
-  border-radius: 0.375rem;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
   width: 100%;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--studio-text-primary);
+  background: #ffffff;
+  border: 2px solid var(--studio-primary);
+  border-radius: 0.5rem;
+  padding: 2px 6px;
   outline: none;
 }
 
-/* Layer Opacity */
 .canvas-studio-layer-opacity {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  width: 100%; /* Full width of parent */
-  margin-bottom: 0.5rem; /* Add space below for controls */
+  gap: 8px;
 }
 
 .canvas-studio-layer-opacity-label {
-  color: var(--cs-text-secondary);
-  font-size: 0.75rem;
-  font-weight: 500;
-  min-width: 40px; /* Fixed width for label */
-  text-align: left;
-  flex-shrink: 0; /* Prevent label from shrinking */
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--studio-text-muted);
+  min-width: 28px;
 }
 
 .canvas-studio-layer-opacity-slider {
-  flex: 1; /* Take remaining space */
-  height: 4px;
-  background: var(--cs-bg-darker);
-  border-radius: 2px;
-  outline: none;
-  -webkit-appearance: none;
+  flex: 1;
   appearance: none;
-  min-width: 80px; /* Minimum slider width */
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--studio-border);
+  outline: none;
+  cursor: pointer;
 }
 
 .canvas-studio-layer-opacity-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
   appearance: none;
+  -webkit-appearance: none;
   width: 14px;
   height: 14px;
-  background: var(--cs-purple);
   border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--studio-secondary);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.2);
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.canvas-studio-layer-opacity-slider::-webkit-slider-thumb:hover {
-  background: var(--cs-purple-light);
-  transform: scale(1.2);
 }
 
 .canvas-studio-layer-opacity-slider::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  background: var(--cs-purple);
-  border: none;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--studio-secondary);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.2);
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.canvas-studio-layer-opacity-slider::-moz-range-thumb:hover {
-  background: var(--cs-purple-light);
-  transform: scale(1.2);
-}
-
-/* Layer Controls */
 .canvas-studio-layer-controls {
   display: flex;
-  flex-direction: row; /* Horizontal layout */
   align-items: center;
-  gap: 0.5rem; /* Space between buttons */
-  flex-shrink: 0; /* Prevent controls from shrinking */
-  width: 100%; /* Full width to align with opacity slider */
-  justify-content: center; /* Center the buttons */
-  padding-left: 40px; /* Offset for the opacity label width */
+  gap: 4px;
 }
 
 .canvas-studio-layer-control-btn {
-  background: transparent;
-  color: var(--cs-text-secondary);
+  width: 28px;
+  height: 28px;
   border: none;
-  border-radius: 0.375rem;
-  padding: 0.5rem; /* Increased from 0.375rem for better touch targets */
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--studio-text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1rem;
   transition: all 0.2s ease;
-  width: 32px; /* Slightly larger for better visibility */
-  height: 32px; /* Slightly larger for better visibility */
-  flex-shrink: 0; /* Prevent button from shrinking */
-  flex: 1; /* Buttons share equal width */
-  max-width: 48px; /* Prevent buttons from getting too large */
-  position: relative; /* For tooltip positioning */
+  padding: 0;
 }
 
 .canvas-studio-layer-control-btn:hover {
-  background: var(--cs-bg-darker);
-  color: var(--cs-text-primary);
+  background: var(--studio-hover);
+  color: var(--studio-text-primary);
 }
 
-/* Enhanced tooltip for layer control buttons */
-.canvas-studio-layer-control-btn::after {
-  content: attr(aria-label);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--cs-bg-darker);
-  color: var(--cs-text-primary);
-  padding: 0.375rem 0.625rem;
-  border-radius: 0.375rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-  margin-bottom: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--cs-border);
-  z-index: 1000;
-}
-
-.canvas-studio-layer-control-btn:hover::after {
-  opacity: 1;
-}
-
-.canvas-studio-layer-control-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.canvas-studio-layer-control-btn:disabled:hover {
-  background: transparent;
-  color: var(--cs-text-secondary);
-  transform: none;
-}
-
-.canvas-studio-layer-control-btn:disabled:hover::after {
-  opacity: 0;
-}
-
-/* Layer More Options */
 .canvas-studio-layer-more {
   position: relative;
 }
 
-.canvas-studio-layer-more:hover .canvas-studio-layer-actions {
-  display: flex;
+.canvas-studio-layer-actions {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 40;
+  background: #ffffff;
+  border: 1px solid var(--studio-border);
+  border-radius: 0.75rem;
+  box-shadow: var(--studio-shadow-floating-pill);
+  padding: 6px;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 120px;
 }
 
-.canvas-studio-layer-actions {
-  position: absolute;
-  right: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--cs-bg-darker);
-  border: 1px solid var(--cs-border);
-  border-radius: 0.5rem;
-  padding: 0.25rem;
-  display: none;
-  gap: 0.25rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 10;
-  margin-right: 0.5rem;
+.canvas-studio-layer-more:hover .canvas-studio-layer-actions,
+.canvas-studio-layer-more:focus-within .canvas-studio-layer-actions {
+  display: flex;
 }
 
 .canvas-studio-layer-actions button {
-  background: transparent;
-  color: var(--cs-text-secondary);
-  border: none;
-  border-radius: 0.375rem;
-  padding: 0.5rem;
-  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  position: relative;
+  gap: 8px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--studio-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px 8px;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .canvas-studio-layer-actions button:hover {
-  background: var(--cs-surface);
-  color: var(--cs-text-primary);
+  background: var(--studio-hover);
+  color: var(--studio-text-primary);
 }
 
-/* Enhanced tooltip for layer action buttons */
-.canvas-studio-layer-actions button::after {
-  content: attr(title);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--cs-bg-darker);
-  color: var(--cs-text-primary);
-  padding: 0.375rem 0.625rem;
-  border-radius: 0.375rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-  margin-bottom: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--cs-border);
-  z-index: 1000;
-}
-
-.canvas-studio-layer-actions button:hover::after {
-  opacity: 1;
-}
-
-/* Layer Reorder */
-.canvas-studio-layer-reorder {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
-.canvas-studio-layer-reorder button {
-  padding: 0.25rem;
-}
-
-/* Desktop Layer Panel (Right Sidebar) */
-@media (min-width: 1024px) {
-  .canvas-studio-desktop .canvas-studio-right-panel {
-    display: flex;
-    flex-direction: column;
-    background: var(--cs-bg-darker);
-    border-left: 1px solid var(--cs-border);
-    overflow: hidden;
-    width: 280px; /* Ensure consistent width */
-  }
-  
-  .canvas-studio-layers-panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  
-  .canvas-studio-layers-panel-header {
-    padding: 1rem;
-    border-bottom: 1px solid var(--cs-border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .canvas-studio-layers-panel-title {
-    color: var(--cs-text-primary);
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  
-  .canvas-studio-layers-panel .canvas-studio-layers-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0.5rem; /* Reduced from 0.75rem */
-  }
-  
-  .canvas-studio-layers-panel .canvas-studio-layer-item {
-    padding: 0.5rem;
-  }
-  
-  .canvas-studio-layers-panel .canvas-studio-layer-thumbnail {
-    width: 48px; /* Slightly smaller */
-    height: 48px;
-    min-width: 48px;
-  }
-  
-  /* Compact layer controls for desktop panel */
-  .canvas-studio-right-panel .canvas-studio-layer-control-btn {
-    width: 28px;
-    height: 28px;
-    padding: 0.25rem;
-  }
-  
-  /* Adjust layer info width */
-  .canvas-studio-right-panel .canvas-studio-layer-info {
-    gap: 0.375rem; /* Tighter spacing */
-  }
-  
-  /* Smaller opacity label */
-  .canvas-studio-right-panel .canvas-studio-layer-opacity-label {
-    min-width: 35px; /* Reduced from 40px */
-    font-size: 0.7rem;
-  }
-  
-  /* Adjust controls padding */
-  .canvas-studio-right-panel .canvas-studio-layer-controls {
-    padding-left: 35px; /* Match smaller label width */
-    gap: 0.375rem;
-  }
-}
-
-/* Scrollbar Styling for Layers List */
-.canvas-studio-layers-list::-webkit-scrollbar {
-  width: 8px;
-}
-
-.canvas-studio-layers-list::-webkit-scrollbar-track {
-  background: var(--cs-bg-darker);
-  border-radius: 4px;
-}
-
-.canvas-studio-layers-list::-webkit-scrollbar-thumb {
-  background: var(--cs-surface);
-  border-radius: 4px;
-}
-
-.canvas-studio-layers-list::-webkit-scrollbar-thumb:hover {
-  background: var(--cs-surface-light);
-}
-
-/* Layer Drag Handle */
 .canvas-studio-layer-drag-handle {
+  width: 20px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
   cursor: grab;
-  opacity: 0.5;
-  transition: opacity 0.2s ease;
-}
-
-.canvas-studio-layer-drag-handle:hover {
-  opacity: 1;
-}
-
-.canvas-studio-layer-drag-handle:active {
-  cursor: grabbing;
+  color: var(--studio-text-placeholder);
+  flex-shrink: 0;
 }
 
 .canvas-studio-layer-drag-dots {
@@ -2590,154 +1481,408 @@ body.capacitor .canvas-studio-mobile-sliders {
 .canvas-studio-layer-drag-dots div {
   width: 4px;
   height: 4px;
-  background: var(--cs-text-secondary);
   border-radius: 50%;
+  background: var(--studio-border-strong);
 }
 
-/* Layer Drag States */
-.canvas-studio-layer-item-dragging {
-  opacity: 0.5;
-  transform: scale(0.95);
-  cursor: grabbing;
+/* Add-layer round button in modal header */
+.canvas-studio-layer-add-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: var(--studio-secondary);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  transition: all 0.2s ease;
 }
 
-.canvas-studio-layer-item-drag-over {
-  border-color: var(--cs-purple) !important;
-  background: var(--cs-surface-light) !important;
+.canvas-studio-layer-add-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 6px 12px -4px rgba(78, 205, 196, 0.6);
 }
 
-/* Layer Animations */
-@keyframes layerSlideIn {
+.canvas-studio-layer-add-btn:active {
+  transform: scale(0.95);
+}
+
+/* ============================================
+   TOOL ICON CONTEXT SIZING
+   (CSS-drawn icons from index.css use currentColor;
+    here we scale them up to the 24px tool size)
+   ============================================ */
+
+.studio-tool-btn .canvas-eraser-icon,
+.studio-dock-tool .canvas-eraser-icon {
+  transform: rotate(-15deg) scale(1.15) !important;
+}
+
+.studio-tool-btn .canvas-square-icon,
+.studio-tool-btn .canvas-circle-icon,
+.studio-tool-btn .canvas-triangle-icon,
+.studio-tool-btn .canvas-line-icon,
+.studio-tool-btn .canvas-brush-soft-icon,
+.studio-tool-btn .canvas-brush-marker-icon,
+.studio-tool-btn .canvas-brush-airbrush-icon,
+.studio-dock-tool .canvas-square-icon,
+.studio-dock-tool .canvas-circle-icon,
+.studio-dock-tool .canvas-triangle-icon,
+.studio-dock-tool .canvas-line-icon,
+.studio-dock-tool .canvas-brush-soft-icon,
+.studio-dock-tool .canvas-brush-marker-icon,
+.studio-dock-tool .canvas-brush-airbrush-icon,
+.studio-strip-circle .canvas-square-icon,
+.studio-strip-circle .canvas-circle-icon,
+.studio-strip-circle .canvas-triangle-icon,
+.studio-strip-circle .canvas-line-icon,
+.studio-strip-circle .canvas-brush-soft-icon,
+.studio-strip-circle .canvas-brush-marker-icon,
+.studio-strip-circle .canvas-brush-airbrush-icon {
+  flex-shrink: 0;
+}
+
+.studio-variant-btn .canvas-square-icon,
+.studio-variant-btn .canvas-circle-icon,
+.studio-variant-btn .canvas-triangle-icon,
+.studio-variant-btn .canvas-line-icon,
+.studio-variant-btn .canvas-brush-soft-icon,
+.studio-variant-btn .canvas-brush-marker-icon,
+.studio-variant-btn .canvas-brush-airbrush-icon {
+  transform: scale(0.85) !important;
+}
+
+.studio-variant-btn .canvas-line-icon {
+  transform: rotate(45deg) scale(0.85) !important;
+}
+
+.studio-variant-btn .canvas-shape-emoji-icon,
+.studio-strip-circle .canvas-shape-emoji-icon,
+.studio-dock-tool .canvas-shape-emoji-icon,
+.studio-tool-btn .canvas-shape-emoji-icon {
+  line-height: 1 !important;
+}
+
+/* ============================================
+   TRASH ZONE (drag-to-delete overlay)
+   ============================================ */
+
+.canvas-studio-trash-zone {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 28px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 3px dashed var(--studio-danger);
+  border-radius: 1.5rem;
+  color: var(--studio-danger);
+  box-shadow: var(--studio-shadow-floating-pill);
+  animation: studioPop 0.2s ease-out;
+  pointer-events: none;
+}
+
+.canvas-studio-trash-zone-active {
+  background: var(--studio-danger);
+  color: #ffffff;
+  transform: translateX(-50%) scale(1.08);
+  border-color: #ffffff;
+}
+
+.canvas-studio-trash-zone-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.canvas-studio-trash-zone-text {
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================
+   MODALS
+   ============================================ */
+
+.canvas-studio-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: studioFadeIn 0.2s ease-out;
+}
+
+.canvas-studio-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: studioFadeIn 0.2s ease-out;
+}
+
+@keyframes studioFadeIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
   }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.canvas-studio-modal {
+  background: var(--studio-panel);
+  border: 1px solid var(--studio-border);
+  border-radius: 1.5rem 1.5rem 0 0;
+  box-shadow: var(--studio-shadow-card);
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: studioSlideUp 0.25s ease-out;
+}
+
+.canvas-studio-modal-backdrop .canvas-studio-modal {
+  border-radius: 1.5rem;
+}
+
+@keyframes studioSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.canvas-studio-layer-item {
-  animation: layerSlideIn 0.2s ease;
-  transition: all 0.2s ease;
+.canvas-studio-modal-small {
+  max-width: 380px;
 }
 
-/* Smooth opacity slider */
-.canvas-studio-layer-opacity-slider {
-  transition: none; /* Remove transition for instant feedback */
+.canvas-studio-modal-large {
+  max-width: 520px;
 }
 
-.canvas-studio-layer-opacity-slider::-webkit-slider-thumb {
-  transition: background 0.2s ease, transform 0.2s ease;
+.canvas-studio-layers-modal {
+  max-height: 70vh;
 }
 
-.canvas-studio-layer-opacity-slider::-moz-range-thumb {
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-/* Mobile Optimizations */
-@media (max-width: 768px) {
-  .canvas-studio-layers-modal {
-    max-width: 95vw;
-    max-height: 85vh;
-  }
-  
-  .canvas-studio-layer-item {
-    padding: 1rem; /* Increased from 0.625rem for better spacing */
-    gap: 1rem; /* Increased from 0.75rem for more space between elements */
-  }
-  
-  .canvas-studio-layer-thumbnail {
-    width: 50px;
-    height: 50px;
-    min-width: 50px;
-  }
-  
-  .canvas-studio-layer-name {
-    font-size: 0.8125rem;
-  }
-  
-  .canvas-studio-layer-control-btn {
-    padding: 0.5rem; /* Touch-friendly padding for mobile */
-    width: 36px; /* Larger touch targets for mobile */
-    height: 36px; /* Larger touch targets for mobile */
-  }
-  
-  .canvas-studio-layer-controls {
-    gap: 0.75rem; /* More space between buttons on mobile */
-    margin-top: 0.25rem; /* Small top margin on mobile */
-    padding-left: 40px; /* Match desktop offset for opacity label */
-  }
-  
-  .canvas-studio-layer-info {
-    gap: 0.75rem; /* Increased from 0.5rem for better vertical spacing */
-  }
-  
-  .canvas-studio-layer-opacity {
-    gap: 0.75rem; /* Increased from 0.5rem for better spacing */
-  }
-}
-
-/* ============================================
-   DARK MODE (Already Dark by Default)
-   ============================================ */
-
-/* Canvas Studio is dark by default, no additional dark mode needed */
-
-/* ============================================
-   INSTAGRAM STORIES STYLE TEXT
-   ============================================ */
-
-/* Overlay container */
-.canvas-text-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  pointer-events: none;
-}
-
-/* Dimmed background */
-.canvas-text-dim {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  pointer-events: all;
-}
-
-/* Top Toolbar */
-.canvas-text-top-toolbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: rgba(50, 50, 50, 0.95);
-  backdrop-filter: blur(10px);
+.canvas-studio-modal-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 1rem;
-  gap: 0.5rem;
-  pointer-events: all;
-  z-index: 1003;
+  gap: 8px;
+  padding: 16px 20px;
+  border-bottom: 2px solid var(--studio-border);
+  flex-shrink: 0;
 }
 
-.canvas-text-toolbar-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  color: #FFFFFF;
+.canvas-studio-modal-title {
+  margin: 0;
   font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--studio-text-primary);
+}
+
+.canvas-studio-modal-header>button:not(.canvas-studio-layer-add-btn) {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: var(--studio-surface-light);
+  color: var(--studio-text-secondary);
   cursor: pointer;
-  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-left: auto;
+  transition: all 0.2s ease;
+}
+
+.canvas-studio-modal-header>button:not(.canvas-studio-layer-add-btn):hover {
+  background: var(--studio-border);
+  color: var(--studio-text-primary);
+}
+
+/* When the add-layer button is present it already has margin-left:auto;
+   keep the close button flush after it */
+.canvas-studio-modal-header>.canvas-studio-layer-add-btn+button {
+  margin-left: 0;
+}
+
+.canvas-studio-modal-close-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.canvas-studio-modal-close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: var(--studio-surface-light);
+  color: var(--studio-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  transition: all 0.2s ease;
+}
+
+.canvas-studio-modal-close:hover {
+  background: var(--studio-border);
+  color: var(--studio-text-primary);
+}
+
+.canvas-studio-modal-content {
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.canvas-studio-layers-modal .canvas-studio-layers-list {
+  padding: 16px 20px;
+}
+
+/* Modal action buttons */
+.canvas-studio-btn-secondary {
+  padding: 0.625rem 1.25rem;
+  background: var(--studio-surface-light);
+  color: var(--studio-text-secondary);
+  border: 2px solid var(--studio-border);
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.canvas-studio-btn-secondary:hover {
+  background: var(--studio-border);
+  color: var(--studio-text-primary);
+}
+
+.canvas-studio-btn-secondary:active {
+  transform: scale(0.95);
+}
+
+.canvas-studio-btn-danger {
+  padding: 0.625rem 1.25rem;
+  background: var(--studio-danger);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 14px -6px rgba(244, 63, 94, 0.5);
+  transition: all 0.2s ease;
+}
+
+.canvas-studio-btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px -6px rgba(244, 63, 94, 0.55);
+}
+
+.canvas-studio-btn-danger:active {
+  transform: scale(0.95);
+}
+
+.studio-modal-done-btn {
+  width: 100%;
+  padding: 0.875rem;
+  background: var(--studio-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--studio-shadow-tool-active);
+  transition: all 0.2s ease;
+}
+
+.studio-modal-done-btn:hover {
+  transform: translateY(-2px);
+}
+
+.studio-modal-done-btn:active {
+  transform: scale(0.97);
+}
+
+/* ============================================
+   TEXT INPUT OVERLAY (Instagram Stories style)
+   ============================================ */
+
+.canvas-text-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Fredoka', ui-sans-serif, system-ui, sans-serif;
+}
+
+.canvas-text-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.canvas-text-top-toolbar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  flex-wrap: wrap;
+}
+
+.canvas-text-toolbar-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
   flex-shrink: 0;
 }
 
@@ -2746,283 +1891,241 @@ body.capacitor .canvas-studio-mobile-sliders {
 }
 
 .canvas-text-toolbar-btn.active {
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--studio-primary);
+  box-shadow: var(--studio-shadow-tool-active);
 }
 
 .canvas-text-color-circle {
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  border: 3px solid #FFFFFF;
-}
-
-.canvas-text-font-btn {
-  font-size: 1.5rem;
-  font-weight: bold;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 .canvas-text-size-slider-wrapper {
   flex: 1;
-  max-width: 150px;
+  min-width: 100px;
   display: flex;
   align-items: center;
-  padding: 0 0.5rem;
+  padding: 0 8px;
 }
 
 .canvas-text-size-slider {
   width: 100%;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
-  outline: none;
-  -webkit-appearance: none;
   appearance: none;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.3);
+  outline: none;
   cursor: pointer;
 }
 
 .canvas-text-size-slider::-webkit-slider-thumb {
+  appearance: none;
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  background: #FFFFFF;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid var(--studio-primary);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.canvas-text-size-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
 }
 
 .canvas-text-size-slider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  background: #FFFFFF;
-  border: none;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid var(--studio-primary);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.canvas-text-size-slider::-moz-range-thumb:hover {
-  transform: scale(1.2);
 }
 
 .canvas-text-done-btn {
-  padding: 0.625rem 1.5rem;
-  background: transparent;
+  padding: 0.5rem 1.25rem;
   border: none;
-  color: #FFFFFF;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 9999px;
+  background: var(--studio-secondary);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
-  margin-left: auto;
+  box-shadow: 0 6px 14px -6px rgba(78, 205, 196, 0.6);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .canvas-text-done-btn:hover:not(:disabled) {
-  opacity: 0.8;
+  transform: translateY(-2px);
 }
 
 .canvas-text-done-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Color Picker Popup */
 .canvas-text-color-picker {
-  position: fixed;
-  top: 70px;
-  left: 1rem;
-  background: rgba(50, 50, 50, 0.98);
-  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 3;
+  margin: 0 16px;
+  background: rgba(255, 255, 255, 0.97);
   border-radius: 1rem;
-  padding: 1rem;
-  pointer-events: all;
-  z-index: 1004;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  padding: 12px;
+  box-shadow: var(--studio-shadow-floating-pill);
+  animation: studioPop 0.18s ease-out;
 }
 
 .canvas-text-color-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 0.5rem;
+  gap: 10px;
 }
 
 .canvas-text-color-option {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  border: 3px solid transparent;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px var(--studio-border);
   cursor: pointer;
-  transition: all 0.2s;
+  padding: 0;
+  transition: all 0.2s ease;
+  justify-self: center;
 }
 
 .canvas-text-color-option:hover {
   transform: scale(1.1);
-  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .canvas-text-color-option.active {
-  border-color: #FFFFFF;
-  box-shadow: 0 0 0 2px rgba(50, 50, 50, 0.98), 0 0 0 5px #FFFFFF;
+  box-shadow: 0 0 0 2px var(--studio-primary);
+  transform: scale(1.1);
 }
 
-/* Text input on canvas */
 .canvas-text-on-canvas {
-  position: fixed;
-  left: 50%;
-  top: 30%;
-  transform: translate(-50%, -50%);
-  pointer-events: all;
-  z-index: 1001;
-  width: 90%;
-  max-width: 600px;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  pointer-events: none;
 }
 
 .canvas-text-input-field {
-  width: 100%;
-  min-height: 100px;
-  padding: 1rem;
+  pointer-events: auto;
   background: transparent;
   border: none;
-  color: #FFFFFF;
-  resize: none;
   outline: none;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  /* Font properties will be set via inline styles */
+  resize: none;
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  caret-color: var(--studio-primary);
 }
 
 .canvas-text-input-field::placeholder {
   color: rgba(255, 255, 255, 0.6);
 }
 
-/* Font Style Buttons - Float above keyboard */
 .canvas-text-font-styles {
-  position: fixed;
-  bottom: max(20px, env(keyboard-inset-bottom, 20px));
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
+  z-index: 2;
   display: flex;
-  gap: 0.75rem;
-  padding: 0.5rem;
-  pointer-events: all;
-  z-index: 1002;
-  transition: bottom 0.3s ease-out;
+  gap: 10px;
+  padding: 12px 16px 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.canvas-text-font-styles::-webkit-scrollbar {
+  display: none;
 }
 
 .canvas-text-font-style {
-  width: 56px;
+  min-width: 56px;
   height: 56px;
-  border-radius: 50%;
-  background: rgba(80, 80, 80, 0.9);
-  border: 2px solid transparent;
-  color: #FFFFFF;
-  font-size: 1.5rem;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 1.125rem;
   cursor: pointer;
-  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
   flex-shrink: 0;
 }
 
 .canvas-text-font-style:hover {
-  background: rgba(100, 100, 100, 0.9);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .canvas-text-font-style.active {
-  background: #FFFFFF;
-  color: #000000;
-  border-color: #FFFFFF;
+  background: #ffffff;
+  color: var(--studio-text-primary);
+  border-color: var(--studio-primary);
+  box-shadow: var(--studio-shadow-tool-active);
 }
 
-/* Mobile responsive */
-@media (max-width: 768px) {
-  .canvas-text-top-toolbar {
-    height: 56px;
-    padding: 0 0.75rem;
-    gap: 0.375rem;
-  }
+/* ============================================
+   RESPONSIVE POLISH
+   ============================================ */
 
-  .canvas-text-toolbar-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 1.125rem;
-  }
-
-  .canvas-text-color-circle {
-    width: 24px;
-    height: 24px;
-  }
-
-  .canvas-text-size-slider-wrapper {
-    max-width: 100px;
-  }
-
-  .canvas-text-done-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.9375rem;
-  }
-
-  .canvas-text-color-picker {
-    left: 0.5rem;
-    right: 0.5rem;
-    top: 60px;
-  }
-
-  .canvas-text-color-grid {
-    grid-template-columns: repeat(6, 1fr);
-    gap: 0.375rem;
-  }
-
-  .canvas-text-color-option {
-    width: 36px;
-    height: 36px;
-  }
-
-  .canvas-text-on-canvas {
-    width: 95%;
-  }
-
-  .canvas-text-input-field {
-    font-size: 1.5rem;
-    min-height: 80px;
-    padding: 0.75rem;
-  }
-
-  .canvas-text-font-styles {
-    bottom: max(15px, env(keyboard-inset-bottom, 15px));
-    gap: 0.5rem;
-    padding: 0.375rem;
-  }
-  
-  .canvas-text-on-canvas {
-    top: 25%;
-  }
-
-  .canvas-text-font-style {
-    width: 48px;
-    height: 48px;
-    font-size: 1.25rem;
+@media (max-width: 767px) {
+  .studio-header-center {
+    gap: 4px;
   }
 }
 
-/* Very small screens */
-@media (max-width: 480px) {
-  .canvas-text-toolbar-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 1rem;
+@media (min-width: 768px) and (max-width: 1023px) {
+  .studio-canvas-area {
+    padding: 24px;
   }
+}
 
-  .canvas-text-font-style {
-    width: 44px;
-    height: 44px;
-    font-size: 1.125rem;
+/* Narrow desktop: let the brush pill scroll gracefully */
+@media (min-width: 1024px) and (max-width: 1280px) {
+  .studio-brush-pill {
+    gap: 6px;
+    padding: 10px 14px;
   }
+}
 
-  .canvas-text-input-field {
-    font-size: 1.25rem;
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  .canvas-studio *,
+  .canvas-text-overlay * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
+}
+
+/* ============================================
+   SCROLLBARS (studio scope)
+   ============================================ */
+
+.canvas-studio ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.canvas-studio ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.canvas-studio ::-webkit-scrollbar-thumb {
+  background: var(--studio-border-strong);
+  border-radius: 4px;
+}
+
+.canvas-studio ::-webkit-scrollbar-thumb:hover {
+  background: var(--studio-text-muted);
 }
