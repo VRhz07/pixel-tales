@@ -75,7 +75,7 @@ const PhotoStoryModal = ({ isOpen, onClose }: PhotoStoryModalProps) => {
   const [ocrProgress, setOcrProgress] = useState<number>(0);
   const [ocrStatus, setOcrStatus] = useState<string>('');
   const [isHandwritten, setIsHandwritten] = useState(false);
-  const [imageModel, setImageModel] = useState<string>('pollinations'); // Default to Pollinations (free)
+  const [imageModel, setImageModel] = useState<string>('flux-schnell'); // Default to Replicate Flux Schnell
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -382,6 +382,10 @@ Make sure EVERY page's imagePrompt:
         );
         
         const baseImageUrl = coverImageUrls[0];
+        if (!baseImageUrl) {
+          throw new Error('Image generation failed completely (including fallback). Please try again later.');
+        }
+        
         console.log('✅ Base cover illustration generated');
         
         // Wait 12 seconds before generating page images to avoid rate limit

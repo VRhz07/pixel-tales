@@ -255,6 +255,12 @@ POLLINATIONS_API_KEY = os.getenv('POLLINATIONS_API_KEY')
 # Replicate API Configuration
 REPLICATE_API_TOKEN = os.getenv('REPLICATE_API_TOKEN')
 
+# Groq API Configuration (server-side — never exposed to browser)
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+
+# OpenRouter API Configuration (server-side — never exposed to browser)
+OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
+
 # Email Configuration
 # Supports Brevo, SendGrid, and Gmail SMTP
 BREVO_API_KEY = os.getenv('BREVO_API_KEY')

@@ -255,7 +255,33 @@ export const generateImage = async (params: ImageGenerationParams): Promise<stri
       }
       
       console.log('🔗 Full Image URL:', finalUrl);
-      return finalUrl;
+      
+      // PRE-FETCH to ensure the image actually generates successfully
+      // If Pollinations returns a 500 or fails, we return null so the fallback triggers
+      try {
+        console.log('⏳ Pre-fetching Pollinations image to verify generation...');
+        const fetchRes = await fetch(finalUrl, { method: 'GET' });
+        if (!fetchRes.ok) {
+           console.error(`❌ Pollinations image fetch failed with status: ${fetchRes.status}`);
+           return null;
+        }
+        
+        // Also check if it's a tiny error placeholder image (like the 500 error placeholder)
+        const blob = await fetchRes.blob();
+        const sizeKB = blob.size / 1024;
+        if (sizeKB < 50) {
+          console.warn(`⚠️ Pollinations returned a suspiciously small image (${sizeKB.toFixed(1)}KB), treating as failure`);
+          return null;
+        }
+        
+        console.log(`✅ Pollinations image verified! (${sizeKB.toFixed(1)}KB)`);
+        
+        // Return as Object URL to avoid fetching it again in the UI
+        return URL.createObjectURL(blob);
+      } catch (err) {
+         console.error('❌ Error fetching Pollinations image:', err);
+         return null;
+      }
     } else {
       console.error('❌ Backend returned unsuccessful response:', response);
       return null;
@@ -448,7 +474,21 @@ export const generateStoryIllustrations = async (
       
       // Check if image generation succeeded
       if (!imageUrl) {
-        console.warn(`⚠️ Page ${pageNumber}: Image generation failed (likely rate limit - try again tomorrow)`);
+        console.warn(`⚠️ Page ${pageNumber}: Replicate generation failed, falling back to Pollinations...`);
+        
+        // Actually implement the fallback to Pollinations
+        imageUrl = await generateImage({
+          prompt: enhancedPrompt,
+          width: 1024,
+          height: 1024,
+          seed: baseSeed + (index * 10)
+        });
+        
+        if (imageUrl) {
+          console.log(`✅ Page ${pageNumber}: Fallback to Pollinations successful!`);
+        } else {
+          console.error(`❌ Page ${pageNumber}: Fallback to Pollinations also failed.`);
+        }
       }
       
       results.push(imageUrl);
@@ -622,7 +662,7 @@ export const generateStoryIllustrationsFromPrompts = async (
   }>,
   characterDescription?: string,
   onProgress?: (current: number, total: number, message: string) => void,
-  imageModel: string = 'pollinations'
+  imageModel: string = 'flux-schnell'
 ): Promise<(string | null)[]> => {
   console.log('🎨 generateStoryIllustrationsFromPrompts called with:', {
     pageCount: pages.length,
@@ -651,8 +691,8 @@ export const generateStoryIllustrationsFromPrompts = async (
       }
       
       try {
-        // Generate unique seed
-        const uniqueSeed = Date.now() + (index * 10000);
+        // Generate unique seed (must be <= 2147483647 for Pollinations API)
+        const uniqueSeed = (Date.now() % 2147400000) + (index * 10000);
         
         console.log(`🖼️ Page ${index + 1}/${pages.length}: Starting image generation...`);
         if (onProgress) {
@@ -695,6 +735,48 @@ export const generateStoryIllustrationsFromPrompts = async (
     });
     
     const results = await Promise.all(generationPromises);
+    
+    // --- FALLBACK LOGIC ---
+    // Pollinations can sometimes timeout or fail. We catch those nulls here and fallback to Replicate.
+    let hasFailures = false;
+    for (let i = 0; i < results.length; i++) {
+      if (results[i] === null && pages[i]?.imagePrompt) {
+        if (!hasFailures) {
+          console.log(`🔄 Proceeding to fallback: Some Pollinations requests failed. Initiating Replicate sequential fallback...`);
+          hasFailures = true;
+        }
+        
+        console.log(`🔄 Page ${i + 1}: Pollinations failed, falling back to Replicate...`);
+        
+        try {
+          const fallbackUrl = await generateImageWithReplicate({
+            prompt: pages[i].imagePrompt as string,
+            width: 1024,
+            height: 1024,
+            seed: (Date.now() % 2147400000) + (i * 10000),
+            pageNumber: pages[i].pageNumber || (i + 1),
+            totalPages: pages.length,
+            model: 'flux-schnell' // Replicate basic model
+          });
+          
+          if (fallbackUrl) {
+            console.log(`✅ Page ${i + 1}: Fallback generation successful!`);
+            results[i] = fallbackUrl;
+          } else {
+            console.error(`❌ Page ${i + 1}: Fallback generation also failed.`);
+          }
+          
+          // Delay to respect Replicate rate limit (6 req/min = ~10 sec between)
+          // We do this even for the last one just in case other generations trigger soon
+          console.log(`⏳ Waiting 10 seconds before next fallback request to respect Replicate rate limit...`);
+          await new Promise(resolve => setTimeout(resolve, 10000));
+        } catch (error) {
+          console.error(`❌ Page ${i + 1}: Error during fallback generation:`, error);
+        }
+      }
+    }
+    // --- END FALLBACK LOGIC ---
+    
     console.log(`🎉 Parallel image generation complete! ${results.filter(r => r !== null).length}/${pages.length} images ready`);
     return results;
     
@@ -723,7 +805,7 @@ export const generateStoryIllustrationsFromPrompts = async (
           onProgress(index + 1, pages.length, `Generating image for page ${index + 1}...`);
         }
         
-        const uniqueSeed = Date.now() + (index * 10000);
+        const uniqueSeed = (Date.now() % 2147400000) + (index * 10000);
         
         const imageUrl = await generateImageWithReplicate({
           prompt: page.imagePrompt,
@@ -926,7 +1008,7 @@ export const generateCoverIllustration = async (
   artStyle: string,
   characterDescription?: string,
   colorScheme?: string,
-  imageModel: string = 'pollinations'
+  imageModel: string = 'flux-schnell'
 ): Promise<string | null> => {
   // Cover-specific style prompts with anatomy quality emphasis
   const stylePrompts: Record<string, string> = {
@@ -974,6 +1056,18 @@ export const generateCoverIllustration = async (
       height: 683, // Slightly taller aspect ratio for book covers (3:4 ratio)
       seed: titleSeed * 100
     });
+    
+    // Fallback to Replicate if Pollinations fails
+    if (!baseImageUrl) {
+      console.log('⚠️ Pollinations failed for cover, falling back to Replicate...');
+      baseImageUrl = await generateImageWithReplicate({
+        prompt: coverPrompt,
+        width: 1024,
+        height: 1365,
+        seed: titleSeed * 100,
+        model: 'flux-schnell' // Replicate basic model
+      });
+    }
   } else {
     console.log(`🎨 Generating cover image with Replicate model ${imageModel}...`);
     baseImageUrl = await generateImageWithReplicate({

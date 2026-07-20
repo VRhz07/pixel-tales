@@ -1,32 +1,30 @@
-// Groq AI Service for story text generation
+// OpenRouter AI Service for story text generation
 // Routes through the secure Django backend proxy — API key never exposed to browser.
-// Backend endpoint: POST /api/ai/groq/generate-story/
+// Backend endpoint: POST /api/ai/openrouter/generate-story/
 
 const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
+// Free chat models verified to work with /chat/completions on OpenRouter:
+//   google/gemma-4-27b-it:free  ← current default (instruction-tuned, returns clean JSON)
+//   mistralai/mistral-7b-instruct:free
+//   meta-llama/llama-3.1-8b-instruct:free
+// AVOID: embedding models (nvidia/llama-nemotron-embed-*), reasoning/thinking models (openrouter/free, deepseek-r1)
+const OPENROUTER_MODEL = 'google/gemma-4-26b-a4b-it:free';
 
-export interface GroqGenerationConfig {
+export interface OpenRouterGenerationConfig {
   temperature?: number;
   maxTokens?: number;
+  model?: string;
 }
 
-
 /**
- * Auto-build an imagePrompt for a page without calling any AI.
- * Generate a story using Groq AI (llama-3.3-70b-versatile).
- *
- * IMPORTANT: We ask Groq for ONLY story text (title, description,
- * characterDescription, colorScheme, pages[].text).
- * imagePrompts are built client-side by buildImagePromptFromText().
- * This keeps the entire request under ~1,500 tokens — well within
- * the 6,000 TPM free-tier limit.
+ * Generate a story using OpenRouter AI.
  *
  * @param storyIdea    The user's story idea
  * @param options      Genre, artStyle, pageCount, language
  * @param config       Optional generation config
- * @returns Parsed story data object (same shape as Gemini output)
+ * @returns Parsed story data object
  */
-export async function generateStoryWithGroq(
+export async function generateStoryWithOpenRouter(
   storyIdea: string,
   options: {
     genres: string[];
@@ -34,7 +32,7 @@ export async function generateStoryWithGroq(
     pageCount: number;
     language: 'en' | 'tl';
   },
-  config: GroqGenerationConfig = {}
+  config: OpenRouterGenerationConfig = {}
 ): Promise<{
   title: string;
   description: string;
@@ -42,7 +40,7 @@ export async function generateStoryWithGroq(
   colorScheme: string;
   pages: Array<{ text: string; imagePrompt: string }>;
 }> {
-  const { temperature = 0.85, maxTokens = 2048 } = config;
+  const { temperature = 0.85, maxTokens = 2048, model = OPENROUTER_MODEL } = config;
   const { genres, artStyle, pageCount, language } = options;
 
   const langInstruction =
@@ -52,12 +50,12 @@ export async function generateStoryWithGroq(
 
   // Map user-facing art style names to Flux-friendly style anchors
   const styleAnchorMap: Record<string, string> = {
-    cartoon:   "children's book illustration, Pixar style, cute cartoon, soft pastel colors",
-    watercolor:"children's book illustration, soft watercolor, hand-painted, pastel tones",
-    digital:   "children's book illustration, digital art, flat design, vibrant colors",
-    sketch:    "children's book illustration, pencil sketch, hand-drawn, warm tones",
+    cartoon: "children's book illustration, Pixar style, cute cartoon, soft pastel colors",
+    watercolor: "children's book illustration, soft watercolor, hand-painted, pastel tones",
+    digital: "children's book illustration, digital art, flat design, vibrant colors",
+    sketch: "children's book illustration, pencil sketch, hand-drawn, warm tones",
     realistic: "children's book illustration, painterly storybook art, warm tones",
-    anime:     "children's book illustration, anime style, Studio Ghibli, soft colors",
+    anime: "children's book illustration, anime style, Studio Ghibli, soft colors",
   };
   const styleAnchor = styleAnchorMap[artStyle] || styleAnchorMap.cartoon;
 
@@ -108,25 +106,26 @@ Rules:
 - Exactly ${pageCount} pages
 - Valid JSON only, no trailing commas`.trim();
 
-  console.log('[Groq] Sending request via backend proxy — text and imagePrompts');
-  console.log('[Groq] Model:', GROQ_MODEL);
+  console.log('[OpenRouter] Sending request via backend proxy — text and imagePrompts');
+  console.log('[OpenRouter] Model:', model);
 
   const token = localStorage.getItem('access_token');
-  const response = await fetch(`${BACKEND_URL}/api/ai/groq/generate-story/`, {
+  const response = await fetch(`${BACKEND_URL}/api/ai/openrouter/generate-story/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify({
-      model: GROQ_MODEL,
+      model,
       messages: [
         {
           role: 'system',
           content:
             "You are a creative children's story writer. " +
-            'Always respond with valid JSON only — no markdown, no code blocks. ' +
-            'JSON must be complete and parseable by JSON.parse().',
+            'Your ENTIRE response must be a single valid JSON object — no explanation, no markdown, no code fences. ' +
+            'Start your response with { and end with }. ' +
+            'JSON must be complete and parseable by JSON.parse(). No trailing commas.',
         },
         { role: 'user', content: prompt },
       ],
@@ -137,36 +136,72 @@ Rules:
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    console.error('[Groq] Proxy error:', err);
-    const errMsg = err?.error || `Groq proxy error ${response.status}`;
-    if (response.status === 401) throw new Error('Groq API key is invalid or not configured on server.');
-    if (response.status === 429) throw new Error('Groq rate limit hit. Please wait a moment and try again.');
+    console.error('[OpenRouter] Proxy error:', err);
+    const errMsg = err?.error || `OpenRouter proxy error ${response.status}`;
+    if (response.status === 401) throw new Error('OpenRouter API key is invalid or not configured on server.');
+    if (response.status === 429) throw new Error('OpenRouter rate limit hit. Please wait a moment and try again.');
     if (response.status === 503) throw new Error(errMsg);
     throw new Error(errMsg);
   }
 
   const data = await response.json();
   const content = data?.choices?.[0]?.message?.content;
-  if (!content) throw new Error('Groq returned an empty response.');
+  if (!content) throw new Error('OpenRouter returned an empty response.');
 
-  console.log('[Groq] Raw response length:', content.length, 'chars');
+  console.log('[OpenRouter] Raw response length:', content.length, 'chars');
 
-  // Parse JSON
+  // ── Robust JSON Extraction ──────────────────────────────────────────
+  // Some free models (especially reasoning/thinking ones) output chain-of-thought
+  // before the final JSON. We scan backwards from the last '}' to find the
+  // last complete top-level JSON object in the response.
   let storyData: any;
+
+  function extractLastJson(raw: string): string | null {
+    // Strip markdown code fences first
+    const fenceMatch = raw.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (fenceMatch) return fenceMatch[1].trim();
+
+    // Find the LAST closing brace and walk backwards to its matching opener
+    const lastClose = raw.lastIndexOf('}');
+    if (lastClose === -1) return null;
+
+    let depth = 0;
+    for (let i = lastClose; i >= 0; i--) {
+      if (raw[i] === '}') depth++;
+      if (raw[i] === '{') depth--;
+      if (depth === 0) return raw.substring(i, lastClose + 1);
+    }
+    return null;
+  }
+
+  function sanitizeJson(raw: string): string {
+    return raw
+      .replace(/,\s*([}\]])/g, '$1') // trailing commas
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ' ') // control chars (keep \t \n \r)
+      .replace(/^\uFEFF/, '') // BOM
+      .trim();
+  }
+
+  const extracted = extractLastJson(content);
+  if (!extracted) {
+    console.error('[OpenRouter] No JSON object found. Raw output:', content);
+    throw new Error('OpenRouter response contained no JSON. Please try again.');
+  }
+
+  const jsonText = sanitizeJson(extracted);
+
   try {
-    storyData = JSON.parse(content);
-  } catch {
-    // Try to extract JSON from any surrounding text
-    const match = content.match(/\{[\s\S]*\}/);
-    if (!match) throw new Error('Groq response was not valid JSON. Please try again.');
-    storyData = JSON.parse(match[0]);
+    storyData = JSON.parse(jsonText);
+  } catch (e) {
+    console.error('[OpenRouter] JSON parse failed after extraction. Sanitized text:', jsonText);
+    throw new Error('OpenRouter response was not valid JSON. Please try again.');
   }
 
   if (!storyData.pages || !Array.isArray(storyData.pages)) {
-    throw new Error('Groq response missing pages array.');
+    throw new Error('OpenRouter response missing pages array.');
   }
 
-  console.log('[Groq] ✅ Story generated with', storyData.pages.length, 'pages');
+  console.log('[OpenRouter] ✅ Story generated with', storyData.pages.length, 'pages');
 
   return {
     title: storyData.title || 'My Story',
@@ -181,8 +216,8 @@ Rules:
 }
 
 /**
- * Check if Groq is available (backend will handle the key check)
+ * Check if OpenRouter is available (backend will handle the key check)
  */
-export function isGroqConfigured(): boolean {
+export function isOpenRouterConfigured(): boolean {
   return true; // Key is on the backend; assume available
 }

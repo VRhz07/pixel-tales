@@ -32,6 +32,14 @@ POLLINATIONS_API_URL = 'https://image.pollinations.ai/prompt'
 # Replicate API Configuration
 REPLICATE_API_TOKEN = getattr(settings, 'REPLICATE_API_TOKEN', None)
 
+# Groq API Configuration
+GROQ_API_KEY = getattr(settings, 'GROQ_API_KEY', None)
+GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
+
+# OpenRouter API Configuration
+OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY', None)
+OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
+
 # Import Replicate (optional dependency)
 try:
     import replicate
@@ -893,4 +901,112 @@ def check_ai_service_status(request):
     }, status=status.HTTP_200_OK)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def generate_story_with_groq(request):
+    """
+    Secure proxy for Groq AI text generation.
+    API key stays on the backend — never exposed to the browser.
+    Expects: { messages: [...], temperature: float, max_tokens: int }
+    Returns: the raw Groq JSON response (choices[0].message.content)
+    """
+    if not GROQ_API_KEY:
+        return Response(
+            {'error': 'Groq API key not configured on the server. Add GROQ_API_KEY to backend/.env.'},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE
+        )
 
+    messages = request.data.get('messages', [])
+    temperature = request.data.get('temperature', 0.85)
+    max_tokens = request.data.get('max_tokens', 2048)
+    model = request.data.get('model', 'llama-3.3-70b-versatile')
+
+    if not messages:
+        return Response({'error': 'messages array is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        response = requests.post(
+            GROQ_API_URL,
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {GROQ_API_KEY}',
+            },
+            json={
+                'model': model,
+                'messages': messages,
+                'temperature': temperature,
+                'max_tokens': max_tokens,
+                'response_format': {'type': 'json_object'},
+            },
+            timeout=60,
+        )
+
+        if response.status_code == 401:
+            return Response({'error': 'Groq API key is invalid.'}, status=status.HTTP_401_UNAUTHORIZED)
+        if response.status_code == 429:
+            return Response({'error': 'Groq rate limit hit. Please wait a moment and try again.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+        if not response.ok:
+            return Response({'error': f'Groq API error {response.status_code}: {response.text}'}, status=response.status_code)
+
+        return Response(response.json(), status=status.HTTP_200_OK)
+
+    except requests.exceptions.Timeout:
+        return Response({'error': 'Groq request timed out. Please try again.'}, status=status.HTTP_504_GATEWAY_TIMEOUT)
+    except Exception as e:
+        return Response({'error': f'Server error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def generate_story_with_openrouter(request):
+    """
+    Secure proxy for OpenRouter AI text generation.
+    API key stays on the backend — never exposed to the browser.
+    Expects: { messages: [...], temperature: float, max_tokens: int, model: str }
+    Returns: the raw OpenRouter JSON response
+    """
+    if not OPENROUTER_API_KEY:
+        return Response(
+            {'error': 'OpenRouter API key not configured on the server. Add OPENROUTER_API_KEY to backend/.env.'},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE
+        )
+
+    messages = request.data.get('messages', [])
+    temperature = request.data.get('temperature', 0.85)
+    max_tokens = request.data.get('max_tokens', 2048)
+    model = request.data.get('model', 'google/gemma-3-27b-it:free')
+
+    if not messages:
+        return Response({'error': 'messages array is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        response = requests.post(
+            OPENROUTER_API_URL,
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {OPENROUTER_API_KEY}',
+                'HTTP-Referer': 'https://pixeltales.app',
+                'X-Title': 'PixelTales',
+            },
+            json={
+                'model': model,
+                'messages': messages,
+                'temperature': temperature,
+                'max_tokens': max_tokens,
+            },
+            timeout=90,
+        )
+
+        if response.status_code == 401:
+            return Response({'error': 'OpenRouter API key is invalid.'}, status=status.HTTP_401_UNAUTHORIZED)
+        if response.status_code == 429:
+            return Response({'error': 'OpenRouter rate limit hit. Please wait a moment and try again.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+        if not response.ok:
+            return Response({'error': f'OpenRouter API error {response.status_code}: {response.text}'}, status=response.status_code)
+
+        return Response(response.json(), status=status.HTTP_200_OK)
+
+    except requests.exceptions.Timeout:
+        return Response({'error': 'OpenRouter request timed out. Please try again.'}, status=status.HTTP_504_GATEWAY_TIMEOUT)
+    except Exception as e:
+        return Response({'error': f'Server error: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
