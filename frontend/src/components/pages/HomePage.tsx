@@ -13,6 +13,7 @@ import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
 import { storage } from '../../utils/storage';
 import Logo from '../common/Logo';
+import StorybookOnboarding, { OnboardingPage } from '../onboarding/StorybookOnboarding';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -25,7 +26,15 @@ const HomePage = () => {
   const [isCollabModeOpen, setIsCollabModeOpen] = useState(false);
   const [isModeSelectionOpen, setIsModeSelectionOpen] = useState(false);
   const [showInviteFriends, setShowInviteFriends] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const onlineUsers = useOnlineStatus();
+
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem('child_onboarding_completed');
+    if (!hasSeenOnboarding) {
+      setShowOnboarding(true);
+    }
+  }, []);
 
   // Set active account state when on home page
   useEffect(() => {
@@ -113,8 +122,47 @@ const HomePage = () => {
     });
   };
 
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    localStorage.setItem('child_onboarding_completed', 'true');
+  };
+
+  const onboardingPages: OnboardingPage[] = [
+    {
+      id: 'welcome',
+      title: 'Welcome to PixelTales!',
+      description: 'Get ready to dive into a world of imagination. Here, you are the author, the artist, and the hero of your own stories.',
+      icon: <Star className="w-24 h-24 text-amber-400" />
+    },
+    {
+      id: 'ai-story',
+      title: 'Magic AI Stories',
+      description: 'Have a cool idea? Just tell our magic AI what you want, and watch as it writes a story and generates beautiful pictures for you automatically!',
+      icon: <Sparkles className="w-24 h-24 text-purple-500" />
+    },
+    {
+      id: 'photo-story',
+      title: 'Photo Stories',
+      description: 'Take a picture or upload one, and our magic tools will turn your real-life photos into amazing animated stories!',
+      icon: <Camera className="w-24 h-24 text-blue-500" />
+    },
+    {
+      id: 'manual-story',
+      title: 'Draw Your Own',
+      description: 'Want to be the artist? Use our drawing tools to paint your own pages and write the story yourself. You can even invite friends to help!',
+      icon: <Pencil className="w-24 h-24 text-green-500" />
+    }
+  ];
+
   return (
     <div className="magical-home">
+      {showOnboarding && (
+        <StorybookOnboarding 
+          pages={onboardingPages} 
+          onComplete={handleOnboardingComplete} 
+          onSkip={handleOnboardingComplete}
+        />
+      )}
       {/* Magical Hero Section */}
       <div className="magical-hero">
         <div className="floating-book">

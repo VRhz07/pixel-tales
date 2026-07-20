@@ -19,6 +19,7 @@ import StoryViewModal from '../components/parent/StoryViewModal';
 import { apiConfigService } from '../services/apiConfig.service';
 import '../styles/dashboard-common.css';
 import './TeacherDashboardPage.css';
+import StorybookOnboarding, { OnboardingPage } from '../components/onboarding/StorybookOnboarding';
 
 interface TeacherClass {
   id: number;
@@ -111,6 +112,7 @@ const TeacherDashboardPage: React.FC = () => {
     subject: '',
     school_year: new Date().getFullYear() + '-' + (new Date().getFullYear() + 1)
   });
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -179,6 +181,13 @@ const TeacherDashboardPage: React.FC = () => {
         setClasses(allClasses);
         // Calculate total pages
         setTotalPages(Math.ceil(allClasses.length / classesPerPage));
+        
+        if (allClasses.length === 0) {
+          const hasSeenOnboarding = localStorage.getItem('teacher_onboarding_completed');
+          if (!hasSeenOnboarding) {
+            setShowOnboarding(true);
+          }
+        }
       } else {
         const errorText = await classesResponse.text();
         console.error('❌ Classes error:', errorText);
@@ -352,8 +361,47 @@ const TeacherDashboardPage: React.FC = () => {
     );
   }
 
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    localStorage.setItem('teacher_onboarding_completed', 'true');
+    setShowAddClassModal(true);
+  };
+
+  const handleOnboardingSkip = () => {
+    setShowOnboarding(false);
+    localStorage.setItem('teacher_onboarding_completed', 'true');
+  };
+
+  const onboardingPages: OnboardingPage[] = [
+    {
+      id: 'welcome',
+      title: 'Welcome to Teacher Dashboard',
+      description: 'Your dashboard is the control center for your students\' creative journey. Here, you can track their reading progress, review the stories they create, and manage their classes.',
+      icon: <AcademicCapIcon className="w-24 h-24" />
+    },
+    {
+      id: 'tracking',
+      title: 'Track Their Progress',
+      description: 'Monitor reading time, stories completed, and achievements earned. Watch them grow as they explore magical worlds and create their own.',
+      icon: <ChartBarIcon className="w-24 h-24" />
+    },
+    {
+      id: 'add-class',
+      title: 'Let\'s Get Started',
+      description: 'To begin, you\'ll need to create a class. You can then add students to your classes and they can start creating their own magical stories safely.',
+      icon: <UserGroupIcon className="w-24 h-24" />
+    }
+  ];
+
   return (
     <div className={`teacher-dashboard ${isDarkMode ? 'dark' : ''}`}>
+      {showOnboarding && (
+        <StorybookOnboarding 
+          pages={onboardingPages} 
+          onComplete={handleOnboardingComplete} 
+          onSkip={handleOnboardingSkip}
+        />
+      )}
       {/* Header */}
       <div className="teacher-top-bar">
         <div className="teacher-top-bar-content">
@@ -643,36 +691,33 @@ const TeacherDashboardPage: React.FC = () => {
 
           {/* Students Tab - REMOVED, now merged with Classes */}
           {activeTab === 'students' && (
-            <section className="parent-section" style={{ marginTop: '24px' }}>
-              <div className="parent-section-header">
-                <h2 className="parent-section-title"><Users size={18} className="inline-block mr-1" /> All Students</h2>
+            <section className="teacher-section" style={{ marginTop: '24px' }}>
+              <div className="teacher-section-header">
+                <h2 className="teacher-section-title"><Users size={18} className="inline-block mr-1" /> All Students</h2>
               </div>
-              <div className="children-grid">
+              <div className="teacher-classes-grid">
                 {allStudents.map((student) => (
-                  <div key={student.id} className="child-card">
-                    <div className="child-card-header">
-                      <div className="child-avatar">
-                        <span className="text-4xl">{student.avatar_emoji || <User size={36} />}</span>
+                  <div key={student.id} className="teacher-class-card">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+                      <div className="teacher-user-avatar" style={{ width: '48px', height: '48px', fontSize: '24px' }}>
+                        {student.avatar_emoji || <User size={24} />}
                       </div>
-                      <div className="child-info">
-                        <h4 className="child-name">{student.display_name}</h4>
-                        <p className="child-username">{student.class_name || 'No Class'}</p>
+                      <div>
+                        <h4 className="teacher-class-name" style={{ margin: 0, fontSize: '18px' }}>{student.display_name}</h4>
+                        <p className="teacher-class-info" style={{ margin: 0 }}>{student.class_name || 'No Class'}</p>
                       </div>
                     </div>
-                    <div className="child-stats">
-                      <div className="stat-item">
-                        <BookOpenIcon className="stat-icon" />
-                        <span className="stat-value">{student.stories_count}</span>
-                        <span className="stat-label">Stories</span>
-                      </div>
+                    <div className="teacher-class-students" style={{ marginTop: '0' }}>
+                      <BookOpen size={16} />
+                      {student.stories_count} Stories
                     </div>
                   </div>
                 ))}
                 {allStudents.length === 0 && (
-                  <div className="empty-state">
-                    <UserGroupIcon className="empty-icon" />
-                    <h3 className="empty-title">No Students Yet</h3>
-                    <p className="empty-description">
+                  <div className="teacher-empty-state" style={{ gridColumn: '1 / -1' }}>
+                    <Users size={48} className="teacher-empty-icon" style={{ margin: '0 auto', marginBottom: '16px' }} />
+                    <h3 className="teacher-empty-title">No Students Yet</h3>
+                    <p className="teacher-empty-text">
                       Add students to your classes to see them here
                     </p>
                   </div>

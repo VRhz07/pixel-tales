@@ -32,6 +32,7 @@ import { useAccountSwitchStore } from '../stores/accountSwitchStore';
 import { storage } from '../utils/storage';
 import '../styles/dashboard-common.css';
 import './ParentDashboardPage.css';
+import StorybookOnboarding, { OnboardingPage } from '../components/onboarding/StorybookOnboarding';
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -203,6 +204,7 @@ const ParentDashboardPage: React.FC = () => {
   const [storyFilter, setStoryFilter] = useState<'all' | 'published' | 'draft'>('all');
   const [storySortBy, setStorySortBy] = useState<'newest' | 'oldest' | 'mostLiked' | 'mostViewed'>('newest');
   const [storySearchQuery, setStorySearchQuery] = useState('');
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Set active account as parent when viewing dashboard
   useEffect(() => {
@@ -318,6 +320,12 @@ const ParentDashboardPage: React.FC = () => {
         // Auto-select first child if available
         if (childrenData.length > 0 && !selectedChild) {
           setSelectedChild(childrenData[0]);
+        } else if (childrenData.length === 0) {
+          // Check if we should show onboarding (only if they haven't dismissed it before)
+          const hasSeenOnboarding = localStorage.getItem('parent_onboarding_completed');
+          if (!hasSeenOnboarding) {
+            setShowOnboarding(true);
+          }
         }
       }
     } catch (error: any) {
@@ -733,8 +741,47 @@ const ParentDashboardPage: React.FC = () => {
   // Dynamic learning goals based on real data
   const learningGoals = goals;
 
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    localStorage.setItem('parent_onboarding_completed', 'true');
+    setShowAddChildModal(true);
+  };
+
+  const handleOnboardingSkip = () => {
+    setShowOnboarding(false);
+    localStorage.setItem('parent_onboarding_completed', 'true');
+  };
+
+  const onboardingPages: OnboardingPage[] = [
+    {
+      id: 'welcome',
+      title: 'Welcome to PixelTales',
+      description: 'Your dashboard is the control center for your child\'s creative journey. Here, you can track their reading progress, review the stories they create, and manage their account.',
+      icon: <BookOpenIcon className="w-24 h-24" />
+    },
+    {
+      id: 'tracking',
+      title: 'Track Their Progress',
+      description: 'Monitor reading time, stories completed, and achievements earned. Watch them grow as they explore magical worlds and create their own.',
+      icon: <ChartBarIcon className="w-24 h-24" />
+    },
+    {
+      id: 'add-child',
+      title: 'Let\'s Get Started',
+      description: 'To begin, you\'ll need to create a profile for your child. They\'ll use this profile to log in, play, and start creating their own magical stories safely.',
+      icon: <UserGroupIcon className="w-24 h-24" />
+    }
+  ];
+
   return (
     <div className={`parent-dashboard ${theme === 'dark' ? 'dark' : ''}`}>
+      {showOnboarding && (
+        <StorybookOnboarding 
+          pages={onboardingPages} 
+          onComplete={handleOnboardingComplete} 
+          onSkip={handleOnboardingSkip}
+        />
+      )}
       {/* Top Bar - Logo, Settings, User Avatar */}
       <div className="parent-top-bar">
         <div className="parent-top-bar-content">

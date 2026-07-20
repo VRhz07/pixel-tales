@@ -2734,7 +2734,7 @@ def get_teacher_students(request):
                 'total_stories': total_stories,
                 'total_reads': total_reads,
                 'achievements_count': achievements_count,
-                'class_name': rel.class_name,
+                'class_name': rel.teacher_class.name if rel.teacher_class else None,
                 'date_added': rel.date_created.isoformat() if rel.date_created else None
             })
         
@@ -2812,11 +2812,18 @@ def create_child_account(request):
                 is_active=True
             )
         else:  # teacher
+            from .models import TeacherClass
+            teacher_class = None
+            if class_name:
+                teacher_class, _ = TeacherClass.objects.get_or_create(
+                    teacher=request.user,
+                    name=class_name
+                )
             TeacherStudentRelationship.objects.create(
                 teacher=request.user,
                 student=child_user,
                 is_active=True,
-                class_name=class_name
+                teacher_class=teacher_class
             )
         
         return Response({
@@ -2880,14 +2887,22 @@ def add_child_relationship(request):
                 relationship.is_active = True
                 relationship.save()
         else:  # teacher
+            from .models import TeacherClass
+            teacher_class = None
+            if class_name:
+                teacher_class, _ = TeacherClass.objects.get_or_create(
+                    teacher=request.user,
+                    name=class_name
+                )
             relationship, created = TeacherStudentRelationship.objects.get_or_create(
                 teacher=request.user,
                 student=child,
-                defaults={'is_active': True, 'class_name': class_name}
+                defaults={'is_active': True, 'teacher_class': teacher_class}
             )
-            if not created and not relationship.is_active:
+            if not created and (not relationship.is_active or (teacher_class and relationship.teacher_class != teacher_class)):
                 relationship.is_active = True
-                relationship.class_name = class_name
+                if teacher_class:
+                    relationship.teacher_class = teacher_class
                 relationship.save()
         
         return Response({
@@ -2961,9 +2976,14 @@ def update_child_profile(request, child_id):
         
         # Update class name if provided (for teachers)
         class_name = request.data.get('className') or request.data.get('class_name')
-        if class_name is not None:
-            # Store in relationship metadata if needed
-            pass
+        if class_name is not None and user_profile.user_type == 'teacher':
+            from .models import TeacherClass
+            teacher_class, _ = TeacherClass.objects.get_or_create(
+                teacher=request.user,
+                name=class_name
+            )
+            relationship.teacher_class = teacher_class
+            relationship.save()
         
         # Save changes
         child_user.save()
