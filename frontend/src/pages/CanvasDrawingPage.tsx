@@ -55,6 +55,61 @@ type ShapeType = 'rectangle' | 'circle' | 'line' | 'triangle' | 'star' | 'heart'
 type BrushType = 'soft' | 'round' | 'pencil' | 'marker' | 'airbrush';
 type Orientation = 'portrait' | 'landscape';
 
+interface StudioSliderRowProps {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  onChange: (v: number) => void;
+  suffix: string;
+  previewDot?: React.ReactNode;
+  labelColor?: string;
+  accentColor?: string;
+  trackBg?: string;
+  thumbBg?: string;
+}
+
+const StudioSliderRow = React.memo(({
+  label,
+  value,
+  min,
+  max,
+  onChange,
+  suffix,
+  previewDot,
+  labelColor = '#334155',
+  accentColor = '#ff6b6b',
+  trackBg = '#cbd5e1',
+  thumbBg = '#ffffff',
+}: StudioSliderRowProps) => {
+  const percent = Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.875rem', fontWeight: 500, color: labelColor }}>
+        <span>{label}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {previewDot}
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: accentColor }}>{value}{suffix}</span>
+        </div>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="canvas-studio-range-input"
+        style={{
+          background: `linear-gradient(to right, ${accentColor} 0%, ${accentColor} ${percent}%, ${trackBg} ${percent}%, ${trackBg} 100%)`,
+          '--slider-thumb-bg': thumbBg,
+          '--slider-accent-color': accentColor,
+        } as React.CSSProperties}
+      />
+    </div>
+  );
+});
+
 interface Character {
   id: string;
   name: string;
@@ -945,48 +1000,45 @@ const CanvasDrawingPage: React.FC = () => {
         setZoomLevel(prev => Math.min(Math.max(prev * delta, 0.1), 5));
       };
 
+      // Pro-grade multi-touch gesture handlers (Simultaneous smooth Pinch-Zoom & Focal Pan)
+      const handleGestureStart = (e: Event) => {
+        e.preventDefault();
+      };
+
       const handleTouchStart = (e: TouchEvent) => {
         setDebugInfo(`TouchStart: ${e.touches.length} fingers`);
 
-        // CRITICAL: Block drawing IMMEDIATELY when second finger touches
         if (e.touches.length >= 2) {
           setDebugInfo('Two fingers - Pan mode ON');
-          // Block drawing BEFORE anything else
           setBlockDrawing(true);
 
-          // Two fingers - start pan/zoom mode
           e.preventDefault();
           e.stopPropagation();
-          e.stopImmediatePropagation(); // CRITICAL: Stop drawing engine from receiving this event
+          e.stopImmediatePropagation();
 
           const touch1 = e.touches[0];
           const touch2 = e.touches[1];
 
-          // Calculate initial pinch distance
-          const distance = Math.sqrt(
-            Math.pow(touch2.clientX - touch1.clientX, 2) +
-            Math.pow(touch2.clientY - touch1.clientY, 2)
+          const distance = Math.hypot(
+            touch2.clientX - touch1.clientX,
+            touch2.clientY - touch1.clientY
           );
           lastPinchDistanceRef.current = distance;
 
-          // Calculate pinch center point
           const centerX = (touch1.clientX + touch2.clientX) / 2;
           const centerY = (touch1.clientY + touch2.clientY) / 2;
           lastPinchCenterRef.current = { x: centerX, y: centerY };
 
           isPanningRef.current = true;
-          setIsPanning(true); // For UI indicator;
+          setIsPanning(true);
         } else if (e.touches.length === 1 && isPanningRef.current) {
-          // One finger while exiting pan mode - block it!
           e.preventDefault();
           e.stopPropagation();
           e.stopImmediatePropagation();
         }
-        // Single touch - let the drawing engine handle it
       };
 
       const handleTouchMove = (e: TouchEvent) => {
-        // Block any touch move if we're exiting pan mode
         if (isPanningRef.current && e.touches.length === 1) {
           e.preventDefault();
           e.stopPropagation();
@@ -994,98 +1046,63 @@ const CanvasDrawingPage: React.FC = () => {
           return;
         }
 
-        if (e.touches.length === 2) {
-          // Two fingers - handle pan and zoom
+        if (e.touches.length >= 2) {
           e.preventDefault();
           e.stopPropagation();
-          e.stopImmediatePropagation(); // CRITICAL: Stop drawing engine from receiving this event
+          e.stopImmediatePropagation();
 
           const touch1 = e.touches[0];
           const touch2 = e.touches[1];
 
-          // Calculate current pinch distance
-          const currentDistance = Math.sqrt(
-            Math.pow(touch2.clientX - touch1.clientX, 2) +
-            Math.pow(touch2.clientY - touch1.clientY, 2)
+          const currentDistance = Math.hypot(
+            touch2.clientX - touch1.clientX,
+            touch2.clientY - touch1.clientY
           );
 
-          // Calculate current pinch center
           const currentCenterX = (touch1.clientX + touch2.clientX) / 2;
           const currentCenterY = (touch1.clientY + touch2.clientY) / 2;
 
-          // Only process if we have previous values
-          if (lastPinchDistanceRef.current !== null) {
-            // Calculate distance change for zoom
-            const distanceChange = Math.abs(currentDistance - lastPinchDistanceRef.current);
-
-            // Calculate center movement for pan
+          if (lastPinchDistanceRef.current !== null && lastPinchDistanceRef.current > 0 && lastPinchCenterRef.current !== null) {
+            const rawScale = currentDistance / lastPinchDistanceRef.current;
             const deltaX = currentCenterX - lastPinchCenterRef.current.x;
             const deltaY = currentCenterY - lastPinchCenterRef.current.y;
-            const panDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-            // Determine if this is primarily a zoom or pan gesture
-            // Make them mutually exclusive - zoom takes priority
-            const isZoomGesture = distanceChange > 0.5; // Ultra sensitive for mobile
-            const isPanGesture = !isZoomGesture && panDistance > 0.1; // Ultra sensitive for mobile
+            // Apply dampening for smooth responsive Procreate-like zoom + pan
+            const dampedScale = 1 + (rawScale - 1) * 0.85;
 
-            setDebugInfo(`Dist:${distanceChange.toFixed(1)} Pan:${panDistance.toFixed(1)} Z:${isZoomGesture} P:${isPanGesture}`);
+            setZoomLevel(prevZoom => Math.min(Math.max(prevZoom * dampedScale, 0.15), 5));
 
-            if (isZoomGesture) {
-              // Handle zoom with SMOOTH damping
-              const rawScale = currentDistance / lastPinchDistanceRef.current;
+            setPanOffset(prevPan => ({
+              x: prevPan.x + deltaX,
+              y: prevPan.y + deltaY
+            }));
 
-              // Apply damping for smooth zoom
-              const dampingFactor = 0.6; // Higher = more responsive zoom
-              const dampedScale = 1 + (rawScale - 1) * dampingFactor;
-
-              setDebugInfo(`ZOOM: ${dampedScale.toFixed(3)}x`);
-
-              // Use functional update to ensure we're using the latest zoom value
-              setZoomLevel(prev => {
-                const calculatedZoom = Math.min(Math.max(prev * dampedScale, 0.1), 5);
-                return calculatedZoom;
-              });
-
-              // Note: Removed zoom-toward-pinch-point to prevent canvas drift
-              // Just zoom at center for stability
-            } else if (isPanGesture) {
-              setDebugInfo(`PAN: ${deltaX.toFixed(0)},${deltaY.toFixed(0)}`);
-              // Only pan if NOT zooming and fingers moved significantly
-              // Multiply by 1.5 for more responsive panning
-              setPanOffset(prev => ({
-                x: prev.x + deltaX * 1.5,
-                y: prev.y + deltaY * 1.5
-              }));
-            }
+            setDebugInfo(`ZOOM: ${(rawScale).toFixed(2)}x PAN: ${deltaX.toFixed(0)},${deltaY.toFixed(0)}`);
           }
 
-          // Update for next frame
           lastPinchDistanceRef.current = currentDistance;
           lastPinchCenterRef.current = { x: currentCenterX, y: currentCenterY };
         }
-        // Single touch - let the drawing engine handle it
       };
 
       const handleTouchEnd = (e: TouchEvent) => {
-        // If we were in pan mode, prevent any touch events from reaching drawing engine
         if (isPanningRef.current) {
           e.preventDefault();
           e.stopPropagation();
           e.stopImmediatePropagation();
 
-          // Keep drawing blocked for longer to prevent accidental strokes
           setBlockDrawing(true);
-          setTimeout(() => setBlockDrawing(false), 600); // Increased to 600ms
 
-          // Don't reset pan state immediately - wait for all fingers to lift
           if (e.touches.length === 0) {
             lastPinchDistanceRef.current = null;
+            lastPinchCenterRef.current = null;
             isPanningRef.current = false;
             setIsPanning(false);
+            setTimeout(() => setBlockDrawing(false), 250);
           }
         } else if (e.touches.length < 2) {
-          // Normal touch end when not panning
           lastPinchDistanceRef.current = null;
+          lastPinchCenterRef.current = null;
           setIsPanning(false);
         }
       };
@@ -1099,7 +1116,6 @@ const CanvasDrawingPage: React.FC = () => {
           setIsPanning(true); // For UI indicator
           lastPanPointRef.current = { x: e.clientX, y: e.clientY };
         }
-        // Don't handle left mouse button without Ctrl - let drawing engine handle it
       };
 
       const handleMouseMove = (e: MouseEvent) => {
@@ -1130,6 +1146,8 @@ const CanvasDrawingPage: React.FC = () => {
       canvas.addEventListener('touchstart', handleTouchStart, { passive: false, capture: true });
       canvas.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
       canvas.addEventListener('touchend', handleTouchEnd, { capture: true });
+      canvas.addEventListener('gesturestart', handleGestureStart, { passive: false, capture: true } as any);
+      canvas.addEventListener('gesturechange', handleGestureStart, { passive: false, capture: true } as any);
       canvas.addEventListener('mousedown', handleMouseDown, { capture: true });
       canvas.addEventListener('mousemove', handleMouseMove, { capture: true });
       canvas.addEventListener('mouseup', handleMouseUp, { capture: true });
@@ -1139,6 +1157,8 @@ const CanvasDrawingPage: React.FC = () => {
         canvas.removeEventListener('touchstart', handleTouchStart, { capture: true } as any);
         canvas.removeEventListener('touchmove', handleTouchMove, { capture: true } as any);
         canvas.removeEventListener('touchend', handleTouchEnd, { capture: true } as any);
+        canvas.removeEventListener('gesturestart', handleGestureStart, { capture: true } as any);
+        canvas.removeEventListener('gesturechange', handleGestureStart, { capture: true } as any);
         canvas.removeEventListener('mousedown', handleMouseDown, { capture: true } as any);
         canvas.removeEventListener('mousemove', handleMouseMove, { capture: true } as any);
         canvas.removeEventListener('mouseup', handleMouseUp, { capture: true } as any);
@@ -2787,69 +2807,6 @@ const CanvasDrawingPage: React.FC = () => {
                     const thumbBg = dark ? '#1e293b' : '#ffffff';
                     const resetBg = dark ? '#334155' : '#f1f5f9';
                     const resetColor = dark ? '#94a3b8' : '#64748b';
-                    const accentColor = '#ff6b6b';
-
-                    const TabletSliderRow = ({ label, value, min, max, onChange, suffix, previewDot }: {
-                      label: string; value: number; min: number; max: number;
-                      onChange: (v: number) => void; suffix: string; previewDot?: React.ReactNode;
-                    }) => (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.875rem', fontWeight: 500, color: labelColor }}>
-                          <span>{label}</span>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            {previewDot}
-                            <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: accentColor }}>{value}{suffix}</span>
-                          </div>
-                        </div>
-                        <input
-                          type="range"
-                          min={min}
-                          max={max}
-                          value={value}
-                          onChange={(e) => onChange(Number(e.target.value))}
-                          style={{
-                            appearance: 'none' as const,
-                            WebkitAppearance: 'none' as const,
-                            width: '100%',
-                            height: 8,
-                            borderRadius: 9999,
-                            background: `linear-gradient(to right, ${accentColor} 0%, ${accentColor} ${((value - min) / (max - min)) * 100}%, ${trackBg} ${((value - min) / (max - min)) * 100}%, ${trackBg} 100%)`,
-                            outline: 'none',
-                            cursor: 'pointer',
-                            border: 'none',
-                          }}
-                        />
-                        <style>{`
-                          input[type=range]::-webkit-slider-thumb {
-                            -webkit-appearance: none;
-                            appearance: none;
-                            width: 20px;
-                            height: 20px;
-                            margin-top: -6px;
-                            border-radius: 50%;
-                            background: ${thumbBg};
-                            border: 3px solid ${accentColor};
-                            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-                            cursor: pointer;
-                          }
-                          input[type=range]::-moz-range-thumb {
-                            width: 14px;
-                            height: 14px;
-                            border-radius: 50%;
-                            background: ${thumbBg};
-                            border: 3px solid ${accentColor};
-                            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-                            cursor: pointer;
-                          }
-                          input[type=range]::-moz-range-track {
-                            height: 8px;
-                            border-radius: 9999px;
-                            background: ${trackBg};
-                            border: none;
-                          }
-                        `}</style>
-                      </div>
-                    );
 
                     return (
                       <div style={{ background: panelBg, border: `1px solid ${borderClr}`, borderRadius: '1rem 1rem 0 0', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -2870,15 +2827,17 @@ const CanvasDrawingPage: React.FC = () => {
                             <ArrowPathIcon style={{ width: 16, height: 16 }} />
                           </button>
                         </div>
-                        <TabletSliderRow
+                        <StudioSliderRow
                           label="Size" value={brushSize} min={1} max={50} suffix="px"
+                          labelColor={labelColor} trackBg={trackBg} thumbBg={thumbBg}
                           onChange={(v) => setBrushSize(v)}
                           previewDot={
                             <div style={{ width: Math.min(brushSize, 30), height: Math.min(brushSize, 30), borderRadius: '50%', backgroundColor: selectedColor, opacity: brushOpacity, minWidth: 4, minHeight: 4 }} />
                           }
                         />
-                        <TabletSliderRow
+                        <StudioSliderRow
                           label="Opacity" value={Math.round(brushOpacity * 100)} min={0} max={100} suffix="%"
+                          labelColor={labelColor} trackBg={trackBg} thumbBg={thumbBg}
                           onChange={(v) => setBrushOpacity(v / 100)}
                         />
                       </div>
@@ -3317,72 +3276,6 @@ const CanvasDrawingPage: React.FC = () => {
               const thumbBg = dark ? '#1e293b' : '#ffffff';
               const resetBg = dark ? '#334155' : '#f1f5f9';
               const resetColor = dark ? '#94a3b8' : '#64748b';
-              const accentColor = '#ff6b6b';
-
-              const SliderRow = ({ label, value, min, max, onChange, suffix, previewDot }: {
-                label: string; value: number; min: number; max: number;
-                onChange: (v: number) => void; suffix: string; previewDot?: React.ReactNode;
-              }) => (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.875rem', fontWeight: 500, color: labelColor }}>
-                    <span>{label}</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      {previewDot}
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: accentColor }}>{value}{suffix}</span>
-                    </div>
-                  </div>
-                  <input
-                    type="range"
-                    min={min}
-                    max={max}
-                    value={value}
-                    onChange={(e) => onChange(Number(e.target.value))}
-                    style={{
-                      appearance: 'none' as const,
-                      WebkitAppearance: 'none' as const,
-                      width: '100%',
-                      height: 8,
-                      borderRadius: 9999,
-                      background: `linear-gradient(to right, ${accentColor} 0%, ${accentColor} ${((value - min) / (max - min)) * 100}%, ${trackBg} ${((value - min) / (max - min)) * 100}%, ${trackBg} 100%)`,
-                      outline: 'none',
-                      cursor: 'pointer',
-                      border: 'none',
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.target as HTMLInputElement).style.setProperty('--thumb-shadow', `0 0 0 6px rgba(255,107,107,0.2)`);
-                    }}
-                  />
-                  <style>{`
-                    input[type=range]::-webkit-slider-thumb {
-                      -webkit-appearance: none;
-                      appearance: none;
-                      width: 20px;
-                      height: 20px;
-                      margin-top: -6px;
-                      border-radius: 50%;
-                      background: ${thumbBg};
-                      border: 3px solid ${accentColor};
-                      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-                      cursor: pointer;
-                    }
-                    input[type=range]::-moz-range-thumb {
-                      width: 14px;
-                      height: 14px;
-                      border-radius: 50%;
-                      background: ${thumbBg};
-                      border: 3px solid ${accentColor};
-                      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-                      cursor: pointer;
-                    }
-                    input[type=range]::-moz-range-track {
-                      height: 8px;
-                      border-radius: 9999px;
-                      background: ${trackBg};
-                      border: none;
-                    }
-                  `}</style>
-                </div>
-              );
 
               return (
                 <div style={{ flexShrink: 0, background: panelBg, borderTop: `2px solid ${borderColor}`, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -3403,15 +3296,17 @@ const CanvasDrawingPage: React.FC = () => {
                       <ArrowPathIcon style={{ width: 16, height: 16 }} />
                     </button>
                   </div>
-                  <SliderRow
+                  <StudioSliderRow
                     label="Size" value={brushSize} min={1} max={50} suffix="px"
+                    labelColor={labelColor} trackBg={trackBg} thumbBg={thumbBg}
                     onChange={(v) => setBrushSize(v)}
                     previewDot={
                       <div style={{ width: Math.min(brushSize, 30), height: Math.min(brushSize, 30), borderRadius: '50%', backgroundColor: selectedColor, opacity: brushOpacity, minWidth: 4, minHeight: 4 }} />
                     }
                   />
-                  <SliderRow
+                  <StudioSliderRow
                     label="Opacity" value={Math.round(brushOpacity * 100)} min={0} max={100} suffix="%"
+                    labelColor={labelColor} trackBg={trackBg} thumbBg={thumbBg}
                     onChange={(v) => setBrushOpacity(v / 100)}
                   />
                 </div>

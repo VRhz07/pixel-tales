@@ -1396,11 +1396,14 @@ export class PaperDrawingEngine {
       const touch = e.touches[0];
       const point = this.getCanvasPoint(touch.clientX, touch.clientY);
       this.handleMouseDown({ point } as any);
+    } else if (e.touches.length >= 2) {
+      e.preventDefault();
     }
   }
   
   private handleRawTouchMove(e: TouchEvent) {
     if (e.touches.length === 1) {
+      if (this.isDrawingBlocked) return;
       e.preventDefault();
       const touch = e.touches[0];
       const point = this.getCanvasPoint(touch.clientX, touch.clientY);
@@ -1411,13 +1414,17 @@ export class PaperDrawingEngine {
       }
       
       this.handleMouseDrag({ point } as any);
+    } else if (e.touches.length >= 2) {
+      e.preventDefault();
     }
   }
   
   private handleRawTouchEnd(e: TouchEvent) {
-    e.preventDefault();
-    const point = this.getCanvasPoint(0, 0); // Dummy point for touch end
-    this.handleMouseUp({ point } as any);
+    if (e.touches.length === 0) {
+      e.preventDefault();
+      const point = this.getCanvasPoint(0, 0); // Dummy point for touch end
+      this.handleMouseUp({ point } as any);
+    }
   }
   
   // No longer needed - coordinate transformation is now handled in getCanvasPoint()

@@ -465,6 +465,17 @@ body.capacitor .canvas-studio {
   position: relative;
 }
 
+.studio-canvas-area,
+.studio-canvas-stage,
+.canvas-studio-canvas-wrapper,
+.canvas-studio-canvas {
+  touch-action: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .canvas-studio-canvas {
   background: var(--studio-canvas-surface);
   width: 500px;
@@ -2209,4 +2220,60 @@ body.capacitor .studio-bottom-dock {
 
 .canvas-studio ::-webkit-scrollbar-thumb:hover {
   background: var(--studio-text-muted);
+}
+
+/* ============================================
+   SMOOTH TOUCH RANGE SLIDER
+   ============================================ */
+
+.canvas-studio-range-input,
+.canvas-studio-slider {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 9999px;
+  outline: none;
+  cursor: pointer;
+  border: none;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.canvas-studio-range-input::-webkit-slider-thumb,
+.canvas-studio-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--slider-thumb-bg, #ffffff);
+  border: 3px solid var(--slider-accent-color, #ff6b6b);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.canvas-studio-range-input::-webkit-slider-thumb:active,
+.canvas-studio-slider::-webkit-slider-thumb:active {
+  transform: scale(1.15);
+}
+
+.canvas-studio-range-input::-moz-range-thumb,
+.canvas-studio-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--slider-thumb-bg, #ffffff);
+  border: 3px solid var(--slider-accent-color, #ff6b6b);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+.canvas-studio-range-input::-moz-range-track,
+.canvas-studio-slider::-moz-range-track {
+  height: 10px;
+  border-radius: 9999px;
+  background: transparent;
+  border: none;
 }
