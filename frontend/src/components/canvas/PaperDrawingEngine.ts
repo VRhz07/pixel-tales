@@ -37,6 +37,15 @@ export interface LayerInfo {
   isBackground: boolean;
 }
 
+export interface UndoOperation {
+  type: 'add' | 'full_snapshot';
+  itemId?: string;
+  layerId?: string;
+  itemData?: any;
+  tool?: DrawingTool;
+  snapshot?: string;
+}
+
 export class PaperDrawingEngine {
   private canvas: HTMLCanvasElement;
   private scope: paper.PaperScope;
@@ -54,8 +63,8 @@ export class PaperDrawingEngine {
   private currentPath: paper.Path | null = null;
   private shapeStartPoint: paper.Point | null = null;
   private currentClickableArea: paper.Path | null = null;
-  private undoStack: any[] = [];
-  private redoStack: any[] = [];
+  private undoStack: UndoOperation[] = [];
+  private redoStack: UndoOperation[] = [];
   private maxUndoSteps = 50;
   private zoomLevel = 1;
   private panOffset = { x: 0, y: 0 };
@@ -329,31 +338,43 @@ export class PaperDrawingEngine {
         if (this.currentTool !== 'brush' && this.currentTool !== 'eraser' && !this.shapeFilled) {
           this.createClickableArea(this.currentPath);
         }
-        
-        // Notify collaboration about completed drawing (ALL TOOLS NOW SUPPORTED)
-        if (this.onDrawingComplete) {
-          if (this.currentTool === 'brush' || this.currentTool === 'eraser') {
-            this.flushBatchedPoints();
-            // Send final end signal for stroke
-            this.onDrawingComplete({
-              type: 'draw_batch_end',
-              strokeId: this.currentStrokeId
-            });
-          } else if (this.currentTool !== 'text' && this.currentTool !== 'fill' && this.currentTool !== 'select') {
-             // Send final end signal for shape preview
-             this.onDrawingComplete({
-               type: 'shape_preview_end',
-               strokeId: 'shape_preview_' + this.scope.project.id
-             });
-          }
-          this.notifyDrawingComplete(pathForCollaboration, toolForCollaboration);
+      }
+      
+      // Notify collaboration — runs for ALL tools including eraser
+      if (this.onDrawingComplete) {
+        if (this.currentTool === 'brush' || this.currentTool === 'eraser') {
+          this.flushBatchedPoints();
+          // Send final end signal for stroke
+          this.onDrawingComplete({
+            type: 'draw_batch_end',
+            strokeId: this.currentStrokeId,
+            layerId: this.scope.project.activeLayer.data.layerId
+          });
+        } else if (this.currentTool !== 'text' && this.currentTool !== 'fill' && this.currentTool !== 'select') {
+           // Send final end signal for shape preview
+           this.onDrawingComplete({
+             type: 'shape_preview_end',
+             strokeId: 'shape_preview_' + (this.scope.project as any).id,
+             layerId: this.scope.project.activeLayer.data.layerId
+           });
         }
+        this.notifyDrawingComplete(pathForCollaboration, toolForCollaboration);
       }
       
       this.currentPath = null;
       this.shapeStartPoint = null;
       this.currentClickableArea = null;
-      this.saveState();
+      if (this.currentTool !== 'eraser' && pathForCollaboration && pathForCollaboration.data && pathForCollaboration.data.id) {
+        this.saveOperation({
+          type: 'add',
+          itemId: pathForCollaboration.data.id,
+          layerId: this.scope.project.activeLayer.data.layerId,
+          itemData: pathForCollaboration.exportJSON({ asString: false }),
+          tool: toolForCollaboration
+        });
+      } else {
+        this.saveState();
+      }
     }
   }
   
@@ -365,7 +386,8 @@ export class PaperDrawingEngine {
     try {
       const pathData: any = {
         type: tool,
-        tool: tool
+        tool: tool,
+        layerId: this.scope.project.activeLayer.data.layerId
       };
 
       // CRITICAL: Include the item ID so remote clients can track this item for transforms
@@ -536,7 +558,8 @@ export class PaperDrawingEngine {
         points: [...this.batchedPoints],
         color: this.currentColor,
         strokeWidth: this.currentSize,
-        tool: this.currentTool
+        tool: this.currentTool,
+        layerId: this.scope.project.activeLayer.data.layerId
       });
     }
     
@@ -582,36 +605,47 @@ export class PaperDrawingEngine {
     this.scope.project.activeLayer.addChild(this.currentPath);
   }
 
-  private performErase(eraserPath: paper.Path, customWidth?: number) {
+  private performErase(eraserPath: paper.Path, customWidth?: number, layerId?: string) {
     const eraserWidth = customWidth || (this.currentSize * 2);
     
-    // Get all items in the project
-    const itemsToCheck = this.scope.project.activeLayer.children.slice();
+    // Professional behavior: eraser works across ALL visible non-background layers.
+    // If a specific layerId is provided (e.g. from a remote event on an older client),
+    // we still erase all layers — this matches Figma/Miro/Procreate behavior where
+    // any collaborator can erase any content on the shared canvas.
+    const layersToErase = this.scope.project.layers.filter((l: any) => {
+      if (!l.visible) return false;
+      if (l.data && l.data.isBackground) return false;
+      return true;
+    });
     
-    for (let i = itemsToCheck.length - 1; i >= 0; i--) {
-      const item = itemsToCheck[i];
+    for (const targetLayer of layersToErase) {
+      const itemsToCheck = targetLayer.children.slice();
       
-      // Skip background, eraser paths, and clickable areas
-      if (item.data.isBackground || item.data.isEraser || item.data.isClickableArea) {
-        continue;
-      }
-      
-      // Check if item is a path or group
-      if (item instanceof this.scope.Path) {
-        this.eraseFromPath(item, eraserPath, eraserWidth);
-      } else if (item instanceof this.scope.Group) {
-        // For groups, check each child
-        const children = item.children.slice();
-        for (let j = children.length - 1; j >= 0; j--) {
-          const child = children[j];
-          if (child instanceof this.scope.Path && !child.data.isClickableArea) {
-            this.eraseFromPath(child, eraserPath, eraserWidth);
-          }
+      for (let i = itemsToCheck.length - 1; i >= 0; i--) {
+        const item = itemsToCheck[i];
+        
+        // Skip background, eraser paths, and clickable areas
+        if (item.data.isBackground || item.data.isEraser || item.data.isClickableArea) {
+          continue;
         }
         
-        // Remove group if all children are gone
-        if (item.children.length === 0) {
-          item.remove();
+        // Check if item is a path or group
+        if (item instanceof this.scope.Path) {
+          this.eraseFromPath(item, eraserPath, eraserWidth);
+        } else if (item instanceof this.scope.Group) {
+          // For groups, check each child
+          const children = item.children.slice();
+          for (let j = children.length - 1; j >= 0; j--) {
+            const child = children[j];
+            if (child instanceof this.scope.Path && !child.data.isClickableArea) {
+              this.eraseFromPath(child, eraserPath, eraserWidth);
+            }
+          }
+          
+          // Remove group if all children are gone
+          if (item.children.length === 0) {
+            item.remove();
+          }
         }
       }
     }
@@ -1436,7 +1470,10 @@ export class PaperDrawingEngine {
     // Save current active layer
     const currentActiveLayer = this.scope.project.activeLayer;
     
-    this.undoStack.push(this.scope.project.exportJSON());
+    this.undoStack.push({
+      type: 'full_snapshot',
+      snapshot: this.scope.project.exportJSON()
+    });
     if (this.undoStack.length > this.maxUndoSteps) {
       this.undoStack.shift();
     }
@@ -1448,6 +1485,15 @@ export class PaperDrawingEngine {
     }
     
     // Notify layers changed to update thumbnails (throttled)
+    this.notifyLayersChangedThrottled();
+  }
+
+  private saveOperation(op: UndoOperation) {
+    this.undoStack.push(op);
+    if (this.undoStack.length > this.maxUndoSteps) {
+      this.undoStack.shift();
+    }
+    this.redoStack = [];
     this.notifyLayersChangedThrottled();
   }
 
@@ -1639,51 +1685,119 @@ export class PaperDrawingEngine {
     // The CSS transform on the container provides the visual zoom effect
   }
 
-  undo() {
-    if (this.undoStack.length > 1) {
-      // Save current active layer ID
-      const activeLayerId = this.scope.project.activeLayer?.data.layerId;
+  undo(): any {
+    if (this.undoStack.length > 0) {
+      const op = this.undoStack.pop()!;
+      this.redoStack.push(op);
       
-      const currentState = this.undoStack.pop()!;
-      this.redoStack.push(currentState);
-      const previousState = this.undoStack[this.undoStack.length - 1];
-      this.scope.project.clear();
-      this.scope.project.importJSON(previousState);
-      
-      // Restore active layer if it still exists
-      if (activeLayerId) {
-        const layerIndex = this.findLayerIndex(activeLayerId);
-        if (layerIndex !== -1) {
-          this.scope.project.layers[layerIndex].activate();
+      if (op.type === 'add' && op.itemId) {
+        // Find the item and remove it
+        let found = false;
+        const targetLayer = op.layerId ? this.getLayerForRemoteData({ layerId: op.layerId } as any) : this.scope.project.activeLayer;
+        
+        // Search in the target layer
+        if (targetLayer) {
+          for (let i = 0; i < targetLayer.children.length; i++) {
+            const item = targetLayer.children[i];
+            if (item.data && (item.data.id === op.itemId || item.data.itemId === op.itemId)) {
+               item.remove();
+               found = true;
+               break;
+            }
+          }
         }
+        
+        // If not found in target layer, search all layers
+        if (!found) {
+           for (const layer of this.scope.project.layers) {
+              for (const item of layer.children) {
+                 if (item.data && (item.data.id === op.itemId || item.data.itemId === op.itemId)) {
+                    item.remove();
+                    found = true;
+                    break;
+                 }
+              }
+              if (found) break;
+           }
+        }
+        
+        this.notifyLayersChangedThrottled();
+        
+        // Trigger delete broadcast
+        if (this.onDrawingComplete) {
+           this.onDrawingComplete({ type: 'delete', itemId: op.itemId });
+        }
+        
+        return { type: 'delete', itemId: op.itemId };
+      } else if (op.type === 'full_snapshot' || !op.type) {
+         // Legacy or full snapshot fallback
+         const snapshot = op.snapshot || op; // Handle legacy strings
+         const previousOp = this.undoStack.length > 0 ? this.undoStack[this.undoStack.length - 1] : null;
+         const previousState = previousOp ? (previousOp.snapshot || previousOp) : null;
+         
+         if (previousState && typeof previousState === 'string') {
+           const activeLayerId = this.scope.project.activeLayer?.data.layerId;
+           this.scope.project.clear();
+           this.scope.project.importJSON(previousState as string);
+           
+           if (activeLayerId) {
+             const layerIndex = this.findLayerIndex(activeLayerId);
+             if (layerIndex !== -1) {
+               this.scope.project.layers[layerIndex].activate();
+             }
+           }
+           
+           this.transformSystem.clearSelection();
+           this.notifyLayersChanged();
+         }
       }
-      
-      this.transformSystem.clearSelection();
-      this.notifyLayersChanged();
     }
+    return null;
   }
 
-  redo() {
+  redo(): any {
     if (this.redoStack.length > 0) {
-      // Save current active layer ID
-      const activeLayerId = this.scope.project.activeLayer?.data.layerId;
+      const op = this.redoStack.pop()!;
+      this.undoStack.push(op);
       
-      const nextState = this.redoStack.pop()!;
-      this.undoStack.push(nextState);
-      this.scope.project.clear();
-      this.scope.project.importJSON(nextState);
-      
-      // Restore active layer if it still exists
-      if (activeLayerId) {
-        const layerIndex = this.findLayerIndex(activeLayerId);
-        if (layerIndex !== -1) {
-          this.scope.project.layers[layerIndex].activate();
-        }
+      if (op.type === 'add' && op.itemData) {
+         const targetLayer = op.layerId ? this.getLayerForRemoteData({ layerId: op.layerId } as any) : this.scope.project.activeLayer;
+         
+         if (targetLayer) {
+           const item = this.scope.project.importJSON(op.itemData) as paper.Item;
+           if (item) {
+              // importJSON adds it to the active layer usually, so we move it to the target layer
+              targetLayer.addChild(item);
+              this.notifyLayersChangedThrottled();
+              
+              // Trigger add broadcast
+              if (this.onDrawingComplete && op.tool) {
+                 // For shape broadcast we usually use notifyDrawingComplete which builds the payload
+                 this.notifyDrawingComplete(item as paper.Path, op.tool);
+              }
+              
+              return { type: 'add', itemId: op.itemId };
+           }
+         }
+      } else if (op.type === 'full_snapshot' || !op.type) {
+         const snapshot = op.snapshot || op;
+         if (typeof snapshot === 'string') {
+           const activeLayerId = this.scope.project.activeLayer?.data.layerId;
+           this.scope.project.clear();
+           this.scope.project.importJSON(snapshot);
+           
+           if (activeLayerId) {
+             const layerIndex = this.findLayerIndex(activeLayerId);
+             if (layerIndex !== -1) {
+               this.scope.project.layers[layerIndex].activate();
+             }
+           }
+           this.transformSystem.clearSelection();
+           this.notifyLayersChanged();
+         }
       }
-      
-      this.transformSystem.clearSelection();
-      this.notifyLayersChanged();
     }
+    return null;
   }
 
   clearCanvas() {
@@ -1789,6 +1903,14 @@ export class PaperDrawingEngine {
     }
   }
 
+  private getLayerForRemoteData(data: any): paper.Layer {
+    if (data && data.layerId) {
+      const layer = this.scope.project.layers.find((l: any) => l.data && l.data.layerId === data.layerId);
+      if (layer) return layer;
+    }
+    return this.scope.project.activeLayer;
+  }
+
   private applyRemoteBrushStroke(data: any) {
     if (!data.points || data.points.length === 0) return;
 
@@ -1808,23 +1930,47 @@ export class PaperDrawingEngine {
     }
 
     path.simplify(10);
-    this.scope.project.activeLayer.addChild(path);
+    this.getLayerForRemoteData(data).addChild(path);
   }
 
   private applyRemoteEraser(data: any) {
     if (!data.points || data.points.length === 0) return;
+
+    console.log('🧹 Applying remote eraser stroke with', data.points.length, 'points');
 
     const eraserPath = new this.scope.Path({
       segments: data.points.map((p: any) => new this.scope.Point(p.x, p.y)),
       strokeWidth: data.strokeWidth || 10
     });
 
+    // performErase now erases across ALL visible layers (professional behavior)
     this.performErase(eraserPath, data.strokeWidth || 10);
     eraserPath.remove();
+    this.notifyLayersChangedThrottled();
   }
 
   private applyRemoteDrawBatchProgress(data: any) {
     if (!data.points || data.points.length === 0 || !data.strokeId) return;
+    
+    if (data.tool === 'eraser') {
+      // For eraser: apply the erase in real-time for immediate visual feedback.
+      // Build a temp path from the new points and erase with it right away.
+      const tempEraserPath = new this.scope.Path({
+        segments: data.points.map((p: any) => new this.scope.Point(p.x, p.y)),
+        strokeWidth: data.strokeWidth || 10
+      });
+      this.performErase(tempEraserPath, data.strokeWidth || 10);
+      tempEraserPath.remove();
+      
+      // Track cumulative eraser path for smooth drawing (used by draw_batch_end cleanup)
+      let eraserTrack = this.activeRemoteStrokes.get(data.strokeId);
+      if (!eraserTrack) {
+        eraserTrack = new this.scope.Path({ visible: false });
+        this.activeRemoteStrokes.set(data.strokeId, eraserTrack);
+      }
+      data.points.forEach((p: any) => eraserTrack!.add(new this.scope.Point(p.x, p.y)));
+      return;
+    }
     
     let path = this.activeRemoteStrokes.get(data.strokeId);
     if (!path) {
@@ -1835,14 +1981,7 @@ export class PaperDrawingEngine {
         strokeJoin: 'round'
       });
       
-      // Give eraser tracks a visible styling
-      if (data.tool === 'eraser') {
-        path.strokeColor = new this.scope.Color('#FFFFFF');
-        path.opacity = 0.5;
-        path.strokeWidth = (data.strokeWidth || 5) * 2;
-      }
-      
-      this.scope.project.activeLayer.addChild(path);
+      this.getLayerForRemoteData(data).addChild(path);
       this.activeRemoteStrokes.set(data.strokeId, path);
     }
     
@@ -1860,9 +1999,7 @@ export class PaperDrawingEngine {
     if (path) {
       path.simplify(10);
       this.activeRemoteStrokes.delete(data.strokeId);
-      // We will let the full 'brush' path data replace this if it arrives later via notifyDrawingComplete.
-      // Alternatively, we can just leave it as is. But PixelTales' notifyDrawingComplete ALSO sends a full 'brush' event.
-      // So let's remove the temporary batched path when the end arrives, because the full 'brush' payload will draw the final simplified path!
+      // Remove the temporary tracking path (for eraser it was invisible anyway)
       path.remove();
     }
   }
@@ -1909,7 +2046,7 @@ export class PaperDrawingEngine {
       
       if (newPath) {
         this.applyRemoteShapeStyle(newPath, data);
-        this.scope.project.activeLayer.addChild(newPath);
+        this.getLayerForRemoteData(data).addChild(newPath);
         this.activeRemoteStrokes.set(data.strokeId, newPath);
       }
     } catch (e) {
@@ -1935,7 +2072,7 @@ export class PaperDrawingEngine {
     );
 
     this.applyRemoteShapeStyle(rect, data);
-    this.scope.project.activeLayer.addChild(rect);
+    this.getLayerForRemoteData(data).addChild(rect);
   }
 
   private applyRemoteCircle(data: any) {
@@ -1951,7 +2088,7 @@ export class PaperDrawingEngine {
     });
 
     this.applyRemoteShapeStyle(ellipse, data);
-    this.scope.project.activeLayer.addChild(ellipse);
+    this.getLayerForRemoteData(data).addChild(ellipse);
   }
 
   private applyRemoteLine(data: any) {
@@ -1971,7 +2108,7 @@ export class PaperDrawingEngine {
       line.data = { id: data.itemId, itemId: data.itemId };
     }
 
-    this.scope.project.activeLayer.addChild(line);
+    this.getLayerForRemoteData(data).addChild(line);
   }
 
   private applyRemoteTriangle(data: any) {
@@ -1986,7 +2123,7 @@ export class PaperDrawingEngine {
     triangle.closed = true;
 
     this.applyRemoteShapeStyle(triangle, data);
-    this.scope.project.activeLayer.addChild(triangle);
+    this.getLayerForRemoteData(data).addChild(triangle);
   }
 
   private applyRemoteStar(data: any) {
@@ -2011,7 +2148,7 @@ export class PaperDrawingEngine {
     starPath.closed = true;
 
     this.applyRemoteShapeStyle(starPath, data);
-    this.scope.project.activeLayer.addChild(starPath);
+    this.getLayerForRemoteData(data).addChild(starPath);
   }
 
   private applyRemoteHeart(data: any) {
@@ -2026,7 +2163,7 @@ export class PaperDrawingEngine {
           heart.data = { id: data.itemId, itemId: data.itemId };
         }
         
-        this.scope.project.activeLayer.addChild(heart);
+        this.getLayerForRemoteData(data).addChild(heart);
         console.log('✅ Heart shape imported from pathData');
         return;
       }
@@ -2059,7 +2196,7 @@ export class PaperDrawingEngine {
     heart.closed = true;
 
     this.applyRemoteShapeStyle(heart, data);
-    this.scope.project.activeLayer.addChild(heart);
+    this.getLayerForRemoteData(data).addChild(heart);
   }
 
   private applyRemoteArrow(data: any) {
@@ -2074,7 +2211,7 @@ export class PaperDrawingEngine {
           arrow.data = { id: data.itemId, itemId: data.itemId };
         }
         
-        this.scope.project.activeLayer.addChild(arrow);
+        this.getLayerForRemoteData(data).addChild(arrow);
         console.log('✅ Arrow shape imported from pathData');
         return;
       }
@@ -2120,7 +2257,7 @@ export class PaperDrawingEngine {
     }
     
     group.opacity = data.opacity || 1;
-    this.scope.project.activeLayer.addChild(group);
+    this.getLayerForRemoteData(data).addChild(group);
   }
 
   private applyRemoteText(data: any) {
@@ -2136,7 +2273,7 @@ export class PaperDrawingEngine {
       justification: data.textAlign || 'left'
     });
 
-    this.scope.project.activeLayer.addChild(text);
+    this.getLayerForRemoteData(data).addChild(text);
   }
 
   private applyRemoteFill(data: any) {
@@ -2559,16 +2696,19 @@ export class PaperDrawingEngine {
    * Apply remote undo operation
    */
   applyRemoteUndo() {
-    console.log('📥 Applying remote undo');
-    this.undo();
+    // Remote undo now propagates as 'delete_item' via onDrawingComplete → CollaborationEnhancer.
+    // This method is kept for backward compatibility but does nothing — acting on a remote
+    // undo by popping the local stack would corrupt local history.
+    console.log('📥 Remote undo received — handled via delete_item channel');
   }
   
   /**
    * Apply remote redo operation
    */
   applyRemoteRedo() {
-    console.log('📥 Applying remote redo');
-    this.redo();
+    // Remote redo propagates as a new 'draw' event via onDrawingComplete → collaborationService.sendDrawing.
+    // Same reasoning as applyRemoteUndo — no local stack manipulation.
+    console.log('📥 Remote redo received — handled via draw channel');
   }
   
   private notifyLayersChangedThrottled() {

@@ -720,6 +720,12 @@ const CanvasDrawingPage: React.FC = () => {
                   // Keep data in nested 'data' key for compatibility with handleRemoteDrawBatch
                   data: enhancedData
                 }], enhancedData.page_id, enhancedData.page_index, enhancedData.is_cover_image);
+              } else if (data.type === 'delete' && data.itemId) {
+                // Undo triggered a delete — broadcast via CollaborationEnhancer so it uses the correct page context
+                if (collaborationEnhancerRef.current) {
+                  collaborationEnhancerRef.current.sendDelete(data.itemId);
+                  console.log('📤 Undo: delete broadcast for item:', data.itemId);
+                }
               } else {
                 collaborationService.sendDrawing(enhancedData);
               }
@@ -1190,35 +1196,27 @@ const CanvasDrawingPage: React.FC = () => {
 
   const handleUndo = () => {
     if (drawingEngineRef.current) {
+      // Engine returns { type: 'delete', itemId } for 'add' ops — the delete is broadcast
+      // via onDrawingComplete → collaborationEnhancerRef.sendDelete automatically.
       drawingEngineRef.current.undo();
-
-      // Broadcast undo to collaborators
-      if (isCollaborating && collaborationService.isConnected()) {
-        // Note: Undo/redo sync can be complex and may cause conflicts
-        // For now, we just notify - full implementation would need operation IDs
-        console.log('🔄 Undo performed (not synced in collaboration mode)');
-      }
     }
   };
 
   const handleRedo = () => {
     if (drawingEngineRef.current) {
+      // Engine re-adds the item and broadcasts it via onDrawingComplete automatically.
       drawingEngineRef.current.redo();
-
-      // Broadcast redo to collaborators
-      if (isCollaborating && collaborationService.isConnected()) {
-        console.log('🔄 Redo performed (not synced in collaboration mode)');
-      }
     }
   };
 
   const handleClear = () => {
+    // Deprecated: use handleClearCanvas which shows a warning modal first.
+    // Kept only for internal use as the confirmed-clear action.
     if (drawingEngineRef.current) {
       drawingEngineRef.current.clearCanvas();
 
       // Broadcast clear to collaborators with page information
       if (isCollaborating && collaborationService.isConnected()) {
-        // Send enhanced clear data for cross-page sync
         collaborationService.clearCanvas(
           isCoverImage ? 'cover_image' : (pageId || `page_${pageIndex}`),
           isCoverImage ? -1 : (pageIndex !== undefined ? pageIndex : 0),
@@ -1809,6 +1807,9 @@ const CanvasDrawingPage: React.FC = () => {
       if (shouldApplyClear) {
         console.log('✅ Applying remote clear from same canvas');
         drawingEngineRef.current.applyRemoteClear();
+        // Friendly toast so collaborators aren't surprised by a sudden blank canvas
+        const clearedBy = message.username || message.user?.username || 'A collaborator';
+        showInfoToast(`🧹 ${clearedBy} cleared the canvas`);
       } else {
         console.log('❌ Ignoring clear from different canvas');
       }
@@ -2140,6 +2141,16 @@ const CanvasDrawingPage: React.FC = () => {
   const handleConfirmClear = () => {
     if (drawingEngineRef.current) {
       drawingEngineRef.current.clearCanvas();
+
+      // Broadcast to collaborators so everyone's canvas is cleared
+      if (isCollaborating && collaborationService.isConnected()) {
+        collaborationService.clearCanvas(
+          isCoverImage ? 'cover_image' : (pageId || `page_${pageIndex}`),
+          isCoverImage ? -1 : (pageIndex !== undefined ? pageIndex : 0),
+          isCoverImage || false
+        );
+        console.log('📤 Clear canvas broadcasted to collaborators');
+      }
     }
     setShowClearConfirmModal(false);
   };
@@ -3979,9 +3990,17 @@ const CanvasDrawingPage: React.FC = () => {
                 </button>
               </div>
               <div className="canvas-studio-modal-content">
-                <p style={{ marginBottom: '1.5rem', color: '#64748b' }}>
-                  This will permanently delete all your drawings on this canvas. This action cannot be undone.
-                </p>
+                {isCollaborating ? (
+                  <p style={{ marginBottom: '1.5rem', color: '#64748b' }}>
+                    🤝 You're in a collaboration session. This will clear the canvas for{' '}
+                    <strong>everyone</strong> in the session — all drawings by all collaborators
+                    will be removed. This cannot be undone.
+                  </p>
+                ) : (
+                  <p style={{ marginBottom: '1.5rem', color: '#64748b' }}>
+                    This will permanently delete all your drawings on this canvas. This action cannot be undone.
+                  </p>
+                )}
                 <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
                   <button
                     className="canvas-studio-btn-secondary"
@@ -3993,7 +4012,7 @@ const CanvasDrawingPage: React.FC = () => {
                     className="canvas-studio-btn-danger"
                     onClick={handleConfirmClear}
                   >
-                    Clear Canvas
+                    {isCollaborating ? 'Clear for Everyone' : 'Clear Canvas'}
                   </button>
                 </div>
               </div>
