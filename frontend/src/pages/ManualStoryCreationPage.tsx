@@ -3,12 +3,15 @@ import ReactDOM from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useStoryStore } from '../stores/storyStore';
 import { useCreationStore } from '../stores/creationStore';
+import { useAuthStore } from '../stores/authStore';
 import SaveStoryModal from '../components/story/SaveStoryModal';
+import GuestGateModal from '../components/ui/GuestGateModal';
 import { VoiceFilteredInput } from '../components/common/VoiceFilteredInput';
 import { VoiceFilteredTextarea } from '../components/common/VoiceFilteredTextarea';
 import { collaborationService } from '../services/collaborationService';
 import { getCollaborationSession } from '../services/collaborationApi';
 import { storyApiService } from '../services/storyApiService';
+import { pdfExportService } from '../services/pdfExportService';
 import { apiConfigService } from '../services/apiConfig.service';
 import { CollaborationInviteModal } from '../components/collaboration/CollaborationInviteModal';
 import { ActiveSessionInviteModal } from '../components/collaboration/ActiveSessionInviteModal';
@@ -84,6 +87,12 @@ const ManualStoryCreationPage: React.FC = () => {
 
   const { addSkillPoints, updateAchievementProgress } = useCreationStore();
   const { showInfoToast } = useToastContext();
+  const { isAuthenticated, user: authUser } = useAuthStore();
+
+  // Soft wall: guests may draw and write freely, but saving requires an account
+  const isGuest = !isAuthenticated || authUser?.id === 'anonymous';
+  const [showGuestSaveGate, setShowGuestSaveGate] = useState(false);
+  const [showGuestAIGate, setShowGuestAIGate] = useState(false);
 
   const [storyTitle, setStoryTitle] = useState('');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -1564,6 +1573,11 @@ const ManualStoryCreationPage: React.FC = () => {
   const hasCoverImage = currentStory ? !!currentStory.coverImage : false;
 
   const handleSaveClick = async () => {
+    // Soft wall: guests hit the sign-in gate at the moment of value
+    if (isGuest) {
+      setShowGuestSaveGate(true);
+      return;
+    }
     if (isCollaborating && currentSessionId) {
       try {
         await collaborationService.initiateVote();
@@ -1575,6 +1589,41 @@ const ManualStoryCreationPage: React.FC = () => {
     } else {
       setShowSaveModal(true);
     }
+  };
+
+  /**
+   * Soft wall: let guests export their work as a PDF so they never lose it.
+   * Builds an exportable story (with canvas images inlined) and downloads
+   * on web / shares via the native sheet on mobile.
+   */
+  const handleGuestPdfDownload = async () => {
+    if (!currentStory) return;
+
+    const exportableStory = {
+      id: currentStory.id,
+      title: storyTitle || currentStory.title || 'My Story',
+      author: 'Guest Artist',
+      category: currentStory.genre,
+      genres: currentStory.tags,
+      language: currentStory.language,
+      pages: currentStory.pages.map((page) => {
+        // Resolve canvas image: prefer live canvas store, fall back to page data
+        const raw = getCanvasData(currentStory.id, page.id) || page.canvasData;
+        const canvasData = typeof raw === 'object' && raw !== null
+          ? (raw as any).canvasDataUrl || (raw as any).canvasData || (raw as any).lastRemoteDrawing
+          : raw;
+        return { text: page.text, canvasData };
+      }),
+      coverImage: currentStory.coverImage,
+      createdAt: currentStory.createdAt ? new Date(currentStory.createdAt) : new Date(),
+      lastModified: new Date(),
+    };
+
+    await pdfExportService.exportStoryToPDF(exportableStory, {
+      template: 'classic',
+      printOptimization: 'screen',
+    });
+    console.log('✅ Guest story exported as PDF');
   };
 
   const handleSaveStory = async (genres: string[], description: string, language: string = 'en') => {
@@ -1815,6 +1864,12 @@ const ManualStoryCreationPage: React.FC = () => {
   };
 
   const handleEnhanceText = (type: EnhancementType) => {
+    // Soft wall: AI enhancement costs server resources - account required
+    if (isGuest) {
+      setShowEnhancementDropdown(false);
+      setShowGuestAIGate(true);
+      return;
+    }
     if (!currentPage?.text || currentPage.text.trim().length < 10) {
       showInfoToast('Please write at least 10 characters before enhancing.');
       return;
@@ -2458,6 +2513,23 @@ const ManualStoryCreationPage: React.FC = () => {
         currentLanguage={currentStory?.language || 'en'}
         currentDescription={currentStory?.description || ''}
         storyTitle={storyTitle || 'Untitled Story'}
+      />
+
+      {/* Guest Gates (Soft Wall) */}
+      <GuestGateModal
+        isOpen={showGuestSaveGate}
+        onClose={() => setShowGuestSaveGate(false)}
+        icon="🎨"
+        title="Don't lose your masterpiece!"
+        message="You've created something wonderful! Sign in for free to save this story and keep working on it anytime - or download it as a PDF to keep forever."
+        onDownloadPdf={handleGuestPdfDownload}
+      />
+      <GuestGateModal
+        isOpen={showGuestAIGate}
+        onClose={() => setShowGuestAIGate(false)}
+        icon="✨"
+        title="Unlock AI Superpowers!"
+        message="Create a free account to enhance your writing with AI magic - grammar fixes, story improvements, and more."
       />
 
       {/* Success Notification */}

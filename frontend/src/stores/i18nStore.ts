@@ -19,6 +19,7 @@ const translations: Translations = {
   'nav.games': { en: 'Games', tl: 'Laro' },
   'nav.social': { en: 'Social', tl: 'Sosyal' },
   'nav.profile': { en: 'Profile', tl: 'Propayl' },
+  'nav.signIn': { en: 'Sign In / Sign Up', tl: 'Mag-sign In / Mag-sign Up' },
   
   // Home Page
   'home.title': { en: 'Pixel Tales', tl: 'Pixel Tales' },
@@ -199,6 +200,7 @@ const translations: Translations = {
   'auth.confirmPassword': { en: 'Confirm Password', tl: 'Kumpirmahin ang Password' },
   'auth.forgotPassword': { en: 'Forgot password?', tl: 'Nakalimutan ang password?' },
   'auth.continueWithoutAccount': { en: 'Continue without account', tl: 'Magpatuloy nang walang account' },
+  'auth.cancelReturnHome': { en: 'Cancel & Return Home', tl: 'Kanselahin at Bumalik sa Home' },
   'auth.createAccount': { en: 'Create Account', tl: 'Lumikha ng Account' },
   'auth.alreadyHaveAccount': { en: 'Already have an account?', tl: 'Mayroon nang account?' },
   'auth.dontHaveAccount': { en: "Don't have an account?", tl: 'Walang account?' },

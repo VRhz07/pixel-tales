@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useI18nStore } from '../../stores/i18nStore';
+import { useAuthStore } from '../../stores/authStore';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
 import Logo from '../common/Logo';
 
@@ -78,6 +79,7 @@ const DesktopSidebar = () => {
   const location = useLocation();
   const { t } = useI18nStore();
   const { playSound } = useSoundEffects();
+  const { isAuthenticated } = useAuthStore();
 
   return (
     <aside className="pt-sidebar">
@@ -121,6 +123,27 @@ const DesktopSidebar = () => {
 
       {/* ── Footer streak card ───────────────────── */}
       <div className="pt-sidebar-footer">
+        {/* Sign In / Sign Up button - only for anonymous guests (soft wall) */}
+        {!isAuthenticated && (
+          <Link
+            to="/auth"
+            onClick={() => playSound('button-click')}
+            className="pt-sidebar-item"
+            style={{
+              '--item-color': '#8b5cf6',
+              marginBottom: '12px',
+              background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+              borderRadius: '12px',
+            } as React.CSSProperties}
+          >
+            <span className="pt-sidebar-item-icon">
+              <NavIcon name="profile" color="#ffffff" />
+            </span>
+            <span className="pt-sidebar-item-label" style={{ color: '#ffffff', fontWeight: 600 }}>
+              {t('nav.signIn')}
+            </span>
+          </Link>
+        )}
         <div className="pt-sidebar-streak-card">
           <div className="pt-sidebar-streak-row">
             <span className="pt-sidebar-streak-emoji">✨</span>

@@ -7,6 +7,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useNavigationStore } from '../../stores/navigationStore';
 import { useI18nStore } from '../../stores/i18nStore';
+import { useAuthStore } from '../../stores/authStore';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
 
 type LibraryType = 'public' | 'private';
@@ -15,8 +16,13 @@ const LibraryPage = () => {
   const { libraryActiveTab, libraryScrollPosition, setLibraryActiveTab, setLibraryScrollPosition } = useNavigationStore();
   const { t } = useI18nStore();
   const { playButtonClick } = useSoundEffects();
+  const { isAuthenticated, user } = useAuthStore();
   const [activeLibrary, setActiveLibrary] = useState<LibraryType>(libraryActiveTab);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Soft wall: anonymous guests can only browse the public library.
+  // The private library (their own saved stories) requires an account.
+  const isGuest = !isAuthenticated || user?.id === 'anonymous';
 
   // Restore scroll position when component mounts
   useEffect(() => {
@@ -56,29 +62,32 @@ const LibraryPage = () => {
 
   return (
     <div className="library-page">
-      {/* Library Navigation */}
-      <div className="library-navigation">
-        <div className="library-nav-tabs">
-          <button
-            className={`library-nav-tab ${activeLibrary === 'public' ? 'active' : ''}`}
-            onClick={() => handleTabChange('public')}
-          >
-            <GlobeAltIcon className="h-5 w-5" />
-            <span>{t('library.discover')}</span>
-          </button>
-          <button
-            className={`library-nav-tab ${activeLibrary === 'private' ? 'active' : ''}`}
-            onClick={() => handleTabChange('private')}
-          >
-            <LockClosedIcon className="h-5 w-5" />
-            <span>{t('library.title')}</span>
-          </button>
+      {/* Library Navigation - hidden for guests (public library only) */}
+      {!isGuest && (
+        <div className="library-navigation">
+          <div className="library-nav-tabs">
+            <button
+              className={`library-nav-tab ${activeLibrary === 'public' ? 'active' : ''}`}
+              onClick={() => handleTabChange('public')}
+            >
+              <GlobeAltIcon className="h-5 w-5" />
+              <span>{t('library.discover')}</span>
+            </button>
+            <button
+              className={`library-nav-tab ${activeLibrary === 'private' ? 'active' : ''}`}
+              onClick={() => handleTabChange('private')}
+            >
+              <LockClosedIcon className="h-5 w-5" />
+              <span>{t('library.title')}</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Library Content */}
+      {/* Library Content - guests always get the public library, even if a
+          previous session persisted 'private' as the active tab */}
       <div className="library-content" ref={scrollContainerRef}>
-        {activeLibrary === 'public' ? (
+        {isGuest || activeLibrary === 'public' ? (
           <PublicLibraryPage />
         ) : (
           <PrivateLibraryPage />

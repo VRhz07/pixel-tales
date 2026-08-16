@@ -12,7 +12,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (!isAuthenticated) {
     // Redirect to auth page, but save the attempted location
-    return <Navigate to="/auth" state={{ from: location }} replace />;
+    // reason: 'auth-required' tells AuthPage this was a guard redirect (prevents guest-mode loops)
+    return <Navigate to="/auth" state={{ from: location, reason: 'auth-required' }} replace />;
   }
 
   return <>{children}</>;

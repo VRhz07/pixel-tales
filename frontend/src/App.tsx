@@ -612,12 +612,12 @@ function AppContent() {
           </AnonymousRoute>
         } />
         <Route path="/create-story-manual" element={
-          <AnonymousRoute requireAuth={true}>
+          <AnonymousRoute>
             <ManualStoryCreationPage />
           </AnonymousRoute>
         } />
         <Route path="/canvas-drawing" element={
-          <AnonymousRoute requireAuth={true}>
+          <AnonymousRoute>
             <CanvasDrawingPage />
           </AnonymousRoute>
         } />
@@ -674,7 +674,7 @@ function AppContent() {
             <GamePlayPage />
           </AnonymousRoute>
         } />
-        <Route path="/" element={<AuthPage />} />
+        <Route path="/" element={<Navigate to="/home" replace />} />
         </Routes>
       </Suspense>
       {showBottomNav && <BottomNav />}

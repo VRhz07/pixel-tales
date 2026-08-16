@@ -31,7 +31,8 @@ const ParentRoute: React.FC<ParentRouteProps> = ({ children }) => {
 
   // Check if user is authenticated
   if (!isAuthenticated) {
-    return <Navigate to="/auth" state={{ from: location }} replace />;
+    // reason: 'auth-required' tells AuthPage this was a guard redirect (prevents guest-mode loops)
+    return <Navigate to="/auth" state={{ from: location, reason: 'auth-required' }} replace />;
   }
 
   // SECURITY FIX: Check the ACTUAL logged-in user type, not the viewed profile

@@ -5,6 +5,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import api from '../services/api';
 import gamesCacheService from '../services/gamesCache.service';
 import { useThemeStore } from '../stores/themeStore';
+import { useAuthStore } from '../stores/authStore';
 import { useSoundEffects } from '../hooks/useSoundEffects';
 import './GamePlayPage.css';
 
@@ -32,6 +33,10 @@ const GamePlayPage: React.FC = () => {
   const location = useLocation();
   const { isDarkMode } = useThemeStore();
   const { playButtonClick, playSuccess, playError, playAchievement, playSound } = useSoundEffects();
+  const { isAuthenticated, user } = useAuthStore();
+
+  // Soft wall: guests can play games locally, but progress is never saved
+  const isGuest = !isAuthenticated || user?.id === 'anonymous';
   
   const [gameData, setGameData] = useState<GameData | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -230,6 +235,37 @@ const GamePlayPage: React.FC = () => {
         return;
       }
       
+      // Guest mode: play locally via the public preview endpoint.
+      // No game attempt is created on the backend, so no progress is saved.
+      if (isGuest) {
+        console.log('👁️ Guest mode: loading game preview for local play');
+        const preview = await api.get(`/games/${gameId}/preview/`);
+
+        const guestGameData: GameData = {
+          id: preview.id || preview.game_id || parseInt(gameId!),
+          game_type: preview.game_type,
+          game_type_display: preview.game_type_display || preview.game_type,
+          story_id: preview.story_id || 0,
+          story_title: preview.story_title || '',
+          questions: preview.questions.map((q: any) => ({
+            id: q.id,
+            question_text: q.question_text,
+            options: q.options,
+            correct_answer: q.correct_answer || '',
+            context: q.context,
+            hint: q.hint
+          }))
+        };
+
+        setGameData(guestGameData);
+        // Negative attempt ID = local-only attempt (same convention as offline mode)
+        setAttemptId(-(parseInt(gameId!)));
+        setStartTime(Date.now());
+        setError(null);
+        setLoading(false);
+        return;
+      }
+
       // Check if we should force a new game
       const forceNew = location.state?.forceNew || false;
       console.log('🎮 Starting game with forceNew:', forceNew);
@@ -329,14 +365,17 @@ const GamePlayPage: React.FC = () => {
     
     setIsSubmitting(true);
     try {
-      if (!gamesCacheService.isOnline()) {
-        // Offline mode - store answer locally
-        console.log('📴 Offline: Storing answer locally');
-        gamesCacheService.storePendingProgress(gameData.id, attemptId, [{
-          question_id: currentQuestion.id,
-          answer: userAnswer.trim(),
-          timestamp: Date.now()
-        }]);
+      if (isGuest || !gamesCacheService.isOnline()) {
+        // Guest / offline mode - evaluate locally
+        // (guests: never store pending progress - nothing to sync)
+        console.log(isGuest ? '👁️ Guest mode: evaluating answer locally' : '📴 Offline: Storing answer locally');
+        if (!isGuest) {
+          gamesCacheService.storePendingProgress(gameData.id, attemptId, [{
+            question_id: currentQuestion.id,
+            answer: userAnswer.trim(),
+            timestamp: Date.now()
+          }]);
+        }
         
         // In offline mode, evaluate if we have the correct answer (from offline cache)
         const hasCorrectAnswer = !!currentQuestion.correct_answer;
@@ -385,12 +424,14 @@ const GamePlayPage: React.FC = () => {
     } catch (err) {
       console.error('Error submitting answer:', err);
       
-      // Store offline as fallback
-      gamesCacheService.storePendingProgress(gameData.id, attemptId, [{
-        question_id: currentQuestion.id,
-        answer: userAnswer.trim(),
-        timestamp: Date.now()
-      }]);
+      // Store offline as fallback (not for guests - progress is never saved)
+      if (!isGuest) {
+        gamesCacheService.storePendingProgress(gameData.id, attemptId, [{
+          question_id: currentQuestion.id,
+          answer: userAnswer.trim(),
+          timestamp: Date.now()
+        }]);
+      }
       
       // Evaluate offline if possible
       const hasCorrectAnswer = !!currentQuestion.correct_answer;
@@ -406,7 +447,9 @@ const GamePlayPage: React.FC = () => {
       }
       
       setShowFeedback(true);
-      setError('Answer saved offline - will sync when online');
+      if (!isGuest) {
+        setError('Answer saved offline - will sync when online');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -431,8 +474,8 @@ const GamePlayPage: React.FC = () => {
     } else {
       // Complete the game by calling the backend
       try {
-        // Only call backend if online
-        if (gamesCacheService.isOnline()) {
+        // Only call backend if online and not a guest (guests never save progress)
+        if (!isGuest && gamesCacheService.isOnline()) {
           const response = await api.post('/games/complete/', {
             attempt_id: attemptId
           });
@@ -583,6 +626,17 @@ const GamePlayPage: React.FC = () => {
       
       // Check if all words found
       if (newFoundWords.length === wordsToFind.length) {
+        // Guest mode: complete locally without touching the backend
+        if (isGuest) {
+          console.log('👁️ Guest mode: word search completed locally');
+          const guestTime = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+          setTimeTaken(guestTime);
+          setXpEarned(0); // Guests don't earn XP
+          setTimeout(() => {
+            setIsComplete(true);
+          }, 2000);
+          return;
+        }
         // Submit the completed word search to backend
         try {
           const currentQuestion = gameData!.questions[currentQuestionIndex];
@@ -815,6 +869,40 @@ const GamePlayPage: React.FC = () => {
             </div>
           </div>
           
+          {/* Guest mode notice (soft wall): progress is not saved */}
+          {isGuest && (
+            <div style={{
+              margin: '0 0 16px 0',
+              padding: '14px 18px',
+              background: 'rgba(139, 92, 246, 0.08)',
+              border: '1px solid rgba(139, 92, 246, 0.25)',
+              borderRadius: '14px',
+              textAlign: 'center',
+            }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#6d28d9' }}>
+                👁️ You're playing as a guest — your score won't be saved.
+              </p>
+              <button
+                onClick={() => {
+                  playButtonClick();
+                  navigate('/auth');
+                }}
+                style={{
+                  background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Sign in to save progress & earn XP
+              </button>
+            </div>
+          )}
+
           <div className="completion-buttons">
             <button 
               onClick={() => {
@@ -829,8 +917,10 @@ const GamePlayPage: React.FC = () => {
               onClick={async () => {
                 playButtonClick();
                 try {
-                  // Clear any incomplete attempts
-                  await api.post(`/games/${gameId}/clear_incomplete/`);
+                  // Clear any incomplete attempts (guests never have any)
+                  if (!isGuest) {
+                    await api.post(`/games/${gameId}/clear_incomplete/`);
+                  }
                 } catch (err) {
                   console.error('Error clearing attempt:', err);
                 }

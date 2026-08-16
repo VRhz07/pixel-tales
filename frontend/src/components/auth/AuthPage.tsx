@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { SparklesIcon } from '@heroicons/react/24/solid';
 import SignInForm from './SignInForm';
 import SignUpForm from './SignUpForm';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
+import { useAuthStore } from '../../stores/authStore';
+import { useI18nStore } from '../../stores/i18nStore';
 import Logo from '../common/Logo';
 import DeveloperModeModal from '../settings/DeveloperModeModal';
 import './auth.css';
@@ -12,6 +15,25 @@ const AuthPage: React.FC = () => {
   const { playSound } = useSoundEffects();
   const [showDeveloperMode, setShowDeveloperMode] = useState(false);
   const [logoClickCount, setLogoClickCount] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { continueWithoutAccount } = useAuthStore();
+  const { t } = useI18nStore();
+
+  // Soft wall: if the user was redirected here from a protected page, explain why
+  const redirectReason = (location.state as any)?.reason;
+  const redirectFrom = (location.state as any)?.from?.pathname;
+  const wasBlocked = redirectReason === 'auth-required';
+
+  const handleContinueAsGuest = () => {
+    playSound('button-click');
+    continueWithoutAccount();
+    // If a route guard sent us here (auth-required), navigating back to the
+    // protected page would bounce the guest straight back to /auth - an infinite
+    // loop. They are already a guest cancelling the sign-in prompt, so send
+    // them safely to /home instead.
+    navigate(wasBlocked ? '/home' : (redirectFrom || '/home'), { replace: true });
+  };
   
   // Developer mode trigger - tap logo 5 times
   useEffect(() => {
@@ -72,6 +94,21 @@ const AuthPage: React.FC = () => {
 
         {/* Auth Card */}
         <div className="auth-card">
+          {/* Redirect notice - shown when a guest tried to access a protected page */}
+          {redirectReason === 'auth-required' && (
+            <div style={{
+              margin: '0 0 16px 0',
+              padding: '12px 16px',
+              background: 'rgba(139, 92, 246, 0.1)',
+              border: '1px solid rgba(139, 92, 246, 0.3)',
+              borderRadius: '12px',
+              color: '#6d28d9',
+              fontSize: '14px',
+              textAlign: 'center',
+            }}>
+              🔒 Please sign in or create an account to access this feature and save your work.
+            </div>
+          )}
           {/* Card Header */}
           <div className="auth-card-header">
             <h2 className="auth-card-title">
@@ -109,6 +146,25 @@ const AuthPage: React.FC = () => {
 
           {/* Form Content */}
           {activeTab === 'signin' ? <SignInForm key="signin-form" /> : <SignUpForm key="signup-form" />}
+
+          {/* Continue as Guest - soft wall: let users back out and keep browsing */}
+          <button
+            onClick={handleContinueAsGuest}
+            style={{
+              marginTop: '16px',
+              width: '100%',
+              padding: '12px',
+              background: 'transparent',
+              border: '1px solid rgba(139, 92, 246, 0.4)',
+              borderRadius: '12px',
+              color: '#8b5cf6',
+              fontSize: '15px',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            {wasBlocked ? t('auth.cancelReturnHome') : t('auth.continueWithoutAccount')}
+          </button>
         </div>
       </div>
       

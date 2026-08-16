@@ -195,6 +195,10 @@ export const useAuthStore = create<AuthState>()(
             featureAccess: null,
             userLimits: null,
           });
+          
+          // Soft wall: after sign-out, immediately fall back to an anonymous guest
+          // session so the user is never stuck on a forced login screen.
+          get().continueWithoutAccount();
         }
       },
 
@@ -502,7 +506,10 @@ export const useAuthStore = create<AuthState>()(
           return false;
         }
 
-        console.log('🔐 No stored session found');
+        console.log('🔐 No stored session found - creating anonymous guest session (soft wall)');
+        // Soft wall: instead of leaving user null (which forces a redirect to /auth),
+        // automatically create an anonymous guest session so users can browse freely.
+        get().continueWithoutAccount();
         return false;
       },
 

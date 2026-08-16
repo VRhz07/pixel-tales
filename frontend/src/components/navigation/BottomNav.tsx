@@ -254,12 +254,16 @@ const BottomNav = () => {
   ];
 
   // Define student navigation items
+  // Soft wall: anonymous guests see "Sign In" instead of "Profile"
+  const isAnonymous = !isAuthenticated || user?.id === 'anonymous';
   const studentNavItems = [
     { path: '/home', icon: 'home', label: t('nav.home') },
     { path: '/games', icon: 'games', label: t('nav.games') },
     { path: '/library', icon: 'library', label: t('nav.library') },
     { path: '/social', icon: 'social', label: t('nav.social') },
-    { path: '/profile', icon: 'profile', label: t('nav.profile') },
+    isAnonymous
+      ? { path: '/auth', icon: 'profile', label: t('auth.signIn') }
+      : { path: '/profile', icon: 'profile', label: t('nav.profile') },
   ];
 
   const isTeacherTabActive = (tab: string | null) => {

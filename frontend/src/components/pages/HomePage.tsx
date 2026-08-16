@@ -13,12 +13,13 @@ import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
 import { storage } from '../../utils/storage';
 import Logo from '../common/Logo';
+import GuestGateModal from '../ui/GuestGateModal';
 import StorybookOnboarding, { OnboardingPage } from '../onboarding/StorybookOnboarding';
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { t } = useI18nStore();
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const { setActiveAccount } = useAccountSwitchStore();
   const { playButtonClick } = useSoundEffects();
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
@@ -27,6 +28,9 @@ const HomePage = () => {
   const [isModeSelectionOpen, setIsModeSelectionOpen] = useState(false);
   const [showInviteFriends, setShowInviteFriends] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  // Soft wall: guests see all features, but premium ones show a sign-in gate
+  const isGuest = !isAuthenticated || user?.id === 'anonymous';
+  const [guestGate, setGuestGate] = useState<{ icon: string; title: string; message: string } | null>(null);
   const onlineUsers = useOnlineStatus();
 
   useEffect(() => {
@@ -39,7 +43,8 @@ const HomePage = () => {
   // Set active account state when on home page
   useEffect(() => {
     // SECURITY FIX: Only set account type based on actual authentication, not persisted state
-    if (!user) return;
+    // Anonymous guests have id 'anonymous' (parseInt would produce NaN) - skip account switching
+    if (!user || user.id === 'anonymous') return;
     
     const parentSession = storage.getItemSync('parent_session');
     const userType = user?.profile?.user_type || user?.user_type;
@@ -199,10 +204,22 @@ const HomePage = () => {
             <div 
               onClick={() => {
                 playButtonClick();
+                if (isGuest) {
+                  setGuestGate({
+                    icon: '✨',
+                    title: 'Unlock AI Superpowers!',
+                    message: 'Create a free account to generate magical AI stories with beautiful illustrations.',
+                  });
+                  return;
+                }
                 setIsAIModalOpen(true);
               }}
               className="feature-button ai-story"
+              style={{ position: 'relative' }}
             >
+              {isGuest && (
+                <span style={{ position: 'absolute', top: '8px', right: '10px', fontSize: '14px' }}>🔒</span>
+              )}
               <div className="feature-button-icon-wrapper">
                 <Sparkles className="feature-button-icon" strokeWidth={1.5} />
               </div>
@@ -234,10 +251,22 @@ const HomePage = () => {
               onClick={() => {
                 playButtonClick();
                 console.log('Photo Story button clicked!');
+                if (isGuest) {
+                  setGuestGate({
+                    icon: '📸',
+                    title: 'Unlock Photo Stories!',
+                    message: 'Create a free account to turn your real-life photos into amazing animated stories with AI.',
+                  });
+                  return;
+                }
                 setIsPhotoModalOpen(true);
               }}
               className="feature-button photo-ai"
+              style={{ position: 'relative' }}
             >
+              {isGuest && (
+                <span style={{ position: 'absolute', top: '8px', right: '10px', fontSize: '14px' }}>🔒</span>
+              )}
               <div className="feature-button-icon-wrapper">
                 <Camera className="feature-button-icon" strokeWidth={1.5} />
               </div>
@@ -366,6 +395,15 @@ const HomePage = () => {
         onCollabReady={handleCollabReady}
         onCollabModeSelected={() => {
           setIsModeSelectionOpen(false);
+          // Soft wall: collaboration needs a stable account (friends list, sessions)
+          if (isGuest) {
+            setGuestGate({
+              icon: '🤝',
+              title: 'Storytelling is better together!',
+              message: 'Sign in for free to invite friends and create stories together in real-time.',
+            });
+            return;
+          }
           setIsCollabModeOpen(true);
         }}
         forceCollabSetup={showInviteFriends}
@@ -383,6 +421,17 @@ const HomePage = () => {
           setIsModeSelectionOpen(true);
         }}
       />
+
+      {/* Guest Gate Modal (Soft Wall) - shown when guests tap premium features */}
+      {guestGate && (
+        <GuestGateModal
+          isOpen={true}
+          onClose={() => setGuestGate(null)}
+          icon={guestGate.icon}
+          title={guestGate.title}
+          message={guestGate.message}
+        />
+      )}
     </div>
   );
 };

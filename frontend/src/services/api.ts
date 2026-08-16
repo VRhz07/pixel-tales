@@ -133,9 +133,17 @@ class ApiService {
                                   (refreshError as any).message?.includes('Network Error');
             
             if (!isNetworkError) {
-              // Real auth failure - only then logout
-              this.clearAuth();
-              window.location.href = '/auth';
+              // Soft wall: never hard-kick anonymous guests to /auth.
+              // A guest has no refresh token, so a 401 here simply means
+              // "this endpoint requires an account" - let the request fail
+              // gracefully and keep the guest session (user_data) intact.
+              // Only users with a REAL expired session get logged out.
+              const hasRealSession = !!this.getRefreshToken();
+              if (hasRealSession) {
+                // Real auth failure - only then logout
+                this.clearAuth();
+                window.location.href = '/auth';
+              }
             }
             // If network error, just fail this request but keep user logged in
             

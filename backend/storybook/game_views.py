@@ -21,9 +21,10 @@ class StoryGameViewSet(viewsets.ReadOnlyModelViewSet):
     
     def get_permissions(self):
         """
-        Allow anyone to browse games, but require auth to play
+        Allow anyone to browse games and preview questions (guest mode play),
+        but require auth for actions that save progress (start_game, etc.)
         """
-        if self.action in ['available_stories', 'games_for_story', 'leaderboard']:
+        if self.action in ['available_stories', 'games_for_story', 'leaderboard', 'preview']:
             return [AllowAny()]
         return [IsAuthenticated()]
     
