@@ -37,6 +37,9 @@ process.on('unhandledRejection', (reason: any) => {
 export default defineConfig({
   plugins: [react()],
   base: './',
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
   resolve: {
     alias: {
       '@': '/src',
@@ -45,14 +48,6 @@ export default defineConfig({
   build: {
     // Optimize bundle size for Android
     target: 'es2015',
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.log in production
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.debug', 'console.info'],
-      },
-    },
     rollupOptions: {
       output: {
         // Manual chunk splitting for better caching

@@ -1,9 +1,11 @@
-// Groq AI Service for story text generation
-// Routes through the secure Django backend proxy — API key never exposed to browser.
-// Backend endpoint: POST /api/ai/groq/generate-story/
+import { apiConfigService } from './apiConfig.service';
 
-const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
+const getBackendUrl = () => {
+  const url = apiConfigService.getApiUrl();
+  return url.replace(/\/api$/, '');
+};
+
+const GROQ_MODEL = 'openai/gpt-oss-120b';
 
 export interface GroqGenerationConfig {
   temperature?: number;
@@ -13,7 +15,7 @@ export interface GroqGenerationConfig {
 
 /**
  * Auto-build an imagePrompt for a page without calling any AI.
- * Generate a story using Groq AI (llama-3.3-70b-versatile).
+ * Generate a story using Groq AI (openai/gpt-oss-120b).
  *
  * IMPORTANT: We ask Groq for ONLY story text (title, description,
  * characterDescription, colorScheme, pages[].text).
@@ -42,7 +44,7 @@ export async function generateStoryWithGroq(
   colorScheme: string;
   pages: Array<{ text: string; imagePrompt: string }>;
 }> {
-  const { temperature = 0.85, maxTokens = 2048 } = config;
+  const { temperature = 0.85, maxTokens = 4096 } = config;
   const { genres, artStyle, pageCount, language } = options;
 
   const langInstruction =
@@ -112,7 +114,7 @@ Rules:
   console.log('[Groq] Model:', GROQ_MODEL);
 
   const token = localStorage.getItem('access_token');
-  const response = await fetch(`${BACKEND_URL}/api/ai/groq/generate-story/`, {
+  const response = await fetch(`${getBackendUrl()}/api/ai/groq/generate-story/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

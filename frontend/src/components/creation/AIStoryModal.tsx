@@ -232,7 +232,7 @@ Make sure EVERY page's imagePrompt:
                 pageCount: formData.pageCount,
                 language: formData.storyLanguage,
               },
-              { temperature: 0.85, maxTokens: 2048 }
+              { temperature: 0.85, maxTokens: 4096 }
             );
             console.log('[Groq] storyData ready:', storyData.pages?.length, 'pages');
           } else {
@@ -249,7 +249,7 @@ Make sure EVERY page's imagePrompt:
               pageCount: formData.pageCount,
               language: formData.storyLanguage,
             },
-            { temperature: 0.85, maxTokens: 2048 }
+            { temperature: 0.85, maxTokens: 4096 }
           );
           console.log('[OpenRouter] storyData ready:', storyData.pages?.length, 'pages');
         }

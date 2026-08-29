@@ -114,8 +114,8 @@ export const checkPollinationsHealth = async (): Promise<boolean> => {
  */
 const pollPredictionStatus = async (
   predictionId: string,
-  maxAttempts: number = 30,
-  delayMs: number = 1000
+  maxAttempts: number = 60,
+  delayMs: number = 1500
 ): Promise<string | null> => {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {

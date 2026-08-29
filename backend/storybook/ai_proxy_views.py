@@ -383,10 +383,12 @@ def generate_image_with_replicate(request):
             )
         
         # Model mapping for Replicate
+        # NOTE: Always use owner/name:version format so predictions.create(version=...) is used.
+        # This is required for compatibility with the installed replicate SDK version.
         model_map = {
-            'flux-schnell': 'black-forest-labs/flux-schnell',  # Fast & Free
-            'flux-dev': 'black-forest-labs/flux-dev',  # Better quality
-            'flux-pro': 'black-forest-labs/flux-pro',  # Best (paid)
+            'flux-schnell': 'black-forest-labs/flux-schnell:c846a69991daf4c0e5d016514849d14ee5b2e6846ce6b9d6f21369e564cfe51e',
+            'flux-dev': 'black-forest-labs/flux-dev:a62e421f21ac7db47e0ddadaed5c9d37dd5b0e3f53a20a5e0f7d72a89af9c84f',
+            'flux-pro': 'black-forest-labs/flux-pro',  # No public version hash — kept as-is
             'stable-diffusion': 'stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf',
             'sdxl': 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b',
         }

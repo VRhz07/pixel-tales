@@ -147,126 +147,170 @@ class HybridStorageAdapter {
    * Extract images from state before localStorage save
    * Returns state without images and saves images to IndexedDB
    */
+  /**
+   * Extract images from a single story object and save to IndexedDB
+   */
+  private async extractSingleStory(story: any): Promise<any> {
+    if (!story) return story;
+    const newStory = { ...story };
+
+    // Extract cover image
+    if (story.coverImage && typeof story.coverImage === 'string' && story.coverImage.startsWith('data:')) {
+      await this.saveImage(story.id, 'cover', 'cover', story.coverImage);
+      newStory.coverImage = '__INDEXED_DB__'; // Placeholder
+    }
+
+    // Extract cover image objects
+    if (story.coverImageDrawingState) {
+      await this.saveImage(story.id, 'cover', 'cover_state', story.coverImageDrawingState);
+      newStory.coverImageDrawingState = '__INDEXED_DB__';
+    }
+    if (story.coverImageOperations) {
+      await this.saveImage(story.id, 'cover', 'cover_operations', story.coverImageOperations);
+      newStory.coverImageOperations = '__INDEXED_DB__';
+    }
+
+    // Extract page images
+    if (story.pages && Array.isArray(story.pages)) {
+      newStory.pages = await Promise.all(
+        story.pages.map(async (page: any) => {
+          const newPage = { ...page };
+          
+          if (page.canvasData && typeof page.canvasData === 'string' && page.canvasData.startsWith('data:')) {
+            await this.saveImage(story.id, page.id, 'page', page.canvasData);
+            newPage.canvasData = '__INDEXED_DB__'; // Placeholder
+          }
+          
+          if (page.canvasDrawingState) {
+            await this.saveImage(story.id, page.id, 'page_state', page.canvasDrawingState);
+            newPage.canvasDrawingState = '__INDEXED_DB__';
+          }
+          
+          if (page.canvasOperations) {
+            await this.saveImage(story.id, page.id, 'page_operations', page.canvasOperations);
+            newPage.canvasOperations = '__INDEXED_DB__';
+          }
+          
+          return newPage;
+        })
+      );
+    }
+
+    return newStory;
+  }
+
+  /**
+   * Restore images to a single story object from IndexedDB
+   */
+  private async restoreSingleStory(story: any): Promise<any> {
+    if (!story) return story;
+    const newStory = { ...story };
+
+    // Restore cover image
+    if (story.coverImage === '__INDEXED_DB__') {
+      const coverData = await this.getImage(story.id, 'cover', 'cover');
+      newStory.coverImage = coverData || undefined;
+    }
+
+    if (story.coverImageDrawingState === '__INDEXED_DB__') {
+      const coverState = await this.getImage(story.id, 'cover', 'cover_state');
+      newStory.coverImageDrawingState = coverState || undefined;
+    }
+    
+    if (story.coverImageOperations === '__INDEXED_DB__') {
+      const coverOps = await this.getImage(story.id, 'cover', 'cover_operations');
+      newStory.coverImageOperations = coverOps || undefined;
+    }
+
+    // Restore page images
+    if (story.pages && Array.isArray(story.pages)) {
+      newStory.pages = await Promise.all(
+        story.pages.map(async (page: any) => {
+          const newPage = { ...page };
+          
+          if (page.canvasData === '__INDEXED_DB__') {
+            const pageData = await this.getImage(story.id, page.id, 'page');
+            newPage.canvasData = pageData || undefined;
+          }
+          
+          if (page.canvasDrawingState === '__INDEXED_DB__') {
+            const pageState = await this.getImage(story.id, page.id, 'page_state');
+            newPage.canvasDrawingState = pageState || undefined;
+          }
+          
+          if (page.canvasOperations === '__INDEXED_DB__') {
+            const pageOps = await this.getImage(story.id, page.id, 'page_operations');
+            newPage.canvasOperations = pageOps || undefined;
+          }
+          
+          return newPage;
+        })
+      );
+    }
+
+    return newStory;
+  }
+
+  /**
+   * Extract images from state before localStorage save
+   * Returns state without images and saves images to IndexedDB
+   */
   async extractImages(state: any): Promise<any> {
-    if (!state.userLibraries) return state;
+    if (!state) return state;
 
     const newState = { ...state };
-    newState.userLibraries = { ...state.userLibraries };
 
-    // Process each user's library
-    for (const userId in state.userLibraries) {
-      const library = state.userLibraries[userId];
-      if (!library) continue;
+    // 1. Extract from currentStory if exists
+    if (state.currentStory) {
+      newState.currentStory = await this.extractSingleStory(state.currentStory);
+    }
 
-      const newLibrary = { ...library };
-      
-      // Process stories
-      if (library.stories && Array.isArray(library.stories)) {
-        newLibrary.stories = await Promise.all(
-          library.stories.map(async (story: any) => {
-            const newStory = { ...story };
+    // 2. Extract from userLibraries if exists
+    if (state.userLibraries) {
+      newState.userLibraries = { ...state.userLibraries };
+      for (const userId in state.userLibraries) {
+        const library = state.userLibraries[userId];
+        if (!library) continue;
 
-            // Extract cover image
-            if (story.coverImage && story.coverImage.startsWith('data:')) {
-              await this.saveImage(story.id, 'cover', 'cover', story.coverImage);
-              newStory.coverImage = '__INDEXED_DB__'; // Placeholder
+        const newLibrary = { ...library };
+        
+        if (library.stories && Array.isArray(library.stories)) {
+          newLibrary.stories = await Promise.all(
+            library.stories.map(async (story: any) => this.extractSingleStory(story))
+          );
+        }
+
+        if (library.offlineStories && Array.isArray(library.offlineStories)) {
+          newLibrary.offlineStories = await Promise.all(
+            library.offlineStories.map(async (story: any) => this.extractSingleStory(story))
+          );
+        }
+
+        // Extract character imageData (base64 character images)
+        if (library.characters && Array.isArray(library.characters)) {
+          newLibrary.characters = await Promise.all(
+            library.characters.map(async (character: any) => {
+              if (character.imageData && typeof character.imageData === 'string' && character.imageData.startsWith('data:')) {
+                await this.saveImage(character.id, 'character', 'cover', character.imageData);
+                return { ...character, imageData: '__INDEXED_DB__' };
+              }
+              return character;
+            })
+          );
+        }
+
+        // Strip coverImageThumbnail from storyMetadata to avoid base64 bloat
+        if (library.storyMetadata && Array.isArray(library.storyMetadata)) {
+          newLibrary.storyMetadata = library.storyMetadata.map((meta: any) => {
+            if (meta.coverImageThumbnail && typeof meta.coverImageThumbnail === 'string' && meta.coverImageThumbnail.startsWith('data:')) {
+              return { ...meta, coverImageThumbnail: undefined };
             }
+            return meta;
+          });
+        }
 
-            // Extract cover image objects
-            if (story.coverImageDrawingState) {
-              await this.saveImage(story.id, 'cover', 'cover_state', story.coverImageDrawingState);
-              newStory.coverImageDrawingState = '__INDEXED_DB__';
-            }
-            if (story.coverImageOperations) {
-              await this.saveImage(story.id, 'cover', 'cover_operations', story.coverImageOperations);
-              newStory.coverImageOperations = '__INDEXED_DB__';
-            }
-
-            // Extract page images
-            if (story.pages && Array.isArray(story.pages)) {
-              newStory.pages = await Promise.all(
-                story.pages.map(async (page: any) => {
-                  const newPage = { ...page };
-                  
-                  if (page.canvasData && typeof page.canvasData === 'string' && page.canvasData.startsWith('data:')) {
-                    await this.saveImage(story.id, page.id, 'page', page.canvasData);
-                    newPage.canvasData = '__INDEXED_DB__'; // Placeholder
-                  }
-                  
-                  if (page.canvasDrawingState) {
-                    await this.saveImage(story.id, page.id, 'page_state', page.canvasDrawingState);
-                    newPage.canvasDrawingState = '__INDEXED_DB__';
-                  }
-                  
-                  if (page.canvasOperations) {
-                    await this.saveImage(story.id, page.id, 'page_operations', page.canvasOperations);
-                    newPage.canvasOperations = '__INDEXED_DB__';
-                  }
-                  
-                  return newPage;
-                })
-              );
-            }
-
-            return newStory;
-          })
-        );
+        newState.userLibraries[userId] = newLibrary;
       }
-
-      // Process offline stories
-      if (library.offlineStories && Array.isArray(library.offlineStories)) {
-        newLibrary.offlineStories = await Promise.all(
-          library.offlineStories.map(async (story: any) => {
-            const newStory = { ...story };
-
-            // Extract cover image
-            if (story.coverImage && story.coverImage.startsWith('data:')) {
-              await this.saveImage(story.id, 'cover', 'cover', story.coverImage);
-              newStory.coverImage = '__INDEXED_DB__';
-            }
-
-            // Extract cover image objects
-            if (story.coverImageDrawingState) {
-              await this.saveImage(story.id, 'cover', 'cover_state', story.coverImageDrawingState);
-              newStory.coverImageDrawingState = '__INDEXED_DB__';
-            }
-            if (story.coverImageOperations) {
-              await this.saveImage(story.id, 'cover', 'cover_operations', story.coverImageOperations);
-              newStory.coverImageOperations = '__INDEXED_DB__';
-            }
-
-            // Extract page images
-            if (story.pages && Array.isArray(story.pages)) {
-              newStory.pages = await Promise.all(
-                story.pages.map(async (page: any) => {
-                  const newPage = { ...page };
-                  
-                  if (page.canvasData && typeof page.canvasData === 'string' && page.canvasData.startsWith('data:')) {
-                    await this.saveImage(story.id, page.id, 'page', page.canvasData);
-                    newPage.canvasData = '__INDEXED_DB__';
-                  }
-
-                  if (page.canvasDrawingState) {
-                    await this.saveImage(story.id, page.id, 'page_state', page.canvasDrawingState);
-                    newPage.canvasDrawingState = '__INDEXED_DB__';
-                  }
-                  
-                  if (page.canvasOperations) {
-                    await this.saveImage(story.id, page.id, 'page_operations', page.canvasOperations);
-                    newPage.canvasOperations = '__INDEXED_DB__';
-                  }
-                  
-                  return newPage;
-                })
-              );
-            }
-
-            return newStory;
-          })
-        );
-      }
-
-      newState.userLibraries[userId] = newLibrary;
     }
 
     return newState;
@@ -276,125 +320,51 @@ class HybridStorageAdapter {
    * Restore images from IndexedDB after localStorage load
    */
   async restoreImages(state: any): Promise<any> {
-    if (!state.userLibraries) return state;
+    if (!state) return state;
 
     const newState = { ...state };
-    newState.userLibraries = { ...state.userLibraries };
 
-    // Process each user's library
-    for (const userId in state.userLibraries) {
-      const library = state.userLibraries[userId];
-      if (!library) continue;
+    // 1. Restore currentStory if exists
+    if (state.currentStory) {
+      newState.currentStory = await this.restoreSingleStory(state.currentStory);
+    }
 
-      const newLibrary = { ...library };
-      
-      // Process stories
-      if (library.stories && Array.isArray(library.stories)) {
-        newLibrary.stories = await Promise.all(
-          library.stories.map(async (story: any) => {
-            const newStory = { ...story };
+    // 2. Restore userLibraries if exists
+    if (state.userLibraries) {
+      newState.userLibraries = { ...state.userLibraries };
+      for (const userId in state.userLibraries) {
+        const library = state.userLibraries[userId];
+        if (!library) continue;
 
-            // Restore cover image
-            if (story.coverImage === '__INDEXED_DB__') {
-              const coverData = await this.getImage(story.id, 'cover', 'cover');
-              newStory.coverImage = coverData || undefined;
-            }
+        const newLibrary = { ...library };
+        
+        if (library.stories && Array.isArray(library.stories)) {
+          newLibrary.stories = await Promise.all(
+            library.stories.map(async (story: any) => this.restoreSingleStory(story))
+          );
+        }
 
-            if (story.coverImageDrawingState === '__INDEXED_DB__') {
-              const coverState = await this.getImage(story.id, 'cover', 'cover_state');
-              newStory.coverImageDrawingState = coverState || undefined;
-            }
-            
-            if (story.coverImageOperations === '__INDEXED_DB__') {
-              const coverOps = await this.getImage(story.id, 'cover', 'cover_operations');
-              newStory.coverImageOperations = coverOps || undefined;
-            }
+        if (library.offlineStories && Array.isArray(library.offlineStories)) {
+          newLibrary.offlineStories = await Promise.all(
+            library.offlineStories.map(async (story: any) => this.restoreSingleStory(story))
+          );
+        }
 
-            // Restore page images
-            if (story.pages && Array.isArray(story.pages)) {
-              newStory.pages = await Promise.all(
-                story.pages.map(async (page: any) => {
-                  const newPage = { ...page };
-                  
-                  if (page.canvasData === '__INDEXED_DB__') {
-                    const pageData = await this.getImage(story.id, page.id, 'page');
-                    newPage.canvasData = pageData || undefined;
-                  }
-                  
-                  if (page.canvasDrawingState === '__INDEXED_DB__') {
-                    const pageState = await this.getImage(story.id, page.id, 'page_state');
-                    newPage.canvasDrawingState = pageState || undefined;
-                  }
-                  
-                  if (page.canvasOperations === '__INDEXED_DB__') {
-                    const pageOps = await this.getImage(story.id, page.id, 'page_operations');
-                    newPage.canvasOperations = pageOps || undefined;
-                  }
-                  
-                  return newPage;
-                })
-              );
-            }
+        // Restore character imageData from IndexedDB
+        if (library.characters && Array.isArray(library.characters)) {
+          newLibrary.characters = await Promise.all(
+            library.characters.map(async (character: any) => {
+              if (character.imageData === '__INDEXED_DB__') {
+                const data = await this.getImage(character.id, 'character', 'cover');
+                return { ...character, imageData: data || undefined };
+              }
+              return character;
+            })
+          );
+        }
 
-            return newStory;
-          })
-        );
+        newState.userLibraries[userId] = newLibrary;
       }
-
-      // Process offline stories
-      if (library.offlineStories && Array.isArray(library.offlineStories)) {
-        newLibrary.offlineStories = await Promise.all(
-          library.offlineStories.map(async (story: any) => {
-            const newStory = { ...story };
-
-            // Restore cover image
-            if (story.coverImage === '__INDEXED_DB__') {
-              const coverData = await this.getImage(story.id, 'cover', 'cover');
-              newStory.coverImage = coverData || undefined;
-            }
-
-            if (story.coverImageDrawingState === '__INDEXED_DB__') {
-              const coverState = await this.getImage(story.id, 'cover', 'cover_state');
-              newStory.coverImageDrawingState = coverState || undefined;
-            }
-            
-            if (story.coverImageOperations === '__INDEXED_DB__') {
-              const coverOps = await this.getImage(story.id, 'cover', 'cover_operations');
-              newStory.coverImageOperations = coverOps || undefined;
-            }
-
-            // Restore page images
-            if (story.pages && Array.isArray(story.pages)) {
-              newStory.pages = await Promise.all(
-                story.pages.map(async (page: any) => {
-                  const newPage = { ...page };
-                  
-                  if (page.canvasData === '__INDEXED_DB__') {
-                    const pageData = await this.getImage(story.id, page.id, 'page');
-                    newPage.canvasData = pageData || undefined;
-                  }
-                  
-                  if (page.canvasDrawingState === '__INDEXED_DB__') {
-                    const pageState = await this.getImage(story.id, page.id, 'page_state');
-                    newPage.canvasDrawingState = pageState || undefined;
-                  }
-                  
-                  if (page.canvasOperations === '__INDEXED_DB__') {
-                    const pageOps = await this.getImage(story.id, page.id, 'page_operations');
-                    newPage.canvasOperations = pageOps || undefined;
-                  }
-                  
-                  return newPage;
-                })
-              );
-            }
-
-            return newStory;
-          })
-        );
-      }
-
-      newState.userLibraries[userId] = newLibrary;
     }
 
     return newState;
@@ -448,7 +418,8 @@ class HybridStorageAdapter {
       console.log(`📊 New state size: ${(newSize / 1024 / 1024).toFixed(2)} MB`);
       console.log(`📊 Reduction: ${(((originalSize - newSize) / originalSize) * 100).toFixed(1)}%`);
 
-      // Save back to localStorage
+      // Remove first to free quota, then save the cleaned-up state
+      localStorage.removeItem('story-store');
       localStorage.setItem('story-store', JSON.stringify(storyStore));
       
       console.log('✅ Force extraction complete!');
@@ -584,22 +555,50 @@ export const createHybridStorage = () => {
         console.log('✅ Saved to hybrid storage (metadata in localStorage, images in IndexedDB)');
       } catch (error: any) {
         if (error.name === 'QuotaExceededError') {
-          console.error('❌ LocalStorage quota exceeded even after extracting images!');
-          console.error('State size:', typeof value === 'string' ? value.length : JSON.stringify(value).length, 'bytes');
+          console.warn('⚠️ LocalStorage quota exceeded — starting staged recovery...');
           
-          // Try force extraction as last resort
+          // Stage 1: force-extract all stale images and retry
           try {
-            console.log('🔄 Attempting force extraction as recovery...');
-            await hybridStorage.forceExtractAllImages();
-            console.log('✅ Force extraction completed, retrying save...');
-            // Don't retry - let it fail and user will see the error
-          } catch (extractError) {
-            console.error('❌ Force extraction also failed:', extractError);
+            await hybridStorage.forceExtractAllImages(); // clears & rewrites story-store
+            const retryState = typeof value === 'string' ? JSON.parse(value) : value;
+            const retryStateWithoutImages = await hybridStorage.extractImages(retryState);
+            localStorage.removeItem(name);
+            localStorage.setItem(name, JSON.stringify(retryStateWithoutImages));
+            console.log('✅ Stage 1 recovery successful.');
+            return; // done
+          } catch (_) { /* fall through to stage 2 */ }
+
+          // Stage 2: trim stored stories to the 5 most recent per user and retry
+          try {
+            console.warn('⚠️ Stage 1 failed — trimming stories to reduce state size...');
+            const retryState = typeof value === 'string' ? JSON.parse(value) : value;
+            const trimmed = await hybridStorage.extractImages(retryState);
+            if (trimmed.userLibraries) {
+              for (const uid in trimmed.userLibraries) {
+                const lib = trimmed.userLibraries[uid];
+                if (lib?.stories?.length > 5) lib.stories = lib.stories.slice(-5);
+                if (lib?.offlineStories?.length > 5) lib.offlineStories = lib.offlineStories.slice(-5);
+              }
+            }
+            // Null out currentStory to avoid persisting its full canvas data
+            trimmed.currentStory = null;
+            localStorage.removeItem(name);
+            localStorage.setItem(name, JSON.stringify(trimmed));
+            console.log('✅ Stage 2 recovery successful — state trimmed to last 5 stories.');
+            return;
+          } catch (_) { /* fall through to stage 3 */ }
+
+          // Stage 3: wipe the store entirely — stories will reload from backend
+          try {
+            console.warn('⚠️ Stage 2 failed — wiping story-store. Stories will reload from backend.');
+            localStorage.removeItem(name);
+          } catch (wipeError) {
+            console.error('❌ All recovery stages failed:', wipeError);
           }
         } else {
           console.error('❌ Error saving to hybrid storage:', error);
+          throw error;
         }
-        throw error;
       }
     },
     
