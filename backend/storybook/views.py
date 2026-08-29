@@ -8,9 +8,11 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
 from django.db import transaction
 from django.db.models import Q, Avg
 from django.utils import timezone
+import base64
 import json
 
 from .models import (
@@ -190,6 +192,9 @@ def story_list(request):
     language = request.GET.get('language', '')
     if language:
         stories = stories.filter(language=language)
+    
+    # Prefetch related data to avoid N+1 queries in the serializer
+    stories = stories.prefetch_related('ratings', 'likes', 'comments', 'authors')
     
     # Pagination
     paginator = PageNumberPagination()
@@ -406,16 +411,38 @@ def unpublish_story(request, story_id):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
+def story_cover(request, story_id):
+    """Serve a story's base64-stored cover image as a real image response.
+    Lets list endpoints return a tiny URL instead of a huge data URL.
+    Cached aggressively by the browser/WebView."""
+    story = get_object_or_404(Story, id=story_id)
+    cover = story.cover_image or ''
+    if not cover.startswith('data:image'):
+        # External URL covers are used directly by clients; nothing to serve here
+        return Response({'detail': 'Cover is an external URL'}, status=status.HTTP_404_NOT_FOUND)
+    try:
+        header, b64data = cover.split(',', 1)
+        content_type = header.split(';')[0].replace('data:', '') or 'image/jpeg'
+        image_bytes = base64.b64decode(b64data)
+    except Exception:
+        return Response({'detail': 'Invalid cover image data'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    response = HttpResponse(image_bytes, content_type=content_type)
+    response['Cache-Control'] = 'public, max-age=86400'  # Cache covers for 24h
+    return response
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def user_stories(request, user_id):
     """Get stories by a specific user"""
     user = get_object_or_404(User, id=user_id)
-    stories = Story.objects.filter(author=user, is_published=True).order_by('-date_created')
+    stories = Story.objects.filter(author=user, is_published=True).select_related('author', 'author__profile').prefetch_related('ratings', 'likes', 'comments', 'authors').order_by('-date_created')
     
     paginator = PageNumberPagination()
     paginator.page_size = 12
     result_page = paginator.paginate_queryset(stories, request)
     
-    serializer = StoryListSerializer(result_page, many=True)
+    serializer = StoryListSerializer(result_page, many=True, context={'request': request})
     return paginator.get_paginated_response(serializer.data)
 
 
@@ -612,12 +639,12 @@ def save_story(request, story_id):
 @permission_classes([IsAuthenticated])
 def saved_stories(request):
     """Get user's saved stories"""
-    saved = SavedStory.objects.filter(user=request.user).select_related('story', 'story__author', 'story__author__profile')
+    saved = SavedStory.objects.filter(user=request.user).select_related('story', 'story__author', 'story__author__profile').prefetch_related('story__ratings', 'story__likes', 'story__comments', 'story__authors')
     
     stories = []
     for saved_story in saved:
         story = saved_story.story
-        serializer = StoryListSerializer(story)
+        serializer = StoryListSerializer(story, context={'request': request})
         story_data = serializer.data
         story_data['date_saved'] = saved_story.date_saved
         stories.append(story_data)

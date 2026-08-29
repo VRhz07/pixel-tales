@@ -50,6 +50,7 @@ urlpatterns = [
     path('stories/', views.story_list, name='story_list'),
     path('stories/create/', views.create_story, name='create_story'),
     path('stories/<int:story_id>/', views.story_detail, name='story_detail'),
+    path('stories/<int:story_id>/cover/', views.story_cover, name='story_cover'),
     path('stories/<int:story_id>/stats/', views.story_stats, name='story_stats'),
     path('stories/<int:story_id>/update/', views.update_story, name='update_story'),
     path('stories/<int:story_id>/delete/', views.delete_story, name='delete_story'),

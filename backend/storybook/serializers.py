@@ -321,6 +321,7 @@ class StoryListSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
     comments_count = serializers.SerializerMethodField()
     is_liked_by_user = serializers.SerializerMethodField()
+    cover_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Story
@@ -328,8 +329,39 @@ class StoryListSerializer(serializers.ModelSerializer):
             'id', 'title', 'author_name', 'authors_names', 'summary', 'category', 'genres', 'language',
             'cover_image', 'creation_type', 'is_published', 'date_created', 'date_updated', 'views',
             'average_rating', 'likes_count', 'comments_count', 'is_liked_by_user',
-            'content', 'canvas_data', 'is_collaborative'
+            'is_collaborative'
         ]
+
+    def get_cover_image(self, obj):
+        """Return a small inline JPEG thumbnail for base64-stored covers.
+        Full-size data URLs (~200KB+) make list payloads huge, and plain-HTTP
+        URLs get blocked by the Android WebView. A ~20KB data-URL thumbnail
+        keeps lists fast and renders everywhere. Thumbnails are cached in Redis.
+        External URLs (e.g. Pollinations) are passed through unchanged."""
+        cover = obj.cover_image or ''
+        if not cover.startswith('data:image'):
+            return cover
+
+        from django.core.cache import cache
+        cache_key = f'cover_thumb_{obj.id}_{len(cover)}'
+        thumb = cache.get(cache_key)
+        if thumb:
+            return thumb
+
+        try:
+            import base64, io
+            from PIL import Image
+            header, b64data = cover.split(',', 1)
+            img = Image.open(io.BytesIO(base64.b64decode(b64data)))
+            img = img.convert('RGB')
+            img.thumbnail((400, 400))
+            buf = io.BytesIO()
+            img.save(buf, format='JPEG', quality=70, optimize=True)
+            thumb = 'data:image/jpeg;base64,' + base64.b64encode(buf.getvalue()).decode('ascii')
+            cache.set(cache_key, thumb, timeout=7 * 24 * 3600)  # 7 days
+            return thumb
+        except Exception:
+            return cover  # Fall back to the original if thumbnailing fails
 
     def get_authors_names(self, obj):
         """Get all co-authors names for collaborative stories"""
