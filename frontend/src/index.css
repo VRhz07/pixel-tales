@@ -29453,3 +29453,25 @@ body.dark .magical-home p {
 
 
 
+
+
+/* ============================================
+   MOBILE PERFORMANCE: disable backdrop blur
+   ============================================
+   Full-screen backdrop-filter forces the Android WebView to re-blur the
+   entire page behind the modal on every animation frame, causing visible
+   lag when opening modals (e.g. AI Story). A plain dark overlay looks
+   nearly identical and is dramatically cheaper to render. */
+@media (max-width: 768px) {
+  .modal-overlay {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(0, 0, 0, 0.75) !important;
+  }
+
+  .modal-content,
+  .glassmorphism-modal {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
