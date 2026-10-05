@@ -49,7 +49,7 @@ const AIStoryModal = ({ isOpen, onClose }: AIStoryModalProps) => {
     pageCount: 5, // Default 5 pages
     storyLanguage: language as 'en' | 'tl' // Use current app language
   });
-  const [aiEngine, setAiEngine] = useState<'gemini' | 'groq' | 'openrouter'>('groq'); // Default to Groq (faster)
+  const [aiEngine, setAiEngine] = useState<'gemini' | 'groq'>('groq'); // Default to Groq (faster)
   const [imageModel, setImageModel] = useState<string>('flux-schnell'); // Default to Replicate Flux Schnell
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationStage, setGenerationStage] = useState<string>('');
@@ -213,35 +213,17 @@ Make sure EVERY page's imagePrompt:
       `.trim();
 
       // ── Call the selected AI engine ──────────────────────────────────────────
-      const engineLabel = aiEngine === 'groq' ? '⚡ Groq (Llama)' : aiEngine === 'openrouter' ? '🌐 OpenRouter' : '✨ Gemini';
+      const engineLabel = aiEngine === 'groq' ? '⚡ Groq (Llama)' : '✨ Gemini';
       setGenerationStage(`${engineLabel}: Creating your magical story...`);
       setGenerationProgress(20);
 
       let storyData: any;
 
-      if (aiEngine === 'groq' || aiEngine === 'openrouter') {
+      if (aiEngine === 'groq') {
         // Structured call — generates text ONLY (~1,500 tokens total)
         try {
-          if (aiEngine === 'groq') {
-            const { generateStoryWithGroq } = await import('../../services/groqService');
-            storyData = await generateStoryWithGroq(
-              formData.storyIdea,
-              {
-                genres: formData.selectedGenres.map(id => genres.find(g => g.id === id)?.name || id),
-                artStyle: formData.selectedArtStyle || 'cartoon',
-                pageCount: formData.pageCount,
-                language: formData.storyLanguage,
-              },
-              { temperature: 0.85, maxTokens: 4096 }
-            );
-            console.log('[Groq] storyData ready:', storyData.pages?.length, 'pages');
-          } else {
-            throw new Error("Force OpenRouter"); // Artificial fallback trigger if openrouter selected
-          }
-        } catch (error: any) {
-          console.log(`[AI] ${aiEngine === 'groq' ? 'Groq failed, falling back to ' : 'Using '}OpenRouter...`);
-          const { generateStoryWithOpenRouter } = await import('../../services/openRouterService');
-          storyData = await generateStoryWithOpenRouter(
+          const { generateStoryWithGroq } = await import('../../services/groqService');
+          storyData = await generateStoryWithGroq(
             formData.storyIdea,
             {
               genres: formData.selectedGenres.map(id => genres.find(g => g.id === id)?.name || id),
@@ -251,7 +233,17 @@ Make sure EVERY page's imagePrompt:
             },
             { temperature: 0.85, maxTokens: 4096 }
           );
-          console.log('[OpenRouter] storyData ready:', storyData.pages?.length, 'pages');
+          console.log('[Groq] storyData ready:', storyData.pages?.length, 'pages');
+        } catch (error: any) {
+          console.log('[Groq] Groq failed, falling back to Gemini...');
+          const { generateStoryWithGemini } = await import('../../services/geminiProxyService');
+          const generatedText = await generateStoryWithGemini(fullPrompt, {
+            temperature: 0.9,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 16384,
+          });
+          storyData = parseGeminiJSONResponse(generatedText);
         }
         setGenerationProgress(40);
 
@@ -637,10 +629,8 @@ Make sure EVERY page's imagePrompt:
       playError();
       const errorMessage = error instanceof Error ? error.message : 'Failed to generate story';
       const engineHint = aiEngine === 'groq'
-        ? 'Make sure your Groq API key (VITE_GROQ_API_KEY) is configured correctly.'
-        : aiEngine === 'openrouter'
-        ? 'Make sure your OpenRouter API key (VITE_OPENROUTER_API_KEY) is configured.'
-        : 'Make sure your Gemini API key is configured correctly in the backend.';
+        ? 'Make sure your Groq API key (GROQ_API_KEY) is configured correctly on the backend.'
+        : 'Make sure your Gemini API key is configured correctly on the backend.';
       // Friendly error handling for beta testers hitting concurrency limits
       const isRateLimit = errorMessage.includes('429') || 
                           errorMessage.toLowerCase().includes('too many requests') || 
@@ -821,24 +811,6 @@ Make sure EVERY page's imagePrompt:
                   <span style={{ fontSize: '10px', background: 'rgba(255,255,255,0.25)', borderRadius: '999px', padding: '1px 6px' }}>FAST</span>
                 )}
               </button>
-              {/* OpenRouter Button */}
-              <button
-                id="engine-toggle-openrouter"
-                onClick={() => setAiEngine('openrouter')}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                  padding: '5px 14px', borderRadius: '999px', border: 'none',
-                  cursor: 'pointer', fontSize: '13px', fontWeight: '600',
-                  transition: 'all 0.2s',
-                  background: aiEngine === 'openrouter'
-                    ? 'linear-gradient(135deg, #a855f7, #7e22ce)'
-                    : isDarkMode ? '#374151' : '#e5e7eb',
-                  color: aiEngine === 'openrouter' ? '#fff' : isDarkMode ? '#9ca3af' : '#6b7280',
-                  boxShadow: aiEngine === 'openrouter' ? '0 2px 8px rgba(168,85,247,0.4)' : 'none'
-                }}
-              >
-                <span>🌐</span> OpenRouter
-              </button>
               {/* Gemini Button */}
               <button
                 id="engine-toggle-gemini"
@@ -858,7 +830,7 @@ Make sure EVERY page's imagePrompt:
                 <span>✨</span> Gemini
               </button>
               <span style={{ fontSize: '11px', color: isDarkMode ? '#6b7280' : '#94a3b8', marginLeft: 'auto' }}>
-                {aiEngine === 'groq' ? 'Groq: ultra-fast text (falls back to OpenRouter)' : aiEngine === 'openrouter' ? 'OpenRouter: versatile models' : 'Gemini: detailed text'}
+                {aiEngine === 'groq' ? 'Groq: ultra-fast text (falls back to Gemini)' : 'Gemini: detailed text'}
               </span>
             </div>
 
@@ -896,8 +868,8 @@ Make sure EVERY page's imagePrompt:
               >
                 <option value="pollinations">Free (Pollinations AI - Flux)</option>
                 <option value="flux-schnell">Flux Schnell (Replicate)</option>
-                <option value="flux-dev">Flux Dev (Replicate)</option>
-                <option value="flux-pro">Flux Pro (Replicate)</option>
+                
+                
               </select>
               <span style={{ fontSize: '11px', color: isDarkMode ? '#9ca3af' : '#64748b', marginLeft: 'auto' }}>
                 {imageModel === 'pollinations' ? '✨ Completely free, proxy-auth, fast' : '🎨 High quality, requires Replicate token'}

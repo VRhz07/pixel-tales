@@ -1184,8 +1184,6 @@ Make sure EVERY page's imagePrompt:
                       >
                         <option value="pollinations">Free (Pollinations AI - Flux)</option>
                         <option value="flux-schnell">Flux Schnell (Replicate)</option>
-                        <option value="flux-dev">Flux Dev (Replicate)</option>
-                        <option value="flux-pro">Flux Pro (Replicate)</option>
                       </select>
                       <span style={{ fontSize: '12px', color: isDarkMode ? '#9ca3af' : '#64748b' }}>
                         {imageModel === 'pollinations' ? '✨ Completely free, fast generation' : '🎨 High quality, requires Replicate API token'}

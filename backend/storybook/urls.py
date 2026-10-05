@@ -225,7 +225,6 @@ urlpatterns = [
     path('ai/pollinations/fetch-image/', ai_proxy_views.fetch_pollinations_image, name='fetch_pollinations_image'),
     path('ai/status/', ai_proxy_views.check_ai_service_status, name='check_ai_service_status'),
     path('ai/groq/generate-story/', ai_proxy_views.generate_story_with_groq, name='generate_story_with_groq'),
-    path('ai/openrouter/generate-story/', ai_proxy_views.generate_story_with_openrouter, name='generate_story_with_openrouter'),
     
     # Text-to-Speech Endpoints
     path('tts/synthesize/', tts_views.synthesize_speech, name='synthesize_speech'),

@@ -168,7 +168,7 @@ export const generateImageWithReplicate = async (params: ImageGenerationParams):
       negative: CHILDREN_BOOK_NEGATIVE,
       width,
       height,
-      model, // Pass selected model
+      model: 'flux-schnell', // Force Flux Schnell only
       seed: seed || Math.floor(Math.random() * 1000000),
       async: true, // Use async mode
     });
