@@ -25,7 +25,13 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 if DEBUG:
     ALLOWED_HOSTS = ['*']
 else:
-    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+    raw_hosts = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+    ALLOWED_HOSTS = raw_hosts + [
+        'pixel-tales.onrender.com',
+        '.onrender.com',  # Allow all render subdomains
+        'localhost',
+        '127.0.0.1',
+    ]
 
 # Application definition
 # Daphne must be first for WebSocket support
