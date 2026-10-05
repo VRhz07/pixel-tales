@@ -101,30 +101,28 @@ if DATABASE_URL and DATABASE_URL.startswith('sqlite'):
     }
 elif DATABASE_URL:
     # Strip problematic parameters that cause IPv6 resolution on Render
-    # channel_binding=require forces IPv6 on Neon - remove it
+    # channel_binding=require forces psycopg3 to use IPv6 - must remove it
     clean_db_url = DATABASE_URL
-    if 'channel_binding=require' in clean_db_url:
-        clean_db_url = clean_db_url.replace('&channel_binding=require', '').replace('channel_binding=require&', '').replace('channel_binding=require', '')
-        print(f'[DB] Stripped channel_binding from DATABASE_URL to force IPv4')
-
-    # PostgreSQL or other database URL
-    db_config = dj_database_url.parse(clean_db_url, conn_max_age=0)
+    for param in ['&channel_binding=require', 'channel_binding=require&', 'channel_binding=require']:
+        clean_db_url = clean_db_url.replace(param, '')
     
-    # ULTRA AGGRESSIVE memory optimization for Render free tier with WebSockets
-    db_config['CONN_MAX_AGE'] = 30  # 30 seconds only (minimal pooling)
+    # FORCE psycopg2 engine explicitly at parse time to avoid psycopg3 IPv6 issues
+    # psycopg3 resolves Neon hostnames to IPv6 which Render cannot reach
+    db_config = dj_database_url.parse(
+        clean_db_url,
+        conn_max_age=30,
+        engine='django.db.backends.postgresql',  # Force psycopg2, NOT psycopg3
+    )
+    
+    # Explicitly override engine again to be 100% sure psycopg2 is used
+    db_config['ENGINE'] = 'django.db.backends.postgresql'
     db_config['CONN_HEALTH_CHECKS'] = True
     
-    # Add PostgreSQL-specific optimizations + force IPv4
     if 'postgres' in DATABASE_URL:
-        # Force psycopg2 engine (more reliable IPv4 on Render than psycopg3)
-        db_config['ENGINE'] = 'django.db.backends.postgresql'
         db_config['OPTIONS'] = {
             'connect_timeout': 15,
             'options': '-c statement_timeout=30000',
-            'sslmode': 'require',
         }
-        # Minimal connection pooling
-        db_config['CONN_MAX_AGE'] = 30
     
     DATABASES = {
         'default': db_config
