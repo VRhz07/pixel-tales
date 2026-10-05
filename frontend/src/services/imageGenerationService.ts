@@ -781,31 +781,30 @@ export const generateStoryIllustrationsFromPrompts = async (
     return results;
     
   } else {
-    // Keep sequential processing for Replicate/others to respect rate limits
-    console.log(`🐌 Using SEQUENTIAL generation for ${imageModel} to respect rate limits`);
-    const results: (string | null)[] = [];
+    // With a paid Replicate account (>$5 credit), we can generate images concurrently
+    console.log(`🚀 Using PARALLEL generation for ${imageModel} (Paid Tier Enabled)`);
     
-    for (let index = 0; index < pages.length; index++) {
-      const page = pages[index];
-      
+    // Variables for concurrent progress tracking
+    let completedCount = 0;
+    
+    const generationPromises = pages.map(async (page, index) => {
       if (!page.imagePrompt) {
         console.error(`❌ Page ${index + 1} missing imagePrompt field!`);
-        results.push(null);
-        continue;
-      }
-
-      if (index > 0) {
-        console.log(`⏳ Waiting 10 seconds before requesting page ${index + 1} to respect rate limit...`);
-        await new Promise(resolve => setTimeout(resolve, 10000));
+        return null;
       }
       
       try {
+        const uniqueSeed = (Date.now() % 2147400000) + (index * 10000);
+        
         console.log(`🖼️ Page ${index + 1}/${pages.length}: Starting image generation with model ${imageModel}...`);
         if (onProgress) {
-          onProgress(index + 1, pages.length, `Generating image for page ${index + 1}...`);
+          onProgress(completedCount, pages.length, `Generating ${pages.length} images concurrently...`);
         }
         
-        const uniqueSeed = (Date.now() % 2147400000) + (index * 10000);
+        // Add a small stagger to avoid overwhelming the server at once
+        if (index > 0) {
+          await new Promise(resolve => setTimeout(resolve, index * 500)); 
+        }
         
         const imageUrl = await generateImageWithReplicate({
           prompt: page.imagePrompt,
@@ -818,23 +817,31 @@ export const generateStoryIllustrationsFromPrompts = async (
         });
         
         if (!imageUrl) {
-          console.error(`❌ Page ${index + 1}: Image generation failed (likely rate limit or service error)`);
-          results.push(null);
-          continue;
+          console.error(`❌ Page ${index + 1}: Image generation failed`);
+          completedCount++;
+          return null;
         }
         
         console.log(`📝 Page ${index + 1}: URL received: ${imageUrl.substring(0, 100)}...`);
         console.log(`✅ Page ${index + 1}: Image ready!`);
         
-        results.push(imageUrl);
+        completedCount++;
+        if (onProgress) {
+          onProgress(completedCount, pages.length, `Completed ${completedCount} of ${pages.length} images...`);
+        }
+        
+        return imageUrl;
         
       } catch (error) {
         console.error(`❌ Page ${index + 1}: Error during generation:`, error);
-        results.push(null);
+        completedCount++;
+        return null;
       }
-    }
+    });
     
-    console.log(`🎉 Sequential image generation complete! ${results.filter(r => r !== null).length}/${pages.length} images ready`);
+    const results = await Promise.all(generationPromises);
+    console.log(`🎉 Parallel image generation complete! ${results.filter(r => r !== null).length}/${pages.length} images ready`);
+    
     return results;
   }
 };
