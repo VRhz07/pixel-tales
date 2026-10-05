@@ -4,7 +4,9 @@
  */
 
 const STORAGE_KEY = 'dev_api_url';
-const DEFAULT_API_URL = import.meta.env.VITE_API_BASE_URL || 'https://pixel-tales-yu7cx.ondigitalocean.app/api'; 
+const PRODUCTION_URL = 'https://pixel-tales.onrender.com/api';
+const IS_PRODUCTION = import.meta.env.VITE_DEV_MODE !== 'true' && import.meta.env.VITE_DEV_MODE !== true;
+const DEFAULT_API_URL = import.meta.env.VITE_API_BASE_URL || PRODUCTION_URL;
 
 export interface ApiPreset {
   id: string;
@@ -17,9 +19,9 @@ export interface ApiPreset {
 export const API_PRESETS: ApiPreset[] = [
   {
     id: 'production',
-    name: 'Production Server',
-    url: 'https://pixel-tales-yu7cx.ondigitalocean.app/api',
-    description: 'Live DigitalOcean backend',
+    name: 'Production Server (Render)',
+    url: 'https://pixel-tales.onrender.com/api',
+    description: 'Live Render backend',
     icon: '🌐'
   },
   {
@@ -43,6 +45,21 @@ class ApiConfigService {
    * Get the current API base URL
    */
   getApiUrl(): string {
+    // In production builds, always use the production URL (ignore any saved dev URL)
+    if (IS_PRODUCTION) {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      // Only allow override if it's explicitly a production-like URL (https://)
+      // Clear any leftover local IPs from dev sessions
+      if (saved && (saved.includes('192.168.') || saved.includes('10.0.2.2') || saved.includes('localhost'))) {
+        console.log('[Production] Clearing stale local dev URL from storage:', saved);
+        localStorage.removeItem(STORAGE_KEY);
+      } else if (saved && saved.startsWith('https://')) {
+        console.log('[Production] Using saved production URL:', saved);
+        return saved;
+      }
+      return DEFAULT_API_URL;
+    }
+
     try {
       const customUrl = localStorage.getItem(STORAGE_KEY);
       if (customUrl) {
