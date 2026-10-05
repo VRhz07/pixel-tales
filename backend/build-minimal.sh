@@ -19,6 +19,6 @@ python manage.py collectstatic --no-input
 
 # Run migrations
 echo "🗄️ Running migrations..."
-python manage.py migrate --no-input
+# python manage.py migrate --no-input
 
 echo "✅ Minimal build complete - ~150MB memory used"

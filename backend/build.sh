@@ -21,7 +21,7 @@ python manage.py collectstatic --no-input
 
 # Run migrations
 echo "🗄️ Running database migrations..."
-python manage.py migrate --no-input
+# python manage.py migrate --no-input
 
 # MEMORY OPTIMIZATION: Only run heavy operations if not skipped
 # Set SKIP_HEAVY_BUILD=true in Render environment to skip memory-intensive operations
