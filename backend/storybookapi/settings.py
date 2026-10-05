@@ -121,7 +121,9 @@ elif DATABASE_URL:
     if 'postgres' in DATABASE_URL:
         db_config['OPTIONS'] = {
             'connect_timeout': 15,
-            'options': '-c statement_timeout=30000',
+            'sslmode': 'require',
+            # NOTE: Do NOT include 'options': '-c statement_timeout=...' here
+            # Neon's PgBouncer pooler does NOT support startup parameters like statement_timeout
         }
     
     DATABASES = {
