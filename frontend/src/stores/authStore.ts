@@ -6,6 +6,8 @@ import { apiConfigService } from '@/services/apiConfig.service';
 import type { User, FeatureAccess, UserLimits, ApiError } from '@/types/api.types';
 import { createCapacitorStorage } from '@/utils/capacitorStorage';
 import { storage } from '@/utils/storage';
+import { Preferences } from '@capacitor/preferences';
+import { Capacitor } from '@capacitor/core';
 
 interface AuthState {
   user: User | null;
@@ -293,7 +295,29 @@ export const useAuthStore = create<AuthState>()(
 
       checkAuth: async () => {
         console.log('🔐 Starting checkAuth...');
-        
+
+        // ─── Version Guard: wipe stale sessions on new APK install ───
+        // Capacitor Preferences (Android SharedPreferences) survives reinstalls.
+        // When the app version changes we clear all stored auth so a previous
+        // user's session cannot auto-restore on a fresh install.
+        if (Capacitor.isNativePlatform()) {
+          const APP_VERSION = import.meta.env.VITE_APP_VERSION || '1.0.0';
+          const storedVersion = storage.getItemSync('app_version');
+          if (storedVersion !== APP_VERSION) {
+            console.log(`🔐 Version changed (${storedVersion} → ${APP_VERSION}), clearing stale auth...`);
+            storage.removeItemSync('user_data');
+            storage.removeItemSync('access_token');
+            storage.removeItemSync('refresh_token');
+            storage.removeItemSync('rememberMe');
+            storage.removeItemSync('sessionExpiry');
+            storage.removeItemSync('parent_session');
+            await Preferences.remove({ key: 'auth-storage' });
+            storage.setItemSync('app_version', APP_VERSION);
+            console.log('🔐 Stale auth cleared. Fresh start.');
+          }
+        }
+        // ─────────────────────────────────────────────────────────────
+
         // Check if we have stored auth data
         const storedUser = authService.getUserData();
         const isAuthenticated = authService.isAuthenticated();
