@@ -1,0 +1,17 @@
+name: Keep Backend Alive
+
+on:
+  schedule:
+    - cron: '*/12 * * * *'  # Every 12 minutes (Render sleeps at 15 min)
+  workflow_dispatch:          # Allow manual trigger from GitHub UI
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping PixelTales Backend
+        run: |
+          echo "Pinging backend at $(date)..."
+          curl -f --max-time 30 https://pixeltales-backend.onrender.com/health/ \
+            && echo "✅ Backend is alive" \
+            || echo "⚠️ Backend is waking up (cold start)"
